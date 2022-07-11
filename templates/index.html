@@ -21,10 +21,21 @@
     <h5>Halo</h5>
     <h6>Halo</h6>
 
+    <div class="flex">
+        <span class="text-sm text-slate-800 mr-2">Light</span>
+        <input type="checkbox" id="dark-mode-toggle" class="hidden">
+        <label for="dark-mode-toggle">
+            <div class="w-9 h-5 bg-slate-500 rounded-full flex items-center p-1 cursor-pointer">
+                <div class="w-4 h-4 bg-white rounded-full toggle-circle"></div>
+            </div>
+        </label>
+        <span class="text-sm text-slate-800 ml-2">Dark</span>
+    </div>
+
     <hr class="my-12">
 
     <div class="px-3">
-        <label for="field" class="mb-2 font-semibold text-lg invisible lg:visible">Field</label>
+        <label for="field" class="mb-2 font-semibold text-lg hidden lg:block">Field</label>
 
         <div class="flex">
             <div class="inline-block mr-2">
@@ -36,14 +47,19 @@
             </div>
             
             <div class="inline-block">
-                <input id="field" class="px-1 py-2
+                <input id="field" class="bg-transparent
+                    border-b-[1px] border-solid 
+                    border-b-slate-800
+                    px-1 py-2
                     text-slate-800
                     text-sm
-                    border-b-[1px] border-solid border-b-slate-800
-                    md:text-base
+                    dark:border-b-slate-100
+                    dark:text-slate-100
                     focus:border-b-2
                     focus:text-slate-800
-                    focus:outline-none" 
+                    focus:dark:text-slate-100
+                    focus:outline-none
+                    md:text-base" 
                     type="text" placeholder="Field">
                 
                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-eye inline-block cursor-pointer ml-2 w-4 h-4 
@@ -54,12 +70,21 @@
                 </svg>
 
                 <p class="mt-1 text-xs font-extralight 
-                    invisible invalid:visible
+                    hidden invalid:block
                     md:text-sm">Pesan</p>
             </div>
         </div>
     </div>
 
     <hr class="my-12">
+
+    <script>
+        const checkbox = document.querySelector('#dark-mode-toggle');
+        const html = document.querySelector('html');
+
+        checkbox.addEventListener('click', function(){
+            checkbox.checked ? html.classList.add('dark') : html.classList.remove('dark');
+        });
+    </script>
 </body>
 </html>

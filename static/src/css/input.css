@@ -4,78 +4,85 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;400;600;700&display=swap');
 
-@media screen(sm){
-    @layer base{
-        html{
-            @apply text-slate-800;
-            @apply leading-normal;
-            font-family: 'Inter', sans-serif;
-        }
+@layer base{
+    html{
+        @apply text-sm;
+        @apply bg-neutral-100;
+        @apply text-slate-800;
+        @apply leading-normal;
+        font-family: 'Inter', sans-serif;
+    }
 
+    html.dark{
+        @apply bg-neutral-800;
+        @apply text-slate-100;
+    }
+
+    h1, h2, h3, h4, h5, h6{
+        @apply font-bold;
+    }
+
+    h1{
+        @apply text-base;
+    }
+
+    h2{
+        @apply text-sm;
+    }
+
+    h3{
+        @apply text-xs;
+    }
+
+    @media screen(md){
         body{
-            @apply text-sm;
-        }
-
-        h1, h2, h3, h4, h5, h6{
-            @apply font-bold;
-        }
-
-        h1{
             @apply text-base;
         }
 
+        h1{
+            @apply text-2xl;
+        }
+
         h2{
-            @apply text-sm;
+            @apply text-xl;
         }
 
         h3{
-            @apply text-xs;
+            @apply text-lg;
+        }
+    }
+    
+    @media screen(lg){
+        h1{
+            @apply text-3xl;
         }
 
-        @media screen(md){
-            body{
-                @apply text-base;
-            }
-
-            h1{
-                @apply text-2xl;
-            }
-
-            h2{
-                @apply text-xl;
-            }
-
-            h3{
-                @apply text-lg;
-            }
+        h2{
+            @apply text-2xl;
         }
-        
-        @media screen(lg){
-            h1{
-                @apply text-3xl;
-            }
 
-            h2{
-                @apply text-2xl;
-            }
-
-            h3{
-                @apply text-xl;
-            }
+        h3{
+            @apply text-xl;
         }
-        
-        @media screen(xl){
-            h1{
-                @apply text-4xl;
-            }
-
-            h2{
-                @apply text-3xl;
-            }
-
-            h3{
-                @apply text-2xl;
-            }
+    }
+    
+    @media screen(xl){
+        h1{
+            @apply text-4xl;
         }
+
+        h2{
+            @apply text-3xl;
+        }
+
+        h3{
+            @apply text-2xl;
+        }
+    }
+}
+
+@layer utilities{
+    #dark-mode-toggle:checked ~ label div.toggle-circle{
+        @apply translate-x-3;
     }
 }
