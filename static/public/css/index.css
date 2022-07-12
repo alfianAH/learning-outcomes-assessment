@@ -676,12 +676,36 @@ h3 {
   margin-top: 0.25rem;
 }
 
+.mt-2\.5 {
+  margin-top: 0.625rem;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+.mt-4 {
+  margin-top: 1rem;
+}
+
+.block {
+  display: block;
+}
+
 .inline-block {
   display: inline-block;
 }
 
+.inline {
+  display: inline;
+}
+
 .flex {
   display: flex;
+}
+
+.inline-flex {
+  display: inline-flex;
 }
 
 .hidden {
@@ -694,6 +718,10 @@ h3 {
 
 .h-4 {
   height: 1rem;
+}
+
+.max-h-full {
+  max-height: 100%;
 }
 
 .w-9 {
@@ -741,6 +769,21 @@ h3 {
 
 .bg-transparent {
   background-color: transparent;
+}
+
+.bg-red-400 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(248 113 113 / var(--tw-bg-opacity));
+}
+
+.bg-red-900 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(127 29 29 / var(--tw-bg-opacity));
+}
+
+.bg-red-200 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(254 202 202 / var(--tw-bg-opacity));
 }
 
 .p-1 {
@@ -795,8 +838,14 @@ h3 {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
-.invalid\:block:invalid {
-  display: block;
+.invalid\:border-b-red-600:invalid {
+  --tw-border-opacity: 1;
+  border-bottom-color: rgb(220 38 38 / var(--tw-border-opacity));
+}
+
+.invalid\:text-red-600:invalid {
+  --tw-text-opacity: 1;
+  color: rgb(220 38 38 / var(--tw-text-opacity));
 }
 
 .focus\:border-b-2:focus {
@@ -813,9 +862,27 @@ h3 {
   outline-offset: 2px;
 }
 
+.peer:invalid ~ .peer-invalid\:block {
+  display: block;
+}
+
+.peer:invalid ~ .peer-invalid\:fill-red-600 {
+  fill: #dc2626;
+}
+
+.peer:invalid ~ .peer-invalid\:text-red-600 {
+  --tw-text-opacity: 1;
+  color: rgb(220 38 38 / var(--tw-text-opacity));
+}
+
 .dark .dark\:border-b-slate-100 {
   --tw-border-opacity: 1;
   border-bottom-color: rgb(241 245 249 / var(--tw-border-opacity));
+}
+
+.dark .dark\:border-b-red-400 {
+  --tw-border-opacity: 1;
+  border-bottom-color: rgb(248 113 113 / var(--tw-border-opacity));
 }
 
 .dark .dark\:text-slate-100 {
@@ -823,9 +890,52 @@ h3 {
   color: rgb(241 245 249 / var(--tw-text-opacity));
 }
 
+.dark .dark\:text-red-400 {
+  --tw-text-opacity: 1;
+  color: rgb(248 113 113 / var(--tw-text-opacity));
+}
+
+.dark .invalid\:dark\:border-b-red-400:invalid {
+  --tw-border-opacity: 1;
+  border-bottom-color: rgb(248 113 113 / var(--tw-border-opacity));
+}
+
+.dark .dark\:invalid\:border-b-red-400:invalid {
+  --tw-border-opacity: 1;
+  border-bottom-color: rgb(248 113 113 / var(--tw-border-opacity));
+}
+
+.dark .invalid\:dark\:text-red-400:invalid {
+  --tw-text-opacity: 1;
+  color: rgb(248 113 113 / var(--tw-text-opacity));
+}
+
+.dark .dark\:invalid\:text-red-400:invalid {
+  --tw-text-opacity: 1;
+  color: rgb(248 113 113 / var(--tw-text-opacity));
+}
+
 .dark .focus\:dark\:text-slate-100:focus {
   --tw-text-opacity: 1;
   color: rgb(241 245 249 / var(--tw-text-opacity));
+}
+
+.peer:invalid ~ .dark .peer-invalid\:dark\:fill-red-400 {
+  fill: #f87171;
+}
+
+.dark .peer:invalid ~ .dark\:peer-invalid\:fill-red-400 {
+  fill: #f87171;
+}
+
+.peer:invalid ~ .dark .peer-invalid\:dark\:text-red-400 {
+  --tw-text-opacity: 1;
+  color: rgb(248 113 113 / var(--tw-text-opacity));
+}
+
+.dark .peer:invalid ~ .dark\:peer-invalid\:text-red-400 {
+  --tw-text-opacity: 1;
+  color: rgb(248 113 113 / var(--tw-text-opacity));
 }
 
 @media (min-width: 768px) {
