@@ -18,6 +18,10 @@
         @apply text-slate-100;
     }
 
+    main{
+        @apply p-4;
+    }
+
     h1, h2, h3, h4, h5, h6{
         @apply font-bold;
     }
@@ -32,6 +36,13 @@
 
     h3{
         @apply text-xs;
+    }
+
+    @media screen(sm){
+        main{
+            @apply py-4;
+            @apply px-8;
+        }
     }
 
     @media screen(md){
