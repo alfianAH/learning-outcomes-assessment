@@ -6,16 +6,12 @@
 
 @layer base{
     html{
-        @apply text-sm;
-        @apply bg-neutral-100;
-        @apply text-slate-800;
-        @apply leading-normal;
+        @apply text-sm bg-neutral-100 text-slate-800 leading-normal;
         font-family: 'Inter', sans-serif;
     }
 
     html.dark{
-        @apply bg-neutral-800;
-        @apply text-slate-100;
+        @apply bg-neutral-800 text-slate-100;
     }
 
     main{
@@ -40,8 +36,7 @@
 
     @media screen(sm){
         main{
-            @apply py-4;
-            @apply px-8;
+            @apply py-4 px-8;
         }
     }
 
@@ -89,6 +84,21 @@
         h3{
             @apply text-2xl;
         }
+    }
+}
+
+@layer components{
+    .dropdown > summary::before{
+        @apply hidden;
+    }
+
+    .dropdown[open] > summary::before{
+        @apply block fixed inset-0;
+        @apply content-[''];
+    }
+    
+    .dropdown-item{
+        @apply cursor-pointer flex flex-row items-center p-2 rounded-md text-slate-100 whitespace-normal hover:bg-slate-600;
     }
 }
 
