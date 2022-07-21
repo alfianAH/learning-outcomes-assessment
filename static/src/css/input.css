@@ -138,9 +138,40 @@
     .dropdown-item{
         @apply cursor-pointer flex flex-row items-center p-2 rounded-md text-slate-100 whitespace-normal hover:bg-slate-600 dark:hover:bg-zinc-500;
     }
+
+    /* Sidebar */
+    .offcanvas {
+        @apply bg-slate-600 dark:bg-zinc-600 flex flex-col fixed h-full invisible lg:visible overflow-x-hidden top-0 left-0 transition-transform duration-300 ease-in-out -translate-x-full w-64 lg:w-80 z-20;
+    }
+    .offcanvas.show:not(.hiding),
+    .offcanvas.showing {
+        @apply transform-none;
+    }
+
+    .offcanvas.hiding,
+    .offcanvas.showing,
+    .offcanvas.show {
+        @apply visible;
+    }
+
+    .offcanvas-backdrop {
+        @apply bg-black fixed top-0 left-0 z-10 w-full h-full;
+    }
+
+    .offcanvas-backdrop.fade{
+        @apply opacity-0;
+    }
+
+    .offcanvas-backdrop.show{
+        @apply opacity-50;
+    }
 }
 
 @layer utilities{
+    .fade {
+        @apply transition-opacity duration-1000 ease-linear;
+    }
+
     #dark-mode-toggle:checked ~ label div.toggle-circle{
         @apply translate-x-3;
     }

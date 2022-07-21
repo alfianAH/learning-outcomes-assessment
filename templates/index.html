@@ -5,11 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Components</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
 
+    <script src="../node_modules/jquery/dist/jquery.min.js"></script>
     <link href="../static/public/css/index.css" rel="stylesheet">
 </head>
 <body>
@@ -18,15 +15,14 @@
         py-3 pl-3 pr-8">
         <div class="flex justify-between">
             <div class="flex items-center">
-                <div class="lg:hidden">
+                <button type="button" class="lg:hidden" onclick="showSidebar(this)" data-target="#sidebar">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" focusable="False" 
                         class="bi bi-list w-6 h-6
-                        cursor-pointer
                         fill-slate-50" 
                         viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
                     </svg>
-                </div>
+                </button>
 
                 <div class="hidden lg:block">
                     <img src="../static/public/img/logo-unhas.png" alt="logo-unhas" class="max-h-10">
@@ -97,16 +93,7 @@
         </div>
     </nav>
 
-    <div class="bg-slate-600 dark:bg-zinc-600
-        flex-col
-        lg:fixed
-        h-full
-        hidden lg:flex
-        overflow-x-hidden
-        top-0 left-0
-        w-64 lg:w-80
-        z-10">
-
+    <div id="sidebar" class="offcanvas">
         <div class="p-5 flex">
             <span class="border-b-slate-50 border-b-2
                 font-bold
@@ -282,36 +269,6 @@
         <hr class="my-12">
     </main>
 
-    <script>
-        const darkModeToggle = document.querySelector('#dark-mode-toggle');
-        const html = document.querySelector('html');
-
-        darkModeToggle.addEventListener('click', function(){
-            darkModeToggle.checked ? html.classList.add('dark') : html.classList.remove('dark');
-        });
-
-        const passwordField = document.querySelector('#field');
-        const passwordViewToggle = document.querySelector('#password-view-toggle');
-        const viewPassword = document.querySelector('.bi-eye');
-        const hidePassword = document.querySelector('.bi-eye-slash');
-
-        passwordViewToggle.addEventListener('click', function(){
-            if(passwordViewToggle.checked){
-                passwordField.setAttribute('type', 'text');
-                viewPassword.classList.remove('inline-block');
-                viewPassword.classList.add('hidden');
-
-                hidePassword.classList.remove('hidden');
-                hidePassword.classList.add('inline-block');
-            } else{
-                passwordField.setAttribute('type', 'password');
-                viewPassword.classList.add('inline-block');
-                viewPassword.classList.remove('hidden');
-                
-                hidePassword.classList.add('hidden');
-                hidePassword.classList.remove('inline-block');
-            }
-        })
-    </script>
+    <script src="../static/public/js/index.js"></script>
 </body>
 </html>
