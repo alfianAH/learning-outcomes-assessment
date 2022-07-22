@@ -664,12 +664,26 @@ h3 {
   flex-direction: row;
   align-items: center;
   border-radius: 0.375rem;
+  border-width: 1px;
   padding-left: 0.5rem;
   padding-right: 0.5rem;
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
   font-size: 0.75rem;
   line-height: 1rem;
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.btn:hover {
+  --tw-border-opacity: 1;
+  border-color: rgb(30 41 59 / var(--tw-border-opacity));
+}
+
+.dark .btn {
+  --tw-border-opacity: 1;
+  border-color: rgb(241 245 249 / var(--tw-border-opacity));
 }
 
 @media (min-width: 640px) {
@@ -717,6 +731,7 @@ h3 {
 }
 
 .btn-primary {
+  border-style: none;
   --tw-bg-opacity: 1;
   background-color: rgb(2 132 199 / var(--tw-bg-opacity));
   --tw-text-opacity: 1;
@@ -749,6 +764,7 @@ h3 {
 }
 
 .btn-success {
+  border-style: none;
   --tw-bg-opacity: 1;
   background-color: rgb(16 185 129 / var(--tw-bg-opacity));
   --tw-text-opacity: 1;
@@ -781,6 +797,7 @@ h3 {
 }
 
 .btn-danger {
+  border-style: none;
   --tw-bg-opacity: 1;
   background-color: rgb(244 63 94 / var(--tw-bg-opacity));
   --tw-text-opacity: 1;
@@ -813,6 +830,7 @@ h3 {
 }
 
 .btn-warning {
+  border-style: none;
   --tw-bg-opacity: 1;
   background-color: rgb(245 158 11 / var(--tw-bg-opacity));
   --tw-text-opacity: 1;
@@ -845,6 +863,7 @@ h3 {
 }
 
 .btn-secondary {
+  border-style: none;
   --tw-bg-opacity: 1;
   background-color: rgb(107 114 128 / var(--tw-bg-opacity));
   --tw-text-opacity: 1;
@@ -877,7 +896,6 @@ h3 {
 }
 
 .btn-light {
-  border-width: 1px;
   --tw-border-opacity: 1;
   border-color: rgb(212 212 212 / var(--tw-border-opacity));
   --tw-bg-opacity: 1;
@@ -888,12 +906,12 @@ h3 {
 
 .btn-light:hover {
   --tw-bg-opacity: 1;
-  background-color: rgb(241 245 249 / var(--tw-bg-opacity));
+  background-color: rgb(226 232 240 / var(--tw-bg-opacity));
 }
 
 .btn-light:active {
   --tw-bg-opacity: 1;
-  background-color: rgb(226 232 240 / var(--tw-bg-opacity));
+  background-color: rgb(203 213 225 / var(--tw-bg-opacity));
 }
 
 .dark .btn-light {
