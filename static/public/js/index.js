@@ -26,16 +26,27 @@ function showSidebar(button){
     const targetId = $(button).attr('data-target');
 
     const target = $(targetId);
-    target.addClass('show');
-    
-    $('body').append($('<div>').addClass('offcanvas-backdrop fade'));
+    // Showing sidebar
+    target.addClass('showing');
+    // Show backdrop
+    target.after($('<div>').addClass('offcanvas-backdrop fade show'));
+
+    // Show sidebar
+    target.one("webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend", function () {
+        target.removeClass('showing').addClass('show');
+    });
 
     const backdrop = $('.offcanvas-backdrop');
+    
+    backdrop.on('click', function () {
+        // Hide sidebar
+        target.addClass('hiding');
 
-    backdrop.addClass('show');
-
-    backdrop.on('click', function(){
-        backdrop.removeClass('show');
-        target.removeClass('show');
+        target.one("webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend", function () {
+            // Remove backdrop
+            backdrop.remove();
+            // Remove sidebar's classses
+            target.removeClass('hiding show');
+        });
     });
 }

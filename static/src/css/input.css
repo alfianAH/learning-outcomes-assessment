@@ -143,6 +143,7 @@
     .offcanvas {
         @apply bg-slate-600 dark:bg-zinc-600 flex flex-col fixed h-full invisible lg:visible overflow-x-hidden top-0 left-0 transition-transform duration-300 ease-in-out -translate-x-full w-64 lg:w-80 z-20;
     }
+    
     .offcanvas.show:not(.hiding),
     .offcanvas.showing {
         @apply transform-none;
@@ -169,7 +170,7 @@
 
 @layer utilities{
     .fade {
-        @apply transition-opacity duration-1000 ease-linear;
+        @apply transition-opacity duration-150 ease-linear;
     }
 
     #dark-mode-toggle:checked ~ label div.toggle-circle{
