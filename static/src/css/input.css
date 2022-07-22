@@ -140,30 +140,30 @@
     }
 
     /* Sidebar */
-    .offcanvas {
-        @apply bg-slate-600 dark:bg-zinc-600 flex flex-col fixed h-full invisible lg:visible overflow-x-hidden top-0 left-0 transition-transform duration-300 ease-in-out -translate-x-full w-64 lg:w-80 z-20;
+    .sidebar {
+        @apply bg-slate-600 dark:bg-zinc-600 flex flex-col fixed h-full invisible lg:visible overflow-x-hidden top-0 left-0 transition-transform duration-300 ease-in-out lg:transition-none -translate-x-full lg:transform-none w-64 lg:w-80 z-20;
     }
     
-    .offcanvas.show:not(.hiding),
-    .offcanvas.showing {
+    .sidebar.show:not(.hiding),
+    .sidebar.showing {
         @apply transform-none;
     }
 
-    .offcanvas.hiding,
-    .offcanvas.showing,
-    .offcanvas.show {
+    .sidebar.hiding,
+    .sidebar.showing,
+    .sidebar.show {
         @apply visible;
     }
 
-    .offcanvas-backdrop {
+    .sidebar-backdrop {
         @apply bg-black fixed top-0 left-0 z-10 w-full h-full;
     }
 
-    .offcanvas-backdrop.fade{
+    .sidebar-backdrop.fade{
         @apply opacity-0;
     }
 
-    .offcanvas-backdrop.show{
+    .sidebar-backdrop.show{
         @apply opacity-50;
     }
 }

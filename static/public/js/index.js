@@ -1,3 +1,23 @@
+function whichTransitionEvent(){
+    var t, el = document.createElement("fakeelement");
+
+    var transitions = {
+        "transition"      : "transitionend",
+        "OTransition"     : "oTransitionEnd",
+        "MozTransition"   : "transitionend",
+        "WebkitTransition": "webkitTransitionEnd"
+    }
+
+    for (t in transitions){
+        if (el.style[t] !== undefined){
+            return transitions[t];
+        }
+    }
+}
+  
+var transitionEvent = whichTransitionEvent();
+console.log(transitionEvent);
+
 const darkModeToggle = $('#dark-mode-toggle');
 const html = $('html');
 
@@ -29,24 +49,41 @@ function showSidebar(button){
     // Showing sidebar
     target.addClass('showing');
     // Show backdrop
-    target.after($('<div>').addClass('offcanvas-backdrop fade show'));
+    const backdrop = $('.sidebar-backdrop');
+    backdrop.removeClass('hidden').addClass('fade show');
 
     // Show sidebar
-    target.one("webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend", function () {
+    target.one(transitionEvent, function () {
         target.removeClass('showing').addClass('show');
     });
-
-    const backdrop = $('.offcanvas-backdrop');
     
     backdrop.on('click', function () {
-        // Hide sidebar
-        target.addClass('hiding');
-
-        target.one("webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend", function () {
-            // Remove backdrop
-            backdrop.remove();
-            // Remove sidebar's classses
-            target.removeClass('hiding show');
-        });
+        closeSidebar(target, backdrop);
     });
+}
+
+function closeSidebar(sidebar, backdrop) {
+    // Hide sidebar
+    sidebar.addClass('hiding');
+
+    sidebar.one(transitionEvent, function () {
+        // Remove backdrop
+        backdrop.removeClass('fade show').addClass('hidden');
+        // Remove sidebar's classses
+        sidebar.removeClass('hiding show');
+    });
+}
+
+function resetSidebarToDefault() {
+    if ($(window).width() >= 1024) {
+        // Remove backdrop
+        $('.sidebar-backdrop').removeClass('fade show').addClass('hidden');
+
+        // Remove sidebar's classses
+        $('.sidebar').removeClass('hiding show');
+    }
+}
+
+window.onresize = function () {
+    resetSidebarToDefault();
 }
