@@ -1136,8 +1136,20 @@ h3 {
 
 /* Dropdown */
 
+.dropdown > summary {
+  cursor: pointer;
+  align-items: center;
+}
+
 .dropdown > summary::before {
+  content: var(--tw-content);
   display: none;
+}
+
+@media (min-width: 768px) {
+  .dropdown > summary {
+    display: flex;
+  }
 }
 
 .dropdown[open] > summary::before {
@@ -1149,6 +1161,24 @@ h3 {
   display: block;
   --tw-content: '';
   content: var(--tw-content);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  --tw-translate-y: 3rem;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+  list-style-type: none;
+  border-radius: 0.375rem;
+  --tw-bg-opacity: 1;
+  background-color: rgb(30 41 59 / var(--tw-bg-opacity));
+  padding: 0.25rem;
+}
+
+.dark .dropdown-menu {
+  --tw-bg-opacity: 1;
+  background-color: rgb(82 82 91 / var(--tw-bg-opacity));
 }
 
 .dropdown-item {
@@ -1171,6 +1201,70 @@ h3 {
 .dark .dropdown-item:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(113 113 122 / var(--tw-bg-opacity));
+}
+
+.dropdown-item > a {
+  margin-left: 0.5rem;
+  --tw-text-opacity: 1;
+  color: rgb(241 245 249 / var(--tw-text-opacity));
+}
+
+.dropdown-item > a:hover {
+  -webkit-text-decoration-line: none;
+          text-decoration-line: none;
+}
+
+/* Navigation Bar */
+
+.navbar {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0px;
+  --tw-bg-opacity: 1;
+  background-color: rgb(51 65 85 / var(--tw-bg-opacity));
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  padding-left: 0.75rem;
+  padding-right: 2rem;
+}
+
+.dark .navbar {
+  --tw-bg-opacity: 1;
+  background-color: rgb(63 63 70 / var(--tw-bg-opacity));
+}
+
+@media (min-width: 1024px) {
+  .navbar {
+    margin-left: 20rem;
+  }
+}
+
+.navbar-header {
+  margin-left: 0.625rem;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 700;
+  --tw-text-opacity: 1;
+  color: rgb(248 250 252 / var(--tw-text-opacity));
+}
+
+.navbar-header:hover {
+  -webkit-text-decoration-line: none;
+          text-decoration-line: none;
+}
+
+@media (min-width: 768px) {
+  .navbar-header {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .navbar-header {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
 }
 
 /* Sidebar */
@@ -1239,38 +1333,13 @@ h3 {
   opacity: 0.5;
 }
 
-.absolute {
-  position: absolute;
-}
-
 .relative {
   position: relative;
-}
-
-.sticky {
-  position: -webkit-sticky;
-  position: sticky;
-}
-
-.top-0 {
-  top: 0px;
-}
-
-.right-0 {
-  right: 0px;
 }
 
 .my-12 {
   margin-top: 3rem;
   margin-bottom: 3rem;
-}
-
-.ml-2\.5 {
-  margin-left: 0.625rem;
-}
-
-.ml-2 {
-  margin-left: 0.5rem;
 }
 
 .mr-2\.5 {
@@ -1283,6 +1352,10 @@ h3 {
 
 .ml-5 {
   margin-left: 1.25rem;
+}
+
+.ml-2 {
+  margin-left: 0.5rem;
 }
 
 .mb-2 {
@@ -1349,17 +1422,8 @@ h3 {
   width: 2.25rem;
 }
 
-.translate-y-12 {
-  --tw-translate-y: 3rem;
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-}
-
 .cursor-pointer {
   cursor: pointer;
-}
-
-.list-none {
-  list-style-type: none;
 }
 
 .flex-row {
@@ -1388,10 +1452,6 @@ h3 {
   border-radius: 9999px;
 }
 
-.rounded-md {
-  border-radius: 0.375rem;
-}
-
 .border-b-2 {
   border-bottom-width: 2px;
 }
@@ -1414,19 +1474,9 @@ h3 {
   border-bottom-color: rgb(30 41 59 / var(--tw-border-opacity));
 }
 
-.bg-slate-700 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(51 65 85 / var(--tw-bg-opacity));
-}
-
 .bg-slate-50 {
   --tw-bg-opacity: 1;
   background-color: rgb(248 250 252 / var(--tw-bg-opacity));
-}
-
-.bg-slate-800 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(30 41 59 / var(--tw-bg-opacity));
 }
 
 .bg-slate-500 {
@@ -1447,17 +1497,16 @@ h3 {
   fill: #f8fafc;
 }
 
-.p-1 {
-  padding: 0.25rem;
+.fill-rose-500 {
+  fill: #f43f5e;
 }
 
 .p-5 {
   padding: 1.25rem;
 }
 
-.py-3 {
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
+.p-1 {
+  padding: 0.25rem;
 }
 
 .px-8 {
@@ -1483,19 +1532,6 @@ h3 {
 .py-2 {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
-}
-
-.pl-3 {
-  padding-left: 0.75rem;
-}
-
-.pr-8 {
-  padding-right: 2rem;
-}
-
-.text-base {
-  font-size: 1rem;
-  line-height: 1.5rem;
 }
 
 .text-3xl {
@@ -1530,14 +1566,14 @@ h3 {
   font-weight: 200;
 }
 
+.\!text-rose-500 {
+  --tw-text-opacity: 1 !important;
+  color: rgb(244 63 94 / var(--tw-text-opacity)) !important;
+}
+
 .text-slate-50 {
   --tw-text-opacity: 1;
   color: rgb(248 250 252 / var(--tw-text-opacity));
-}
-
-.text-rose-500 {
-  --tw-text-opacity: 1;
-  color: rgb(244 63 94 / var(--tw-text-opacity));
 }
 
 .text-slate-800 {
@@ -1585,16 +1621,6 @@ h3 {
   background-color: rgb(100 116 139 / var(--tw-bg-opacity));
 }
 
-.hover\:text-rose-400:hover {
-  --tw-text-opacity: 1;
-  color: rgb(251 113 133 / var(--tw-text-opacity));
-}
-
-.hover\:no-underline:hover {
-  -webkit-text-decoration-line: none;
-          text-decoration-line: none;
-}
-
 .focus\:border-b-2:focus {
   border-bottom-width: 2px;
 }
@@ -1612,6 +1638,11 @@ h3 {
 .active\:bg-slate-700:active {
   --tw-bg-opacity: 1;
   background-color: rgb(51 65 85 / var(--tw-bg-opacity));
+}
+
+.group:hover .group-hover\:text-rose-400 {
+  --tw-text-opacity: 1;
+  color: rgb(251 113 133 / var(--tw-text-opacity));
 }
 
 .peer:invalid ~ .peer-invalid\:block {
@@ -1632,14 +1663,8 @@ h3 {
   border-bottom-color: rgb(241 245 249 / var(--tw-border-opacity));
 }
 
-.dark .dark\:bg-zinc-700 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(63 63 70 / var(--tw-bg-opacity));
-}
-
-.dark .dark\:bg-zinc-600 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(82 82 91 / var(--tw-bg-opacity));
+.dark .dark\:fill-rose-400 {
+  fill: #fb7185;
 }
 
 .dark .dark\:text-rose-400 {
@@ -1695,21 +1720,12 @@ h3 {
     margin-top: 0.5rem;
   }
 
-  .md\:flex {
-    display: flex;
-  }
-
   .md\:h-5 {
     height: 1.25rem;
   }
 
   .md\:w-5 {
     width: 1.25rem;
-  }
-
-  .md\:text-xl {
-    font-size: 1.25rem;
-    line-height: 1.75rem;
   }
 
   .md\:text-base {
@@ -1734,11 +1750,6 @@ h3 {
 
   .lg\:hidden {
     display: none;
-  }
-
-  .lg\:text-3xl {
-    font-size: 1.875rem;
-    line-height: 2.25rem;
   }
 }
 
