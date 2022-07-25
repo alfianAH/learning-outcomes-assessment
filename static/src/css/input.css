@@ -5,6 +5,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;400;600;700&display=swap');
 
 @layer base{
+    a{
+        @apply text-sky-600 hover:underline hover:underline-offset-2 active:text-sky-800 transition-all;
+    }
+
     html{
         @apply text-sm bg-neutral-100 text-slate-800 leading-normal;
         font-family: 'Inter', sans-serif;
@@ -115,6 +119,19 @@
 
     .badge-outline-dark{
         @apply border border-slate-800 dark:border-slate-50 bg-transparent text-slate-800 dark:text-slate-50
+    }
+
+    /* Breadcrumb */
+    .breadcrumb{
+        @apply list-none flex flex-row flex-wrap items-center mb-3;
+    }
+
+    .breadcrumb-item + .breadcrumb-item{
+        @apply pl-2 before:pr-2 before:content-['>'] before:first:content-none before:text-neutral-500 dark:before:text-neutral-300;
+    }
+
+    .breadcrumb-item.active{
+        @apply text-neutral-500 dark:text-neutral-300
     }
 
     /* Buttons */
