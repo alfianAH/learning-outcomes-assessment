@@ -99,7 +99,7 @@ function toggleClass(element, className) {
 }
 
 $('.dropdown').on('click', function () {
-    
+    toggleClass($('body'), 'noscroll');
 });
 
 function breadcrumb() {
