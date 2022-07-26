@@ -126,7 +126,13 @@
         @apply list-none flex flex-row flex-wrap items-center mb-3;
     }
 
-    .breadcrumb-item + .breadcrumb-item{
+    .breadcrumb-item, .breadcrumb-item-collapse{
+        @apply flex flex-row;
+    }
+
+    .breadcrumb-item + .breadcrumb-item, 
+    .breadcrumb-item-collapse + .breadcrumb-item, 
+    .breadcrumb-item + .breadcrumb-item-collapse{
         @apply pl-2 before:pr-2 before:content-['>'] before:first:content-none before:text-neutral-500 dark:before:text-neutral-300;
     }
 
@@ -172,8 +178,12 @@
     }
 
     /* Dropdown */
+    .dropdown{
+        @apply marker:hidden;
+    }
+
     .dropdown > summary{
-        @apply cursor-pointer items-center md:flex before:hidden;
+        @apply cursor-pointer items-center flex before:hidden;
     }
 
     .dropdown[open] > summary{
@@ -181,15 +191,11 @@
     }
 
     .dropdown-menu{
-        @apply absolute bg-slate-800 dark:bg-zinc-700 p-1 list-none top-0 right-0 translate-y-12 rounded-md;
+        @apply absolute bg-slate-800 dark:bg-zinc-700 p-1 top-1/2 left-1/2 -translate-x-1/2 translate-y-5 rounded-md;
     }
     
     .dropdown-item{
-        @apply cursor-pointer flex flex-row items-center p-2 rounded-md text-slate-100 whitespace-normal hover:bg-slate-600 dark:hover:bg-zinc-600 active:bg-slate-700 dark:active:bg-zinc-500 transition-all;
-    }
-
-    .dropdown-item > a{
-        @apply text-slate-100 ml-2 hover:no-underline;
+        @apply cursor-pointer flex flex-row items-center p-2 rounded-md text-slate-100 whitespace-nowrap hover:bg-slate-600 dark:hover:bg-zinc-600 active:bg-slate-700 active:text-slate-100 dark:active:bg-zinc-500 hover:no-underline transition-all;
     }
 
     /* Navigation Bar */
@@ -249,6 +255,10 @@
 @layer utilities{
     .fade {
         @apply transition-opacity duration-150 ease-linear;
+    }
+
+    .noscroll{
+        @apply overflow-hidden;
     }
 
     #dark-mode-toggle:checked ~ label div.toggle-circle{

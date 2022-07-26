@@ -87,3 +87,38 @@ function resetSidebarToDefault() {
 window.onresize = function () {
     resetSidebarToDefault();
 }
+
+function toggleClass(element, className) {
+    let currentClass = element.attr('class');
+
+    if (currentClass !== undefined && currentClass.includes(className)) {
+        element.removeClass(className);
+    } else {
+        element.addClass(className);
+    }
+}
+
+$('.dropdown').on('click', function () {
+    
+});
+
+function breadcrumb() {
+    let breadcrumbs = $('.breadcrumb').children('.breadcrumb-item');
+
+    if (breadcrumbs.length <= 4) return;
+
+    let collapseBreadcrumbs = []
+    
+    for (let i = 1; i < breadcrumbs.length - 2; i++){
+        collapseBreadcrumbs.push(breadcrumbs[i].innerText);
+        $(breadcrumbs[i]).addClass('hidden');
+    }
+
+    toggleClass($('.breadcrumb-item-collapse'), 'hidden');
+
+    for (let i = 0; i < collapseBreadcrumbs.length; i++){
+        $('#breadcrumb-collapse').append(`<a class='dropdown-item' href='#'>${collapseBreadcrumbs[i]}</a>`);
+    }
+}
+
+breadcrumb();
