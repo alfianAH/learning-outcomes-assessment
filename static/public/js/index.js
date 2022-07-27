@@ -98,7 +98,7 @@ function toggleClass(element, className) {
     }
 }
 
-$('.dropdown').on('click', function () {
+$('.dropdown > summary').on('click', function () {
     toggleClass($('body'), 'noscroll');
 });
 
@@ -107,17 +107,19 @@ function breadcrumb() {
 
     if (breadcrumbs.length <= 4) return;
 
-    let collapseBreadcrumbs = []
+    let collapseBreadcrumbs = {}
     
     for (let i = 1; i < breadcrumbs.length - 2; i++){
-        collapseBreadcrumbs.push(breadcrumbs[i].innerText);
+        let breadcrumbText = breadcrumbs[i].innerText;
+        let breadcrumbLink = breadcrumbs[i].children[0];
+        collapseBreadcrumbs[breadcrumbLink] = breadcrumbText;
         $(breadcrumbs[i]).addClass('hidden');
     }
 
     toggleClass($('.breadcrumb-item-collapse'), 'hidden');
 
-    for (let i = 0; i < collapseBreadcrumbs.length; i++){
-        $('#breadcrumb-collapse').append(`<a class='dropdown-item' href='#'>${collapseBreadcrumbs[i]}</a>`);
+    for (let key in collapseBreadcrumbs){
+        $('#breadcrumb-collapse').append(`<a class='dropdown-item' href='${key}'>${collapseBreadcrumbs[key]}</a>`);
     }
 }
 
