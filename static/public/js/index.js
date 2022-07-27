@@ -123,4 +123,118 @@ function breadcrumb() {
     }
 }
 
+function pagination() {
+    let pages = $('.pagination > li').children('.page-link');
+    let pagesLength = pages.length - 2;
+
+    if (pagesLength <= 5) return;
+    
+    // Get active, previous, and next page
+    let activePage = null,
+        previousPage = null,
+        nextPage = null,
+        activePageIndex = null;
+
+    for (let i = 1; i < pagesLength + 1; i++) {
+        if ($(pages[i]).hasClass('active')) {
+            activePage = pages[i];
+
+            if (i !== 1) {
+                previousPage = pages[i - 1];
+                activePageIndex = i + 1;
+            }
+            if (i !== pagesLength) {
+                nextPage = pages[i + 1];
+                activePageIndex = i + 1;
+            }
+            if (i === 1) activePageIndex = 1;
+            // 2 because skip 2 collapses
+            if (i === pagesLength) activePageIndex = i + 2;
+
+            break;
+        }
+    }
+
+    if (activePage === null) return;
+
+    let listItems = $('.pagination').children();
+    // first is 2 because previous and 1 page
+    // last is -3 because next, last page and index 0
+    let firstCollapseIndex = 2,
+        lastCollapseIndex = listItems.length - 3;
+    
+    let firstCollapse = $($($($($(listItems[firstCollapseIndex]).children()[0]).children()[0]).children()[0]).children()[0]);
+    let lastCollapse = $($($($($(listItems[lastCollapseIndex]).children()[0]).children()[0]).children()[0]).children()[0]);
+
+    // Remove children in first and last collapse
+    $('#pagination-collapse-first').children().remove();
+    $('#pagination-collapse-last').children().remove();
+    
+    let firstDiff = activePageIndex - firstCollapseIndex;
+    let lastDiff = lastCollapseIndex - activePageIndex;
+    
+    if (firstDiff > lastDiff) {
+        // first collapse
+        console.log('first');
+        // end index is active - 2 because we want to take the previous page (1 page number)
+        let endIndex = activePageIndex - 2;
+        
+        // If end index is last in pages, then - 1, so it can take 2 page numbers before last pages
+        if (endIndex == pagesLength) endIndex -= 2;
+
+        for (let i = firstCollapseIndex + 1; i <= endIndex; i++){
+            // Append page to collapse
+            $('#pagination-collapse-first').append(`<a class='dropdown-item' href='#'>${pages[i - 1].innerText}</a>`)
+            // Hide the page
+            toggleClass($(pages[i-1]), 'hidden');
+        }
+
+        // Show the collapse
+        toggleClass($(firstCollapse), 'hidden');
+    } else if (firstDiff < lastDiff) {
+        // last collapse
+        console.log('last');
+        // start index is active + 2, because we want to take the next page (1 page number)
+        let startIndex = activePageIndex + 2;
+        
+        // If active page is first page, then + 2, because it will take first collapse and 1 page number more
+        if (activePageIndex === 1) startIndex += 2;
+        
+        for (let i = startIndex; i < lastCollapseIndex; i++){
+            // Append page to collapse
+            $('#pagination-collapse-last').append(`<a class='dropdown-item' href='#'>${pages[i - 1].innerText}</a>`)
+            // Hide the page
+            toggleClass($(pages[i-1]), 'hidden');
+        }
+        
+        // Show the collapse
+        toggleClass($(lastCollapse), 'hidden');
+    } else {
+        // both collapse
+        console.log('both');
+        // end index is active - 2 because we want to take the previous page (1 page number)
+        let endIndex = activePageIndex - 2;
+        
+        for (let i = firstCollapseIndex + 1; i <= endIndex; i++){
+            // Append page to collapse
+            $('#pagination-collapse-first').append(`<a class='dropdown-item' href='#'>${pages[i - 1].innerText}</a>`)
+            // Hide the page
+            toggleClass($(pages[i-1]), 'hidden');
+        }
+        // Show the collapse
+        toggleClass($(firstCollapse), 'hidden');
+
+        // Last collapse
+        for (let i = activePageIndex + 2; i < lastCollapseIndex; i++) {
+            // Append page to collapse
+            $('#pagination-collapse-last').append(`<a class='dropdown-item' href='#'>${pages[i - 1].innerText}</a>`)
+            // Hide the page
+            toggleClass($(pages[i - 1]), 'hidden');
+        }
+        // Show the collapse
+        toggleClass($(lastCollapse), 'hidden');
+    }
+}
+
 breadcrumb();
+pagination();

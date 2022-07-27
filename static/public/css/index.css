@@ -1297,7 +1297,7 @@ h3 {
   align-items: center;
 }
 
-.page-link {
+.page-link,  .page-link-collapse {
   position: relative;
   display: block;
   height: 100%;
@@ -1321,19 +1321,19 @@ h3 {
   transition-duration: 150ms;
 }
 
-.page-link:hover {
+.page-link:hover,  .page-link-collapse:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(226 232 240 / var(--tw-bg-opacity));
   -webkit-text-decoration-line: none;
           text-decoration-line: none;
 }
 
-.page-link:active {
+.page-link:active,  .page-link-collapse:active {
   --tw-bg-opacity: 1;
   background-color: rgb(203 213 225 / var(--tw-bg-opacity));
 }
 
-.dark .page-link {
+.dark .page-link, .dark  .page-link-collapse {
   --tw-border-opacity: 1;
   border-color: rgb(82 82 91 / var(--tw-border-opacity));
   --tw-bg-opacity: 1;
@@ -1342,18 +1342,18 @@ h3 {
   color: rgb(228 228 231 / var(--tw-text-opacity));
 }
 
-.dark .page-link:hover {
+.dark .page-link:hover, .dark  .page-link-collapse:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(82 82 91 / var(--tw-bg-opacity));
 }
 
-.dark .page-link:active {
+.dark .page-link:active, .dark  .page-link-collapse:active {
   --tw-bg-opacity: 1;
   background-color: rgb(161 161 170 / var(--tw-bg-opacity));
 }
 
 @media (min-width: 768px) {
-  .page-link {
+  .page-link,  .page-link-collapse {
     padding-left: 0.75rem;
     padding-right: 0.75rem;
     padding-top: 0.75rem;
@@ -1364,7 +1364,7 @@ h3 {
 }
 
 @media (min-width: 1024px) {
-  .page-link {
+  .page-link,  .page-link-collapse {
     padding-left: 1rem;
     padding-right: 1rem;
     padding-top: 1rem;
