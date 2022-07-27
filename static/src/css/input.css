@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;400;600;700&display=swap');
-
 @layer base{
     a{
         @apply text-sky-600 hover:underline hover:underline-offset-2 active:text-sky-800 transition-all;
@@ -11,7 +9,6 @@
 
     html{
         @apply text-sm bg-neutral-100 text-slate-800 leading-normal;
-        font-family: 'Inter', sans-serif;
     }
 
     html.dark{
