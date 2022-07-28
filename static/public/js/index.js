@@ -127,7 +127,7 @@ function pagination() {
     let pages = $('.pagination > li').children('.page-link');
     let pagesLength = pages.length - 2;
 
-    if (pagesLength <= 5) return;
+    if (pagesLength <= 6) return;
     
     // Get active page and its index
     let activePage = null,
@@ -170,11 +170,11 @@ function pagination() {
     
     if (firstDiff > 1 && lastDiff <= 1) {
         // first collapse
-        // end index is active - 2 because we want to take the previous pages (2 page numbers)
-        let endIndex = activePageIndex - 2;
+        // end index is active - 3 because we want to take the previous pages (2 page numbers, 1 hidden page)
+        let endIndex = activePageIndex - 3;
         
-        // If end index is last in pages, then - 3, so it can take 3 page numbers before last pages
-        if (endIndex == pagesLength) endIndex -= 3;
+        // If end index + 1 (so it can be last page) is last in pages, then - 2, so it can take 3 page numbers before last pages
+        if (endIndex+1 == pagesLength) endIndex -= 2;
 
         // Hide pages after first collapse until end index
         for (let i = firstCollapseIndex + 1; i <= endIndex; i++){
