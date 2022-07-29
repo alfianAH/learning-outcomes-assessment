@@ -1367,69 +1367,20 @@ h3 {
   .page-link {
     padding-left: 1rem;
     padding-right: 1rem;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
     font-size: 1.125rem;
     line-height: 1.75rem;
   }
 }
 
-.page-link-collapse {
-  position: relative;
-  display: block;
-  height: 100%;
-  width: 100%;
+.page-link.collapse {
   cursor: default;
-  align-items: center;
-  border-width: 1px;
-  --tw-border-opacity: 1;
-  border-color: rgb(226 232 240 / var(--tw-border-opacity));
   --tw-bg-opacity: 1;
   background-color: rgb(248 250 252 / var(--tw-bg-opacity));
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  font-size: 0.75rem;
-  line-height: 1rem;
-  --tw-text-opacity: 1;
-  color: rgb(71 85 105 / var(--tw-text-opacity));
 }
 
-.page-link-collapse:hover {
-  -webkit-text-decoration-line: none;
-          text-decoration-line: none;
-}
-
-.dark .page-link-collapse {
-  --tw-border-opacity: 1;
-  border-color: rgb(82 82 91 / var(--tw-border-opacity));
+.dark .page-link.collapse {
   --tw-bg-opacity: 1;
   background-color: rgb(63 63 70 / var(--tw-bg-opacity));
-  --tw-text-opacity: 1;
-  color: rgb(228 228 231 / var(--tw-text-opacity));
-}
-
-@media (min-width: 768px) {
-  .page-link-collapse {
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
-    padding-top: 0.75rem;
-    padding-bottom: 0.75rem;
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .page-link-collapse {
-    padding-left: 1rem;
-    padding-right: 1rem;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-    font-size: 1.125rem;
-    line-height: 1.75rem;
-  }
 }
 
 .page-link.active {
@@ -1980,9 +1931,9 @@ h3 {
     display: none;
   }
 
-  .lg\:py-5 {
-    padding-top: 1.25rem;
-    padding-bottom: 1.25rem;
+  .lg\:py-4 {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
   }
 }
 
