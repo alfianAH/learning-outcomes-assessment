@@ -35,6 +35,14 @@
         @apply text-xs;
     }
 
+    table{
+        @apply border-collapse;
+    }
+
+    tbody, td, tfoot, th, thead, tr {
+        @apply border-0 border-inherit border-solid;
+    }
+
     @media screen(sm){
         main{
             @apply py-4 px-8;
@@ -91,7 +99,7 @@
 @layer components{
     /* Badge */
     .badge{
-        @apply rounded-full px-2 py-1 text-xs md:text-sm text-slate-100;
+        @apply rounded-full px-2 py-1 text-xs md:text-sm text-slate-100 w-min;
     }
 
     .badge-primary{
@@ -267,6 +275,39 @@
 
     .sidebar-title{
         @apply border-b-slate-50 border-b-2 font-bold text-3xl text-slate-50 w-full;
+    }
+
+    /* Table */
+    .table {
+        @apply w-full mb-4 align-top;
+    }
+    
+    .table > :not(caption) > * > *{
+        @apply border-b border-slate-800 dark:border-slate-100 px-1 py-2 md:px-2.5 md:py-2.5 xl:px-3 xl:py-3 text-sm md:text-base xl:text-lg;
+    }
+
+    .table > :not(caption) > * > *.checkbox{
+        @apply w-14;
+    }
+
+    .table > :not(caption) > * > *.number{
+        @apply w-14 xl:w-20;
+    }
+
+    .table > tbody > * > * {
+        @apply bg-slate-50 dark:bg-zinc-700;
+    }
+
+    .table-hover > tbody > tr:hover > *{
+        @apply bg-slate-200 dark:bg-zinc-500;
+    }
+
+    .table > thead{
+        @apply align-bottom border-none;
+    }
+
+    .table > thead > tr > th{
+        @apply bg-slate-500 dark:bg-zinc-600 text-slate-50;
     }
 }
 
