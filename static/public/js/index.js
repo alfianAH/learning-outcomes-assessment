@@ -96,6 +96,8 @@ function toggleClass(element, className) {
     } else {
         element.addClass(className);
     }
+
+    return element;
 }
 
 $('.dropdown > summary').on('click', function () {
@@ -280,6 +282,10 @@ function checkboxTable(element) {
             }).end();
 }
 
-checkboxTable("table#table-test");
+function tableAccordion(element) {
+    toggleClass($(element).closest('.table-row').next(".table-fold"), "open");
+}
+
+checkboxTable("table.table-checkbox");
 breadcrumb();
 pagination();

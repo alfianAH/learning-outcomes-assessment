@@ -147,7 +147,7 @@
 
     /* Buttons */
     .btn{
-        @apply flex flex-row items-center px-2 py-1 md:py-2 lg:px-2.5 rounded-md text-xs sm:text-sm md:text-base lg:text-lg border hover:border-slate-800 dark:border-slate-100 transition-all;
+        @apply flex flex-row items-center px-2 py-1 md:py-2 lg:px-2.5 rounded-md text-xs sm:text-sm md:text-base lg:text-lg border hover:border-slate-800 hover:no-underline h-min dark:border-slate-100 transition-all;
     }
 
     .btn > svg{
@@ -313,6 +313,14 @@
 
     .table > thead > tr > th{
         @apply bg-slate-500 dark:bg-zinc-600 text-slate-50;
+    }
+
+    .table-accordion > tbody > tr.table-fold{
+        @apply hidden;
+    }
+
+    .table-accordion > tbody > tr.table-fold.open{
+        @apply table-row;
     }
 }
 
