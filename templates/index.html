@@ -419,11 +419,11 @@
 
         <hr class="my-12">
 
-        <table class="table table-hover">
+        <table id="table-test" class="table table-hover">
             <thead class="table-header-group">
                 <tr class="table-row">
                     <th scope="col" class="table-cell text-center checkbox">
-                        <input type="checkbox" name="data-1" id="table-checkbox">
+                        <input type="checkbox" name="table-checkbox" id="table-checkbox">
                     </th>
                     <th scope="col" class="table-cell text-center number">No.</th>
                     <th scope="col" class="table-cell text-left">Text</th>
@@ -436,9 +436,30 @@
             <tbody class="table-row-group">
                 <tr class="table-row">
                     <th scope="row" class="table-cell text-center checkbox">
-                        <input type="checkbox" name="data-1" id="table-checkbox">
+                        <input type="checkbox" name="data-1" id="data-1">
                     </th>
-                    <th scope="row" class="table-cell  text-center number">1.</th>
+                    <th scope="row" class="table-cell text-center number">1.</th>
+                    <td class="table-cell text-left">Data</td>
+                    <td class="table-cell text-left">
+                        <div class="badge badge-primary">
+                            Badge
+                        </div>
+                    </td>
+                    <td class="table-cell text-right">100</td>
+                    <td class="table-cell text-center">
+                        <button>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-5 h-5 fill-sky-600" focusable="False" aria-label="edit">
+                                <path d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                            </svg>
+                        </button>
+                    </td>
+                </tr>
+                <tr class="table-row">
+                    <th scope="row" class="table-cell text-center checkbox">
+                        <input type="checkbox" name="data-2" id="data-2">
+                    </th>
+                    <th scope="row" class="table-cell text-center number">1.</th>
                     <td class="table-cell text-left">Data</td>
                     <td class="table-cell text-left">
                         <div class="badge badge-primary">

@@ -224,5 +224,62 @@ function pagination() {
     }
 }
 
+function checkboxTable(element) {
+    let table = $(element);
+    
+    table
+        .find("thead th:nth-child(1) input[type='checkbox']")
+            .on("change", function () {
+                // When checkbox on table header on change ...
+                // If not checked, ...
+                console.log($(this).is(":checked"));
+                if ($(this).is(":checked")) {
+                    // Check all checkboxes that are not disabled and not checked
+                    table.find("tbody th:nth-child(1) input[type='checkbox']:not(:disabled):not(:checked)").prop("checked", true).trigger("change");
+                } else {
+                    // Uncheck all checkboxes that are not disable and checked
+                    table.find("tbody th:nth-child(1) input[type='checkbox']:not(:disabled):checked").prop("checked", false).trigger("change");
+                }
+            }).end()
+        .find("tbody tr")
+            .on("click", function () {
+                // When checkbox on table row in table body on click ...
+                // Get checkbox on clicked row
+                let checkbox = $(this).find("th:nth-child(1) input[type='checkbox']:not(:disabled)");
+                
+                // Change checked property
+                checkbox.prop("checked", !checkbox.is(":checked")).trigger("change");
+                
+                checkbox.is(":checked") ? $(this).addClass("active") : $(this).removeClass("active");
+            }).end()
+        .find("tbody th:nth-child(1) input[type='checkbox']")
+            .on("change", function () {
+                // When checkbox on table body on change ...
+                // Get checked checkboxes
+                let checkedCheckboxes = $(this).closest("tbody").find("th:nth-child(1) input[type='checkbox']:not(:disabled):checked");
+                let totalCheckboxes = $(this).closest("tbody").find("th:nth-child(1) input[type='checkbox']:not(:disabled)");
+
+                // Change checkbox on table header
+                if (checkedCheckboxes.length === 0) {
+                    // Uncheck
+                    table.find("thead th:nth-child(1) input[type='checkbox']").prop("checked", false);
+                    table.find("thead th:nth-child(1) input[type='checkbox']").prop("indeterminate", false);
+                } else if (checkedCheckboxes.length === totalCheckboxes.length) {
+                    // Check
+                    table.find("thead th:nth-child(1) input[type='checkbox']").prop("checked", true);
+                    table.find("thead th:nth-child(1) input[type='checkbox']").prop("indeterminate", false);
+                } else {
+                    // Indeterminate
+                    table.find("thead th:nth-child(1) input[type='checkbox']").prop("checked", false);
+                    table.find("thead th:nth-child(1) input[type='checkbox']").prop("indeterminate", true);
+                }
+            }).trigger("change").end()
+        .find("tbody td a, input[type='checkbox']")
+            .on("click", function (e) {
+                e.stopPropagation();
+            }).end();
+}
+
+checkboxTable("table#table-test");
 breadcrumb();
 pagination();
