@@ -294,12 +294,12 @@
         @apply w-14 xl:w-20;
     }
 
-    .table > tbody > *:not(.table-fold) > * {
+    .table > tbody > *:not(.table-details) > * {
         @apply bg-slate-50 dark:bg-zinc-700;
     }
 
-    .table-hover > tbody > tr:hover:not(.table-fold) > *,
-    .table-hover > tbody > tr.active:hover:not(.table-fold) > *{
+    .table-hover > tbody > tr:hover:not(.table-details) > *,
+    .table-hover > tbody > tr.active:hover:not(.table-details) > *{
         @apply bg-slate-200 dark:bg-zinc-600;
     }
     
@@ -315,15 +315,23 @@
         @apply bg-slate-500 dark:bg-zinc-600 text-slate-50;
     }
 
-    .table-accordion > tbody > tr.table-fold{
+    .table-accordion > tbody > tr.table-details{
         @apply hidden;
     }
 
-    .table-accordion > tbody > tr.table-fold.open{
+    .table-accordion > tbody > tr.table-details.open{
         @apply table-row;
     }
 
-    .table-fold table > tbody td {
+    .table-accordion > tbody > tr:not(.table-details) > td > .table-collapse{
+        @apply transition-all duration-300;
+    }
+
+    .table-accordion > tbody > tr:not(.table-details).open > td > .table-collapse{
+        @apply -rotate-180;
+    }
+
+    .table-details table > tbody td {
         @apply pr-2.5;
     }
 }

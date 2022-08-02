@@ -283,7 +283,7 @@ function checkboxTable(element) {
 }
 
 function tableAccordion(element) {
-    toggleClass($(element).closest('.table-row').next(".table-fold"), "open");
+    toggleClass($(toggleClass($(element).closest('.table-row'), "open")).next(".table-details"), "open");
 }
 
 checkboxTable("table.table-checkbox");
