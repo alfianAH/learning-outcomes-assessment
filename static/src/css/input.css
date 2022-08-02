@@ -147,7 +147,7 @@
 
     /* Buttons */
     .btn{
-        @apply flex flex-row items-center px-2 py-1 md:py-2 lg:px-2.5 rounded-md text-xs sm:text-sm md:text-base lg:text-lg border hover:border-slate-800 hover:no-underline h-min dark:border-slate-100 transition-all;
+        @apply flex flex-row items-center px-2 py-1 md:py-2 lg:px-2.5 rounded-md text-xs sm:text-sm md:text-base lg:text-lg border hover:border-slate-800 hover:no-underline h-min whitespace-nowrap dark:border-slate-100 transition-all;
     }
 
     .btn > svg{
@@ -294,12 +294,12 @@
         @apply w-14 xl:w-20;
     }
 
-    .table > tbody > * > * {
+    .table > tbody > *:not(.table-fold) > * {
         @apply bg-slate-50 dark:bg-zinc-700;
     }
 
-    .table-hover > tbody > tr:hover > *,
-    .table-hover > tbody > tr.active:hover > *{
+    .table-hover > tbody > tr:hover:not(.table-fold) > *,
+    .table-hover > tbody > tr.active:hover:not(.table-fold) > *{
         @apply bg-slate-200 dark:bg-zinc-600;
     }
     
@@ -321,6 +321,10 @@
 
     .table-accordion > tbody > tr.table-fold.open{
         @apply table-row;
+    }
+
+    .table-fold table > tbody td {
+        @apply pr-2.5;
     }
 }
 
