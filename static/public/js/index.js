@@ -251,8 +251,6 @@ function checkboxTable(element) {
                 
                 // Change checked property
                 checkbox.prop("checked", !checkbox.is(":checked")).trigger("change");
-                
-                checkbox.is(":checked") ? $(this).addClass("active") : $(this).removeClass("active");
             }).end()
         .find("tbody th:nth-child(1) input[type='checkbox']")
             .on("change", function () {
@@ -274,6 +272,13 @@ function checkboxTable(element) {
                     // Indeterminate
                     table.find("thead th:nth-child(1) input[type='checkbox']").prop("checked", false);
                     table.find("thead th:nth-child(1) input[type='checkbox']").prop("indeterminate", true);
+                }
+
+                // Change tr color
+                if ($(this).is(":checked")) {
+                    $(this).closest('tr').addClass("active");
+                } else {
+                    $(this).closest('tr').removeClass("active");
                 }
             }).trigger("change").end()
         .find("tbody td a, input[type='checkbox']")
