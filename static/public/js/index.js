@@ -1,4 +1,6 @@
-function whichTransitionEvent(){
+const DARK_MODE_KEY = "dark_theme";
+
+function whichTransitionEvent() {
     var t, el = document.createElement("fakeelement");
 
     var transitions = {
@@ -14,33 +16,58 @@ function whichTransitionEvent(){
         }
     }
 }
-  
-var transitionEvent = whichTransitionEvent();
-console.log(transitionEvent);
 
-const darkModeToggle = $('#dark-mode-toggle');
-const body = $('body');
+function checkForStorage() {
+    return typeof(Storage) !== "undefined"
+}
 
-darkModeToggle.on('click', function(){
-    darkModeToggle.is(':checked') ? body.addClass('dark') : body.removeClass('dark');
-});
+function darkModeClass(isDarkMode) {
+    isDarkMode ? $('body').addClass("dark") : $('body').removeClass('dark');
+}
 
-const passwordField = $('#field');
-const passwordViewToggle = $('#password-view-toggle');
-const viewPassword = $('.bi-eye');
-const hidePassword = $('.bi-eye-slash');
+function darkModeHandler(){
+    let darkModeToggle = $('#dark-mode-toggle');
 
-passwordViewToggle.on('click', function(){
-    if(passwordViewToggle.is(':checked')){
-        passwordField.attr('type', 'text');
-        viewPassword.removeClass('inline-block').addClass('hidden');
-        hidePassword.removeClass('hidden').addClass('inline-block');
-    } else{
-        passwordField.attr('type', 'password');
-        viewPassword.addClass('inline-block').removeClass('hidden');
-        hidePassword.addClass('hidden').removeClass('inline-block');
+    if (checkForStorage()) {
+        let isDarkMode = localStorage.getItem(DARK_MODE_KEY);
+
+        if (isDarkMode === null) {
+            darkModeToggle.prop("checked", false);
+            darkModeClass(false);
+            localStorage.setItem(DARK_MODE_KEY, false);
+        } else {
+            isDarkMode = JSON.parse(isDarkMode) === true;
+            darkModeToggle.prop("checked", isDarkMode);
+            darkModeClass(isDarkMode);
+        }
     }
-})
+
+    darkModeToggle.on('click', function () {
+        let isToggleChecked = darkModeToggle.is(":checked");
+
+        localStorage.setItem(DARK_MODE_KEY, isToggleChecked);
+        darkModeClass(isToggleChecked);
+    });
+}
+
+function passwordHandler() {
+    let passwordField = $('#field');
+    let passwordViewToggle = $('#password-view-toggle');
+    let viewPassword = $('.bi-eye');
+    let hidePassword = $('.bi-eye-slash');
+
+    passwordViewToggle.on('click', function () {
+        if (passwordViewToggle.is(':checked')) {
+            passwordField.attr('type', 'text');
+            viewPassword.removeClass('inline-block').addClass('hidden');
+            hidePassword.removeClass('hidden').addClass('inline-block');
+        } else {
+            passwordField.attr('type', 'password');
+            viewPassword.addClass('inline-block').removeClass('hidden');
+            hidePassword.addClass('hidden').removeClass('inline-block');
+        }
+    });
+}
 
 function showSidebar(button){
     const targetId = $(button).attr('data-target');
@@ -291,6 +318,11 @@ function tableAccordion(element) {
     toggleClass($(toggleClass($(element).closest('.table-row'), "open")).next(".table-details"), "open");
 }
 
+var transitionEvent = whichTransitionEvent();
+console.log(transitionEvent);
+
 checkboxTable("table.table-checkbox");
+darkModeHandler();
 breadcrumb();
 pagination();
+passwordHandler();
