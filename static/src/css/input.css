@@ -195,6 +195,14 @@
         @apply before:block before:content-[''] before:fixed before:inset-0;
     }
 
+    .dropdown > summary .dropdown-indicator{
+        @apply transition-all;
+    }
+
+    .dropdown[open] > summary .dropdown-indicator{
+        @apply -rotate-180;
+    }
+
     .dropdown-menu{
         @apply absolute bg-slate-800 dark:bg-zinc-700 p-1 top-full left-1/2 -translate-x-1/2 rounded-md;
     }

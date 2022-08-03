@@ -1198,6 +1198,17 @@ tbody,  td,  tfoot,  th,  thead,  tr {
   content: var(--tw-content);
 }
 
+.dropdown > summary .dropdown-indicator {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.dropdown[open] > summary .dropdown-indicator {
+  --tw-rotate: -180deg;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
 .dropdown-menu {
   position: absolute;
   top: 100%;
