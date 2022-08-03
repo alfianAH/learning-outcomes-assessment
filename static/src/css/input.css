@@ -3,6 +3,22 @@
 @tailwind utilities;
 
 @layer base{
+    /* Works on Firefox */
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: #cdcdcd;
+    }
+
+    /* Works on Chrome, Edge, and Safari */
+    *::-webkit-scrollbar {
+        @apply w-2;
+    }
+
+    *::-webkit-scrollbar-thumb {
+        @apply bg-[#aaaaaa];
+    }
+
+
     a{
         @apply text-sky-600 hover:underline hover:underline-offset-2 active:text-sky-800 transition-all;
     }
@@ -68,6 +84,10 @@
     }
     
     @media screen(lg){
+        body{
+            @apply text-lg;
+        }
+
         h1{
             @apply text-3xl;
         }
@@ -99,7 +119,7 @@
 @layer components{
     /* Badge */
     .badge{
-        @apply rounded-full px-2 py-1 text-xs md:text-sm text-slate-100 w-min;
+        @apply rounded-full px-2 py-1 xl:px-2.5 text-xs md:text-sm text-slate-100 w-min;
     }
 
     .badge-primary{
@@ -151,7 +171,7 @@
     }
 
     .btn > svg{
-        @apply w-4 h-4 md:w-5 md:h-5 mr-1 sm:mr-2.5;
+        @apply w-4 h-4 md:w-5 md:h-5 xl:w-6 xl:h-6 mr-1 sm:mr-2.5;
     }
 
     .btn-primary{
@@ -183,7 +203,7 @@
     }
 
     /* Dropdown */
-    .dropdown{
+    details.dropdown{
         @apply marker:hidden;
     }
 
@@ -204,11 +224,11 @@
     }
 
     .dropdown-menu{
-        @apply absolute bg-slate-800 dark:bg-zinc-700 p-1 top-full left-1/2 -translate-x-1/2 rounded-md;
+        @apply absolute bg-slate-800 dark:bg-zinc-600 p-1 top-full left-1/2 -translate-x-1/2 rounded-md;
     }
     
     .dropdown-item{
-        @apply cursor-pointer flex flex-row items-center p-2 rounded-md text-slate-100 whitespace-nowrap hover:bg-slate-600 dark:hover:bg-zinc-600 active:bg-slate-700 active:text-slate-100 dark:active:bg-zinc-500 hover:no-underline transition-all;
+        @apply cursor-pointer flex flex-row items-center p-2 rounded-md text-slate-100 whitespace-nowrap hover:bg-slate-600 dark:hover:bg-zinc-500 active:bg-slate-700 active:text-slate-100 dark:active:bg-zinc-500 hover:no-underline transition-all;
     }
 
     /* Navigation Bar */
@@ -226,7 +246,7 @@
     }
 
     .page-link{
-        @apply bg-slate-50 hover:bg-slate-200 active:bg-slate-300 dark:bg-zinc-700  dark:hover:bg-zinc-600 dark:active:bg-zinc-400 border border-slate-300 dark:border-zinc-600 block relative hover:no-underline text-slate-600 dark:text-zinc-200 text-xs md:text-sm lg:text-lg w-full h-full px-2 py-2 md:px-3 md:py-3 lg:px-4 items-center transition-all;
+        @apply bg-slate-50 hover:bg-slate-200 active:bg-slate-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 dark:active:bg-zinc-400 border border-slate-300 dark:border-zinc-600 block relative hover:no-underline text-slate-600 dark:text-zinc-200 text-xs md:text-sm lg:text-lg w-full h-full px-2 py-2 md:px-3 md:py-3 lg:px-4 items-center transition-all;
     }
 
     .page-link.collapse {
@@ -282,7 +302,7 @@
     }
 
     .sidebar-title{
-        @apply border-b-slate-50 border-b-2 font-bold text-3xl text-slate-50 w-full;
+        @apply border-b-slate-50 border-b-2 pb-1 font-bold text-3xl text-slate-50 w-full;
     }
 
     /* Table */
@@ -358,7 +378,7 @@
     }
 
     .noscroll{
-        @apply overflow-hidden pr-[17px];
+        @apply overflow-hidden pr-2;
     }
 
     #dark-mode-toggle:checked ~ label div.toggle-circle{
