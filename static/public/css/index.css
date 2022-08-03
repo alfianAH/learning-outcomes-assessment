@@ -436,7 +436,7 @@ a:active {
   color: rgb(7 89 133 / var(--tw-text-opacity));
 }
 
-html {
+body {
   scroll-behavior: smooth;
   --tw-bg-opacity: 1;
   background-color: rgb(245 245 245 / var(--tw-bg-opacity));
@@ -447,7 +447,7 @@ html {
   color: rgb(30 41 59 / var(--tw-text-opacity));
 }
 
-html.dark {
+body.dark {
   --tw-bg-opacity: 1;
   background-color: rgb(38 38 38 / var(--tw-bg-opacity));
   --tw-text-opacity: 1;
@@ -1585,13 +1585,13 @@ tbody,  td,  tfoot,  th,  thead,  tr {
 
 /* Table */
 
-.table {
+.table-css {
   margin-bottom: 1rem;
   width: 100%;
   vertical-align: top;
 }
 
-.table > :not(caption) > * > * {
+.table-css > :not(caption) > * > * {
   border-bottom-width: 1px;
   border-left-width: 1px;
   --tw-border-opacity: 1;
@@ -1604,21 +1604,21 @@ tbody,  td,  tfoot,  th,  thead,  tr {
   line-height: 1.25rem;
 }
 
-.table > :not(caption) > * > *:first-child {
+.table-css > :not(caption) > * > *:first-child {
   border-left-color: transparent;
 }
 
-.dark .table > :not(caption) > * > * {
+.dark .table-css > :not(caption) > * > * {
   --tw-border-opacity: 1;
   border-color: rgb(148 163 184 / var(--tw-border-opacity));
 }
 
-.dark .table > :not(caption) > * > *:first-child {
+.dark .table-css > :not(caption) > * > *:first-child {
   border-left-color: transparent;
 }
 
 @media (min-width: 768px) {
-  .table > :not(caption) > * > * {
+  .table-css > :not(caption) > * > * {
     padding-left: 0.625rem;
     padding-right: 0.625rem;
     padding-top: 0.625rem;
@@ -1629,7 +1629,7 @@ tbody,  td,  tfoot,  th,  thead,  tr {
 }
 
 @media (min-width: 1280px) {
-  .table > :not(caption) > * > * {
+  .table-css > :not(caption) > * > * {
     padding-left: 0.75rem;
     padding-right: 0.75rem;
     padding-top: 0.75rem;
@@ -1639,30 +1639,30 @@ tbody,  td,  tfoot,  th,  thead,  tr {
   }
 }
 
-.table > :not(caption) > * > *.checkbox {
+.table-css > :not(caption) > * > *.checkbox {
   width: 3.5rem;
 }
 
-.table > :not(caption) > * > *.\!checkbox {
+.table-css > :not(caption) > * > *.\!checkbox {
   width: 3.5rem;
 }
 
-.table > :not(caption) > * > *.number {
+.table-css > :not(caption) > * > *.number {
   width: 3.5rem;
 }
 
 @media (min-width: 1280px) {
-  .table > :not(caption) > * > *.number {
+  .table-css > :not(caption) > * > *.number {
     width: 5rem;
   }
 }
 
-.table > tbody > *:not(.table-details) > * {
+.table-css > tbody > *:not(.table-details) > * {
   --tw-bg-opacity: 1;
   background-color: rgb(248 250 252 / var(--tw-bg-opacity));
 }
 
-.dark .table > tbody > *:not(.table-details) > * {
+.dark .table-css > tbody > *:not(.table-details) > * {
   --tw-bg-opacity: 1;
   background-color: rgb(63 63 70 / var(--tw-bg-opacity));
 }
@@ -1679,29 +1679,29 @@ tbody,  td,  tfoot,  th,  thead,  tr {
   background-color: rgb(82 82 91 / var(--tw-bg-opacity));
 }
 
-.table > tbody > tr.active > * {
+.table-css > tbody > tr.active > * {
   --tw-bg-opacity: 1;
   background-color: rgb(203 213 225 / var(--tw-bg-opacity));
 }
 
-.dark .table > tbody > tr.active > * {
+.dark .table-css > tbody > tr.active > * {
   --tw-bg-opacity: 1;
   background-color: rgb(113 113 122 / var(--tw-bg-opacity));
 }
 
-.table > thead {
+.table-css > thead {
   border-style: none;
   vertical-align: bottom;
 }
 
-.table > thead > tr > th {
+.table-css > thead > tr > th {
   --tw-bg-opacity: 1;
   background-color: rgb(100 116 139 / var(--tw-bg-opacity));
   --tw-text-opacity: 1;
   color: rgb(248 250 252 / var(--tw-text-opacity));
 }
 
-.dark .table > thead > tr > th {
+.dark .table-css > thead > tr > th {
   --tw-bg-opacity: 1;
   background-color: rgb(82 82 91 / var(--tw-bg-opacity));
 }
@@ -1727,6 +1727,19 @@ tbody,  td,  tfoot,  th,  thead,  tr {
 
 .table-details table > tbody td {
   padding-right: 0.625rem;
+}
+
+.table-scroll-header {
+  display: inline-table;
+  table-layout: fixed;
+  border-right-width: 2px;
+  --tw-border-opacity: 1;
+  border-right-color: rgb(30 41 59 / var(--tw-border-opacity));
+}
+
+.table-scroll-data {
+  display: inline-block;
+  overflow-x: scroll;
 }
 
 .relative {
@@ -1778,6 +1791,18 @@ tbody,  td,  tfoot,  th,  thead,  tr {
 
 .ml-3 {
   margin-left: 0.75rem;
+}
+
+.ml-4 {
+  margin-left: 1rem;
+}
+
+.ml-1 {
+  margin-left: 0.25rem;
+}
+
+.-ml-1 {
+  margin-left: -0.25rem;
 }
 
 .inline-block {
@@ -1864,6 +1889,30 @@ tbody,  td,  tfoot,  th,  thead,  tr {
   width: 16rem;
 }
 
+.w-72 {
+  width: 18rem;
+}
+
+.w-\[calc\(100\%-18rem\)\] {
+  width: calc(100% - 18rem);
+}
+
+.w-\[calc\(100\%-17rem\)\] {
+  width: calc(100% - 17rem);
+}
+
+.w-36 {
+  width: 9rem;
+}
+
+.w-40 {
+  width: 10rem;
+}
+
+.w-\[calc\(100\%-10rem\)\] {
+  width: calc(100% - 10rem);
+}
+
 .cursor-pointer {
   cursor: pointer;
 }
@@ -1943,6 +1992,11 @@ tbody,  td,  tfoot,  th,  thead,  tr {
 .bg-slate-200 {
   --tw-bg-opacity: 1;
   background-color: rgb(226 232 240 / var(--tw-bg-opacity));
+}
+
+.bg-red-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(239 68 68 / var(--tw-bg-opacity));
 }
 
 .fill-slate-50 {
@@ -2206,6 +2260,14 @@ tbody,  td,  tfoot,  th,  thead,  tr {
   .sm\:block {
     display: block;
   }
+
+  .sm\:w-72 {
+    width: 18rem;
+  }
+
+  .sm\:w-\[calc\(100\%-18rem\)\] {
+    width: calc(100% - 18rem);
+  }
 }
 
 @media (min-width: 768px) {
@@ -2221,12 +2283,28 @@ tbody,  td,  tfoot,  th,  thead,  tr {
     margin-bottom: 0.75rem;
   }
 
+  .md\:-ml-1\.5 {
+    margin-left: -0.375rem;
+  }
+
+  .md\:-ml-1 {
+    margin-left: -0.25rem;
+  }
+
   .md\:h-5 {
     height: 1.25rem;
   }
 
   .md\:w-5 {
     width: 1.25rem;
+  }
+
+  .md\:w-96 {
+    width: 24rem;
+  }
+
+  .md\:w-\[calc\(100\%-24rem\)\] {
+    width: calc(100% - 24rem);
   }
 
   .md\:px-3 {
@@ -2279,6 +2357,18 @@ tbody,  td,  tfoot,  th,  thead,  tr {
     margin-right: 0.75rem;
   }
 
+  .xl\:-ml-2 {
+    margin-left: -0.5rem;
+  }
+
+  .xl\:-ml-1 {
+    margin-left: -0.25rem;
+  }
+
+  .xl\:-ml-1\.5 {
+    margin-left: -0.375rem;
+  }
+
   .xl\:h-10 {
     height: 2.5rem;
   }
@@ -2297,5 +2387,13 @@ tbody,  td,  tfoot,  th,  thead,  tr {
 
   .xl\:w-72 {
     width: 18rem;
+  }
+
+  .xl\:w-\[28rem\] {
+    width: 28rem;
+  }
+
+  .xl\:w-\[calc\(100\%-28rem\)\] {
+    width: calc(100% - 28rem);
   }
 }

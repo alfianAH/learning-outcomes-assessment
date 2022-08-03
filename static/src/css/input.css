@@ -7,11 +7,11 @@
         @apply text-sky-600 hover:underline hover:underline-offset-2 active:text-sky-800 transition-all;
     }
 
-    html{
-        @apply text-sm bg-neutral-100 text-slate-800 leading-normal scroll-smooth;
+    body{
+        @apply text-sm bg-neutral-100 text-slate-800 leading-normal scroll-smooth
     }
 
-    html.dark{
+    body.dark{
         @apply bg-neutral-800 text-slate-100;
     }
 
@@ -286,23 +286,23 @@
     }
 
     /* Table */
-    .table {
+    .table-css {
         @apply w-full mb-4 align-top;
     }
     
-    .table > :not(caption) > * > *{
+    .table-css > :not(caption) > * > *{
         @apply border-b border-l border-slate-400 first:border-l-transparent dark:border-slate-400 dark:first:border-l-transparent px-1 py-2 md:px-2.5 md:py-2.5 xl:px-3 xl:py-3 text-sm md:text-base xl:text-lg;
     }
 
-    .table > :not(caption) > * > *.checkbox{
+    .table-css > :not(caption) > * > *.checkbox{
         @apply w-14;
     }
 
-    .table > :not(caption) > * > *.number{
+    .table-css > :not(caption) > * > *.number{
         @apply w-14 xl:w-20;
     }
 
-    .table > tbody > *:not(.table-details) > * {
+    .table-css > tbody > *:not(.table-details) > * {
         @apply bg-slate-50 dark:bg-zinc-700;
     }
 
@@ -311,15 +311,15 @@
         @apply bg-slate-200 dark:bg-zinc-600;
     }
     
-    .table > tbody > tr.active > * {
+    .table-css > tbody > tr.active > * {
         @apply bg-slate-300 dark:bg-zinc-500;
     }
 
-    .table > thead{
+    .table-css > thead{
         @apply align-bottom border-none;
     }
 
-    .table > thead > tr > th{
+    .table-css > thead > tr > th{
         @apply bg-slate-500 dark:bg-zinc-600 text-slate-50;
     }
 
@@ -341,6 +341,14 @@
 
     .table-details table > tbody td {
         @apply pr-2.5;
+    }
+
+    .table-scroll-header{
+        @apply table-fixed inline-table border-r-2 border-r-slate-800;
+    }
+    
+    .table-scroll-data {
+        @apply inline-block overflow-x-scroll;
     }
 }
 

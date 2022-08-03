@@ -19,10 +19,10 @@ var transitionEvent = whichTransitionEvent();
 console.log(transitionEvent);
 
 const darkModeToggle = $('#dark-mode-toggle');
-const html = $('html');
+const body = $('body');
 
 darkModeToggle.on('click', function(){
-    darkModeToggle.is(':checked') ? html.addClass('dark') : html.removeClass('dark');
+    darkModeToggle.is(':checked') ? body.addClass('dark') : body.removeClass('dark');
 });
 
 const passwordField = $('#field');
