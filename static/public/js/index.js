@@ -318,11 +318,37 @@ function tableAccordion(element) {
     toggleClass($(toggleClass($(element).closest('.table-row'), "open")).next(".table-details"), "open");
 }
 
+function tabElement() {
+    $(".tab-item").on("click", function () {
+        let activeTab = $('.tab').find(".tab-item:not(.disabled)");
+
+        if ($(activeTab).is($(this))) return;
+
+        let clickedTab = $(this);
+        let activeTabContent = $('.tab-content').find(".show.active");
+        let clickedTabContent = $(clickedTab.attr('data-target'));
+
+        // Tabs classes
+        activeTab.addClass("disabled");
+        clickedTab.removeClass("disabled");
+
+        // Tab contents classes
+        activeTabContent.removeClass("show");
+        clickedTabContent.addClass("active");
+
+        activeTabContent.one(transitionEvent, function () {
+            activeTabContent.removeClass("active");
+            clickedTabContent.addClass("show");
+        });
+    });
+}
+
 var transitionEvent = whichTransitionEvent();
 console.log(transitionEvent);
 
+breadcrumb();
 checkboxTable("table.table-checkbox");
 darkModeHandler();
-breadcrumb();
 pagination();
 passwordHandler();
+tabElement();

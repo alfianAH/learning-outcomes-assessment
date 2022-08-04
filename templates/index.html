@@ -717,8 +717,8 @@
 
         <hr class="my-12">
 
-        <div class="tab">
-            <div class="tab-item disabled w-32">
+        <ul class="tab" role="tablist">
+            <li class="tab-item w-32" id="tab-1" data-target="#tab-1-pane" role="presentation">
                 <div class="tab-title">
                     Title
 
@@ -726,9 +726,9 @@
                 </div>
 
                 <div class="tab-item-line"></div>
-            </div>
+            </li>
 
-            <div class="tab-item w-32">
+            <li class="tab-item disabled w-32" id="tab-2" data-target="#tab-2-pane" role="presentation">
                 <div class="tab-title">
                     Title
 
@@ -736,6 +736,30 @@
                 </div>
 
                 <div class="tab-item-line"></div>
+            </li>
+
+            <li class="tab-item disabled w-32" id="tab-3" data-target="#tab-3-pane" role="presentation">
+                <div class="tab-title">
+                    Title
+
+                    <div class="w-2 h-2 lg:w-2.5 lg:h-2.5 ml-2.5 badge-warning  rounded-full"></div>
+                </div>
+
+                <div class="tab-item-line"></div>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="tab-1-pane" role="tabpanel" aria-labelledby="tab-1">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti deserunt earum nemo assumenda possimus, eos pariatur, repellendus impedit voluptas nam molestiae voluptate debitis porro numquam veritatis mollitia aperiam ipsum necessitatibus? Cupiditate, nisi non natus corporis quia eaque odio? Accusantium, maxime illo assumenda dolorem natus veritatis laborum officia. Error, ex. Quas!
+            </div>
+
+            <div class="tab-pane fade" role="tabpanel" id="tab-2-pane" aria-labelledby="tab-2">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Error minima, quae iusto cupiditate dignissimos aliquid porro fuga, dicta eveniet animi dolorum beatae ab minus libero? Officia est autem sed, labore praesentium, consequuntur numquam recusandae delectus aspernatur necessitatibus doloribus quasi deleniti officiis quibusdam perspiciatis. Id recusandae quasi ea facere beatae repellat sequi ut cupiditate consequuntur veritatis incidunt aliquam qui perspiciatis, nemo in distinctio pariatur impedit debitis ipsum! Explicabo harum deserunt nisi, placeat aperiam atque, recusandae dolore iure debitis, nulla vero magnam eligendi fugiat? Modi sit, suscipit fuga aliquam quidem excepturi. Corporis, reiciendis laboriosam itaque ducimus beatae quibusdam fuga recusandae pariatur enim?
+            </div>
+
+            <div class="tab-pane fade" role="tabpanel" id="tab-3-pane" aria-labelledby="tab-3">
+                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Voluptatum voluptas, possimus eligendi incidunt, blanditiis rerum saepe accusantium est at, earum ipsa! Tempora itaque eaque voluptate!
             </div>
         </div>
 

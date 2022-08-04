@@ -1626,12 +1626,31 @@ details.dropdown::marker {
 
 .tab {
   display: flex;
+  list-style-type: none;
 }
 
 .tab > :not([hidden]) ~ :not([hidden]) {
   --tw-space-x-reverse: 0;
   margin-right: calc(0.625rem * var(--tw-space-x-reverse));
   margin-left: calc(0.625rem * calc(1 - var(--tw-space-x-reverse)));
+}
+
+.tab {
+  border-bottom-width: 1px;
+  --tw-border-opacity: 1;
+  border-bottom-color: rgb(148 163 184 / var(--tw-border-opacity));
+}
+
+.tab-content {
+  margin-top: 0.625rem;
+}
+
+.tab-content > .tab-pane {
+  display: none;
+}
+
+.tab-content > .active {
+  display: block;
 }
 
 .tab-item {
@@ -1985,6 +2004,10 @@ details.dropdown::marker {
   display: table-row;
 }
 
+.contents {
+  display: contents;
+}
+
 .hidden {
   display: none;
 }
@@ -2266,6 +2289,10 @@ details.dropdown::marker {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
   transition-timing-function: linear;
+}
+
+.fade:not(.show) {
+  opacity: 0;
 }
 
 .noscroll {

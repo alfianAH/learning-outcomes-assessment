@@ -307,7 +307,19 @@
 
     /* Tabs */
     .tab{
-        @apply flex space-x-2.5;
+        @apply flex space-x-2.5 list-none border-b border-b-slate-400;
+    }
+
+    .tab-content{
+        @apply mt-2.5;
+    }
+
+    .tab-content > .tab-pane{
+        @apply hidden;
+    }
+
+    .tab-content > .active{
+        @apply block;
     }
 
     .tab-item{
@@ -416,6 +428,10 @@
 @layer utilities{
     .fade {
         @apply transition-opacity duration-150 ease-linear;
+    }
+
+    .fade:not(.show){
+        @apply opacity-0;
     }
 
     .noscroll{
