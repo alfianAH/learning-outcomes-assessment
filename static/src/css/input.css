@@ -305,6 +305,47 @@
         @apply border-b-slate-50 border-b-2 pb-1 font-bold text-3xl text-slate-50 w-full;
     }
 
+    /* Tabs */
+    .tab{
+        @apply flex space-x-2.5;
+    }
+
+    .tab-item{
+        @apply flex flex-col cursor-pointer;
+    }
+    
+    .tab-item-line{
+        @apply bg-indigo-800 dark:bg-indigo-400 h-0.5 lg:h-1 mt-2.5 rounded-t-md transition-all;
+    }
+
+    .tab-item.disabled > .tab-item-line{
+        @apply hidden;
+    }
+
+    .tab-item.disabled:hover > .tab-item-line{
+        @apply block bg-indigo-500 dark:bg-indigo-700;
+    }
+
+    .tab-item.disabled:active > .tab-item-line{
+        @apply block bg-indigo-700 dark:bg-indigo-500;
+    }
+
+    .tab-title{
+        @apply flex font-bold pt-2 text-sm lg:text-xl justify-center items-center transition-all;
+    }
+
+    .tab-item.disabled > .tab-title{
+        @apply text-slate-400 dark:text-neutral-600;
+    }
+
+    .tab-item.disabled:hover > .tab-title{
+        @apply text-slate-500 dark:text-neutral-600
+    }
+
+    .tab-item.disabled:active > .tab-title{
+        @apply text-slate-700 dark:text-neutral-400
+    }
+
     /* Table */
     .table-css {
         @apply w-full mb-4 align-top;
@@ -364,7 +405,7 @@
     }
 
     .table-scroll-header{
-        @apply table-fixed inline-table border-r-4 border-r-slate-800 dark:border-r-zinc-400 shadow-md;
+        @apply table-fixed inline-table border-r-4 border-r-slate-800 dark:border-r-zinc-400;
     }
     
     .table-scroll-data {
