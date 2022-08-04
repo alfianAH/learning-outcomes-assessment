@@ -1308,6 +1308,7 @@ details.dropdown::marker {
   position: -webkit-sticky;
   position: sticky;
   top: 0px;
+  z-index: 30;
   --tw-bg-opacity: 1;
   background-color: rgb(51 65 85 / var(--tw-bg-opacity));
   padding-top: 0.75rem;
@@ -1505,7 +1506,7 @@ details.dropdown::marker {
   position: fixed;
   top: 0px;
   left: 0px;
-  z-index: 20;
+  z-index: 50;
   display: flex;
   height: 100%;
   width: 16rem;
@@ -1549,7 +1550,7 @@ details.dropdown::marker {
   position: fixed;
   top: 0px;
   left: 0px;
-  z-index: 10;
+  z-index: 40;
   height: 100%;
   width: 100%;
   --tw-bg-opacity: 1;
@@ -1644,11 +1645,6 @@ details.dropdown::marker {
 
 .table-css > :not(caption) > * > *:first-child {
   border-left-color: transparent;
-}
-
-.dark .table-css > :not(caption) > * > * {
-  --tw-border-opacity: 1;
-  border-color: rgb(148 163 184 / var(--tw-border-opacity));
 }
 
 .dark .table-css > :not(caption) > * > *:first-child {
@@ -1770,9 +1766,17 @@ details.dropdown::marker {
 .table-scroll-header {
   display: inline-table;
   table-layout: fixed;
-  border-right-width: 2px;
+  border-right-width: 4px;
   --tw-border-opacity: 1;
   border-right-color: rgb(30 41 59 / var(--tw-border-opacity));
+  --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.dark .table-scroll-header {
+  --tw-border-opacity: 1;
+  border-right-color: rgb(161 161 170 / var(--tw-border-opacity));
 }
 
 .table-scroll-data {

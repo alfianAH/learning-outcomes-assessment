@@ -18,8 +18,8 @@
     <script src="../node_modules/jquery/dist/jquery.min.js"></script>
 </head>
 <body>
-    <header role="banner">
-        <nav class="navbar">
+    <header class="navbar" role="banner">
+        <nav>
             <div class="flex justify-between">
                 <div class="flex items-center">
                     <button type="button" role="button" class="lg:hidden" onclick="showSidebar(this)" data-target="#sidebar">
@@ -180,14 +180,14 @@
         <h6 role="heading">Halo</h6>
 
         <div class="flex">
-            <span class="text-sm text-slate-800 mr-2">Light</span>
+            <span class="text-sm mr-2">Light</span>
             <input type="checkbox" id="dark-mode-toggle" class="hidden" role="checkbox" aria-labelledby="dark-mode-toggle-label">
             <label for="dark-mode-toggle" id="dark-mode-toggle-label">
                 <div class="w-9 h-5 bg-slate-500 rounded-full flex items-center p-1 cursor-pointer">
                     <div class="w-4 h-4 bg-white rounded-full toggle-circle"></div>
                 </div>
             </label>
-            <span class="text-sm text-slate-800 ml-2">Dark</span>
+            <span class="text-sm ml-2">Dark</span>
         </div>
 
         <hr class="my-12">
@@ -716,6 +716,8 @@
         </div>
 
         <hr class="my-12">
+
+        
     </main>
 
     <script src="../static/public/js/index.js"></script>
