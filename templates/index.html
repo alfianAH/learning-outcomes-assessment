@@ -765,12 +765,14 @@
 
         <hr class="my-12">
 
-        <div class="flex flex-col sm:flex-row sm:flex-wrap md:hidden">
-            <div class="list-item-flex list-item-model-a">
+        <h1>List Item Model A</h1>
+
+        <ol class="flex flex-col sm:flex-row sm:flex-wrap md:hidden list-numbered" role="list">
+            <li class="list-item-flex list-item-model-a" role="listitem">
                 <div class="flex space-x-2.5">
                     <input type="checkbox" name="list-item-1" id="list-item-1">
                     
-                    <label class="w-full font-bold sm:w-fit" for="list-item-1">Kurikulum 2019/2024</label>
+                    <label class="list-item-model-a-title" for="list-item-1">Kurikulum 2019/2024</label>
 
                     <div class="badge badge-success">Aktif</div>
                 </div>
@@ -793,13 +795,13 @@
                         </tr>
                     </tbody>
                 </table>
-            </div>
+            </li>
             
-            <div class="list-item-flex list-item-model-a">
+            <li class="list-item-flex list-item-model-a" role="listitem">
                 <div class="flex space-x-2.5">
                     <input type="checkbox" name="list-item-2" id="list-item-2">
                     
-                    <label class="w-full font-bold sm:w-fit" for="list-item-2">Kurikulum 2019/2024</label>
+                    <label class="list-item-model-a-title" for="list-item-2">Kurikulum 2019/2024</label>
 
                     <div class="badge badge-success">Aktif</div>
                 </div>
@@ -822,13 +824,13 @@
                         </tr>
                     </tbody>
                 </table>
-            </div>
+            </li>
 
-            <div class="list-item-flex list-item-model-a">
+            <li class="list-item-flex list-item-model-a" role="listitem">
                 <div class="flex space-x-2.5">
                     <input type="checkbox" name="list-item-3" id="list-item-3">
                     
-                    <label class="w-full font-bold sm:w-fit" for="list-item-3">Kurikulum 2019/2024</label>
+                    <label class="list-item-model-a-title" for="list-item-3">Kurikulum 2019/2024</label>
 
                     <div class="badge badge-success">Aktif</div>
                 </div>
@@ -851,8 +853,14 @@
                         </tr>
                     </tbody>
                 </table>
-            </div>
-        </div>
+            </li>
+        </ol>
+
+        <hr class="my-12">
+
+        <h1>List Item Model B</h1>
+
+        
 
         <hr class="my-12">
     </main>
