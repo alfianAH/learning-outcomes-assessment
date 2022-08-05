@@ -314,6 +314,15 @@ function checkboxTable(element) {
             }).end();
 }
 
+function listItemCheckbox(element) {
+    let listItemClass = $(element);
+
+    listItemClass.find("input[type='checkbox']").on("change", function () {
+        let listItem = $(this).closest(element);
+        $(this).is(":checked") ? listItem.addClass("active") : listItem.removeClass("active")
+    })
+}
+
 function tableAccordion(element) {
     toggleClass($(toggleClass($(element).closest('.table-row'), "open")).next(".table-details"), "open");
 }
@@ -349,6 +358,7 @@ console.log(transitionEvent);
 breadcrumb();
 checkboxTable("table.table-checkbox");
 darkModeHandler();
+listItemCheckbox(".list-item-model-a");
 pagination();
 passwordHandler();
 tabElement();
