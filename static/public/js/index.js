@@ -359,6 +359,7 @@ breadcrumb();
 checkboxTable("table.table-checkbox");
 darkModeHandler();
 listItemCheckbox(".list-item-model-a");
+listItemCheckbox(".list-item-model-b");
 pagination();
 passwordHandler();
 tabElement();

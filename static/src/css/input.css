@@ -258,7 +258,11 @@
 
     /* Model B */
     .list-item-model-b{
-        @apply sm:flex-[0_1_calc(50%-12px)] xl:flex-[0_1_calc(33%-12px)] mt-2 sm:mt-2.5 sm:mr-3 bg-slate-200 dark:bg-neutral-700 hover:bg-slate-300 active:bg-slate-400 dark:hover:bg-neutral-600 dark:active:bg-neutral-500 border border-slate-400 dark:border-none rounded-md px-2.5 py-2.5 md:px-3 md:py-3 transition-all;
+        @apply sm:flex-[0_1_calc(50%-12px)] xl:flex-[0_1_calc(33%-12px)] mt-2 sm:mt-2.5 sm:mr-3 flex items-start bg-slate-200 dark:bg-neutral-700 border border-slate-400 dark:border-none rounded-md px-2.5 py-2.5 md:px-3 md:py-3 transition-all;
+    }
+
+    .list-item-model-b.active{
+        @apply bg-slate-300 dark:bg-neutral-600 border-2 dark:border-solid border-slate-500 dark:border-slate-300;
     }
 
     /* Navigation Bar */
