@@ -261,7 +261,6 @@ function checkboxTable(element) {
             .on("change", function () {
                 // When checkbox on table header on change ...
                 // If not checked, ...
-                console.log($(this).is(":checked"));
                 if ($(this).is(":checked")) {
                     // Check all checkboxes that are not disabled and not checked
                     table.find("tbody th:nth-child(1) input[type='checkbox']:not(:disabled):not(:checked)").prop("checked", true).trigger("change");
@@ -320,7 +319,7 @@ function listItemCheckbox(element) {
     listItemClass.find("input[type='checkbox']").on("change", function () {
         let listItem = $(this).closest(element);
         $(this).is(":checked") ? listItem.addClass("active") : listItem.removeClass("active")
-    })
+    }).trigger("change");
 }
 
 function tableAccordion(element) {
@@ -360,6 +359,7 @@ checkboxTable("table.table-checkbox");
 darkModeHandler();
 listItemCheckbox(".list-item-model-a");
 listItemCheckbox(".list-item-model-b");
+listItemCheckbox(".list-item-model-c");
 pagination();
 passwordHandler();
 tabElement();
