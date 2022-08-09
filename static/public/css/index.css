@@ -1357,10 +1357,6 @@ details.dropdown::marker {
 }
 
 @media (min-width: 640px) {
-  .list-item-model-a {
-    flex: 0 1 calc(50% - 8px);
-  }
-
   .list-item-model-a:nth-child(even) {
     margin-left: 0.625rem;
   }
@@ -1407,7 +1403,6 @@ details.dropdown::marker {
   .list-item-model-b {
     margin-top: 0.625rem;
     margin-right: 0.75rem;
-    flex: 0 1 calc(50% - 12px);
   }
 }
 
@@ -1417,12 +1412,6 @@ details.dropdown::marker {
     padding-right: 0.75rem;
     padding-top: 0.75rem;
     padding-bottom: 0.75rem;
-  }
-}
-
-@media (min-width: 1280px) {
-  .list-item-model-b {
-    flex: 0 1 calc(33% - 12px);
   }
 }
 
@@ -1502,6 +1491,12 @@ details.dropdown::marker {
 
 /* Model D */
 
+.list-item-model-d {
+  height: -webkit-min-content;
+  height: -moz-min-content;
+  height: min-content;
+}
+
 .list-item-model-d > :not([hidden]) ~ :not([hidden]) {
   --tw-space-y-reverse: 0;
   margin-top: calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));
@@ -1513,12 +1508,6 @@ details.dropdown::marker {
   padding-right: 0.5rem;
   padding-top: 0.5rem;
   padding-bottom: 0.75rem;
-}
-
-@media (min-width: 640px) {
-  .list-item-model-d {
-    flex: 0 1 calc(50% - 8px);
-  }
 }
 
 .list-item-model-d-details {
@@ -2819,12 +2808,20 @@ details.dropdown::marker {
     display: block;
   }
 
+  .sm\:grid {
+    display: grid;
+  }
+
   .sm\:w-72 {
     width: 18rem;
   }
 
   .sm\:w-\[calc\(100\%-18rem\)\] {
     width: calc(100% - 18rem);
+  }
+
+  .sm\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .sm\:flex-row {
@@ -2991,6 +2988,10 @@ details.dropdown::marker {
 
   .xl\:w-\[calc\(100\%-28rem\)\] {
     width: calc(100% - 28rem);
+  }
+
+  .xl\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .xl\:space-y-3 > :not([hidden]) ~ :not([hidden]) {

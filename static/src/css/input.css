@@ -251,7 +251,7 @@
 
     /* Model A */
     .list-item-model-a{
-        @apply px-2 pt-2 pb-3 mt-2.5 sm:even:ml-2.5 space-y-2 w-full border-b border-b-slate-400 sm:flex-[0_1_calc(50%-8px)];
+        @apply px-2 pt-2 pb-3 mt-2.5 sm:even:ml-2.5 space-y-2 w-full border-b border-b-slate-400;
     }
 
     .list-item-model-a.active{
@@ -260,7 +260,7 @@
 
     /* Model B */
     .list-item-model-b{
-        @apply sm:flex-[0_1_calc(50%-12px)] xl:flex-[0_1_calc(33%-12px)] mt-2 sm:mt-2.5 sm:mr-3 flex items-start bg-slate-200 dark:bg-neutral-700 border border-slate-400 dark:border-none rounded-md px-2.5 py-2.5 md:px-3 md:py-3 transition-all;
+        @apply mt-2 sm:mt-2.5 sm:mr-3 flex items-start bg-slate-200 dark:bg-neutral-700 border border-slate-400 dark:border-none rounded-md px-2.5 py-2.5 md:px-3 md:py-3 transition-all;
     }
 
     .list-item-model-b.active{
@@ -278,7 +278,7 @@
 
     /* Model D */
     .list-item-model-d{
-        @apply space-y-2 px-2 pt-2 pb-3 sm:flex-[0_1_calc(50%-8px)];
+        @apply space-y-2 px-2 pt-2 pb-3 h-min;
     }
 
     .list-item-model-d-details{
