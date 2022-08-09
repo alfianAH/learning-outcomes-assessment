@@ -356,6 +356,14 @@ function listItemCollapse(element) {
     toggleClass($(element).closest(targetClass), "open");
 }
 
+function listItemRowCollapse(element) {
+    let listItem = $(element);
+
+    listItem.on("click", function () {
+        toggleClass($(this), "open");
+    });
+}
+
 var transitionEvent = whichTransitionEvent();
 console.log(transitionEvent);
 
@@ -365,6 +373,7 @@ darkModeHandler();
 listItemCheckbox(".list-item-model-a");
 listItemCheckbox(".list-item-model-b");
 listItemCheckbox(".list-item-model-c");
+listItemRowCollapse(".list-item-model-f");
 pagination();
 passwordHandler();
 tabElement();

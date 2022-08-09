@@ -285,16 +285,33 @@
         @apply px-6 py-2.5 bg-slate-200 dark:bg-neutral-700 rounded-md space-y-1 hidden;
     }
 
-    /* Model E */
-    .list-item-model-e{
-        @apply bg-slate-200 dark:bg-neutral-700 border border-slate-400 hover:bg-slate-300 dark:hover:bg-neutral-600 dark:border-none p-2.5 md:p-3 xl:p-4 rounded-md;
-    }
-
     .list-item-model-d.open > .list-item-model-d-details{
         @apply block;
     }
 
     .list-item-model-d.open .list-item-collapse{
+        @apply -rotate-180;
+    }
+
+    /* Model E */
+    .list-item-model-e{
+        @apply bg-slate-200 dark:bg-neutral-700 border border-slate-400 hover:bg-slate-300 dark:hover:bg-neutral-600 dark:border-none p-2.5 md:p-3 xl:p-4 rounded-md;
+    }
+
+    /* Model F */
+    .list-item-model-f{
+        @apply bg-slate-200 dark:bg-neutral-700 p-2.5 md:p-3 xl:p-4 rounded-md space-y-2.5 cursor-pointer h-min w-full hover:bg-slate-300 active:bg-slate-400 dark:hover:bg-neutral-600 dark:active:bg-neutral-500 transition-all;
+    }
+
+    .list-item-model-f-details{
+        @apply border-t border-t-slate-800 dark:border-t-slate-100 hidden;
+    }
+
+    .list-item-model-f.open > .list-item-model-f-details{
+        @apply block;
+    }
+
+    .list-item-model-f.open .list-item-collapse{
         @apply -rotate-180;
     }
 
