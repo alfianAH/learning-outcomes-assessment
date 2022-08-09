@@ -285,6 +285,11 @@
         @apply px-6 py-2.5 bg-slate-200 dark:bg-neutral-700 rounded-md space-y-1 hidden;
     }
 
+    /* Model E */
+    .list-item-model-e{
+        @apply bg-slate-200 dark:bg-neutral-700 border border-slate-400 hover:bg-slate-300 dark:hover:bg-neutral-600 dark:border-none p-2.5 md:p-3 xl:p-4 rounded-md;
+    }
+
     .list-item-model-d.open > .list-item-model-d-details{
         @apply block;
     }
