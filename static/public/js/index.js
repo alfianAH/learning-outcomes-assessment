@@ -351,6 +351,11 @@ function tabElement() {
     });
 }
 
+function listItemCollapse(element) {
+    let targetClass = $(element).attr('data-target');
+    toggleClass($(element).closest(targetClass), "open");
+}
+
 var transitionEvent = whichTransitionEvent();
 console.log(transitionEvent);
 

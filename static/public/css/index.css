@@ -884,6 +884,7 @@ tbody,  td,  tfoot,  th,  thead,  tr {
   height: min-content;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
   white-space: nowrap;
   border-radius: 0.375rem;
   border-width: 1px;
@@ -1304,6 +1305,34 @@ details.dropdown::marker {
 
 /* List item */
 
+.list-item-title {
+  width: 100%;
+  font-weight: 700;
+}
+
+@media (min-width: 640px) {
+  .list-item-title {
+    width: -webkit-fit-content;
+    width: -moz-fit-content;
+    width: fit-content;
+  }
+}
+
+.list-numbered{
+  counter-reset: section;
+}
+
+.list-numbered .list-item-title::before{
+  content: counters(section, ".") ". ";
+  counter-increment: section;
+}
+
+.list-item-collapse {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
 /* Model A */
 
 .list-item-model-a {
@@ -1345,28 +1374,6 @@ details.dropdown::marker {
 .dark .list-item-model-a.active {
   --tw-bg-opacity: 1;
   background-color: rgb(113 113 122 / var(--tw-bg-opacity));
-}
-
-.list-item-model-a-title {
-  width: 100%;
-  font-weight: 700;
-}
-
-@media (min-width: 640px) {
-  .list-item-model-a-title {
-    width: -webkit-fit-content;
-    width: -moz-fit-content;
-    width: fit-content;
-  }
-}
-
-.list-numbered{
-  counter-reset: section;
-}
-
-.list-numbered .list-item-model-a-title::before{
-  content: counters(section, ".") ". ";
-  counter-increment: section;
 }
 
 /* Model B */
@@ -1491,6 +1498,61 @@ details.dropdown::marker {
 .dark .list-item-model-c.active {
   --tw-bg-opacity: 1;
   background-color: rgb(63 63 70 / var(--tw-bg-opacity));
+}
+
+/* Model D */
+
+.list-item-model-d > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(0.5rem * var(--tw-space-y-reverse));
+}
+
+.list-item-model-d {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .list-item-model-d {
+    flex: 0 1 calc(50% - 8px);
+  }
+}
+
+.list-item-model-d-details {
+  display: none;
+}
+
+.list-item-model-d-details > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(0.25rem * var(--tw-space-y-reverse));
+}
+
+.list-item-model-d-details {
+  border-radius: 0.375rem;
+  --tw-bg-opacity: 1;
+  background-color: rgb(226 232 240 / var(--tw-bg-opacity));
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
+}
+
+.dark .list-item-model-d-details {
+  --tw-bg-opacity: 1;
+  background-color: rgb(64 64 64 / var(--tw-bg-opacity));
+}
+
+.list-item-model-d.open > .list-item-model-d-details {
+  display: block;
+}
+
+.list-item-model-d.open .list-item-collapse {
+  --tw-rotate: -180deg;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
 /* Navigation Bar */
@@ -2108,6 +2170,20 @@ details.dropdown::marker {
   overflow-x: scroll;
 }
 
+.table-strip tr {
+  border-radius: 0.5rem;
+}
+
+.table-strip tr:nth-child(odd) {
+  --tw-bg-opacity: 1;
+  background-color: rgb(226 232 240 / var(--tw-bg-opacity));
+}
+
+.dark .table-strip tr:nth-child(odd) {
+  --tw-bg-opacity: 1;
+  background-color: rgb(64 64 64 / var(--tw-bg-opacity));
+}
+
 .relative {
   position: relative;
 }
@@ -2231,6 +2307,10 @@ details.dropdown::marker {
   height: 0.5rem;
 }
 
+.h-2\.5 {
+  height: 0.625rem;
+}
+
 .max-h-10 {
   max-height: 2.5rem;
 }
@@ -2281,6 +2361,10 @@ details.dropdown::marker {
 
 .w-2 {
   width: 0.5rem;
+}
+
+.w-2\.5 {
+  width: 0.625rem;
 }
 
 .cursor-pointer {
@@ -2349,10 +2433,6 @@ details.dropdown::marker {
 
 .rounded-md {
   border-radius: 0.375rem;
-}
-
-.rounded-lg {
-  border-radius: 0.5rem;
 }
 
 .border {
@@ -2426,6 +2506,10 @@ details.dropdown::marker {
 
 .fill-sky-600 {
   fill: #0284c7;
+}
+
+.fill-emerald-500 {
+  fill: #10b981;
 }
 
 .p-1 {
@@ -2564,11 +2648,6 @@ details.dropdown::marker {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
-.odd\:bg-slate-200:nth-child(odd) {
-  --tw-bg-opacity: 1;
-  background-color: rgb(226 232 240 / var(--tw-bg-opacity));
-}
-
 .invalid\:border-b-red-600:invalid {
   --tw-border-opacity: 1;
   border-bottom-color: rgb(220 38 38 / var(--tw-border-opacity));
@@ -2677,11 +2756,6 @@ details.dropdown::marker {
 .dark .dark\:text-slate-100 {
   --tw-text-opacity: 1;
   color: rgb(241 245 249 / var(--tw-text-opacity));
-}
-
-.dark .dark\:odd\:bg-neutral-700:nth-child(odd) {
-  --tw-bg-opacity: 1;
-  background-color: rgb(64 64 64 / var(--tw-bg-opacity));
 }
 
 .dark .dark\:invalid\:border-b-red-400:invalid {

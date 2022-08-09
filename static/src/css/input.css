@@ -167,7 +167,7 @@
 
     /* Buttons */
     .btn{
-        @apply flex flex-row items-center px-2 py-1 md:py-2 lg:px-2.5 rounded-md text-xs sm:text-sm md:text-base lg:text-lg border hover:border-slate-800 hover:no-underline h-min whitespace-nowrap dark:border-slate-100 transition-all;
+        @apply flex flex-row items-center justify-center px-2 py-1 md:py-2 lg:px-2.5 rounded-md text-xs sm:text-sm md:text-base lg:text-lg border hover:border-slate-800 hover:no-underline h-min whitespace-nowrap dark:border-slate-100 transition-all;
     }
 
     .btn > svg{
@@ -232,18 +232,7 @@
     }
 
     /* List item */
-
-    /* Model A */
-
-    .list-item-model-a{
-        @apply px-2 pt-2 pb-3 mt-2.5 sm:even:ml-2.5 space-y-2 w-full border-b border-b-slate-400 sm:flex-[0_1_calc(50%-8px)];
-    }
-
-    .list-item-model-a.active{
-        @apply bg-indigo-200 dark:bg-zinc-500;
-    }
-
-    .list-item-model-a-title{
+    .list-item-title{
         @apply w-full font-bold sm:w-fit;
     }
 
@@ -251,9 +240,22 @@
         counter-reset: section;
     }
 
-    .list-numbered .list-item-model-a-title::before{
+    .list-numbered .list-item-title::before{
         content: counters(section, ".") ". ";
         counter-increment: section;
+    }
+
+    .list-item-collapse{
+        @apply transition-all duration-300;
+    }
+
+    /* Model A */
+    .list-item-model-a{
+        @apply px-2 pt-2 pb-3 mt-2.5 sm:even:ml-2.5 space-y-2 w-full border-b border-b-slate-400 sm:flex-[0_1_calc(50%-8px)];
+    }
+
+    .list-item-model-a.active{
+        @apply bg-indigo-200 dark:bg-zinc-500;
     }
 
     /* Model B */
@@ -272,6 +274,23 @@
 
     .list-item-model-c.active{
         @apply bg-indigo-200 dark:bg-zinc-700;
+    }
+
+    /* Model D */
+    .list-item-model-d{
+        @apply space-y-2 px-2 pt-2 pb-3 sm:flex-[0_1_calc(50%-8px)];
+    }
+
+    .list-item-model-d-details{
+        @apply px-6 py-2.5 bg-slate-200 dark:bg-neutral-700 rounded-md space-y-1 hidden;
+    }
+
+    .list-item-model-d.open > .list-item-model-d-details{
+        @apply block;
+    }
+
+    .list-item-model-d.open .list-item-collapse{
+        @apply -rotate-180;
     }
 
     /* Navigation Bar */
@@ -465,6 +484,10 @@
     
     .table-scroll-data {
         @apply inline-block overflow-x-scroll;
+    }
+
+    .table-strip tr{
+        @apply odd:bg-slate-200 dark:odd:bg-neutral-700  rounded-lg;
     }
 }
 
