@@ -1,4 +1,8 @@
 const DARK_MODE_KEY = "dark_theme";
+var grid = $('.masonry').masonry({
+    // options
+    itemSelector: 'li',
+});
 
 function whichTransitionEvent() {
     var t, el = document.createElement("fakeelement");
@@ -354,6 +358,7 @@ function tabElement() {
 function listItemCollapse(element) {
     let targetClass = $(element).attr('data-target');
     toggleClass($(element).closest(targetClass), "open");
+    grid.masonry('layout');
 }
 
 function listItemRowCollapse(element) {
@@ -361,6 +366,7 @@ function listItemRowCollapse(element) {
 
     listItem.on("click", function () {
         toggleClass($(this), "open");
+        grid.masonry('layout');
     });
 }
 

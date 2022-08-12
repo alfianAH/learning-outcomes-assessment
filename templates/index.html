@@ -16,6 +16,7 @@
 
     <!-- JQuery -->
     <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../node_modules/masonry-layout/dist/masonry.pkgd.min.js"></script>
 </head>
 <body>
     <header class="navbar" role="banner">
@@ -1043,7 +1044,65 @@
 
         <h1>List Item Model D</h1>
 
-        <ol class="flex flex-col sm:grid sm:grid-cols-2 list-numbered" role="list">
+        <ol class="flex flex-col masonry list-numbered" role="list">
+            <li class="list-item-model-d" role="listitem">
+                <div class="flex flex-row space-x-2.5">
+                    <span class="list-item-title">Alfian Aldy Hamdani</span>
+
+                    <div class="flex flex-row items-center space-x-2.5">
+                        <div class="w-2.5 h-2.5 rounded-full badge-warning"></div>
+                        
+                        <button>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-4 h-4 fill-emerald-500" focusable="False" aria-label="edit">
+                                <path d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                            </svg>
+                        </button>
+
+                        <button onclick="listItemCollapse(this)" class="list-item-collapse" data-target=".list-item-model-d">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="w-4 h-4" focusable="False" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <table class="w-full table-strip">
+                    <tbody class="space-y-1">
+                        <tr class="flex px-3 py-1 space-x-2.5">
+                            <td class="w-full">NIM</td>
+                            <td>D121181001</td>
+                        </tr>
+
+                        <tr class="flex px-3 py-1 space-x-2.5">
+                            <td class="w-full">Nilai</td>
+                            <td>90</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="list-item-model-d-details">
+                    <table class="w-full">
+                        <tbody class="flex flex-col space-y-1">
+                            <tr class="flex space-x-2.5">
+                                <td class="w-full">CLO 1</td>
+                                <td>90</td>
+                            </tr>
+                            <tr class="flex space-x-2.5">
+                                <td class="w-full">CLO 1</td>
+                                <td>90</td>
+                            </tr>
+                            <tr class="flex space-x-2.5">
+                                <td class="w-full">CLO 1</td>
+                                <td>90</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <button class="btn btn-primary w-full">Student Performance</button>
+                </div>
+            </li>
+
             <li class="list-item-model-d" role="listitem">
                 <div class="flex flex-row space-x-2.5">
                     <span class="list-item-title">Alfian Aldy Hamdani</span>
@@ -1334,7 +1393,7 @@
 
         <h1>List Item Model F</h1>
 
-        <ul class="flex flex-col sm:grid sm:grid-cols-2 gap-2.5 mt-2.5">
+        <ul class="flex flex-col masonry mt-2.5">
             <li class="list-item-model-f">
                 <div class="flex flex-row items-center">
                     <span class="font-bold w-full">CLO 1</span>
