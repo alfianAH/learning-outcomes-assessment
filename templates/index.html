@@ -716,7 +716,7 @@
             </div>
         </div>
 
-        <hr class="my-12">
+        <hr class="my-12"> -->
 
         <ul class="tab" role="tablist">
             <li class="tab-item w-32" id="tab-1" data-target="#tab-1-pane" role="presentation">
@@ -766,7 +766,7 @@
 
         <hr class="my-12">
 
-        <h1>List Item Model A</h1>
+        <!-- <h1>List Item Model A</h1>
 
         <ol class="flex flex-col sm:grid sm:grid-cols-2 list-numbered" role="list">
             <li class="list-item-model-a" role="listitem">
@@ -1541,92 +1541,130 @@
 
         <hr class="my-12"> -->
 
-        <h1>Form Wizard</h1>
+        <h1 class="mb-2.5">Form Wizard</h1>
 
-        <form action="#" method="post" class="form-wizard">
-            <nav role="navigation">
-                <ol>
-                    <li class="form-wizard-page finish" data-target="#form-page-1" aria-current="true"></li>
-                    <li class="form-wizard-page active" data-target="#form-page-2"></li>
-                    <li class="form-wizard-page" data-target="#form-page-3"></li>
-                </ol>
-            </nav>
-            
-            <div>
-                <div class="form-wizard-content" id="form-page-1" aria-label="form-page-1">
-                    <div>
-                        <label for="select-field-1" class="form-label">Kurikulum</label>
-                        <select name="select-field-1" id="select-field-1" class="form-control">
-                            <option value="">Pilih Kurikulum</option>
-                            <option value="1">Kurikulum 2010/2015</option>
-                            <option value="2">Kurikulum 2015/2020</option>
-                            <option value="3">Kurikulum 2015/2020</option>
-                        </select>
-                    </div>
+        <form action="#" method="post" class="space-y-2.5 xl:space-y-3">
+            <div class="form-wizard">
+                <nav role="navigation">
+                    <ol>
+                        <!-- <li class="form-wizard-page finish mr-32 last:mr-0 after:w-32 md:mb-8 md:last:mb-0 md:mr-0 md:after:h-8 md:after:w-px" data-target="#form-page-1" aria-current="true"></li> -->
+                        <li class="form-wizard-page active mr-32 last:mr-0 after:w-32 md:mb-8 md:last:mb-0 md:mr-0 md:after:h-8 md:after:w-px" data-target="#form-page-1" aria-current="true"></li>
+                        <li class="form-wizard-page mr-32 last:mr-0 after:w-32 md:mb-8 md:last:mb-0 md:mr-0 md:after:h-8 md:after:w-px" data-target="#form-page-2"></li>
+                        <li class="form-wizard-page mr-32 last:mr-0 after:w-32 md:mb-8 md:last:mb-0 md:mr-0 md:after:h-8 md:after:w-px" data-target="#form-page-3"></li>
+                    </ol>
+                </nav>
+                
+                <div class="list-numbered md:space-y-4">
+                    <div class="form-wizard-content active" id="form-page-1" aria-label="form-page-1">
+                        <h2 class="form-wizard-header list-item-title">Lorem ipsum dolor sit amet.</h2>
+                        
+                        <div class="fade show active">
+                            <div>
+                                <label for="select-field-1" class="form-label">Kurikulum</label>
+                                <select name="select-field-1" id="select-field-1" class="form-control">
+                                    <option value="">Pilih Kurikulum</option>
+                                    <option value="1">Kurikulum 2010/2015</option>
+                                    <option value="2">Kurikulum 2015/2020</option>
+                                    <option value="3">Kurikulum 2015/2020</option>
+                                </select>
+                            </div>
 
-                    <div>
-                        <label for="select-field-2" class="form-label">Semester</label>
-                        <select name="select-field-2" id="select-field-2" class="form-control">
-                            <option value="">Pilih Semester</option>
-                            <option value="1">Semester 2010/2015</option>
-                            <option value="2">Semester 2015/2020</option>
-                            <option value="3">Semester 2015/2020</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-wizard-content" id="form-page-2" aria-label="form-page-2">
-                    <div>
-                        <label for="select-field-3" class="form-label">ILO</label>
-                        <select name="select-field-3" id="select-field-3" class="form-control">
-                            <option value="">Pilih ILO</option>
-                            <option value="1">ILO 1</option>
-                            <option value="2">ILO 2</option>
-                            <option value="3">ILO 3</option>
-                        </select>
-                    </div>
-
-                    <div class="space-y-1">
-                        <span>Penilaian</span>
-
-                        <div>
-                            <input type="checkbox" name="input-checkbox-1" id="input-checkbox-1" class="form-checkbox">
-                            <label for="input-checkbox" class="form-label">Field 1</label>
-                        </div>
-
-                        <div>
-                            <input type="checkbox" name="input-checkbox-2" id="input-checkbox-2" class="form-checkbox">
-                            <label for="input-checkbox" class="form-label">Field 2</label>
-                        </div>
-
-                        <div>
-                            <input type="checkbox" name="input-checkbox-3" id="input-checkbox-3" class="form-checkbox">
-                            <label for="input-checkbox" class="form-label">Field 3</label>
+                            <div>
+                                <label for="select-field-2" class="form-label">Semester</label>
+                                <select name="select-field-2" id="select-field-2" class="form-control">
+                                    <option value="">Pilih Semester</option>
+                                    <option value="1">Semester 2010/2015</option>
+                                    <option value="2">Semester 2015/2020</option>
+                                    <option value="3">Semester 2015/2020</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="form-wizard-content" id="form-page-3" aria-label="form-page-3">
-                    <div>
-                        <label for="select-field-1" class="form-label">Kurikulum</label>
-                        <select name="select-field-1" id="select-field-1" class="form-control">
-                            <option value="">Pilih Kurikulum</option>
-                            <option value="1">Kurikulum 2010/2015</option>
-                            <option value="2">Kurikulum 2015/2020</option>
-                            <option value="3">Kurikulum 2015/2020</option>
-                        </select>
+                    <div class="form-wizard-content hidden" id="form-page-2" aria-label="form-page-2">
+                        <h2 class="form-wizard-header list-item-title">Lorem ipsum dolor sit amet.</h2>
+
+                        <div class="fade">
+                            <div>
+                                <label for="select-field-3" class="form-label">ILO</label>
+                                <select name="select-field-3" id="select-field-3" class="form-control">
+                                    <option value="">Pilih ILO</option>
+                                    <option value="1">ILO 1</option>
+                                    <option value="2">ILO 2</option>
+                                    <option value="3">ILO 3</option>
+                                </select>
+                            </div>
+
+                            <div class="space-y-1">
+                                <span>Penilaian</span>
+
+                                <div>
+                                    <input type="checkbox" name="input-checkbox-1" id="input-checkbox-1" class="form-checkbox">
+                                    <label for="input-checkbox" class="form-label">Field 1</label>
+                                </div>
+
+                                <div>
+                                    <input type="checkbox" name="input-checkbox-2" id="input-checkbox-2" class="form-checkbox">
+                                    <label for="input-checkbox" class="form-label">Field 2</label>
+                                </div>
+
+                                <div>
+                                    <input type="checkbox" name="input-checkbox-3" id="input-checkbox-3" class="form-checkbox">
+                                    <label for="input-checkbox" class="form-label">Field 3</label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div>
-                        <label for="select-field-2" class="form-label">Semester</label>
-                        <select name="select-field-2" id="select-field-2" class="form-control">
-                            <option value="">Pilih Semester</option>
-                            <option value="1">Semester 2010/2015</option>
-                            <option value="2">Semester 2015/2020</option>
-                            <option value="3">Semester 2015/2020</option>
-                        </select>
+                    <div class="form-wizard-content hidden" id="form-page-3" aria-label="form-page-3">
+                        <h2 class="form-wizard-header list-item-title">Lorem ipsum dolor sit amet.</h2>
+
+                        <div class="fade">
+                            <div>
+                                <label for="select-field-1" class="form-label">Kurikulum</label>
+                                <select name="select-field-1" id="select-field-1" class="form-control">
+                                    <option value="">Pilih Kurikulum</option>
+                                    <option value="1">Kurikulum 2010/2015</option>
+                                    <option value="2">Kurikulum 2015/2020</option>
+                                    <option value="3">Kurikulum 2015/2020</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="select-field-2" class="form-label">Semester</label>
+                                <select name="select-field-2" id="select-field-2" class="form-control">
+                                    <option value="">Pilih Semester</option>
+                                    <option value="1">Semester 2010/2015</option>
+                                    <option value="2">Semester 2015/2020</option>
+                                    <option value="3">Semester 2015/2020</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
+
+            <div class="form-wizard-buttons">
+                <button class="btn btn-secondary btn-icon-start" type="button" role="button" id="prev-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" focusable="False" role="img" aria-label="previous" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+                    </svg>
+                    Sebelumnya
+                </button>
+
+                <button class="btn btn-success btn-icon-end" type="button" role="button" id="next-btn">
+                    Selanjutnya
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" focusable="False" role="img" aria-label="next" class="bi bi-chevron-right" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+                    </svg>
+                </button>
+
+                <button class="btn btn-success btn-icon-end" type="submit" role="button" id="submit-btn">
+                    Sinkronisasi
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" focusable="False" role="img" aria-label="submit" class="bi bi-check2" viewBox="0 0 16 16">
+                        <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                    </svg>
+                </button>
             </div>
         </form>
 

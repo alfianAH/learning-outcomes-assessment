@@ -370,6 +370,12 @@ function listItemRowCollapse(element) {
     });
 }
 
+function formWizard() {
+    const FORM_WIZARD_CLASS = ".form-wizard";
+    const FORM_WIZARD_PAGE_CLASS = ".form-wizard-page";
+    const FORM_WIZARD_CONTENT_CLASS = ".form-wizard-content";
+}
+
 var transitionEvent = whichTransitionEvent();
 console.log(transitionEvent);
 
