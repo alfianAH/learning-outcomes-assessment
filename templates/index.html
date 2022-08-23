@@ -170,7 +170,7 @@
             </ol>
         </nav>
 
-        <h1 role="heading">Halo</h1>
+        <!-- <h1 role="heading">Halo</h1>
         <p>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur quae laborum officia vero quis beatae maiores magnam aspernatur fuga voluptatum tempora corporis, voluptatem ab veritatis! Odit, ratione eaque. Eveniet cupiditate pariatur aut nihil reiciendis placeat recusandae ab laudantium nam eligendi necessitatibus quidem sed optio quam ad, perspiciatis alias quae praesentium aliquam modi. Quia molestias commodi quis qui vero possimus totam, velit cum ut nemo est impedit aut quaerat error rerum laboriosam! Minus perspiciatis culpa ut, nam saepe ex delectus tempora laborum cum quidem atque ipsam voluptates placeat minima. Voluptatem odio soluta alias, perferendis, tempora, tenetur accusamus optio saepe illo laborum incidunt perspiciatis nesciunt iste dolores? Tenetur dolorum, praesentium ipsam, quos repellendus optio laboriosam doloremque blanditiis tempore excepturi maxime accusamus vero molestias itaque. Vero corrupti rerum eligendi dolorem officiis nostrum nobis nesciunt illum, modi saepe aspernatur voluptas quia, ab blanditiis sequi, aliquam recusandae itaque quidem omnis ipsam nisi id dolores dolor. Omnis sequi delectus assumenda animi pariatur qui enim repellendus possimus voluptate autem dolorum officiis totam recusandae amet, inventore odit perspiciatis doloribus nemo quia praesentium sapiente harum velit esse voluptatibus? Delectus, explicabo corporis tempore ipsum ratione sequi magnam molestias adipisci! Nulla, deleniti quos. Saepe molestias officiis, sunt, error corrupti animi officia debitis, at quibusdam optio vel labore quisquam. Quidem vel mollitia fuga eius quod laudantium eaque rerum voluptate in? Saepe tempore minus vitae provident dolores eveniet quisquam consectetur minima eos magni doloremque labore consequuntur nostrum doloribus, ad animi distinctio blanditiis praesentium pariatur officia odit natus nesciunt dolor alias? Quasi laborum, provident excepturi dolore commodi fugiat ipsa iste dicta aut impedit mollitia facilis voluptate eligendi possimus asperiores minima sint cum quaerat expedita sequi cumque eius saepe. Ratione quibusdam quidem officia recusandae debitis aliquam non ea perferendis facere porro, molestias amet necessitatibus ipsa culpa sint quas. Vel quaerat est tempore provident, laudantium alias?
         </p>
@@ -1539,19 +1539,98 @@
             <label for="input-checkbox" class="form-label">Field</label>
         </div>
 
-        <hr class="my-12">
+        <hr class="my-12"> -->
 
-        <!-- <h1>Interactive Form</h1>
+        <h1>Form Wizard</h1>
 
-        <form action="#" method="post">
-            <select name="select-field" id="select-field">
-                <option value="1">Kurikulum 2010/2015</option>
-                <option value="2">Kurikulum 2015/2020</option>
-                <option value="3">Kurikulum 2015/2020</option>
-            </select>
+        <form action="#" method="post" class="form-wizard">
+            <nav role="navigation">
+                <ol>
+                    <li class="form-wizard-page finish" data-target="#form-page-1" aria-current="true"></li>
+                    <li class="form-wizard-page active" data-target="#form-page-2"></li>
+                    <li class="form-wizard-page" data-target="#form-page-3"></li>
+                </ol>
+            </nav>
+            
+            <div>
+                <div class="form-wizard-content" id="form-page-1" aria-label="form-page-1">
+                    <div>
+                        <label for="select-field-1" class="form-label">Kurikulum</label>
+                        <select name="select-field-1" id="select-field-1" class="form-control">
+                            <option value="">Pilih Kurikulum</option>
+                            <option value="1">Kurikulum 2010/2015</option>
+                            <option value="2">Kurikulum 2015/2020</option>
+                            <option value="3">Kurikulum 2015/2020</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="select-field-2" class="form-label">Semester</label>
+                        <select name="select-field-2" id="select-field-2" class="form-control">
+                            <option value="">Pilih Semester</option>
+                            <option value="1">Semester 2010/2015</option>
+                            <option value="2">Semester 2015/2020</option>
+                            <option value="3">Semester 2015/2020</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-wizard-content" id="form-page-2" aria-label="form-page-2">
+                    <div>
+                        <label for="select-field-3" class="form-label">ILO</label>
+                        <select name="select-field-3" id="select-field-3" class="form-control">
+                            <option value="">Pilih ILO</option>
+                            <option value="1">ILO 1</option>
+                            <option value="2">ILO 2</option>
+                            <option value="3">ILO 3</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-1">
+                        <span>Penilaian</span>
+
+                        <div>
+                            <input type="checkbox" name="input-checkbox-1" id="input-checkbox-1" class="form-checkbox">
+                            <label for="input-checkbox" class="form-label">Field 1</label>
+                        </div>
+
+                        <div>
+                            <input type="checkbox" name="input-checkbox-2" id="input-checkbox-2" class="form-checkbox">
+                            <label for="input-checkbox" class="form-label">Field 2</label>
+                        </div>
+
+                        <div>
+                            <input type="checkbox" name="input-checkbox-3" id="input-checkbox-3" class="form-checkbox">
+                            <label for="input-checkbox" class="form-label">Field 3</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-wizard-content" id="form-page-3" aria-label="form-page-3">
+                    <div>
+                        <label for="select-field-1" class="form-label">Kurikulum</label>
+                        <select name="select-field-1" id="select-field-1" class="form-control">
+                            <option value="">Pilih Kurikulum</option>
+                            <option value="1">Kurikulum 2010/2015</option>
+                            <option value="2">Kurikulum 2015/2020</option>
+                            <option value="3">Kurikulum 2015/2020</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="select-field-2" class="form-label">Semester</label>
+                        <select name="select-field-2" id="select-field-2" class="form-control">
+                            <option value="">Pilih Semester</option>
+                            <option value="1">Semester 2010/2015</option>
+                            <option value="2">Semester 2015/2020</option>
+                            <option value="3">Semester 2015/2020</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
         </form>
 
-        <hr class="my-12"> -->
+        <hr class="my-12">
     </main>
 
     <script src="../static/public/js/index.js"></script>
