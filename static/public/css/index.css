@@ -1630,8 +1630,14 @@ details.dropdown::marker {
   color: rgb(87 83 78 / var(--tw-text-opacity));
 }
 
-.form-wizard-content.disabled > *:not(.form-wizard-header) {
+.form-wizard-content.disabled > .form-wizard-header {
   display: none;
+}
+
+@media (min-width: 768px) {
+  .form-wizard-content.disabled > .form-wizard-header {
+    display: block;
+  }
 }
 
 /* List item */

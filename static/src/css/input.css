@@ -285,8 +285,8 @@
         @apply font-normal text-gray-400 dark:text-stone-600;
     }
 
-    .form-wizard-content.disabled > *:not(.form-wizard-header) {
-        @apply hidden;
+    .form-wizard-content.disabled > .form-wizard-header {
+        @apply hidden md:block;
     }
 
     /* List item */
