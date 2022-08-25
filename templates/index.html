@@ -17,6 +17,8 @@
     <!-- JQuery -->
     <script src="../node_modules/jquery/dist/jquery.min.js"></script>
     <script src="../node_modules/masonry-layout/dist/masonry.pkgd.min.js"></script>
+    <!-- JQuery Validation -->
+    <script src="../node_modules/jquery-validation/dist/jquery.validate.min.js"></script>
 </head>
 <body>
     <header class="navbar" role="banner">
@@ -1547,18 +1549,25 @@
             <div class="form-wizard">
                 <nav role="navigation">
                     <ol>
-                        <!-- <li class="form-wizard-page finish mr-32 last:mr-0 after:w-32 md:mb-8 md:last:mb-0 md:mr-0 md:after:h-8 md:after:w-px" data-target="#form-page-1" aria-current="true"></li> -->
-                        <li class="form-wizard-page active mr-32 last:mr-0 after:w-32 md:mb-8 md:last:mb-0 md:mr-0 md:after:h-8 md:after:w-px" data-target="#form-page-1" aria-current="true"></li>
-                        <li class="form-wizard-page mr-32 last:mr-0 after:w-32 md:mb-8 md:last:mb-0 md:mr-0 md:after:h-8 md:after:w-px" data-target="#form-page-2"></li>
-                        <li class="form-wizard-page mr-32 last:mr-0 after:w-32 md:mb-8 md:last:mb-0 md:mr-0 md:after:h-8 md:after:w-px" data-target="#form-page-3"></li>
+                        <!-- <li class="form-wizard-page finish mr-32 last:mr-0 after:w-32 md:mb-8 md:last:mb-0 md:mr-0 md:after:h-8 md:after:w-px" data-target="#form-content-page-1" aria-current="true"></li> -->
+                        <li class="form-wizard-page active mr-32 last:mr-0 after:w-32 md:mb-8 md:last:mb-0 md:mr-0 md:after:h-8 md:after:w-px" id="form-page-1" data-target="#form-content-page-1" aria-current="true"></li>
+                        <li class="form-wizard-page mr-32 last:mr-0 after:w-32 md:mb-8 md:last:mb-0 md:mr-0 md:after:h-8 md:after:w-px" id="form-page-2" data-target="#form-content-page-2"></li>
+                        <li class="form-wizard-page mr-32 last:mr-0 after:w-32 md:mb-8 md:last:mb-0 md:mr-0 md:after:h-8 md:after:w-px" id="form-page-3" data-target="#form-content-page-3"></li>
+                        <li class="form-wizard-page mr-32 last:mr-0 after:w-32 md:mb-8 md:last:mb-0 md:mr-0 md:after:h-8 md:after:w-px" id="form-page-4" data-target="#form-content-page-4"></li>
+                        <li class="form-wizard-page mr-32 last:mr-0 after:w-32 md:mb-8 md:last:mb-0 md:mr-0 md:after:h-8 md:after:w-px" id="form-page-5" data-target="#form-content-page-5"></li>
                     </ol>
                 </nav>
                 
                 <div class="list-numbered md:space-y-4">
-                    <div class="form-wizard-content active" id="form-page-1" aria-label="form-page-1">
+                    <div class="form-wizard-content active" id="form-content-page-1" aria-label="form-content-page-1" data-page="#form-page-1">
                         <h2 class="form-wizard-header list-item-title">Lorem ipsum dolor sit amet.</h2>
                         
                         <div class="fade show active">
+                            <div>
+                                <label for="input-text" class="form-label">Nama</label>
+                                <input type="text" id="input-text" class="form-control col-form-control" placeholder="Field">
+                            </div>
+
                             <div>
                                 <label for="select-field-1" class="form-label">Kurikulum</label>
                                 <select name="select-field-1" id="select-field-1" class="form-control" required aria-required="true">
@@ -1581,7 +1590,7 @@
                         </div>
                     </div>
 
-                    <div class="form-wizard-content hidden" id="form-page-2" aria-label="form-page-2">
+                    <div class="form-wizard-content hidden" id="form-content-page-2" aria-label="form-content-page-2" data-page="#form-page-2">
                         <h2 class="form-wizard-header list-item-title">Lorem ipsum dolor sit amet.</h2>
 
                         <div class="fade">
@@ -1616,7 +1625,59 @@
                         </div>
                     </div>
 
-                    <div class="form-wizard-content hidden" id="form-page-3" aria-label="form-page-3">
+                    <div class="form-wizard-content hidden" id="form-content-page-3" aria-label="form-content-page-3" data-page="#form-page-3">
+                        <h2 class="form-wizard-header list-item-title">Lorem ipsum dolor sit amet.</h2>
+
+                        <div class="fade">
+                            <div>
+                                <label for="select-field-1" class="form-label">Kurikulum</label>
+                                <select name="select-field-1" id="select-field-1" class="form-control" required aria-required="true">
+                                    <option value="">Pilih Kurikulum</option>
+                                    <option value="1">Kurikulum 2010/2015</option>
+                                    <option value="2">Kurikulum 2015/2020</option>
+                                    <option value="3">Kurikulum 2015/2020</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="select-field-2" class="form-label">Semester</label>
+                                <select name="select-field-2" id="select-field-2" class="form-control" required aria-required="true">
+                                    <option value="">Pilih Semester</option>
+                                    <option value="1">Semester 2010/2015</option>
+                                    <option value="2">Semester 2015/2020</option>
+                                    <option value="3">Semester 2015/2020</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-wizard-content hidden" id="form-content-page-4" aria-label="form-content-page-4" data-page="#form-page-4">
+                        <h2 class="form-wizard-header list-item-title">Lorem ipsum dolor sit amet.</h2>
+
+                        <div class="fade">
+                            <div>
+                                <label for="select-field-1" class="form-label">Kurikulum</label>
+                                <select name="select-field-1" id="select-field-1" class="form-control" required aria-required="true">
+                                    <option value="">Pilih Kurikulum</option>
+                                    <option value="1">Kurikulum 2010/2015</option>
+                                    <option value="2">Kurikulum 2015/2020</option>
+                                    <option value="3">Kurikulum 2015/2020</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="select-field-2" class="form-label">Semester</label>
+                                <select name="select-field-2" id="select-field-2" class="form-control" required aria-required="true">
+                                    <option value="">Pilih Semester</option>
+                                    <option value="1">Semester 2010/2015</option>
+                                    <option value="2">Semester 2015/2020</option>
+                                    <option value="3">Semester 2015/2020</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-wizard-content hidden" id="form-content-page-5" aria-label="form-content-page-5" data-page="#form-page-5">
                         <h2 class="form-wizard-header list-item-title">Lorem ipsum dolor sit amet.</h2>
 
                         <div class="fade">
@@ -1645,14 +1706,14 @@
             </div>
 
             <div class="form-wizard-buttons">
-                <button class="btn btn-secondary btn-icon-start" type="button" role="button" id="prev-btn">
+                <button class="btn btn-secondary btn-icon-start" type="button" role="button" id="prev-btn" data-target="">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-chevron-left" focusable="False" role="img" aria-label="previous" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
                     </svg>
                     Sebelumnya
                 </button>
 
-                <button class="btn btn-success btn-icon-end" type="button" role="button" id="next-btn">
+                <button class="btn btn-success btn-icon-end" type="button" role="button" id="next-btn" data-target="#form-content-page-2">
                     Selanjutnya
                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" focusable="False" role="img" aria-label="next" class="bi bi-chevron-right" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
@@ -1672,5 +1733,6 @@
     </main>
 
     <script src="../static/public/js/index.js"></script>
+    <script src="../static/public/js/form-wizard.js"></script>
 </body>
 </html>

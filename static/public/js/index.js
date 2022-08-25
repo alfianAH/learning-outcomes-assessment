@@ -370,69 +370,12 @@ function listItemRowCollapse(element) {
     });
 }
 
-function formWizard() {
-    const FORM_WIZARD_CLASS = ".form-wizard";
-    const FORM_WIZARD_PAGE_CLASS = ".form-wizard-page";
-    const FORM_WIZARD_CONTENT_CLASS = ".form-wizard-content";
-
-    $(FORM_WIZARD_PAGE_CLASS).on("click", function () {
-        let formContentsParent = $(FORM_WIZARD_CONTENT_CLASS).parent();
-        let formContentId = $(this).attr("data-target");
-        let clickedFormContent = $(formContentId);
-
-        if (clickedFormContent.hasClass("active")) return;
-        
-        let activeFormPage = $(`${FORM_WIZARD_CLASS} > nav > ol`).find(`${FORM_WIZARD_PAGE_CLASS}.active`);
-        let activeFormContent = formContentsParent.find(`${FORM_WIZARD_CONTENT_CLASS}.active`);
-        
-        let clickedIndex = $(FORM_WIZARD_CONTENT_CLASS).index(clickedFormContent);
-        let activeIndex = $(FORM_WIZARD_CONTENT_CLASS).index(activeFormContent);
-        
-        // Deactivate active form content
-        activeFormContent.removeClass("active");
-        // Switch the active page to the clicked page
-        activeFormPage.removeClass("active");
-        $(this).addClass("active");
-
-        if (clickedIndex > activeIndex) {
-            // Content from clicked until active + 1 goes disabled
-            activeFormContent.addClass("disabled");
-            // Clicked content removes hidden
-            clickedFormContent.removeClass("hidden");
-        }
-
-        // Fade out animation
-        activeFormContent.find(".fade").removeClass("show");
-
-        // Show the clicked form content
-        clickedFormContent.addClass("active");
-        clickedFormContent.find(".fade").removeClass("hidden").addClass("active");
-
-        // After active form content fade out, ...
-        activeFormContent.one(transitionEvent, function () {
-            // Hide form content (because fade is only opacity)
-            activeFormContent.find(".fade").addClass("hidden").removeClass("active");
-
-            // Show clicked form content
-            clickedFormContent.find(".fade").addClass("show");
-
-            if(clickedIndex < activeIndex) {
-                // Acitve goes hidden
-                activeFormContent.addClass("hidden");
-                // Clicked content removes disabled
-                clickedFormContent.removeClass("disabled");
-            }
-        });
-    });
-}
-
 var transitionEvent = whichTransitionEvent();
 console.log(transitionEvent);
 
 breadcrumb();
 checkboxTable("table.table-checkbox");
 darkModeHandler();
-formWizard();
 listItemCheckbox(".list-item-model-a");
 listItemCheckbox(".list-item-model-b");
 listItemCheckbox(".list-item-model-c");
