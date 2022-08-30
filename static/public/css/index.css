@@ -1525,6 +1525,12 @@ details.dropdown::marker {
   background-color: rgb(120 113 108 / var(--tw-bg-opacity));
 }
 
+.dark .form-wizard-page::after {
+  content: var(--tw-content);
+  --tw-border-opacity: 1;
+  border-color: rgb(120 113 108 / var(--tw-border-opacity));
+}
+
 @media (min-width: 768px) {
   .form-wizard-page::after {
     margin-left: auto;
@@ -1572,16 +1578,77 @@ details.dropdown::marker {
   background-color: rgb(14 116 144 / var(--tw-bg-opacity));
 }
 
-.form-wizard-page.current::after {
+.form-wizard-page.latest {
+  cursor: pointer;
+  border-width: 1px;
+  --tw-border-opacity: 1;
+  border-color: rgb(168 162 158 / var(--tw-border-opacity));
+  background-color: transparent;
+}
+
+.form-wizard-page.latest::after {
   content: var(--tw-content);
+  --tw-border-opacity: 1;
+  border-color: rgb(168 162 158 / var(--tw-border-opacity));
+}
+
+.form-wizard-page.latest:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(168 162 158 / var(--tw-bg-opacity));
+}
+
+.form-wizard-page.latest:active {
+  --tw-bg-opacity: 1;
+  background-color: rgb(120 113 108 / var(--tw-bg-opacity));
+}
+
+.dark .form-wizard-page.latest {
+  --tw-border-opacity: 1;
+  border-color: rgb(120 113 108 / var(--tw-border-opacity));
+}
+
+.dark .form-wizard-page.latest::after {
+  content: var(--tw-content);
+  --tw-border-opacity: 1;
+  border-color: rgb(120 113 108 / var(--tw-border-opacity));
+}
+
+.dark .form-wizard-page.latest:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(120 113 108 / var(--tw-bg-opacity));
+}
+
+.dark .form-wizard-page.latest:active {
+  --tw-bg-opacity: 1;
+  background-color: rgb(168 162 158 / var(--tw-bg-opacity));
+}
+
+.form-wizard-page.active {
+  cursor: default;
+  border-width: 1px;
+  --tw-border-opacity: 1;
+  border-color: rgb(6 182 212 / var(--tw-border-opacity));
+  background-color: transparent;
+}
+
+.form-wizard-page.active:hover {
+  background-color: transparent;
+}
+
+.form-wizard-page.active:active {
+  background-color: transparent;
+}
+
+.dark .form-wizard-page.active {
   --tw-border-opacity: 1;
   border-color: rgb(6 182 212 / var(--tw-border-opacity));
 }
 
-.form-wizard-page.active {
-  border-width: 1px;
-  --tw-border-opacity: 1;
-  border-color: rgb(6 182 212 / var(--tw-border-opacity));
+.dark .form-wizard-page.active:hover {
+  background-color: transparent;
+}
+
+.dark .form-wizard-page.active:active {
   background-color: transparent;
 }
 

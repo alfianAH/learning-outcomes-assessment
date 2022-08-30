@@ -270,19 +270,19 @@
     }
 
     .form-wizard-page{
-        @apply inline-block bg-stone-400 dark:bg-stone-500 w-4 h-4 lg:w-5 lg:h-5 rounded-full last:mr-0 after:content-[""] after:flex after:border-stone-400 after:border after:my-auto after:mx-4 md:after:mx-auto md:after:my-4 lg:after:my-5 after:translate-y-2 md:after:translate-y-0 transition-all last:after:hidden;
+        @apply inline-block bg-stone-400 dark:bg-stone-500 w-4 h-4 lg:w-5 lg:h-5 rounded-full last:mr-0 after:content-[""] after:flex after:border-stone-400 dark:after:border-stone-500 after:border after:my-auto after:mx-4 md:after:mx-auto md:after:my-4 lg:after:my-5 after:translate-y-2 md:after:translate-y-0 transition-all last:after:hidden;
     }
 
     .form-wizard-page.revealed{
         @apply bg-cyan-500 after:border-cyan-500 hover:bg-cyan-600 active:bg-cyan-700 cursor-pointer;
     }
 
-    .form-wizard-page.current{
-        @apply after:border-cyan-500;
+    .form-wizard-page.latest{
+        @apply bg-transparent border border-stone-400 dark:border-stone-500 hover:bg-stone-400 dark:hover:bg-stone-500 active:bg-stone-500 dark:active:bg-stone-400 after:border-stone-400 dark:after:border-stone-500 cursor-pointer;
     }
 
     .form-wizard-page.active{
-        @apply bg-transparent border border-cyan-500;
+        @apply bg-transparent border border-cyan-500 dark:border-cyan-500 hover:bg-transparent dark:hover:bg-transparent active:bg-transparent dark:active:bg-transparent cursor-default;
     }
 
     .form-wizard-content.disabled > .form-wizard-header{

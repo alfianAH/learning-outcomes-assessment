@@ -3,6 +3,11 @@ const FORM_WIZARD_CONTENT_CLASS = ".form-wizard-content";
 const FORM_TAGS = ["input", "textarea", "select"]
 const FORM_CONTENT_PAGE_PATTERN = /#form-content-page-(\d+)/;
 
+const REVEALED_CLASS = "revealed",
+    ACTIVE_CLASS = "active",
+    LATEST_CLASS = "latest";
+
+
 /**
  * Validate form element in form parents
  * @param {*} element Form parents
@@ -27,6 +32,46 @@ function validateForm(element) {
     return true;
 }
 
+/**
+ * Filter target's form content ID and return page number
+ * @param {string} targetFormContentId target's form content ID
+ * @returns Page number
+ */
+function getPageNumber(targetFormContentId) {
+    let regexResult = targetFormContentId.match(FORM_CONTENT_PAGE_PATTERN);
+
+    if (regexResult.length <= 1) {
+        console.error(regexResult);
+        return;
+    }
+
+    return parseInt(regexResult[1]);
+}
+
+function updateFormWizardButton(page, button, currentPage, submitBtn) {
+    let lastPage = $(".form-wizard-parent").children().length;
+
+    // If previous page isn't available,
+    if($(page).length == 0){
+        // Hide the next button
+        button.addClass("hidden");
+        // Update data-target in next button
+        button.attr("data-target", "");
+    } else if ($(page).length == 1) {
+        // Show previous button
+        button.removeClass("hidden");
+        // Update data-target in previous button
+        button.attr("data-target", page);
+    }
+
+    if (currentPage == lastPage) {
+        // Show the sync button
+        submitBtn.removeClass("hidden");
+    } else {
+        submitBtn.addClass("hidden");
+    }
+}
+
 function formWizard() {
     let nextBtn = $(".form-wizard-buttons > #next-btn");
     let prevBtn = $(".form-wizard-buttons > #prev-btn");
@@ -37,11 +82,26 @@ function formWizard() {
         let targetFormContentId = $(this).attr("data-target");
         let targetForm = $(targetFormContentId);
         let targetFormPage = $(targetForm.attr("data-page"));
+        let activeFormPage = $(".form-wizard > nav > ol").find(`${FORM_WIZARD_PAGE_CLASS}.active`);
 
-        // If target form content doesn't have active or revealed class, return
-        if (!targetFormPage.hasClass("revealed")) return;
-        
-        moveForm(targetForm);
+        // If target form content hasn't revealed yet, return        
+        if (((targetFormPage.hasClass(REVEALED_CLASS) && !targetFormPage.hasClass(ACTIVE_CLASS) && !targetFormPage.hasClass(LATEST_CLASS)) && 
+            ((!activeFormPage.hasClass(REVEALED_CLASS) && activeFormPage.hasClass(LATEST_CLASS)) ||
+                (activeFormPage.hasClass(REVEALED_CLASS) && !activeFormPage.hasClass(LATEST_CLASS)))) ||
+            (!targetFormPage.hasClass(REVEALED_CLASS) && !targetFormPage.hasClass(ACTIVE_CLASS) && targetFormPage.hasClass(LATEST_CLASS) &&
+            activeFormPage.hasClass(REVEALED_CLASS) && !activeFormPage.hasClass(LATEST_CLASS))
+        ) {
+            // If can move form, update button and pages
+            if (moveForm(targetForm)) {
+                let currentPage = getPageNumber(targetFormContentId);
+                
+                let previousPage = `#form-content-page-${currentPage - 1}`;
+                let nextPage = `#form-content-page-${currentPage + 1}`;
+                
+                updateFormWizardButton(nextPage, nextBtn, currentPage, submitBtn);
+                updateFormWizardButton(previousPage, prevBtn, currentPage, submitBtn);
+            }
+        }
     });
 
     // Next button handler
@@ -50,51 +110,25 @@ function formWizard() {
             let targetFormContentId = $(this).attr("data-target");
             let targetForm = $(targetFormContentId);
             
-            // If can move form, ...
+            // If can move form, update button and pages
             if (moveForm(targetForm)) {
-                let regexResult = targetFormContentId.match(FORM_CONTENT_PAGE_PATTERN);
-
-                if (regexResult.length <= 1) {
-                    console.log(regexResult);
-                    return;
-                }
-                let currentPage = parseInt(regexResult[1]);
+                let currentPage = getPageNumber(targetFormContentId);
                 
                 let previousPage = `#form-content-page-${currentPage - 1}`;
                 let nextPage = `#form-content-page-${currentPage + 1}`;
                 
-                // If previous page is available,
-                if ($(previousPage).length == 1) {
-                    // Show previous button
-                    prevBtn.removeClass("hidden");
-                    // Update data-target in previous button
-                    prevBtn.attr("data-target", previousPage);
-                }
-                
-                // If next page isn't available, 
-                if($(nextPage).length == 0){
-                    // Hide the next button
-                    $(this).addClass("hidden");
-                    // Update data-target in next button
-                    $(this).attr("data-target", "");
-                    // Show the sync button
-                    $(submitBtn).removeClass("hidden");
-                } else if ($(nextPage).length == 1) {
-                    // Show the next button
-                    $(this).removeClass("hidden");
-                    // Update data-target in next button
-                    $(this).attr("data-target", nextPage);
-                }
+                updateFormWizardButton(nextPage, nextBtn, currentPage, submitBtn);
+                updateFormWizardButton(previousPage, prevBtn, currentPage, submitBtn);
             }
         }).end()
         .on("change", function () {
             let targetFormContentId = $(this).attr("data-target");
-            console.log("next change");
+            // console.log("next change");
             if (targetFormContentId == null) {
-                console.log("next hide");
+                // console.log("next hide");
                 $(this).addClass("hidden");
             } else {
-                console.log("next show");
+                // console.log("next show");
                 $(this).removeClass("hidden");
             }
         }).trigger("change").end();
@@ -105,49 +139,25 @@ function formWizard() {
             let targetFormContentId = $(this).attr("data-target");
             let targetForm = $(targetFormContentId);
             
-            // If can move form, ...
+            // If can move form, update button and pages
             if (moveForm(targetForm)) {
-                let regexResult = targetFormContentId.match(FORM_CONTENT_PAGE_PATTERN);
-
-                if (regexResult.length <= 1) {
-                    console.log(regexResult);
-                    return;
-                }
-                let currentPage = parseInt(regexResult[1]);
+                let currentPage = getPageNumber(targetFormContentId);
                 
                 let previousPage = `#form-content-page-${currentPage - 1}`;
                 let nextPage = `#form-content-page-${currentPage + 1}`;
                 
-                // If next page is available,
-                if ($(nextPage).length == 1) {
-                    // Show next button
-                    nextBtn.removeClass("hidden");
-                    // Update data-target in next button
-                    nextBtn.attr("data-target", nextPage);
-                }
-                
-                // If previous page isn't available, 
-                if ($(previousPage).length == 0) {
-                    // Hide the previous button
-                    $(this).addClass("hidden");
-                    // Update data-target in previous button
-                    $(this).attr("data-target", "");
-                } else if ($(previousPage).length == 1) {
-                    // Show the previous button
-                    $(this).removeClass("hidden");
-                    // Update data-target in previous button
-                    $(this).attr("data-target", previousPage);
-                }
+                updateFormWizardButton(nextPage, nextBtn, currentPage, submitBtn);
+                updateFormWizardButton(previousPage, prevBtn, currentPage, submitBtn);
             }
         }).end()
         .on("change", function () {
             let targetFormContentId = $(this).attr("data-target");
-            console.log("previous change");
+            // console.log("previous change");
             if (targetFormContentId == null) {
-                console.log("previous hide");
+                // console.log("previous hide");
                 $(this).addClass("hidden");
             } else {
-                console.log("previous show");
+                // console.log("previous show");
                 $(this).removeClass("hidden");
             }
         }).trigger("change").end();
@@ -155,8 +165,9 @@ function formWizard() {
 
 function moveForm(targetForm) {
     let formContentsParent = $(FORM_WIZARD_CONTENT_CLASS).parent();
-    let activeFormPage = $(".form-wizard > nav > ol").find(`${FORM_WIZARD_PAGE_CLASS}.active`);
     let activeForm = formContentsParent.find(`${FORM_WIZARD_CONTENT_CLASS}.active`);
+
+    let activeFormPage = $(".form-wizard > nav > ol").find(`${FORM_WIZARD_PAGE_CLASS}.active`);
 
     let isNext = false;
 
@@ -170,17 +181,26 @@ function moveForm(targetForm) {
         isNext = true;
     }
 
+    let isActiveFormValid = validateForm(activeForm);
+
     // If form isn't valid, don't move and give warning
-    if (!validateForm(activeForm) && isNext) {
+    if (!isActiveFormValid && isNext) {
         console.log("Form not valid");
         return false;
+    }
+
+    if (isActiveFormValid && isNext) {
+        activeFormPage.addClass("revealed");
+        activeFormPage.removeClass("latest");
+    }
+
+    if (!targetFormPage.hasClass("revealed")) {
+        targetFormPage.addClass("latest");
     }
 
     // Deactivate active form content
     activeForm.removeClass("active");
     // Switch the active page to the clicked page
-    // if (!activeFormPage.hasClass("revealed"))
-    activeFormPage.addClass("revealed");
     activeFormPage.removeClass("active");
     targetFormPage.addClass("active");
 
