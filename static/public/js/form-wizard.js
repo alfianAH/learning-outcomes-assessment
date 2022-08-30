@@ -1,5 +1,6 @@
 const FORM_WIZARD_PAGE_CLASS = ".form-wizard-page";
 const FORM_WIZARD_CONTENT_CLASS = ".form-wizard-content";
+const FORM_WIZARD_CONTENT_PARENT_CLASS = ".form-wizard-parent";
 const FORM_TAGS = ["input", "textarea", "select"]
 const FORM_CONTENT_PAGE_PATTERN = /#form-content-page-(\d+)/;
 
@@ -49,7 +50,7 @@ function getPageNumber(targetFormContentId) {
 }
 
 function updateFormWizardButton(page, button, currentPage, submitBtn) {
-    let lastPage = $(".form-wizard-parent").children().length;
+    let lastPage = $(FORM_WIZARD_CONTENT_PARENT_CLASS).children().length;
 
     // If previous page isn't available,
     if($(page).length == 0){
@@ -164,8 +165,7 @@ function formWizard() {
 }
 
 function moveForm(targetForm) {
-    let formContentsParent = $(FORM_WIZARD_CONTENT_CLASS).parent();
-    let activeForm = formContentsParent.find(`${FORM_WIZARD_CONTENT_CLASS}.active`);
+    let activeForm = $(FORM_WIZARD_CONTENT_PARENT_CLASS).find(`${FORM_WIZARD_CONTENT_CLASS}.active`);
 
     let activeFormPage = $(".form-wizard > nav > ol").find(`${FORM_WIZARD_PAGE_CLASS}.active`);
 
@@ -204,12 +204,16 @@ function moveForm(targetForm) {
     activeFormPage.removeClass("active");
     targetFormPage.addClass("active");
 
+    // Next content
     if (targetIndex > activeIndex) {
-        // Context: ... active ... clicked
-        // Content from clicked until active + 1 goes disabled
-        activeForm.addClass("disabled");
-        // Clicked content removes hidden
-        targetForm.removeClass("hidden");
+        // Context: ... active ... target
+        // Content from active until target get disabled
+        // Remove hidden to make numbering is still in order
+        for (let i = activeIndex; i < targetIndex; i++){
+            $(`#form-content-page-${i + 1}`).addClass("disabled").removeClass("hidden");
+        }
+        // Clicked content removes disabled and hidden
+        targetForm.removeClass("disabled hidden");
     }
 
     // Fade out animation
@@ -228,9 +232,10 @@ function moveForm(targetForm) {
         targetForm.find(".fade").addClass("show");
 
         // Previous content
-        if(targetIndex < activeIndex) {
-            // Acitve goes hidden
-            activeForm.addClass("hidden");
+        if (targetIndex < activeIndex) {
+            for (let i = activeIndex; i > targetIndex; i--){
+                $(`#form-content-page-${i + 1}`).addClass("hidden");
+            }
             // Clicked content removes disabled
             targetForm.removeClass("disabled");
         }
