@@ -290,7 +290,7 @@
     }
 
     .form-wizard-content.disabled > .form-wizard-header {
-        @apply hidden md:block;
+        @apply absolute left-full max-h-0 overflow-hidden opacity-0 md:relative md:left-auto md:max-h-max md:overflow-visible md:opacity-100;
     }
 
     /* List item */

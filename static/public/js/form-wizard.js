@@ -121,18 +121,7 @@ function formWizard() {
                 updateFormWizardButton(nextPage, nextBtn, currentPage, submitBtn);
                 updateFormWizardButton(previousPage, prevBtn, currentPage, submitBtn);
             }
-        }).end()
-        .on("change", function () {
-            let targetFormContentId = $(this).attr("data-target");
-            // console.log("next change");
-            if (targetFormContentId == null) {
-                // console.log("next hide");
-                $(this).addClass("hidden");
-            } else {
-                // console.log("next show");
-                $(this).removeClass("hidden");
-            }
-        }).trigger("change").end();
+        });
 
     // Previous button handler
     prevBtn
@@ -150,20 +139,14 @@ function formWizard() {
                 updateFormWizardButton(nextPage, nextBtn, currentPage, submitBtn);
                 updateFormWizardButton(previousPage, prevBtn, currentPage, submitBtn);
             }
-        }).end()
-        .on("change", function () {
-            let targetFormContentId = $(this).attr("data-target");
-            // console.log("previous change");
-            if (targetFormContentId == null) {
-                // console.log("previous hide");
-                $(this).addClass("hidden");
-            } else {
-                // console.log("previous show");
-                $(this).removeClass("hidden");
-            }
-        }).trigger("change").end();
+        });
 }
 
+/**
+ * Move active form to the target form
+ * @param {element} targetForm Target form element
+ * @returns Returns true if can move to target form, false if cannot move to target form
+ */
 function moveForm(targetForm) {
     let activeForm = $(FORM_WIZARD_CONTENT_PARENT_CLASS).find(`${FORM_WIZARD_CONTENT_CLASS}.active`);
 
