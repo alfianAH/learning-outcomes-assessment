@@ -21,9 +21,11 @@ function validateForm(element) {
         
         for (const formElement of formElements) {
             // If form is valid, continue
+            // TODO: validation
             if ($(formElement).val() !== "") {
                 continue;
             } else { // Else, return false right away
+                // TODO: focus and give warning
                 return false;
             }
         }
@@ -31,6 +33,50 @@ function validateForm(element) {
 
     // Return true after all of form elements are valid
     return true;
+}
+
+function emptyAllForms(element) {
+    for (const formTag of FORM_TAGS) {
+        let formElements = $(element).find(formTag);
+        if (formElements.length == 0) continue;
+        
+        switch (formTag) {
+            case "input":
+                for (const formElement of formElements) {
+                    let inputType = $(formElement).attr("type");
+                    if(inputType == null) continue;
+                    
+                    switch (inputType) {
+                        case "text":
+                        case "number":
+                        case "password":
+                            $(formElement).val('');
+                            break;
+                        case "radio":
+                        case "checkbox":
+                            if($(formElement).prop("checked")){
+                                $(formElement).prop("checked", false);
+                            }
+                            break;
+                        default:
+                            console.error(`${inputType} is not in case`);
+                            break;
+                    }
+                }
+                break;
+            case "textarea":
+            case "select":
+                for (const formElement of formElements) {
+                    $(formElement).val("");
+                }
+                break;
+            default:
+                break;
+        }
+        for (const formElement of formElements) {
+            $(formElement).val('');
+        }
+    }
 }
 
 /**
@@ -49,6 +95,13 @@ function getPageNumber(targetFormContentId) {
     return parseInt(regexResult[1]);
 }
 
+/**
+ * Update page data in form wizard buttons
+ * @param {integer} page page number
+ * @param {element} button page navigation button
+ * @param {integer} currentPage current page number
+ * @param {element} submitBtn form submit button
+ */
 function updateFormWizardButton(page, button, currentPage, submitBtn) {
     let lastPage = $(FORM_WIZARD_CONTENT_PARENT_CLASS).children().length;
 
@@ -78,6 +131,47 @@ function formWizard() {
     let prevBtn = $(".form-wizard-buttons > #prev-btn");
     let submitBtn = $(".form-wizard-buttons > #submit-btn");
 
+    let formHasChanged = false;
+    let submitted = false;
+    
+    $(document).on("change", ".form-wizard input, .form-wizard select, .form-wizard textarea", function (e) {
+        formHasChanged = true;
+    });
+
+    $(function () { 
+        // Show prompt before unload
+        $(window).on("beforeunload", function (e) {
+            const pageAccessedByReload = window.performance
+                .getEntriesByType('navigation')
+                .map((nav) => nav.type)
+                .includes('reload');
+
+            if (formHasChanged && !submitted && pageAccessedByReload) {
+                var message = "You have not saved your changes.";
+                if (e) {
+                    e.returnValue = message;
+                }
+                return message;
+            }
+        });
+
+        // Empty all forms when unload
+        $(window).on("unload", function (e) {
+            const pageAccessedByReload = window.performance
+                .getEntriesByType('navigation')
+                .map((nav) => nav.type)
+                .includes('reload');
+            
+            if(pageAccessedByReload)
+                emptyAllForms(".form-wizard");
+        });
+        
+        $($(".form-wizard").parent()).on("submit", function () {
+            $(window).off("beforeunload");
+            submitted = true;
+        });
+    });
+
     // Form page on click
     $(FORM_WIZARD_PAGE_CLASS).on("click", function () {
         let targetFormContentId = $(this).attr("data-target");
@@ -106,40 +200,38 @@ function formWizard() {
     });
 
     // Next button handler
-    nextBtn
-        .on("click", function () {
-            let targetFormContentId = $(this).attr("data-target");
-            let targetForm = $(targetFormContentId);
+    nextBtn.on("click", function () {
+        let targetFormContentId = $(this).attr("data-target");
+        let targetForm = $(targetFormContentId);
+        
+        // If can move form, update button and pages
+        if (moveForm(targetForm)) {
+            let currentPage = getPageNumber(targetFormContentId);
             
-            // If can move form, update button and pages
-            if (moveForm(targetForm)) {
-                let currentPage = getPageNumber(targetFormContentId);
-                
-                let previousPage = `#form-content-page-${currentPage - 1}`;
-                let nextPage = `#form-content-page-${currentPage + 1}`;
-                
-                updateFormWizardButton(nextPage, nextBtn, currentPage, submitBtn);
-                updateFormWizardButton(previousPage, prevBtn, currentPage, submitBtn);
-            }
-        });
+            let previousPage = `#form-content-page-${currentPage - 1}`;
+            let nextPage = `#form-content-page-${currentPage + 1}`;
+            
+            updateFormWizardButton(nextPage, nextBtn, currentPage, submitBtn);
+            updateFormWizardButton(previousPage, prevBtn, currentPage, submitBtn);
+        }
+    });
 
     // Previous button handler
-    prevBtn
-        .on("click", function () {
-            let targetFormContentId = $(this).attr("data-target");
-            let targetForm = $(targetFormContentId);
+    prevBtn.on("click", function () {
+        let targetFormContentId = $(this).attr("data-target");
+        let targetForm = $(targetFormContentId);
+        
+        // If can move form, update button and pages
+        if (moveForm(targetForm)) {
+            let currentPage = getPageNumber(targetFormContentId);
             
-            // If can move form, update button and pages
-            if (moveForm(targetForm)) {
-                let currentPage = getPageNumber(targetFormContentId);
-                
-                let previousPage = `#form-content-page-${currentPage - 1}`;
-                let nextPage = `#form-content-page-${currentPage + 1}`;
-                
-                updateFormWizardButton(nextPage, nextBtn, currentPage, submitBtn);
-                updateFormWizardButton(previousPage, prevBtn, currentPage, submitBtn);
-            }
-        });
+            let previousPage = `#form-content-page-${currentPage - 1}`;
+            let nextPage = `#form-content-page-${currentPage + 1}`;
+            
+            updateFormWizardButton(nextPage, nextBtn, currentPage, submitBtn);
+            updateFormWizardButton(previousPage, prevBtn, currentPage, submitBtn);
+        }
+    });
 }
 
 /**
