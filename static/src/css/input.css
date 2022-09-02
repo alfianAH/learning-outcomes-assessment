@@ -18,7 +18,6 @@
         @apply bg-[#aaaaaa];
     }
 
-
     a{
         @apply text-sky-600 hover:underline hover:underline-offset-2 active:text-sky-800 transition-all;
     }
@@ -241,19 +240,27 @@
 
     /* Form */
     .form-control{
-        @apply block bg-slate-300 dark:bg-zinc-600 focus:outline-none focus:shadow-md focus:shadow-slate-500/70 dark:focus:shadow-none dark:border dark:border-zinc-600 dark:focus:border-slate-100 p-2 md:p-2.5 placeholder:text-slate-400 dark:placeholder:text-zinc-400 rounded-md;
+        @apply block bg-slate-300 dark:bg-zinc-600 border border-slate-200 focus:outline-none focus:border-slate-800 dark:border-zinc-600 dark:focus:border-slate-100 p-2 md:p-2.5 placeholder:text-slate-400 dark:placeholder:text-zinc-400 rounded-md;
+    }
+
+    .form-control.danger{
+        @apply border-rose-500 dark:border-rose-600;
     }
 
     .col-form-control{
         @apply inline-block;
     }
 
-    .form-checkbox{
-        @apply w-4 h-4 xl:w-5 xl:h-5;
-    }
-
     .form-label{
         @apply inline-block mb-1.5 md:mb-2.5 mr-2.5 md:mr-3 xl:mr-4;
+    }
+
+    .form-error{
+        @apply hidden text-rose-500 dark:text-rose-600 mt-1;
+    }
+
+    .form-error.active{
+        @apply block;
     }
 
     /* Form wizard */

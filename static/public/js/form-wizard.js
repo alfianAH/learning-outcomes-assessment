@@ -35,6 +35,10 @@ function validateForm(element) {
     return true;
 }
 
+/**
+ * Empty all form fields in form element
+ * @param {element} element formElement
+ */
 function emptyAllForms(element) {
     for (const formTag of FORM_TAGS) {
         let formElements = $(element).find(formTag);

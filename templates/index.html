@@ -718,7 +718,7 @@
             </div>
         </div>
 
-        <hr class="my-12"> -->
+        <hr class="my-12">
 
         <ul class="tab" role="tablist">
             <li class="tab-item w-32" id="tab-1" data-target="#tab-1-pane" role="presentation">
@@ -768,7 +768,7 @@
 
         <hr class="my-12">
 
-        <!-- <h1>List Item Model A</h1>
+        <h1>List Item Model A</h1>
 
         <ol class="flex flex-col sm:grid sm:grid-cols-2 list-numbered" role="list">
             <li class="list-item-model-a" role="listitem">
@@ -1502,49 +1502,87 @@
             </li>
         </ul>
 
-        <hr class="my-12">
+        <hr class="my-12"> -->
 
         <h1>Form Control</h1>
 
         <div class="mb-3">
-            <label for="input-text" class="form-label">Text</label>
-            <input type="text" id="input-text" class="form-control" placeholder="Field">
+            <label for="input-text" class="form-label">Email</label>
+            <input type="email" id="input-text" class="form-control invalid:border-rose-500 dark:invalid:border-rose-600 peer" placeholder="Field">
+            <span class="form-error peer-invalid:block">Email anda tidak valid</span>
+            <span class="form-error secondary">Lorem ipsum dolor sit amet.</span>
         </div>
 
         <div class="mb-3">
             <label for="input-text" class="form-label">Number</label>
-            <input type="number" id="input-text" class="form-control" placeholder="Field">
+            <input type="number" id="input-text" class="form-control invalid:border-rose-500 dark:invalid:border-rose-600 peer" min=0 max=5 placeholder="Field">
+            <span class="form-error peer-invalid:block">Angka yang dimasukkan harus berada di antara 0-5</span>
+            <span class="form-error secondary">Lorem ipsum dolor sit amet.</span>
         </div>
 
         <div class="mb-3">
             <label for="input-text" class="form-label">Column Number</label>
-            <input type="number" id="input-text" class="form-control col-form-control" placeholder="Field">
+            <input type="number" id="input-text" class="form-control col-form-control invalid:border-rose-500 dark:invalid:border-rose-600 peer" min=0 max=5 placeholder="Field">
+            <span class="form-error peer-invalid:block">Angka yang dimasukkan harus berada di antara 0-5</span>
+            <span class="form-error secondary">Lorem ipsum dolor sit amet.</span>
         </div>
 
         <div class="mb-3">
             <label for="input-text" class="form-label">Textarea</label>
-            <textarea name="input-textarea" id="input-textarea" cols="30" rows="5" placeholder="Field" class="form-control"></textarea>
+            <textarea name="input-textarea" id="input-textarea" cols="30" rows="5" placeholder="Field" class="form-control invalid:border-rose-500 dark:invalid:border-rose-600 peer"></textarea>
+            <span class="form-error peer-invalid:block">Lorem ipsum dolor sit amet.</span>
+            <span class="form-error secondary">Lorem ipsum dolor sit amet.</span>
         </div>
 
         <div class="mb-3">
             <label for="input-select" class="form-label">Select</label>
-            <select name="input-select" id="input-select" class="form-control">
+            <select name="input-select" id="input-select" class="form-control invalid:border-rose-500 dark:invalid:border-rose-600 peer">
+                <option value="">Pilih</option>
                 <option value="1">Lorem, ipsum.</option>
                 <option value="1">Lorem, ipsum.</option>
                 <option value="1">Lorem, ipsum.</option>
                 <option value="1">Lorem, ipsum.</option>
             </select>
+            <span class="form-error peer-invalid:block"><option value="1">Lorem, ipsum.</option></span>
+            <span class="form-error secondary">Lorem ipsum dolor sit amet.</span>
         </div>
 
         <div class="mb-3">
-            <input type="checkbox" name="input-checkbox" id="input-checkbox" class="form-checkbox">
-            <label for="input-checkbox" class="form-label">Field</label>
+            <span class="form-label">Lorem Ipsum</span>
+
+            <div>
+                <input type="checkbox" name="input-checkbox" id="input-checkbox" class="w-4 h-4 xl:w-5 xl:h-5">
+                <label for="input-checkbox" class="form-label">Field</label>
+            </div>
+            <div>
+                <input type="checkbox" name="input-checkbox" id="input-checkbox-1" class="w-4 h-4 xl:w-5 xl:h-5">
+                <label for="input-checkbox-1" class="form-label">Field</label>
+            </div>
+
+            <span class="form-error peer-invalid:block"><option value="1">Lorem, ipsum.</option></span>
+            <span class="form-error secondary active">Lorem ipsum dolor sit amet.</span>
         </div>
 
-        <hr class="my-12"> -->
+        <div class="mb-3">
+            <span class="form-label">Lorem ipsum</span>
+            <div>
+                <input type="radio" name="input-radio" id="input-radio-1" class="w-4 h-4 xl:w-5 xl:h-5">
+                <label for="input-radio-1" class="form-label">Field</label>
+            </div>
+
+            <div>
+                <input type="radio" name="input-radio" id="input-radio-2" class="w-4 h-4 xl:w-5 xl:h-5">
+                <label for="input-radio-2" class="form-label">Field</label>
+            </div>
+
+            <span class="form-error peer-invalid:block"><option value="1">Lorem, ipsum.</option></span>
+            <span class="form-error secondary active">Lorem ipsum dolor sit amet.</span>
+        </div>
+
+        <hr class="my-12">
 
         <h1 class="mb-2.5">Form Wizard</h1>
-        <a href="https://google.com">Google</a>
+        
         <form action="javascript:void(0);" method="post" class="space-y-2.5 xl:space-y-3">
             <div class="form-wizard">
                 <nav role="navigation">
@@ -1592,13 +1630,13 @@
                                 <span>Penilaian</span>
                                 
                                 <div>
-                                    <input type="radio" name="input-radio-1" id="input-radio-1" value="input-radio-1" class="form-checkbox">
+                                    <input type="radio" name="input-radio-1" id="input-radio-1" value="input-radio-1" class="w-4 h-4 xl:w-5 xl:h-5">
                                     <label for="input-radio-1" class="form-label">Field 1</label>
 
-                                    <input type="radio" name="input-radio-2" value="input-radio-2" id="input-radio-2" class="form-checkbox">
+                                    <input type="radio" name="input-radio-2" value="input-radio-2" id="input-radio-2" class="w-4 h-4 xl:w-5 xl:h-5">
                                     <label for="input-radio-2" class="form-label">Field 2</label>
 
-                                    <input type="radio" name="input-radio-3" value="input-radio-3" id="input-radio-3" class="form-checkbox">
+                                    <input type="radio" name="input-radio-3" value="input-radio-3" id="input-radio-3" class="w-4 h-4 xl:w-5 xl:h-5">
                                     <label for="input-radio-3" class="form-label">Field 3</label>
                                 </div>
                             </div>
@@ -1623,17 +1661,17 @@
                                 <span>Penilaian</span>
 
                                 <div>
-                                    <input type="checkbox" name="input-checkbox-1" id="input-checkbox-1" class="form-checkbox">
+                                    <input type="checkbox" name="input-checkbox-1" id="input-checkbox-1" class="w-4 h-4 xl:w-5 xl:h-5">
                                     <label for="input-checkbox-1" class="form-label">Field 1</label>
                                 </div>
 
                                 <div>
-                                    <input type="checkbox" name="input-checkbox-2" id="input-checkbox-2" class="form-checkbox">
+                                    <input type="checkbox" name="input-checkbox-2" id="input-checkbox-2" class="w-4 h-4 xl:w-5 xl:h-5">
                                     <label for="input-checkbox-2" class="form-label">Field 2</label>
                                 </div>
 
                                 <div>
-                                    <input type="checkbox" name="input-checkbox-3" id="input-checkbox-3" class="form-checkbox">
+                                    <input type="checkbox" name="input-checkbox-3" id="input-checkbox-3" class="w-4 h-4 xl:w-5 xl:h-5">
                                     <label for="input-checkbox-3" class="form-label">Field 3</label>
                                 </div>
                             </div>
@@ -1745,6 +1783,15 @@
         </form>
 
         <hr class="my-12">
+
+        <div class="fixed w-24 h-24 bottom-0 right-0 mx-8 my-6">
+            <input type="checkbox" id="dark-mode-toggle" class="hidden" role="checkbox" aria-labelledby="dark-mode-toggle-label">
+            <label for="dark-mode-toggle" id="dark-mode-toggle-label">
+                <div class="absolute w-10 h-10 bg-cyan-500 rounded-full z-10 cursor-pointer text-slate-100 text-center text-lg m-auto bottom-0 right-0 left-0 select-none">
+                    +
+                <div>
+            </label>
+        </div>
     </main>
 
     <script src="../static/public/js/index.js"></script>
