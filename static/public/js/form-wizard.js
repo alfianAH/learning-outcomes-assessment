@@ -8,30 +8,60 @@ const REVEALED_CLASS = "revealed",
     ACTIVE_CLASS = "active",
     LATEST_CLASS = "latest";
 
-function invalidAction(formElement, invalidMessage) {
-    // Change the field style
-    $(formElement).addClass("danger");
-        
-    // Show the warning
-    $(formElement).siblings(".form-error").addClass("active");
-    $(formElement).siblings(".form-error").text(invalidMessage);
-}
-
-function validateTextField(formElement) {
-    if ($(formElement).val() !== "") {
-        $(formElement).siblings(".form-error").removeClass("active");
-        return true;
-    } else {
+/**
+ * Actions if form is invalid
+ * @param {element} formError Form error element
+ * @param {string} invalidMessage Invalid message
+ * @param {element} formElement Form element
+ */
+function formInvalidActions(formError, invalidMessage, formElement = null) {
+    // Add danger class to form element that has border
+    if(formElement != null){
         // Change the field style
         $(formElement).addClass("danger");
+    }
         
-        // Show the warning
-        $(formElement).siblings(".form-error").addClass("active");
-        $(formElement).siblings(".form-error").text("Field ini tidak boleh kosong");
+    // Show the warning
+    $(formError).addClass("active");
+    $(formError).text(invalidMessage);
+}
+
+/**
+ * Actions if form is valid
+ * @param {element} formError Form error element
+ * @param {element} formElement Form element
+ */
+function formValidActions(formError, formElement = null) {
+    // Remove danger class to form element that has border
+    if(formElement != null){
+        // Change the field style
+        $(formElement).removeClass("danger");
+    }
+        
+    // Hide the warning
+    $(formError).removeClass("active");
+}
+
+/**
+ * Validate text field
+ * @param {element} formElement Form element
+ * @returns Returns true if text field is not empty, otherwise false
+ */
+function validateTextField(formElement) {
+    if ($(formElement).val() !== "") {
+        formValidActions($(formElement).siblings(".form-error"), formElement);
+        return true;
+    } else {
+        formInvalidActions($(formElement).siblings(".form-error"), "Field ini tidak boleh kosong", formElement);
         return false;
     }
 }
 
+/**
+ * Validate select field
+ * @param {element} formElement Form Element
+ * @returns Returns true if user select an option that has value, otherwise false
+ */
 function validateSelectField(formElement) {
     let options = $(formElement).find("option:selected");
 
@@ -39,33 +69,84 @@ function validateSelectField(formElement) {
         let optionValue = $(options[0]).attr("value");
         // Return true if value is not empty string
         if (optionValue != "") {
-            $(formElement).siblings(".form-error").removeClass("active");
+            formValidActions($(formElement).siblings(".form-error"), formElement);
             return true;
         }
     }
     // Return false if option value is empty string and none are selected
-    // Change the field style
-    $(formElement).addClass("danger");
-        
-    // Show the warning
-    $(formElement).siblings(".form-error").addClass("active");
-    $(formElement).siblings(".form-error").text("Pilih salah satu");
+    formInvalidActions($(formElement).siblings(".form-error"), "Pilih salah satu", formElement);
     return false;
 }
 
-function validateRadioField(radioFieldName, radioGroup) {
-    let radioFields = $(`input[type='radio'][name='${radioFieldName}']:checked`);
+/**
+ * Validate radio field
+ * @param {string} formFieldName Radio form field name
+ * @param {*} formGroup Radios' group
+ * @param {*} invalidMessage Invalid message if not valid
+ * @returns Returns true if checked checkbox is 1, otherwise false
+ */
+function validateRadioField(formFieldName, formGroup, invalidMessage) {
+    let formFields = $(`input[type='radio'][name='${formFieldName}']:checked`);
 
-    console.log()
-
-    if (radioFields.length == 1) {
-        $(radioGroup).find(".form-error").removeClass("active");
+    if (formFields.length == 1) {
+        formValidActions($(formGroup).find(".form-error"));
         return true;
     }
 
-    $(radioGroup).find(".form-error").addClass("active");
-    $(radioGroup).find(".form-error").text("Pilih salah satu");
+    formInvalidActions($(formGroup).find(".form-error"), invalidMessage);
     return false;
+}
+
+/**
+ * Validate checkbox field
+ * @param {string} formFieldName Checkbox form field name
+ * @param {element} formGroup Checkboxes' group
+ * @param {string} checkType Checkbox type. Value: "min", "max"
+ * @param {integer} checkRequirement Checkbox that should be checked
+ * @returns Returns true if it fits with criteria, false if doesn't fit
+ */
+function validateCheckboxField(formFieldName, formGroup, checkType="min", checkRequirement=0) {
+    let formFields = $(`input[type='checkbox'][name='${formFieldName}']:checked`);
+    let formError = $(formGroup).find(".form-error");
+
+    switch (checkType) {
+        case "min":
+            if (formFields.length < checkRequirement) {
+                formInvalidActions(formError,`Minimal pilihan: ${checkRequirement}`);
+                return false;
+            }
+            break;
+        case "max":
+            if (formFields.length > checkRequirement) {
+                formInvalidActions(formError,`Maksimal pilihan: ${checkRequirement}`);
+                return false;
+            }
+            break;
+        default:
+            break;
+    }
+
+    formValidActions(formError);
+    return true;
+}
+
+/**
+ * Get array checked form field's name
+ * @param {Array} formElements Array of check form fields
+ * @returns Array of checked form field's name
+ */
+function getCheckedFieldNames(formElements) {
+    let fieldNames = [];
+
+    for (const formElement of formElements) {
+        let fieldName = $(formElement).attr("name");
+
+        if (!fieldNames.includes(fieldName)) {
+            fieldNames.push(fieldName);
+        }
+    }
+
+    return fieldNames;
 }
 
 /**
@@ -102,22 +183,37 @@ function validateForm(element) {
     }
 
     if (radioFieldElements.length > 0) {
-        let radioFieldNames = [];
-
-        for (const formElement of radioFieldElements) {
-            let radioFieldName = $(formElement).attr("name");
-
-            if (!radioFieldNames.includes(radioFieldName)) {
-                radioFieldNames.push(radioFieldName);
-            }
-        }
+        let radioFieldNames = getCheckedFieldNames(radioFieldElements);
 
         for (const radioFieldName of radioFieldNames) {
+            // Get form group
             let radioGroup = $(`input[type='radio'][name='${radioFieldName}']`).closest(".form-group");
 
-            if (!validateRadioField(radioFieldName, radioGroup)) {
+            let isRadioFieldValid = validateRadioField(radioFieldName, radioGroup, "Pilih salah satu");
+            
+            if (!isRadioFieldValid) {
                 isValid = false;
                 radioGroup.triggerHandler("focus");
+            }
+        }
+    }
+
+    if (checkboxFieldElements.length > 0) {
+        let checkboxFieldNames = getCheckedFieldNames(checkboxFieldElements);
+
+        for (const checkboxFieldName of checkboxFieldNames) {
+            // Get form group
+            let checkboxGroup = $(`input[type='checkbox'][name='${checkboxFieldName}']`).closest(".form-group");
+
+            // Get check type and requirement
+            let checkType = $(checkboxGroup).attr("data-checkbox-check-type");
+            let checkRequirement = parseInt($(checkboxGroup).attr("data-checkbox-check-requirement"));
+
+            let isCheckboxFieldValid = validateCheckboxField(checkboxFieldName, checkboxGroup, checkType, checkRequirement);
+
+            if (!isCheckboxFieldValid) {
+                isValid = false;
+                checkboxGroup.triggerHandler("focus");
             }
         }
     }
@@ -143,6 +239,7 @@ function emptyAllForms(element) {
                     
                     switch (inputType) {
                         case "text":
+                        case "email":
                         case "number":
                         case "password":
                             $(formElement).val('');
