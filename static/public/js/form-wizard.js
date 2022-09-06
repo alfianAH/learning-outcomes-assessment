@@ -53,6 +53,21 @@ function validateSelectField(formElement) {
     return false;
 }
 
+function validateRadioField(radioFieldName, radioGroup) {
+    let radioFields = $(`input[type='radio'][name='${radioFieldName}']:checked`);
+
+    console.log()
+
+    if (radioFields.length == 1) {
+        $(radioGroup).find(".form-error").removeClass("active");
+        return true;
+    }
+
+    $(radioGroup).find(".form-error").addClass("active");
+    $(radioGroup).find(".form-error").text("Pilih salah satu");
+    return false;
+}
+
 /**
  * Validate form element in form parents
  * @param {*} element Form parents
@@ -82,6 +97,27 @@ function validateForm(element) {
                 isValid = false;
                 // Focus on element
                 $(formElement).triggerHandler("focus");
+            }
+        }
+    }
+
+    if (radioFieldElements.length > 0) {
+        let radioFieldNames = [];
+
+        for (const formElement of radioFieldElements) {
+            let radioFieldName = $(formElement).attr("name");
+
+            if (!radioFieldNames.includes(radioFieldName)) {
+                radioFieldNames.push(radioFieldName);
+            }
+        }
+
+        for (const radioFieldName of radioFieldNames) {
+            let radioGroup = $(`input[type='radio'][name='${radioFieldName}']`).closest(".form-group");
+
+            if (!validateRadioField(radioFieldName, radioGroup)) {
+                isValid = false;
+                radioGroup.triggerHandler("focus");
             }
         }
     }
