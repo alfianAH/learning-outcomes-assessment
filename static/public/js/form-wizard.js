@@ -8,6 +8,50 @@ const REVEALED_CLASS = "revealed",
     ACTIVE_CLASS = "active",
     LATEST_CLASS = "latest";
 
+function invalidAction(formElement, invalidMessage) {
+    // Change the field style
+    $(formElement).addClass("danger");
+        
+    // Show the warning
+    $(formElement).siblings(".form-error").addClass("active");
+    $(formElement).siblings(".form-error").text(invalidMessage);
+}
+
+function validateTextField(formElement) {
+    if ($(formElement).val() !== "") {
+        $(formElement).siblings(".form-error").removeClass("active");
+        return true;
+    } else {
+        // Change the field style
+        $(formElement).addClass("danger");
+        
+        // Show the warning
+        $(formElement).siblings(".form-error").addClass("active");
+        $(formElement).siblings(".form-error").text("Field ini tidak boleh kosong");
+        return false;
+    }
+}
+
+function validateSelectField(formElement) {
+    let options = $(formElement).find("option:selected");
+
+    if (options.length == 1) {
+        let optionValue = $(options[0]).attr("value");
+        // Return true if value is not empty string
+        if (optionValue != "") {
+            $(formElement).siblings(".form-error").removeClass("active");
+            return true;
+        }
+    }
+    // Return false if option value is empty string and none are selected
+    // Change the field style
+    $(formElement).addClass("danger");
+        
+    // Show the warning
+    $(formElement).siblings(".form-error").addClass("active");
+    $(formElement).siblings(".form-error").text("Pilih salah satu");
+    return false;
+}
 
 /**
  * Validate form element in form parents
@@ -15,24 +59,35 @@ const REVEALED_CLASS = "revealed",
  * @returns True, if form is valid. False, if form is not valid
  */
 function validateForm(element) {
-    for (const formTag of FORM_TAGS) {
-        let formElements = $(element).find(formTag);
-        if (formElements.length == 0) continue;
-        
-        for (const formElement of formElements) {
-            // If form is valid, continue
-            // TODO: validation
-            if ($(formElement).val() !== "") {
-                continue;
-            } else { // Else, return false right away
-                // TODO: focus and give warning
-                return false;
+    let isValid = true;
+
+    let textFieldElements = $(element).find("input[type=email], input[type=text], input[type=number], input[type=password], textarea");
+    let selectFieldElements = $(element).find("select");
+    let radioFieldElements = $(element).find("input[type='radio']");
+    let checkboxFieldElements = $(element).find("input[type='checkbox']");
+
+    if (textFieldElements.length > 0) {
+        for (const formElement of textFieldElements) {
+            if (!validateTextField(formElement)) {
+                isValid = false;
+                // Focus on element
+                $(formElement).triggerHandler("focus");
+            }
+        }
+    }
+
+    if (selectFieldElements.length > 0) {
+        for (const formElement of selectFieldElements) {
+            if (!validateSelectField(formElement)) {
+                isValid = false;
+                // Focus on element
+                $(formElement).triggerHandler("focus");
             }
         }
     }
 
     // Return true after all of form elements are valid
-    return true;
+    return isValid;
 }
 
 /**
@@ -76,9 +131,6 @@ function emptyAllForms(element) {
                 break;
             default:
                 break;
-        }
-        for (const formElement of formElements) {
-            $(formElement).val('');
         }
     }
 }

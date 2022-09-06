@@ -1575,7 +1575,7 @@
                 <label for="input-radio-2" class="form-label">Field</label>
             </div>
 
-            <span class="form-error peer-invalid:block"><option value="1">Lorem, ipsum.</option></span>
+            <span class="form-error peer-invalid:block">Pilih salah satu</span>
             <span class="form-error secondary active">Lorem ipsum dolor sit amet.</span>
         </div>
 
@@ -1601,44 +1601,50 @@
                         <h2 class="form-wizard-header list-item-title">Lorem ipsum dolor sit amet.</h2>
                         
                         <div class="fade show active">
-                            <div>
-                                <label for="input-text" class="form-label">Nama</label>
-                                <input type="text" id="input-text" class="form-control col-form-control" placeholder="Field">
+                            <div class="mb-3">
+                                <label for="input-text" class="form-label">Email</label>
+                                <input type="email" id="input-text" class="form-control" placeholder="Field" required aria-required="true">
+                                <span class="form-error">Lorem ipsum dolor sit amet.</span>
                             </div>
 
-                            <div>
-                                <label for="select-field-1" class="form-label">Kurikulum</label>
-                                <select name="select-field-1" id="select-field-1" class="form-control" required aria-required="true">
-                                    <option value="">Pilih Kurikulum</option>
-                                    <option value="1">Kurikulum 2010/2015</option>
-                                    <option value="2">Kurikulum 2015/2020</option>
-                                    <option value="3">Kurikulum 2015/2020</option>
+                            <div class="mb-3">
+                                <label for="input-text" class="form-label">Text</label>
+                                <input type="text" id="input-text" class="form-control" placeholder="Field" required aria-required="true">
+                                <span class="form-error">Lorem ipsum dolor sit amet.</span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="input-number" class="form-label">Number</label>
+                                <input type="number" id="input-number" class="form-control" min="0" max="5" placeholder="Field" required aria-required="true">
+                                <span class="form-error">Lorem ipsum dolor sit amet.</span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="input-select" class="form-label">Select</label>
+                                <select name="input-select" id="input-select" class="form-control" required aria-required="true">
+                                    <option value="">Pilih</option>
+                                    <option value="1">Lorem, ipsum.</option>
+                                    <option value="1">Lorem, ipsum.</option>
+                                    <option value="1">Lorem, ipsum.</option>
+                                    <option value="1">Lorem, ipsum.</option>
                                 </select>
+                                <span class="form-error">Lorem ipsum dolor sit amet.</span>
                             </div>
 
-                            <div>
-                                <label for="select-field-2" class="form-label">Semester</label>
-                                <select name="select-field-2" id="select-field-2" class="form-control"required aria-required="true">
-                                    <option value="">Pilih Semester</option>
-                                    <option value="1">Semester 2010/2015</option>
-                                    <option value="2">Semester 2015/2020</option>
-                                    <option value="3">Semester 2015/2020</option>
-                                </select>
-                            </div>
+                            <div class="mb-3">
+                                <span class="form-label">Lorem ipsum</span>
 
-                            <div class="space-y-1">
-                                <span>Penilaian</span>
-                                
                                 <div>
-                                    <input type="radio" name="input-radio-1" id="input-radio-1" value="input-radio-1" class="w-4 h-4 xl:w-5 xl:h-5">
-                                    <label for="input-radio-1" class="form-label">Field 1</label>
-
-                                    <input type="radio" name="input-radio-2" value="input-radio-2" id="input-radio-2" class="w-4 h-4 xl:w-5 xl:h-5">
-                                    <label for="input-radio-2" class="form-label">Field 2</label>
-
-                                    <input type="radio" name="input-radio-3" value="input-radio-3" id="input-radio-3" class="w-4 h-4 xl:w-5 xl:h-5">
-                                    <label for="input-radio-3" class="form-label">Field 3</label>
+                                    <input type="radio" name="input-radio" id="form-input-radio-1" class="w-4 h-4 xl:w-5 xl:h-5" required aria-required="true">
+                                    <label for="form-input-radio-1" class="form-label">Field</label>
                                 </div>
+
+                                <div>
+                                    <input type="radio" name="input-radio" id="form-input-radio-2" class="w-4 h-4 xl:w-5 xl:h-5" required aria-required="true">
+                                    <label for="form-input-radio-2" class="form-label">Field</label>
+                                </div>
+
+                                <span class="form-error">Lorem ipsum dolor sit amet.</span>
                             </div>
                         </div>
                     </div>

@@ -3342,6 +3342,10 @@ details.dropdown::marker {
   color: rgb(251 113 133 / var(--tw-text-opacity));
 }
 
+.peer:default ~ .peer-default\:hidden {
+  display: none;
+}
+
 .peer:invalid ~ .peer-invalid\:block {
   display: block;
 }
