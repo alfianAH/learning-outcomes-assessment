@@ -1,7 +1,6 @@
 const FORM_WIZARD_PAGE_CLASS = ".form-wizard-page";
 const FORM_WIZARD_CONTENT_CLASS = ".form-wizard-content";
 const FORM_WIZARD_CONTENT_PARENT_CLASS = ".form-wizard-parent";
-const FORM_TAGS = ["input", "textarea", "select"]
 const FORM_CONTENT_PAGE_PATTERN = /#form-content-page-(\d+)/;
 
 const REVEALED_CLASS = "revealed",
@@ -264,7 +263,7 @@ function validateForm(element) {
 
     if (textFieldElements.length > 0) {
         for (const formElement of textFieldElements) {
-            if (!validateEmptyField(formElement, "Field ini tidak boleh kosong")) {
+            if (!validateTextField(formElement, "Field ini tidak boleh kosong")) {
                 isValid = false;
                 // Focus on element
                 $(formElement).triggerHandler("focus");
@@ -337,43 +336,20 @@ function validateForm(element) {
  * @param {element} element formElement
  */
 function emptyAllForms(element) {
-    for (const formTag of FORM_TAGS) {
-        let formElements = $(element).find(formTag);
-        if (formElements.length == 0) continue;
-        
-        switch (formTag) {
-            case "input":
-                for (const formElement of formElements) {
-                    let inputType = $(formElement).attr("type");
-                    if(inputType == null) continue;
-                    
-                    switch (inputType) {
-                        case "text":
-                        case "email":
-                        case "number":
-                        case "password":
-                            $(formElement).val('');
-                            break;
-                        case "radio":
-                        case "checkbox":
-                            if($(formElement).prop("checked")){
-                                $(formElement).prop("checked", false);
-                            }
-                            break;
-                        default:
-                            console.error(`${inputType} is not in case`);
-                            break;
-                    }
-                }
-                break;
-            case "textarea":
-            case "select":
-                for (const formElement of formElements) {
-                    $(formElement).val("");
-                }
-                break;
-            default:
-                break;
+    let valueFieldElements = $(element).find("input[type=email], input[type=text], input[type=password], input[type=number], textarea, select");
+    let checkedFieldElements = $(element).find("input[type='radio'], input[type='checkbox']");
+
+    if (valueFieldElements.length > 0) {
+        for (const formElement of valueFieldElements) {
+            $(formElement).val('');
+        }
+    }
+    
+    if (checkedFieldElements.length > 0) {
+        for (const formElement of checkedFieldElements) {
+            if($(formElement).prop("checked")){
+                $(formElement).prop("checked", false);
+            }
         }
     }
 }
