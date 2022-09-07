@@ -43,18 +43,54 @@ function formValidActions(formError, formElement = null) {
 }
 
 /**
+ * Validate if field is empty or not
+ * @param {element} formElement Form element
+ * @param {string} invalidMessage Invalid message
+ * @returns Returns false if text field is empty, otherwise true
+ */
+function validateEmptyField(formElement, invalidMessage) {
+    if ($(formElement).val() != "") return true;
+    
+    formInvalidActions($(formElement).siblings(".form-error"), invalidMessage, formElement);
+    return false;
+}
+
+/**
+ * Validate max length of text field
+ * @param {element} formElement Form element
+ * @returns Returns true if value doesn't exceed the max length, otherwise false
+ */
+function validateMaxLengthTextField(formElement) {
+    let formError = $(formElement).siblings(".form-error");
+    let limitChar = $(formElement).attr("maxlength");
+
+    if (limitChar == null) return true;
+    
+    limitChar = parseInt(limitChar);
+    if ($(formElement).val().length < limitChar) return true;
+
+    formInvalidActions(formError, `Batas karakter: ${limitChar}`, formElement);
+    return false;
+}
+
+/**
  * Validate text field
  * @param {element} formElement Form element
- * @returns Returns true if text field is not empty, otherwise false
+ * @returns Returns true if text field is filled and not exceed the max length, otherwise false
  */
 function validateTextField(formElement) {
-    if ($(formElement).val() !== "") {
-        formValidActions($(formElement).siblings(".form-error"), formElement);
-        return true;
-    } else {
-        formInvalidActions($(formElement).siblings(".form-error"), "Field ini tidak boleh kosong", formElement);
-        return false;
-    }
+    let formError = $(formElement).siblings(".form-error");
+
+    // If empty field, return false
+    let isFieldFilled = validateEmptyField(formElement, "Field ini tidak boleh kosong");
+    if (!isFieldFilled) return false;
+
+    // If value exceeds the max length, return false
+    let isFieldBelowMax = validateMaxLengthTextField(formElement);
+    if (!isFieldBelowMax) return false;
+
+    formValidActions(formError, formElement);
+    return true;
 }
 
 /**
@@ -98,9 +134,9 @@ function validateMinMaxNumberField(formElement, type) {
  */
 function validateNumberField(formElement) {
     let formError = $(formElement).siblings(".form-error");
-    // Check the value first
-    if ($(formElement).val() == "") {
-        formInvalidActions(formError, "Field ini tidak valid", formElement);
+
+    // If empty field, return false
+    if (!validateEmptyField(formElement, "Field ini tidak valid")) {
         return false;
     }
 
@@ -228,7 +264,7 @@ function validateForm(element) {
 
     if (textFieldElements.length > 0) {
         for (const formElement of textFieldElements) {
-            if (!validateTextField(formElement)) {
+            if (!validateEmptyField(formElement, "Field ini tidak boleh kosong")) {
                 isValid = false;
                 // Focus on element
                 $(formElement).triggerHandler("focus");
