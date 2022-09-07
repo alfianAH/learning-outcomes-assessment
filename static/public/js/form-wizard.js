@@ -58,6 +58,64 @@ function validateTextField(formElement) {
 }
 
 /**
+ * Validate number field if it has min or max attribute
+ * @param {element} formElement Form element
+ * @param {string} type min or max
+ * @returns Returns true if number type is null or the value is in min until max range, otherwise false
+ */
+function validateMinMaxNumberField(formElement, type) {
+    let formError = $(formElement).siblings(".form-error");
+    let numberType = $(formElement).attr(type);
+
+    if (numberType == null) return true;
+
+    numberType = parseInt(numberType);
+
+    switch (type) {
+        case "min":
+            if ($(formElement).val() < numberType) {
+                formInvalidActions(formError, `Angka tidak boleh lebih kecil dari ${numberType}`, formElement);
+                return false;
+            }
+            break;
+        case "max":
+            if ($(formElement).val() > numberType) {
+                formInvalidActions(formError, `Angka tidak boleh lebih besar dari ${numberType}`, formElement);
+                return false;
+            }
+            break;
+        default:
+            break;
+    }
+
+    return true;
+}
+
+/**
+ * Validate number field
+ * @param {element} formElement Form element
+ * @returns Returns true if number is in range and valid number, otherwise false
+ */
+function validateNumberField(formElement) {
+    let formError = $(formElement).siblings(".form-error");
+    // Check the value first
+    if ($(formElement).val() == "") {
+        formInvalidActions(formError, "Field ini tidak valid", formElement);
+        return false;
+    }
+
+    // Check min and max attribute
+    let min = validateMinMaxNumberField(formElement, "min");
+    let max = validateMinMaxNumberField(formElement, "max");
+
+    // If all true then form is valid
+    if (min && max) {
+        formValidActions(formError, formElement);
+        return true;
+    }
+}
+
+/**
  * Validate select field
  * @param {element} formElement Form Element
  * @returns Returns true if user select an option that has value, otherwise false
@@ -122,6 +180,11 @@ function validateCheckboxField(formFieldName, formGroup, checkType="min", checkR
                 return false;
             }
             break;
+        case "same":
+            if (formFields.length != checkRequirement) {
+                formInvalidActions(formError,`Harus memilih ${checkRequirement} pilihan.`);
+                return false;
+            }
         default:
             break;
     }
@@ -157,7 +220,8 @@ function getCheckedFieldNames(formElements) {
 function validateForm(element) {
     let isValid = true;
 
-    let textFieldElements = $(element).find("input[type=email], input[type=text], input[type=number], input[type=password], textarea");
+    let textFieldElements = $(element).find("input[type=email], input[type=text], input[type=password], textarea");
+    let numberFieldElements = $(element).find("input[type=number]");
     let selectFieldElements = $(element).find("select");
     let radioFieldElements = $(element).find("input[type='radio']");
     let checkboxFieldElements = $(element).find("input[type='checkbox']");
@@ -165,6 +229,16 @@ function validateForm(element) {
     if (textFieldElements.length > 0) {
         for (const formElement of textFieldElements) {
             if (!validateTextField(formElement)) {
+                isValid = false;
+                // Focus on element
+                $(formElement).triggerHandler("focus");
+            }
+        }
+    }
+
+    if (numberFieldElements.length > 0) {
+        for (const formElement of numberFieldElements) {
+            if (!validateNumberField(formElement)) {
                 isValid = false;
                 // Focus on element
                 $(formElement).triggerHandler("focus");
