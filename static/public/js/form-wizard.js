@@ -255,11 +255,11 @@ function getCheckedFieldNames(formElements) {
 function validateForm(element) {
     let isValid = true;
 
-    let textFieldElements = $(element).find("input[type=email], input[type=text], input[type=password], textarea");
-    let numberFieldElements = $(element).find("input[type=number]");
-    let selectFieldElements = $(element).find("select");
-    let radioFieldElements = $(element).find("input[type='radio']");
-    let checkboxFieldElements = $(element).find("input[type='checkbox']");
+    let textFieldElements = $(element).find("input[type=email][required], input[type=text][required], input[type=password][required], textarea[required]");
+    let numberFieldElements = $(element).find("input[type=number][required]");
+    let selectFieldElements = $(element).find("select[required]");
+    let radioFieldElements = $(element).find("input[type='radio'][required]");
+    let checkboxFieldElements = $(element).find("input[type='checkbox'][required]");
 
     if (textFieldElements.length > 0) {
         for (const formElement of textFieldElements) {
@@ -344,7 +344,7 @@ function emptyAllForms(element) {
             $(formElement).val('');
         }
     }
-    
+
     if (checkedFieldElements.length > 0) {
         for (const formElement of checkedFieldElements) {
             if($(formElement).prop("checked")){
@@ -399,6 +399,91 @@ function updateFormWizardButton(page, button, currentPage, submitBtn) {
     } else {
         submitBtn.addClass("hidden");
     }
+}
+
+/**
+ * Move active form to the target form
+ * @param {element} targetForm Target form element
+ * @returns Returns true if can move to target form, false if cannot move to target form
+ */
+function moveForm(targetForm) {
+    let activeForm = $(FORM_WIZARD_CONTENT_PARENT_CLASS).find(`${FORM_WIZARD_CONTENT_CLASS}.active`);
+
+    let activeFormPage = $(".form-wizard > nav > ol").find(`${FORM_WIZARD_PAGE_CLASS}.active`);
+
+    let isNext = false;
+
+    let targetFormPage = $(targetForm.attr("data-page"));
+
+    let activeIndex = $(FORM_WIZARD_CONTENT_CLASS).index(activeForm);
+    let targetIndex = $(FORM_WIZARD_CONTENT_CLASS).index(targetForm);
+    
+    // Allow move to previous without validation
+    if (targetIndex > activeIndex) {
+        isNext = true;
+    }
+
+    let isActiveFormValid = validateForm(activeForm);
+
+    // If form isn't valid, don't move and give warning
+    if (!isActiveFormValid && isNext) {
+        console.log("Form not valid");
+        return false;
+    }
+
+    if (isActiveFormValid && isNext) {
+        activeFormPage.addClass("revealed");
+        activeFormPage.removeClass("latest");
+    }
+
+    if (!targetFormPage.hasClass("revealed")) {
+        targetFormPage.addClass("latest");
+    }
+
+    // Deactivate active form content
+    activeForm.removeClass("active");
+    // Switch the active page to the clicked page
+    activeFormPage.removeClass("active");
+    targetFormPage.addClass("active");
+
+    // Next content
+    if (targetIndex > activeIndex) {
+        // Context: ... active ... target
+        // Content from active until target get disabled
+        // Remove hidden to make numbering is still in order
+        for (let i = activeIndex; i < targetIndex; i++){
+            $(`#form-content-page-${i + 1}`).addClass("disabled").removeClass("hidden");
+        }
+        // Clicked content removes disabled and hidden
+        targetForm.removeClass("disabled hidden");
+    }
+
+    // Fade out animation
+    activeForm.find(".fade").removeClass("show");
+
+    // Show the clicked form content
+    targetForm.addClass("active");
+    targetForm.find(".fade").removeClass("hidden").addClass("active");
+
+    // After active form content fade out, ...
+    activeForm.one(transitionEvent, function () {
+        // Hide form content (because fade is only opacity)
+        activeForm.find(".fade").addClass("hidden").removeClass("active");
+
+        // Show clicked form content
+        targetForm.find(".fade").addClass("show");
+
+        // Previous content
+        if (targetIndex < activeIndex) {
+            for (let i = activeIndex; i > targetIndex; i--){
+                $(`#form-content-page-${i + 1}`).addClass("hidden");
+            }
+            // Clicked content removes disabled
+            targetForm.removeClass("disabled");
+        }
+    });
+
+    return true;
 }
 
 function formWizard() {
@@ -507,91 +592,6 @@ function formWizard() {
             updateFormWizardButton(previousPage, prevBtn, currentPage, submitBtn);
         }
     });
-}
-
-/**
- * Move active form to the target form
- * @param {element} targetForm Target form element
- * @returns Returns true if can move to target form, false if cannot move to target form
- */
-function moveForm(targetForm) {
-    let activeForm = $(FORM_WIZARD_CONTENT_PARENT_CLASS).find(`${FORM_WIZARD_CONTENT_CLASS}.active`);
-
-    let activeFormPage = $(".form-wizard > nav > ol").find(`${FORM_WIZARD_PAGE_CLASS}.active`);
-
-    let isNext = false;
-
-    let targetFormPage = $(targetForm.attr("data-page"));
-
-    let activeIndex = $(FORM_WIZARD_CONTENT_CLASS).index(activeForm);
-    let targetIndex = $(FORM_WIZARD_CONTENT_CLASS).index(targetForm);
-    
-    // Allow move to previous without validation
-    if (targetIndex > activeIndex) {
-        isNext = true;
-    }
-
-    let isActiveFormValid = validateForm(activeForm);
-
-    // If form isn't valid, don't move and give warning
-    if (!isActiveFormValid && isNext) {
-        console.log("Form not valid");
-        return false;
-    }
-
-    if (isActiveFormValid && isNext) {
-        activeFormPage.addClass("revealed");
-        activeFormPage.removeClass("latest");
-    }
-
-    if (!targetFormPage.hasClass("revealed")) {
-        targetFormPage.addClass("latest");
-    }
-
-    // Deactivate active form content
-    activeForm.removeClass("active");
-    // Switch the active page to the clicked page
-    activeFormPage.removeClass("active");
-    targetFormPage.addClass("active");
-
-    // Next content
-    if (targetIndex > activeIndex) {
-        // Context: ... active ... target
-        // Content from active until target get disabled
-        // Remove hidden to make numbering is still in order
-        for (let i = activeIndex; i < targetIndex; i++){
-            $(`#form-content-page-${i + 1}`).addClass("disabled").removeClass("hidden");
-        }
-        // Clicked content removes disabled and hidden
-        targetForm.removeClass("disabled hidden");
-    }
-
-    // Fade out animation
-    activeForm.find(".fade").removeClass("show");
-
-    // Show the clicked form content
-    targetForm.addClass("active");
-    targetForm.find(".fade").removeClass("hidden").addClass("active");
-
-    // After active form content fade out, ...
-    activeForm.one(transitionEvent, function () {
-        // Hide form content (because fade is only opacity)
-        activeForm.find(".fade").addClass("hidden").removeClass("active");
-
-        // Show clicked form content
-        targetForm.find(".fade").addClass("show");
-
-        // Previous content
-        if (targetIndex < activeIndex) {
-            for (let i = activeIndex; i > targetIndex; i--){
-                $(`#form-content-page-${i + 1}`).addClass("hidden");
-            }
-            // Clicked content removes disabled
-            targetForm.removeClass("disabled");
-        }
-    });
-
-    return true;
 }
 
 formWizard();
