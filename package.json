@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "run-css": "npx tailwindcss -i ./static/src/css/input.css -o ./static/public/css/index.css --watch",
+    "min-css": "npx tailwindcss -o ./static/public/css/index.min.css --minify"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.2.1"
+  },
+  "dependencies": {
+    "bootstrap-icons": "^1.8.3",
+    "jquery": "^3.6.0",
+    "jquery-validation": "^1.19.5",
+    "masonry-layout": "^4.2.2"
+  }
+}
