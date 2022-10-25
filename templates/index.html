@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Learning Outcomes Assessment</title>
 
-    <link href="../static/public/css/index.css" rel="stylesheet">
+    <link href="{% static 'public/css/index.css' %}" rel="stylesheet">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,8 +21,10 @@
     <script src="../node_modules/jquery-validation/dist/jquery.validate.min.js"></script>
 </head>
 <body>
+    {% block content %}
     
-    <script src="../static/public/js/index.js"></script>
-    <script src="../static/public/js/form-wizard.js"></script>
+    {% endblock content %}
+    <script src="{% static 'public/js/index.js' %}"></script>
+    <script src="{% static 'public/js/form-wizard.js' %}"></script>
 </body>
 </html>
