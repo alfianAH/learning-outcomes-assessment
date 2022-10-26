@@ -1,6 +1,7 @@
 from django.http import HttpRequest
-from django.contrib.auth import login, logout
+from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from .forms import MyAuthForm
 
 
@@ -9,14 +10,13 @@ def login_view(request: HttpRequest):
     form = MyAuthForm(request, data=request.POST or None)
 
     if form.is_valid():
-        login(request, form.get_user())
+        login(request, user=form.get_user())
 
         return redirect("/")
     
     return render(request, "accounts/login.html", context={"form": form})
 
 def logout_view(request: HttpRequest):
-    if request.htmx:
-        logout(request)
-        return redirect("/login/")
+    logout(request)
+    return redirect("/")
     

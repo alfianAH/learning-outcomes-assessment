@@ -9,12 +9,7 @@ class MyAuthForm(AuthenticationForm):
         password = self.cleaned_data.get('password')
 
         if username is not None and password:
-            user = validate_user(username, password)
-            
-            if user is None: 
-                raise self.get_invalid_login_error()
-            
-            self.user_cache = authenticate(self.request, user=user)
+            self.user_cache = authenticate(self.request, username=username, password=password)
             
             if self.user_cache is None:
                 raise self.get_invalid_login_error()

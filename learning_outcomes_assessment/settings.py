@@ -34,7 +34,6 @@ if not DEBUG:
 # Application definition
 AUTHENTICATION_BACKENDS = [
     'accounts.auth.MyBackend',
-    'accounts.auth.MyBackend2',
 ]
 
 AUTH_USER_MODEL = 'accounts.MyUser'
