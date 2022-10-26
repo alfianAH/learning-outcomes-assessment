@@ -23,7 +23,7 @@
     }
 
     body{
-        @apply text-sm bg-neutral-100 text-slate-800 leading-normal scroll-smooth
+        @apply text-sm bg-neutral-100 text-slate-800 leading-normal scroll-smooth min-h-screen;
     }
 
     body.dark{
@@ -31,7 +31,7 @@
     }
 
     main{
-        @apply p-4;
+        @apply p-4 min-h-screen;
     }
 
     h1, h2, h3, h4, h5, h6{
