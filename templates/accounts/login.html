@@ -5,8 +5,13 @@
 <div>
     <form method="post">
         {% csrf_token %}
-
-        {{ form.as_p }}
+        
+        {% for field in form %}
+            <div>
+                {{ field.errors }}
+                {{ field.label_tag }} {{ field }}
+            </div>
+        {% endfor %}
 
         <button class="btn btn-outline-success" type="submit">Login</button>
     </form>
