@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate
 from django import forms
+from django.forms import ValidationError
 
 from .models import RoleChoices
 from .widgets import LoginTextInput, LoginPasswordInput, LoginSelect
@@ -44,6 +45,8 @@ class MyAuthForm(AuthenticationForm):
             self.user_cache = authenticate(self.request, username=username, password=password, role=role)
             
             if self.user_cache is None:
+                self.add_error("username", "Username anda salah")
+                self.add_error("password", "Password anda salah")
                 raise self.get_invalid_login_error()
             else:
                 self.confirm_login_allowed(self.user_cache)

@@ -33,13 +33,20 @@
                             
                             <div class="inline-block w-full">
                                 {{ form.username }}
-            
-                                <p class="mt-1 text-xs font-extralight 
-                                    hidden
-                                    md:text-sm
-                                    peer-invalid:block
-                                    peer-invalid:text-red-600
-                                    dark:peer-invalid:text-red-400">{{ form.username.errors }}</p>
+                                
+                                {% if form.username.errors %}
+                                    <ol>
+                                        {% for error in form.username.errors %}
+                                            <li>
+                                                <p class="mt-1 text-xs font-extralight 
+                                                    block
+                                                    md:text-sm
+                                                    text-red-600
+                                                    dark:text-red-400">{{ error }}</p>
+                                            </li>
+                                        {% endfor %}
+                                    </ol>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -84,13 +91,20 @@
                                         </svg>
                                     </label>
                                 </div>
-            
-                                <p class="mt-1 text-xs font-extralight 
-                                    hidden
-                                    md:text-sm
-                                    peer-invalid:block
-                                    peer-invalid:text-red-600
-                                    dark:peer-invalid:text-red-400">{{ form.password.errors }}</p>
+
+                                {% if form.password.errors %}
+                                    <ol>
+                                        {% for error in form.password.errors %}
+                                            <li>
+                                                <p class="mt-1 text-xs font-extralight 
+                                                    block
+                                                    md:text-sm
+                                                    text-red-600
+                                                    dark:text-red-400">{{ error }}</p>
+                                            </li>
+                                        {% endfor %}
+                                    </ol>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
