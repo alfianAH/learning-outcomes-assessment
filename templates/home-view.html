@@ -1,11 +1,6 @@
 {% extends 'index.html' %}
 
-{% block content %}
-{{ request.user.is_authenticated }}
-
-{% if request.user.is_authenticated %}
-    <a href="{{ logout_url }}">Logout</a>
-{% else %}
-    <a href="{{ login_url }}">Login</a>
-{% endif %}
-{% endblock content %}
+{% block main %}
+{{ request.user }}
+<a href="{{ logout_url }}">Logout</a>
+{% endblock main %}

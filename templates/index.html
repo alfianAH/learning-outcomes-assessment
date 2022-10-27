@@ -19,9 +19,13 @@
     <script src="{% static 'masonry-layout/dist/masonry.pkgd.min.js' %}"></script>
 </head>
 <body>
-    {% block content %}
+    {% block header %}
     
-    {% endblock content %}
+    {% endblock header %}
+
+    {% block main %}
+    
+    {% endblock main %}
     <script src="{% static 'public/js/index.js' %}"></script>
     <script src="{% static 'public/js/form-wizard.js' %}"></script>
 </body>

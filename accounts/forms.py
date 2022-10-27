@@ -4,14 +4,31 @@ from django.contrib.auth import authenticate
 from django import forms
 
 from .models import RoleChoices
+from .widgets import LoginTextInput, LoginPasswordInput, LoginSelect
 
 
 class MyAuthForm(AuthenticationForm):
     ordered_fields_name = ('role', 'username', 'password')
 
+    username = forms.CharField(
+        widget=LoginTextInput(
+            attrs={
+                "placeholder": "Username"
+            }
+        )
+    )
+
+    password = forms.CharField(
+        widget=LoginPasswordInput(
+            attrs={
+                "placeholder": "Password"
+            }
+        )
+    )
+
     role = forms.ChoiceField(
         choices=RoleChoices.choices,
-        label="Login sebagai"
+        widget=LoginSelect()
     )
 
     def __init__(self, request, *args, **kwargs) -> None:
