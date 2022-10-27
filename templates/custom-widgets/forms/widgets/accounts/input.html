@@ -1,0 +1,22 @@
+<input class="bg-transparent w-[85%] lg:w-[90%]
+    border-b border-solid 
+    border-b-slate-800
+    peer
+    px-1 py-2
+    text-slate-800
+    text-sm
+    dark:border-b-slate-100
+    dark:text-slate-100
+    dark:invalid:border-b-red-400
+    dark:invalid:text-red-400
+    focus:border-b-2
+    focus:text-slate-800
+    focus:dark:text-slate-100
+    focus:outline-none
+    invalid:border-b-red-600
+    invalid:text-red-600
+    md:text-base" 
+    type="{{ widget.type }}" 
+    name="{{ widget.name }}"{% if widget.value != None %} 
+    value="{{ widget.value|stringformat:'s' }}"{% endif %}
+    {% include "django/forms/widgets/attrs.html" %}>

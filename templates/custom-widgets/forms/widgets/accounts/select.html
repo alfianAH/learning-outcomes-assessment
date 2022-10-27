@@ -1,0 +1,18 @@
+<select name="{{ widget.name }}" 
+    class="bg-neutral-300 dark:bg-zinc-600 border border-slate-200 focus:outline-none focus:border-slate-800 dark:border-zinc-600 dark:focus:border-slate-100 p-2 md:p-2.5 rounded-md"
+    {% include "django/forms/widgets/attrs.html" %}>
+    {% for group_name, group_choices, group_index in widget.optgroups %}
+        {% if group_name %}
+            <optgroup label="{{ group_name }}">
+        {% endif %}
+        
+        {% for option in group_choices %}
+            {% include option.template_name with widget=option %}
+        {% endfor %}
+
+        {% if group_name %}
+            </optgroup>
+        {% endif %}
+    {% endfor %}
+</select>
+  

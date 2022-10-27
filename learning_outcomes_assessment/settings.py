@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Customization
+    'django.forms',
 
     # Third party
     'django_htmx',
@@ -152,3 +154,9 @@ MEDIA_ROOT = BASE_DIR / 'staticfiles-cdn' / 'uploads'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Form
+FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
+DIRS = [
+    BASE_DIR / 'templates' / 'custom-widgets' / 'forms' / 'widgets'
+]
