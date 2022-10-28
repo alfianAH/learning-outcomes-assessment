@@ -24,6 +24,9 @@ class MyBackend(BaseBackend):
         fakultas = self.get_or_create_fakultas(user_profile)
         prodi = self.get_or_create_prodi(user_profile, fakultas)
         
+        if fakultas is None or prodi is None: 
+            return None
+        
         # Get user
         try:
             user = MyUser.objects.get(username=username)
@@ -38,6 +41,9 @@ class MyBackend(BaseBackend):
                     user = MyUser.objects.create_mahasiswa_user(user_data, prodi)
             
             return user
+        except MyUser.MultipleObjectsReturned:
+            if settings.DEBUG: print("MyUser returns multiple objects.")
+            return None
 
         if settings.DEBUG: print("Return existing user")
         return user
@@ -68,6 +74,9 @@ class MyBackend(BaseBackend):
                 id_neosia = user_profile['id_fakultas'],
                 nama = user_profile['nama_fakultas']
             )
+        except Fakultas.MultipleObjectsReturned:
+            if settings.DEBUG: print("Fakultas returns multiple objects.")
+            return None
         
         return fakultas
     
@@ -82,6 +91,7 @@ class MyBackend(BaseBackend):
             ProgramStudi: existing or new Program Studi object
         """
 
+        if fakultas is None: return None
         try:
             prodi = ProgramStudi.objects.get(
                 id_neosia = user_profile['id_prodi'], 
@@ -94,5 +104,8 @@ class MyBackend(BaseBackend):
                 fakultas = fakultas,
                 nama = user_profile['nama_prodi'],
             )
+        except ProgramStudi.MultipleObjectsReturned:
+            if settings.DEBUG: print("Program Studi returns multiple objects.")
+            return None
 
         return prodi

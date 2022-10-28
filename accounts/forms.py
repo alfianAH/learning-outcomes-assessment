@@ -2,7 +2,6 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate
 from django import forms
-from django.forms import ValidationError
 
 from .models import RoleChoices
 from .widgets import LoginTextInput, LoginPasswordInput, LoginSelect
