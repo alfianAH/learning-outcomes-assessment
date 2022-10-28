@@ -55,7 +55,7 @@ function darkModeHandler(){
 }
 
 function passwordHandler() {
-    let passwordField = $('#field');
+    let passwordField = $('#id_password');
     let passwordViewToggle = $('#password-view-toggle');
     let viewPassword = $('.bi-eye');
     let hidePassword = $('.bi-eye-slash');
