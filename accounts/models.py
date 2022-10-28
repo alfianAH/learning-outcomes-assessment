@@ -15,9 +15,15 @@ class ProgramStudi(models.Model):
     nama = models.CharField(max_length=100, null=False)
 
 class MyUser(AbstractUser):
+    # Unused default fields
+    email = None
+    first_name = None
+    last_name = None
+    password = None
+
+    username = models.CharField(max_length=50, unique=True, null=False, primary_key=True)
     objects = UserOAuthManager()
     prodi = models.ForeignKey(ProgramStudi, on_delete=models.CASCADE)
 
-    username = models.CharField(max_length=50, unique=True, null=False)
     name = models.CharField(max_length=100, null=False)
     role = models.CharField(max_length=1, choices=RoleChoices.choices, null=False)
