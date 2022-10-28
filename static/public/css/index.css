@@ -2019,6 +2019,10 @@ details.dropdown::marker {
   height: 1rem;
 }
 
+.h-5 {
+  height: 1.25rem;
+}
+
 .max-h-10 {
   max-height: 2.5rem;
 }
@@ -2049,6 +2053,10 @@ details.dropdown::marker {
 
 .w-\[85\%\] {
   width: 85%;
+}
+
+.w-9 {
+  width: 2.25rem;
 }
 
 .cursor-pointer {
@@ -2127,6 +2135,16 @@ details.dropdown::marker {
   background-color: rgb(212 212 212 / var(--tw-bg-opacity));
 }
 
+.bg-slate-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(100 116 139 / var(--tw-bg-opacity));
+}
+
+.bg-white {
+  --tw-bg-opacity: 1;
+  background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+}
+
 .fill-slate-50 {
   fill: #f8fafc;
 }
@@ -2145,6 +2163,10 @@ details.dropdown::marker {
 
 .p-2 {
   padding: 0.5rem;
+}
+
+.p-1 {
+  padding: 0.25rem;
 }
 
 .px-3 {
@@ -2246,6 +2268,11 @@ details.dropdown::marker {
 .noscroll {
   overflow: hidden;
   padding-right: 0.5rem;
+}
+
+#dark-mode-toggle:checked ~ label div.toggle-circle {
+  --tw-translate-x: 0.75rem;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
 .invalid\:border-b-red-600:invalid {
@@ -2378,6 +2405,16 @@ details.dropdown::marker {
   .sm\:bg-neutral-50 {
     --tw-bg-opacity: 1;
     background-color: rgb(250 250 250 / var(--tw-bg-opacity));
+  }
+
+  .dark .dark\:sm\:border-slate-100 {
+    --tw-border-opacity: 1;
+    border-color: rgb(241 245 249 / var(--tw-border-opacity));
+  }
+
+  .dark .dark\:sm\:bg-neutral-700 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(64 64 64 / var(--tw-bg-opacity));
   }
 }
 
