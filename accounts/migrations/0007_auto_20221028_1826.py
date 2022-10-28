@@ -20,15 +20,6 @@ class Migration(migrations.Migration):
         ),
         migrations.RemoveField(
             model_name='myuser',
-            name='id',
-        ),
-        migrations.RemoveField(
-            model_name='myuser',
             name='last_name',
-        ),
-        migrations.AlterField(
-            model_name='myuser',
-            name='username',
-            field=models.CharField(max_length=50, primary_key=True, serialize=False, unique=True),
         ),
     ]
