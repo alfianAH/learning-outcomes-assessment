@@ -3,35 +3,42 @@ from django.contrib.auth import models
 from .enums import RoleChoices
 
 class UserOAuthManager(models.UserManager):
-    def create_admin_prodi_user(self, user):
-        new_user = self.create(
-            username = user["nip"],
-            name = user["nama_admin"],
-            prodi = user["nama_prodi"],
-            fakultas = user["nama_fakultas"],
-            role=RoleChoices.ADMIN_PRODI
+    def create_admin_prodi_user(self, user: dict, prodi):
+        new_user = self.create_user(
+            user['nip'],
+            user['nama_admin'],
+            RoleChoices.ADMIN_PRODI,
+            prodi
         )
 
         return new_user
 
-    def create_dosen_user(self, user):
-        new_user = self.create(
-            username = user["nip"],
-            name = user["nama_dosen"],
-            prodi = user["nama_prodi"],
-            fakultas = user["nama_fakultas"],
-            role=RoleChoices.DOSEN
+    def create_dosen_user(self, user: dict, prodi):
+        new_user = self.create_user(
+            user['nip'],
+            user['nama_dosen'],
+            RoleChoices.DOSEN,
+            prodi
         )
 
         return new_user
     
-    def create_mahasiswa_user(self, user):
-        new_user = self.create(
-            username = user["nim"],
-            name = user["nama_mahasiswa"],
-            prodi = user["nama_prodi"],
-            fakultas = user["nama_fakultas"],
-            role=RoleChoices.MAHASISWA
+    def create_mahasiswa_user(self, user: dict, prodi):
+        new_user = self.create_user(
+            user['nim'],
+            user['nama_mahasiswa'],
+            RoleChoices.MAHASISWA,
+            prodi
         )
 
+        return new_user
+    
+    def create_user(self, username: str, name: str, role: str, prodi):
+        new_user = self.create(
+            username = username,
+            name = name,
+            prodi = prodi,
+            role = role,
+        )
+        
         return new_user
