@@ -1,16 +1,15 @@
 from django.urls import reverse
 from django.views.generic.base import View
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import(
-    DeleteView
-)
+from django.views.generic.edit import DeleteView, FormView
 from django.views.generic.list import ListView
 
-from kurikulum.models import Kurikulum
+from .models import Kurikulum
+from .forms import KurikulumReadAllSyncForm
 
 
 # Create your views here.
-class KurikulumReadAllSyncView(View):
+class KurikulumReadAllSyncView(FormView):
     """All kurikulums synchronization from Neosia
     What to do in sync:
     1. Create Kurikulum
@@ -19,7 +18,14 @@ class KurikulumReadAllSyncView(View):
             1. Create Mata Kuliah Semester
     2. Update Kurikulum
     """
-    pass
+    form_class = KurikulumReadAllSyncForm
+    template_name: str = 'kurikulum/read-all-sync-form.html'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'user': self.request.user})
+        return kwargs
+
 
 class KurikulumReadSyncView(View):
     """Kurikulum synchronization from Neosia

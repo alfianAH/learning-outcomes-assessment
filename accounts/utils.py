@@ -1,6 +1,7 @@
+from django.conf import settings
+from requests.exceptions import MissingSchema
 import os
 import requests
-from requests.exceptions import MissingSchema
 
 from .enums import RoleChoices
 
@@ -54,7 +55,7 @@ def validate_user(username: str, password: str, role: str):
         user = json_response["data"]
         return user
     else:
-        print(response)
+        if settings.DEBUG: print(response)
         return None
 
 def get_user_profile(username:str, role: str):
@@ -94,7 +95,7 @@ def get_user_profile(username:str, role: str):
         user_profile = json_response["data"][0]
         return user_profile
     else:
-        print(response)
+        if settings.DEBUG: print(response)
         return None
 
 def request_data_to_neosia(auth_url: str, parameters: dict, headers: dict):

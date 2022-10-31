@@ -1,0 +1,9 @@
+{% extends 'home-view.html' %}
+
+{% block content %}
+<form action="." method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success">Sinkronisasi</button>
+</form>
+{% endblock content %}
