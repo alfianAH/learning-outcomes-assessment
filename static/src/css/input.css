@@ -170,7 +170,7 @@
     }
 
     .btn > svg{
-        @apply w-4 h-4 md:w-5 md:h-5 xl:w-6 xl:h-6;
+        @apply w-4 h-4 md:w-5 md:h-5 xl:w-6 xl:h-6 fill-slate-100;
     }
 
     .btn-icon-start > svg{
@@ -207,6 +207,10 @@
     
     .btn-outline-dark{
         @apply bg-transparent border border-slate-800 dark:border-slate-100 text-slate-800 dark:text-slate-100 hover:bg-slate-700 hover:text-slate-100 dark:hover:bg-slate-100 dark:hover:text-slate-800 active:bg-slate-800 dark:active:bg-slate-200;
+    }
+
+    .btn-light > svg, .btn-outline-dark > svg{
+        @apply fill-slate-800 dark:fill-slate-100;
     }
 
     /* Dropdown */
