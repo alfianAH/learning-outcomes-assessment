@@ -52,7 +52,8 @@ INSTALLED_APPS = [
     'django_htmx',
 
     # Internal
-    'accounts'
+    'accounts',
+    'kurikulum',
 ]
 
 MIDDLEWARE = [
