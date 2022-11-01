@@ -721,9 +721,10 @@ tbody,  td,  tfoot,  th,  thead,  tr {
 /* Badge */
 
 .badge {
-  min-width: -webkit-min-content;
-  min-width: -moz-min-content;
-  min-width: min-content;
+  width: -webkit-min-content;
+  width: -moz-min-content;
+  width: min-content;
+  white-space: nowrap;
   border-radius: 9999px;
   padding-left: 0.5rem;
   padding-right: 0.5rem;
@@ -2854,14 +2855,6 @@ details.dropdown::marker {
 
 .table-cell {
   display: table-cell;
-}
-
-.table-header-group {
-  display: table-header-group;
-}
-
-.table-row-group {
-  display: table-row-group;
 }
 
 .table-row {
