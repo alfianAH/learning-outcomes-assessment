@@ -949,6 +949,8 @@ tbody, td, tfoot, th, thead, tr {
 .btn-primary:active {
   --tw-bg-opacity: 1;
   background-color: rgb(12 74 110 / var(--tw-bg-opacity));
+  --tw-text-opacity: 1;
+  color: rgb(241 245 249 / var(--tw-text-opacity));
 }
 
 .dark .btn-primary {
@@ -964,6 +966,8 @@ tbody, td, tfoot, th, thead, tr {
 .dark .btn-primary:active {
   --tw-bg-opacity: 1;
   background-color: rgb(2 132 199 / var(--tw-bg-opacity));
+  --tw-text-opacity: 1;
+  color: rgb(241 245 249 / var(--tw-text-opacity));
 }
 
 .btn-success {
@@ -982,6 +986,8 @@ tbody, td, tfoot, th, thead, tr {
 .btn-success:active {
   --tw-bg-opacity: 1;
   background-color: rgb(4 120 87 / var(--tw-bg-opacity));
+  --tw-text-opacity: 1;
+  color: rgb(241 245 249 / var(--tw-text-opacity));
 }
 
 .dark .btn-success {
@@ -997,6 +1003,8 @@ tbody, td, tfoot, th, thead, tr {
 .dark .btn-success:active {
   --tw-bg-opacity: 1;
   background-color: rgb(5 150 105 / var(--tw-bg-opacity));
+  --tw-text-opacity: 1;
+  color: rgb(241 245 249 / var(--tw-text-opacity));
 }
 
 .btn-secondary {
@@ -1015,6 +1023,8 @@ tbody, td, tfoot, th, thead, tr {
 .btn-secondary:active {
   --tw-bg-opacity: 1;
   background-color: rgb(55 65 81 / var(--tw-bg-opacity));
+  --tw-text-opacity: 1;
+  color: rgb(241 245 249 / var(--tw-text-opacity));
 }
 
 .dark .btn-secondary {
@@ -1030,6 +1040,8 @@ tbody, td, tfoot, th, thead, tr {
 .dark .btn-secondary:active {
   --tw-bg-opacity: 1;
   background-color: rgb(156 163 175 / var(--tw-bg-opacity));
+  --tw-text-opacity: 1;
+  color: rgb(241 245 249 / var(--tw-text-opacity));
 }
 
 /* Dropdown */
