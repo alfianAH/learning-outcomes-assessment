@@ -1497,6 +1497,7 @@ details.dropdown::marker {
 }
 
 .form-wizard-page {
+  margin-right: 8rem;
   display: inline-block;
   height: 1rem;
   width: 1rem;
@@ -1514,6 +1515,7 @@ details.dropdown::marker {
   margin-left: 1rem;
   margin-right: 1rem;
   display: flex;
+  width: 8rem;
   --tw-translate-y: 0.5rem;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
   border-width: 1px;
@@ -1544,14 +1546,25 @@ details.dropdown::marker {
 }
 
 @media (min-width: 768px) {
+  .form-wizard-page {
+    margin-bottom: 2rem;
+    margin-right: 0px;
+  }
+
   .form-wizard-page::after {
     margin-left: auto;
     margin-right: auto;
     margin-top: 1rem;
     margin-bottom: 1rem;
+    height: 2rem;
+    width: 1px;
     content: var(--tw-content);
     --tw-translate-y: 0px;
     transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+  }
+
+  .form-wizard-page:last-child {
+    margin-bottom: 0px;
   }
 }
 
@@ -3557,11 +3570,6 @@ details.dropdown::marker {
   .dark .dark\:sm\:border-slate-100 {
     --tw-border-opacity: 1;
     border-color: rgb(241 245 249 / var(--tw-border-opacity));
-  }
-
-  .dark .dark\:sm\:bg-neutral-600 {
-    --tw-bg-opacity: 1;
-    background-color: rgb(82 82 82 / var(--tw-bg-opacity));
   }
 
   .dark .dark\:sm\:bg-neutral-700 {
