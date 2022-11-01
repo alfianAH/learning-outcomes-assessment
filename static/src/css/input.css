@@ -118,7 +118,7 @@
 @layer components{
     /* Badge */
     .badge{
-        @apply rounded-full px-2 py-1 xl:px-2.5 text-xs md:text-sm text-slate-100 w-min;
+        @apply rounded-full px-2 py-1 xl:px-2.5 text-xs md:text-sm text-slate-100 min-w-min;
     }
 
     .badge-primary{
