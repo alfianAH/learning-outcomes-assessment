@@ -1,0 +1,9 @@
+{% include "django/forms/widgets/input.html" %}
+
+{% if widget.wrap_label %}
+<label class="list-item-title" 
+    for="{% if widget.attrs.id %}{{ widget.attrs.id }}{% endif %}">{% endif %}
+    {% if widget.wrap_label %} 
+        {{ widget.label.nama }}
+</label>
+{% endif %}

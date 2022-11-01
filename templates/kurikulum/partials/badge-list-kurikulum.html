@@ -1,0 +1,5 @@
+{% if widget.wrap_label %}
+<div class="badge {% if widget.label.is_active %}badge-success{% else %}badge-info{% endif %}">
+    {% if widget.label.is_active %}Aktif{% else %}Non-aktif{% endif %}
+</div>
+{% endif %}

@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import CheckboxSelectMultiple
+from widgets.widgets import ChoiceListInteractive
 from .utils import get_kurikulum_by_prodi
 
 
@@ -12,22 +12,18 @@ class KurikulumReadAllSyncForm(forms.Form):
         self.user = kwargs.pop('user')
         super().__init__(*args, **kwargs)
         
-        kurikulum_datas = get_kurikulum_by_prodi(self.user.prodi.id_neosia)
-        kurikulum_choices = []
-
-        for kurikulum_data in kurikulum_datas:
-            kurikulum_choice = {
-                'id_neosia': kurikulum_data['id'],
-                'prodi': kurikulum_data['id_prodi'],
-                'nama': kurikulum_data['nama'],
-                'tahun_mulai': kurikulum_data['tahun'],
-                'is_active': kurikulum_data['is_current'] == 1,
-            }
-
-            kurikulum_choices.append(kurikulum_choice)
+        self.label_suffix = "" 
+        
+        kurikulum_choices = get_kurikulum_by_prodi(self.user.prodi.id_neosia)
         
         print(kurikulum_choices)
-        self.kurikulum_from_neosia = forms.MultipleChoiceField(
+        choice_list_widget = ChoiceListInteractive(
+            badge_template='kurikulum/partials/badge-list-kurikulum.html',
+            custom_field_template='kurikulum/partials/custom-field-list-kurikulum.html',
+        )
+        self.fields['kurikulum_from_neosia'] = forms.MultipleChoiceField(
             choices=kurikulum_choices,
-            widget=forms.CheckboxSelectMultiple,
+            widget=choice_list_widget,
+            label='Tambahkan Kurikukulum dari Neosia',
+            help_text='Data di bawah ini merupakan data baru dari Neosia dan belum ditemukan dalam database. Beri centang pada item yang ingin anda tambahkan.',
         )

@@ -20,8 +20,22 @@ def get_kurikulum_by_prodi(prodi_id):
         json_response = response.json()
         
         if len(json_response) == 0: return None
+
+        kurikulum_choices = []
+
+        for kurikulum_data in json_response:
+            kurikulum_choice = {
+                'id_neosia': kurikulum_data['id'],
+                'prodi': kurikulum_data['id_prodi'],
+                'nama': kurikulum_data['nama'],
+                'tahun_mulai': kurikulum_data['tahun'],
+                'is_active': kurikulum_data['is_current'] == 1,
+            }
+            kurikulum_choice = kurikulum_data['id'], kurikulum_choice
+
+            kurikulum_choices.append(kurikulum_choice)
         
-        return json_response
+        return tuple(kurikulum_choices)
     else: 
         if settings.DEBUG: print(response)
         return None
