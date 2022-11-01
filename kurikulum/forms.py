@@ -19,11 +19,12 @@ class KurikulumReadAllSyncForm(forms.Form):
         print(kurikulum_choices)
         choice_list_widget = ChoiceListInteractive(
             badge_template='kurikulum/partials/badge-list-kurikulum.html',
-            custom_field_template='kurikulum/partials/custom-field-list-kurikulum.html',
+            list_custom_field_template='kurikulum/partials/list-custom-field-kurikulum.html',
+            table_custom_field_template='kurikulum/partials/table-custom-field-kurikulum.html',
         )
         self.fields['kurikulum_from_neosia'] = forms.MultipleChoiceField(
             choices=kurikulum_choices,
             widget=choice_list_widget,
-            label='Tambahkan Kurikukulum dari Neosia',
+            label='Tambahkan Kurikulum dari Neosia',
             help_text='Data di bawah ini merupakan data baru dari Neosia dan belum ditemukan dalam database. Beri centang pada item yang ingin anda tambahkan.',
         )

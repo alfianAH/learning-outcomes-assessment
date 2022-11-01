@@ -12,7 +12,6 @@
     <div class="form-wizard">
         <nav role="navigation">
             <ol>
-                <!-- <li class="form-wizard-page finish" data-target="#form-content-page-1" aria-current="true"></li> -->
                 {% for _ in form %}
                     <li class="form-wizard-page {% if forcounter.first %}active{% endif %}" id="form-page-{{ forloop.counter }}" data-target="#form-content-page-{{ forloop.counter }}"></li>
                 {% endfor %}
@@ -20,133 +19,25 @@
         </nav>
 
         <div class="form-wizard-parent list-numbered md:space-y-4">
-            <div class="form-wizard-content active" id="form-content-page-1" aria-label="form-content-page-1" data-page="#form-page-1">
+            {% for field in form %}
+                <div class="form-wizard-content {% if forloop.first %}active{% endif %}" 
+                    id="form-content-page-{{ forloop.counter }}" 
+                    aria-label="form-content-page-{{ forloop.counter }}" 
+                    data-page="#form-page-{{ forloop.counter }}">
 
-                <h2 class="form-wizard-header list-item-title">{{ form.kurikulum_from_neosia.label_tag }}</h2>
+                    <h2 class="form-wizard-header list-item-title">{{ field.label_tag }}</h2>
 
-                {% if form.kurikulum_from_neosia.help_text %}
-                    <p>{{ form.kurikulum_from_neosia.help_text|safe }}</p>
-                {% endif %}
+                    {% if field.help_text %}
+                        <p>{{ field.help_text|safe }}</p>
+                    {% endif %}
 
-                <div class="fade show active">
-                    <div class="form-group mb-3" >
-                        {{ form.kurikulum_from_neosia }}
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-wizard-content hidden" id="form-content-page-2" aria-label="form-content-page-2" data-page="#form-page-2">
-                <h2 class="form-wizard-header list-item-title">Lorem ipsum dolor sit amet.</h2>
-
-                <div class="fade">
-                    <div>
-                        <label for="select-field-3" class="form-label">ILO</label>
-                        <select name="select-field-3" id="select-field-3" class="form-control"required aria-required="true">
-                            <option value="">Pilih ILO</option>
-                            <option value="1">ILO 1</option>
-                            <option value="2">ILO 2</option>
-                            <option value="3">ILO 3</option>
-                        </select>
-                    </div>
-
-                    <div class="space-y-1">
-                        <span>Penilaian</span>
-
-                        <div>
-                            <input type="checkbox" name="input-checkbox-1" id="input-checkbox-1" class="w-4 h-4 xl:w-5 xl:h-5">
-                            <label for="input-checkbox-1" class="form-label">Field 1</label>
-                        </div>
-
-                        <div>
-                            <input type="checkbox" name="input-checkbox-2" id="input-checkbox-2" class="w-4 h-4 xl:w-5 xl:h-5">
-                            <label for="input-checkbox-2" class="form-label">Field 2</label>
-                        </div>
-
-                        <div>
-                            <input type="checkbox" name="input-checkbox-3" id="input-checkbox-3" class="w-4 h-4 xl:w-5 xl:h-5">
-                            <label for="input-checkbox-3" class="form-label">Field 3</label>
+                    <div class="fade {% if forloop.first %}show active{% endif %}">
+                        <div class="form-group mb-3" >
+                            {{ field }}
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="form-wizard-content hidden" id="form-content-page-3" aria-label="form-content-page-3" data-page="#form-page-3">
-                <h2 class="form-wizard-header list-item-title">Lorem ipsum dolor sit amet.</h2>
-
-                <div class="fade">
-                    <div>
-                        <label for="select-field-1" class="form-label">Kurikulum</label>
-                        <select name="select-field-1" id="select-field-1" class="form-control" required aria-required="true">
-                            <option value="">Pilih Kurikulum</option>
-                            <option value="1">Kurikulum 2010/2015</option>
-                            <option value="2">Kurikulum 2015/2020</option>
-                            <option value="3">Kurikulum 2015/2020</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="select-field-2" class="form-label">Semester</label>
-                        <select name="select-field-2" id="select-field-2" class="form-control" required aria-required="true">
-                            <option value="">Pilih Semester</option>
-                            <option value="1">Semester 2010/2015</option>
-                            <option value="2">Semester 2015/2020</option>
-                            <option value="3">Semester 2015/2020</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-wizard-content hidden" id="form-content-page-4" aria-label="form-content-page-4" data-page="#form-page-4">
-                <h2 class="form-wizard-header list-item-title">Lorem ipsum dolor sit amet.</h2>
-
-                <div class="fade">
-                    <div>
-                        <label for="select-field-1" class="form-label">Kurikulum</label>
-                        <select name="select-field-1" id="select-field-1" class="form-control" required aria-required="true">
-                            <option value="">Pilih Kurikulum</option>
-                            <option value="1">Kurikulum 2010/2015</option>
-                            <option value="2">Kurikulum 2015/2020</option>
-                            <option value="3">Kurikulum 2015/2020</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="select-field-2" class="form-label">Semester</label>
-                        <select name="select-field-2" id="select-field-2" class="form-control" required aria-required="true">
-                            <option value="">Pilih Semester</option>
-                            <option value="1">Semester 2010/2015</option>
-                            <option value="2">Semester 2015/2020</option>
-                            <option value="3">Semester 2015/2020</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-wizard-content hidden" id="form-content-page-5" aria-label="form-content-page-5" data-page="#form-page-5">
-                <h2 class="form-wizard-header list-item-title">Lorem ipsum dolor sit amet.</h2>
-
-                <div class="fade">
-                    <div>
-                        <label for="select-field-1" class="form-label">Kurikulum</label>
-                        <select name="select-field-1" id="select-field-1" class="form-control" required aria-required="true">
-                            <option value="">Pilih Kurikulum</option>
-                            <option value="1">Kurikulum 2010/2015</option>
-                            <option value="2">Kurikulum 2015/2020</option>
-                            <option value="3">Kurikulum 2015/2020</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="select-field-2" class="form-label">Semester</label>
-                        <select name="select-field-2" id="select-field-2" class="form-control" required aria-required="true">
-                            <option value="">Pilih Semester</option>
-                            <option value="1">Semester 2010/2015</option>
-                            <option value="2">Semester 2015/2020</option>
-                            <option value="3">Semester 2015/2020</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
+            {% endfor %}
         </div>
     </div>
 
