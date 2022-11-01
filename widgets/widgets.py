@@ -1,7 +1,8 @@
-from django.forms.widgets import ChoiceWidget
+from django.forms import CheckboxSelectMultiple
 
-class ChoiceListInteractive(ChoiceWidget):
-    input_type = 'checkbox'
+class ChoiceListInteractive(CheckboxSelectMultiple):
+    is_required: bool = False
+    input_type: str = 'checkbox'
     template_name: str = 'custom-widgets/forms/widgets/checkbox_select.html'
     option_template_name: str = 'custom-widgets/forms/widgets/checkbox_option.html'
     badge_template: str = None

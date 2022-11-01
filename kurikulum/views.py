@@ -1,4 +1,6 @@
-from django.urls import reverse
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import redirect, render
+from django.urls import reverse, reverse_lazy
 from django.views.generic.base import View
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import DeleteView, FormView
@@ -25,6 +27,10 @@ class KurikulumReadAllSyncView(FormView):
         kwargs = super().get_form_kwargs()
         kwargs.update({'user': self.request.user})
         return kwargs
+
+    def form_valid(self, form) -> HttpResponse:
+        self.success_url = reverse_lazy('kurikulum:read-all')
+        return super().form_valid(form)
 
 
 class KurikulumReadSyncView(View):

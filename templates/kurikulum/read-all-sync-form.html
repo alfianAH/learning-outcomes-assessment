@@ -20,12 +20,12 @@
 
         <div class="form-wizard-parent list-numbered md:space-y-4">
             {% for field in form %}
-                <div class="form-wizard-content {% if forloop.first %}active{% endif %}" 
+                <div class="form-wizard-content {% if forloop.first %}active{% else %}hidden{% endif %}" 
                     id="form-content-page-{{ forloop.counter }}" 
                     aria-label="form-content-page-{{ forloop.counter }}" 
                     data-page="#form-page-{{ forloop.counter }}">
 
-                    <h2 class="form-wizard-header list-item-title">{{ field.label_tag }}</h2>
+                    <h2 class="form-wizard-header list-item-title">{{ field.label }}</h2>
 
                     {% if field.help_text %}
                         <p>{{ field.help_text|safe }}</p>
@@ -34,6 +34,16 @@
                     <div class="fade {% if forloop.first %}show active{% endif %}">
                         <div class="form-group mb-3" >
                             {{ field }}
+                            
+                            {% if field.errors %}
+                                <ul>
+                                {% for error in field.errors %}
+                                    <li>
+                                        <span class="form-error active">{{ error }}</span>
+                                    </li>
+                                {% endfor %}
+                                </ul>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -56,7 +66,7 @@
             </svg>
         </button>
 
-        <button class="btn btn-success btn-icon-end hidden" type="submit" role="button" id="submit-btn">
+        <button class="btn btn-success btn-icon-end" type="submit" role="button" id="submit-btn">
             Sinkronisasi
             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" focusable="False" role="img" aria-label="submit" class="bi bi-check2" viewBox="0 0 16 16">
                 <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
