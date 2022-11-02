@@ -34,9 +34,6 @@ class Kurikulum(models.Model):
             'kurikulum_id': self.id_neosia
         })
 
-    def get_mata_kuliah_kurikulum(self):
-        pass
-
 
 class MataKuliahKurikulum(models.Model):
     prodi = models.ForeignKey(ProgramStudi, on_delete=models.CASCADE)
@@ -44,4 +41,4 @@ class MataKuliahKurikulum(models.Model):
     
     kode = models.CharField(max_length=100, null=False)
     nama = models.CharField(max_length=255, null=False)
-    sks = models.PositiveSmallIntegerField()
+    sks = models.PositiveSmallIntegerField(null=False)

@@ -40,7 +40,7 @@ def get_kurikulum_by_prodi(prodi_id):
         
         return tuple(kurikulum_choices)
     else: 
-        if settings.DEBUG: print(response)
+        if settings.DEBUG: print(response.raw)
         return None
 
 def get_mata_kuliah_kurikulum(kurikulum_id, prodi_id):
@@ -78,5 +78,5 @@ def get_mata_kuliah_kurikulum(kurikulum_id, prodi_id):
         print(list_mata_kuliah_kurikulum)
         return list_mata_kuliah_kurikulum
     else: 
-        if settings.DEBUG: print(response)
+        if settings.DEBUG: print(response.raw)
         return None

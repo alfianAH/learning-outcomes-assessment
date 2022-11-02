@@ -55,7 +55,7 @@ def validate_user(username: str, password: str, role: str):
         user = json_response["data"]
         return user
     else:
-        if settings.DEBUG: print(response)
+        if settings.DEBUG: print(response.raw)
         return None
 
 def get_user_profile(username:str, role: str):
@@ -95,7 +95,7 @@ def get_user_profile(username:str, role: str):
         user_profile = json_response["data"][0]
         return user_profile
     else:
-        if settings.DEBUG: print(response)
+        if settings.DEBUG: print(response.raw)
         return None
 
 def request_data_to_neosia(auth_url: str, parameters: dict, headers: dict):
@@ -113,5 +113,6 @@ def request_data_to_neosia(auth_url: str, parameters: dict, headers: dict):
     try:
         response = requests.post(auth_url, params=parameters, headers=headers)
     except MissingSchema:
+        if settings.DEBUG: print('There are no response')
         return None
     return response
