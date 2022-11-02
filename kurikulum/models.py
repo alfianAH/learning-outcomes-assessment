@@ -11,7 +11,7 @@ class Kurikulum(models.Model):
     nama = models.CharField(max_length=255, null=False)
     tahun_mulai = models.IntegerField(null=False)
     tahun_akhir = models.IntegerField(null=False)
-    total_sks_lulus = models.IntegerField(null=False)
+    total_sks_lulus = models.PositiveSmallIntegerField(null=False)
     is_active = models.BooleanField(null=False)
 
     def read_sync_url(self):
@@ -36,3 +36,12 @@ class Kurikulum(models.Model):
 
     def get_mata_kuliah_kurikulum(self):
         pass
+
+
+class MataKuliahKurikulum(models.Model):
+    prodi = models.ForeignKey(ProgramStudi, on_delete=models.CASCADE)
+    kurikulum = models.ForeignKey(Kurikulum, on_delete=models.CASCADE)
+    
+    kode = models.CharField(max_length=100, null=False)
+    nama = models.CharField(max_length=255, null=False)
+    sks = models.PositiveSmallIntegerField()
