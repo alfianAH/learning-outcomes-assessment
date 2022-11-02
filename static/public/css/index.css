@@ -505,6 +505,12 @@ tbody, td, tfoot, th, thead, tr {
   border-color: inherit;
 }
 
+th {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 @media (min-width: 640px){
   main {
     padding-top: 1rem;
@@ -2160,12 +2166,6 @@ details.dropdown::marker {
   width: 3.5rem;
 }
 
-@media (min-width: 1280px) {
-  .table-css > :not(caption) > * > *.number {
-    width: 5rem;
-  }
-}
-
 .table-css > tbody > *:not(.table-details) > * {
   --tw-bg-opacity: 1;
   background-color: rgb(248 250 252 / var(--tw-bg-opacity));
@@ -2382,6 +2382,10 @@ details.dropdown::marker {
 
 .w-\[85\%\] {
   width: 85%;
+}
+
+.max-w-\[128px\] {
+  max-width: 128px;
 }
 
 .cursor-pointer {
@@ -2906,6 +2910,10 @@ details.dropdown::marker {
     margin-right: 0.75rem;
   }
 
+  .xl\:table-cell {
+    display: table-cell;
+  }
+
   .xl\:h-10 {
     height: 2.5rem;
   }
@@ -2920,6 +2928,10 @@ details.dropdown::marker {
 
   .xl\:w-6 {
     width: 1.5rem;
+  }
+
+  .xl\:max-w-\[156px\] {
+    max-width: 156px;
   }
 
   .xl\:space-y-3 > :not([hidden]) ~ :not([hidden]) {

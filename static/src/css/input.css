@@ -58,6 +58,10 @@
         @apply border-0 border-inherit border-solid;
     }
 
+    th{
+        @apply whitespace-nowrap overflow-hidden overflow-ellipsis;
+    }
+
     @media screen(sm){
         main{
             @apply py-4 px-8;
@@ -537,7 +541,7 @@
     }
 
     .table-css > :not(caption) > * > *.number{
-        @apply w-14 xl:w-20;
+        @apply w-14;
     }
 
     .table-css > tbody > *:not(.table-details) > * {
