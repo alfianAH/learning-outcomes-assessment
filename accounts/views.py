@@ -1,16 +1,21 @@
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, JsonResponse
 from django.contrib.auth import login, logout
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from urllib.parse import urlencode
-import requests
 from requests import Request, Session
 import os
 
 
 # Create your views here.
 def login_view(request: HttpRequest):
-    redirect_uri = '127.0.0.1:8000' + reverse('accounts:oauth-callback')
+    context = {
+        'oauth_url': reverse('accounts:oauth')
+    }
+    return render(request, 'accounts/login.html', context=context)
+
+def login_oauth_view(request: HttpRequest):
+    redirect_uri = os.environ.get('DJANGO_ALLOWED_HOST') + reverse('accounts:oauth-callback')
     parameters = {
         'client_id': '3',
         'redirect_uri':'http://{}'.format(redirect_uri),
@@ -24,7 +29,7 @@ def login_view(request: HttpRequest):
 
 def oauth_callback(request: HttpRequest):
     code = request.GET['code']
-    redirect_uri = '127.0.0.1:8000' + reverse('accounts:oauth-callback')
+    redirect_uri = os.environ.get('DJANGO_ALLOWED_HOST') + reverse('accounts:oauth-callback')
     parameters = {
         'grant_type': 'authorization_code',
         'client_id': '3',
@@ -50,7 +55,7 @@ def oauth_callback(request: HttpRequest):
     print("Response Status: {}".format(response.status_code))
     print("Response: {}".format(response.json()))
     
-    return HttpResponse()
+    return JsonResponse(response.json())
 
 def logout_view(request: HttpRequest):
     logout(request)
