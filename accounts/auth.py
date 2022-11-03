@@ -2,22 +2,15 @@ from django.conf import settings
 from django.contrib.auth.backends import BaseBackend
 from .models import Fakultas, MyUser, ProgramStudi
 from .enums import RoleChoices
-from .utils import validate_user, get_user_profile
+from .utils import get_user_profile
 
 class MyBackend(BaseBackend):
-    def authenticate(self, request, username=None, password=None, role=None):
-        user_data = validate_user(username, password, role)
-
-        # Return None if user data is None
-        if user_data is None: 
-            if settings.DEBUG: print("User data is not valid: {}".format(username))
-            return None
-        
-        user_profile = get_user_profile(username, role)
+    def authenticate(self, request, user=None, role=None):
+        user_profile = get_user_profile(user, role)
 
         # Return None if user profile is None
         if user_profile is None:
-            if settings.DEBUG: print("Failed to get user profile: {}".format(username))
+            if settings.DEBUG: print("Failed to get user profile: {}".format(user['username']))
             return None
 
         # Get Fakultas and Program Studi from user profile
@@ -29,16 +22,16 @@ class MyBackend(BaseBackend):
         
         # Get user
         try:
-            user = MyUser.objects.get(username=username)
+            user = MyUser.objects.get(username=user['username'])
         except MyUser.DoesNotExist:
             if settings.DEBUG: print("Create new user")
             match(role):
                 case RoleChoices.ADMIN_PRODI:
-                    user = MyUser.objects.create_admin_prodi_user(user_data, prodi)
+                    user = MyUser.objects.create_admin_prodi_user(user, prodi)
                 case RoleChoices.DOSEN:
-                    user = MyUser.objects.create_dosen_user(user_data, prodi)
+                    user = MyUser.objects.create_dosen_user(user, prodi)
                 case RoleChoices.MAHASISWA:
-                    user = MyUser.objects.create_mahasiswa_user(user_data, prodi)
+                    user = MyUser.objects.create_mahasiswa_user(user, prodi)
             
             return user
         except MyUser.MultipleObjectsReturned:
@@ -80,7 +73,7 @@ class MyBackend(BaseBackend):
         
         return fakultas
     
-    def get_or_create_prodi(self, user_profile:dict, fakultas: Fakultas) -> ProgramStudi:
+    def get_or_create_prodi(self, user_profile: dict, fakultas: Fakultas) -> ProgramStudi:
         """Get or create Program Studi object
 
         Args:

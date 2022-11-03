@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser, Group
+from django.contrib.auth.models import AbstractUser, Group, UserManager
 from .enums import RoleChoices
 
 
@@ -21,7 +21,7 @@ class ProgramStudi(models.Model):
         return self.nama
 
 
-class UserOAuthManager(models.UserManager):
+class UserOAuthManager(UserManager):
     def create_admin_prodi_user(self, user: dict, prodi: ProgramStudi):
         admin_prodi_group, _ = Group.objects.get_or_create(name='Admin Program Studi')
         new_user = self.create_user(
