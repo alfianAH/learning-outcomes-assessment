@@ -754,6 +754,16 @@ th {
   }
 }
 
+.badge-primary {
+  --tw-bg-opacity: 1;
+  background-color: rgb(2 132 199 / var(--tw-bg-opacity));
+}
+
+.dark .badge-primary {
+  --tw-bg-opacity: 1;
+  background-color: rgb(7 89 133 / var(--tw-bg-opacity));
+}
+
 .badge-success {
   --tw-bg-opacity: 1;
   background-color: rgb(16 185 129 / var(--tw-bg-opacity));
@@ -1491,6 +1501,9 @@ details.dropdown::marker {
 
 .list-item-title {
   width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-weight: 700;
 }
 
@@ -2301,6 +2314,10 @@ details.dropdown::marker {
   margin-bottom: 0.75rem;
 }
 
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
 .block {
   display: block;
 }
@@ -2804,6 +2821,10 @@ details.dropdown::marker {
     margin-top: 0.5rem;
   }
 
+  .md\:mt-3 {
+    margin-top: 0.75rem;
+  }
+
   .md\:table {
     display: table;
   }
@@ -2828,6 +2849,12 @@ details.dropdown::marker {
     --tw-space-y-reverse: 0;
     margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
     margin-bottom: calc(1rem * var(--tw-space-y-reverse));
+  }
+
+  .md\:space-y-3 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-y-reverse: 0;
+    margin-top: calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));
+    margin-bottom: calc(0.75rem * var(--tw-space-y-reverse));
   }
 
   .md\:p-2\.5 {

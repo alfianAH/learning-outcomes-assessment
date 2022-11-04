@@ -5,9 +5,10 @@ import requests
 
 KURIKULUM_URL = 'https://customapi.neosia.unhas.ac.id/getKurikulum'
 MATA_KULIAH_KURIKULUM_URL = 'https://customapi.neosia.unhas.ac.id/getMKbyKurikulumAndProdi'
+ALL_SEMESTER_URL = 'https://customapi.neosia.unhas.ac.id/getAllSemester'
 SEMESTER_BY_KURIKULUM_URL = 'https://customapi.neosia.unhas.ac.id/getSemesterByKurikulum'
 
-def request_data_to_neosia(auth_url: str, params: dict, headers: dict = {}):
+def request_data_to_neosia(auth_url: str, params: dict = {}, headers: dict = {}):
     headers['token'] = os.environ.get('NEOSIA_API_TOKEN')
     
     response = requests.post(auth_url, params=params, headers=headers)
@@ -31,7 +32,7 @@ def get_kurikulum_by_prodi(prodi_id: int):
 
     json_response = request_data_to_neosia(KURIKULUM_URL, params=parameters)
     kurikulum_choices = []
-    if json_response is None: return kurikulum_choices
+    if json_response is None: return tuple(kurikulum_choices)
 
     for kurikulum_data in json_response:
         kurikulum_choice = {
@@ -70,6 +71,30 @@ def get_mata_kuliah_kurikulum(kurikulum_id: int, prodi_id: int):
         list_mata_kuliah_kurikulum.append(mata_kuliah)
     
     return list_mata_kuliah_kurikulum
+
+def get_all_semester():
+    json_response = request_data_to_neosia(ALL_SEMESTER_URL)
+    semester_choices = []
+    if json_response is None: return tuple(semester_choices)
+
+    for semester_data in json_response:
+        semester_choice = {
+            'id_neosia': semester_data['id'],
+            'tahun_ajaran': semester_data['tahun_ajaran'],
+            'jenis': semester_data['jenis'],
+            'nama': 'Semester {} {}'.format(
+                semester_data['tahun_ajaran'],
+                semester_data['jenis'].capitalize()
+            ),
+        }
+
+        # Convert it to input value, options
+        semester_choice = semester_data['id'], semester_choice
+
+        semester_choices.append(semester_choice)
+    
+    return tuple(semester_choices)
+
 
 def get_semester_by_kurikulum(kurikulum_id: int):
     parameters = {

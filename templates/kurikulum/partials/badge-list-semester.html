@@ -1,0 +1,5 @@
+{% if widget.wrap_label %}
+<div class="badge {% if widget.label.jenis|lower == "ganjil" %}badge-primary{% elif widget.label.jenis|lower == "genap" %}badge-success{% else %}badge-info{% endif %}">
+    {{ widget.label.jenis|capfirst }}
+</div>
+{% endif %}

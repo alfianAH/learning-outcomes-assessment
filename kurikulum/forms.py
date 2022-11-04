@@ -1,7 +1,10 @@
 from django import forms
 from django.conf import settings
 from widgets.widgets import ChoiceListInteractive
-from .utils import get_kurikulum_by_prodi
+from .utils import (
+    get_kurikulum_by_prodi,
+    get_all_semester,
+)
 
 
 class KurikulumReadAllSyncForm(forms.Form):
@@ -10,9 +13,21 @@ class KurikulumReadAllSyncForm(forms.Form):
             badge_template='kurikulum/partials/badge-list-kurikulum.html',
             list_custom_field_template='kurikulum/partials/list-custom-field-kurikulum.html',
             table_custom_field_template='kurikulum/partials/table-custom-field-kurikulum.html',
+            table_custom_field_header_template='kurikulum/partials/table-custom-field-header-kurikulum.html',
         ),
         label = 'Tambahkan Kurikulum dari Neosia',
         help_text = 'Data di bawah ini merupakan data baru dari Neosia dan belum ditemukan dalam database. Beri centang pada item yang ingin anda tambahkan.',
+        required = False,
+    )
+    semester_from_neosia = forms.MultipleChoiceField(
+        widget=ChoiceListInteractive(
+            badge_template='kurikulum/partials/badge-list-semester.html',
+            list_custom_field_template='kurikulum/partials/list-custom-field-semester.html',
+            table_custom_field_template='kurikulum/partials/table-custom-field-semester.html',
+            table_custom_field_header_template='kurikulum/partials/table-custom-field-header-semester.html',
+        ),
+        label = 'Tambahkan Semester dari Neosia',
+        help_text = 'Data di bawah ini merupakan data semester, dari Neosia, berdasarkan kurikulum yang dipilih pada langkah 1. Beri centang pada item yang ingin anda tambahkan.',
         required = False,
     )
     
@@ -22,8 +37,10 @@ class KurikulumReadAllSyncForm(forms.Form):
         self.label_suffix = ""
         
         kurikulum_choices = get_kurikulum_by_prodi(self.user.prodi.id_neosia)
+        semester_choices = get_all_semester()
         
         self.fields['kurikulum_from_neosia'].choices = kurikulum_choices
+        self.fields['semester_from_neosia'].choices = semester_choices
     
     def clean(self):
         cleaned_data = super().clean()

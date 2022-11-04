@@ -318,7 +318,7 @@
 
     /* List item */
     .list-item-title{
-        @apply w-full font-bold sm:w-fit;
+        @apply w-full font-bold sm:w-fit whitespace-nowrap overflow-hidden overflow-ellipsis;
     }
 
     .list-numbered{

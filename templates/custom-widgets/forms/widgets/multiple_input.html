@@ -31,11 +31,14 @@
                     <input type="checkbox" name="table-checkbox" id="table-checkbox">
                 </th>
                 <th scope="col" class="text-center number">No.</th>
-                <th scope="col" class="text-left" title="Nama Kurikulum">Nama Kurikulum</th>
-                <th scope="col" class="text-left hidden xl:table-cell" title="Tahun mulai">Tahun Mulai</th>
-                <th scope="col" class="text-left hidden xl:table-cell" title="Tahun akhir">Tahun Akhir</th>
-                <th scope="col" class="text-left max-w-[128px] xl:max-w-[156px]" title="Minimal SKS Kelulusan">Min. SKS Kelulusan</th>
-                <th scope="col" class="text-left" title="Keaktifan">Keaktifan</th>
+
+                {% for group, options, index in widget.optgroups|slice:":1" %}
+                    {% for option in options|slice:":1" %}
+                        {% if option.table_custom_field_header_template %}
+                            {% include option.table_custom_field_header_template %}
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
             </tr>
         </thead>
 
