@@ -467,7 +467,7 @@
     }
 
     .sidebar-item{
-        @apply flex flex-row items-center cursor-pointer px-8 py-6 hover:bg-slate-500 hover:dark:bg-zinc-500 active:bg-slate-700 active:dark:bg-zinc-700 transition-all;
+        @apply flex flex-row items-center cursor-pointer hover:no-underline px-8 py-6 hover:bg-slate-500 hover:dark:bg-zinc-500 active:bg-slate-700 active:dark:bg-zinc-700 transition-all;
     }
 
     .sidebar-title{
