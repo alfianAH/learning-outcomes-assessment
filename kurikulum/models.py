@@ -36,6 +36,7 @@ class Kurikulum(models.Model):
 
 
 class MataKuliahKurikulum(models.Model):
+    id_neosia = models.BigIntegerField(primary_key=True, null=False, unique=True)
     prodi = models.ForeignKey(ProgramStudi, on_delete=models.CASCADE)
     kurikulum = models.ForeignKey(Kurikulum, on_delete=models.CASCADE)
     

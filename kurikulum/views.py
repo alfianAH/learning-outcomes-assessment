@@ -8,7 +8,10 @@ from django.views.generic.list import ListView
 
 from .models import Kurikulum
 from .forms import KurikulumReadAllSyncForm
-from .utils import get_mata_kuliah_kurikulum
+from .utils import (
+    get_mata_kuliah_kurikulum,
+    get_semester_by_kurikulum,
+)
 
 
 # Create your views here.
@@ -34,6 +37,7 @@ class KurikulumReadAllSyncView(FormView):
 
         for kurikulum_id in kurikulum_ids:
             list_mata_kuliah_kurikulum = get_mata_kuliah_kurikulum(kurikulum_id, self.request.user.prodi.id_neosia)
+            list_semester = get_semester_by_kurikulum(kurikulum_id)
 
         self.success_url = reverse_lazy('kurikulum:read-all')
         return super().form_valid(form)
