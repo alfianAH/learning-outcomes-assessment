@@ -13,7 +13,7 @@
         <nav role="navigation">
             <ol>
                 {% for _ in form %}
-                    <li class="form-wizard-page {% if forcounter.first %}active{% endif %}" id="form-page-{{ forloop.counter }}" data-target="#form-content-page-{{ forloop.counter }}"></li>
+                    <li class="form-wizard-page {% if forloop.first %}active{% endif %}" id="form-page-{{ forloop.counter }}" data-target="#form-content-page-{{ forloop.counter }}"></li>
                 {% endfor %}
             </ol>
         </nav>
@@ -75,3 +75,54 @@
     </div>
 </form>
 {% endblock content %}
+
+{% block script %}
+<script>
+    $('#next-btn').on("click", function(){
+        let targetPage = $(this).attr('data-target');
+        let isSemesterPage = targetPage === "#form-content-page-2";
+        
+        if(!isSemesterPage) return;
+        let listKurikulumID = [];
+        let checkedKurikulums = $('#id_kurikulum_from_neosia').find('input:checkbox:checked');
+
+        for(const checkedKurikulum of checkedKurikulums){
+            listKurikulumID.push($(checkedKurikulum).val());
+        }
+        
+        console.log('Checked kurikulum: ' + listKurikulumID);
+
+        let data = {
+            'csrfmiddlewaretoken': '{{ csrf_token }}',
+            'list_kurikulum_id': listKurikulumID
+        };
+
+        $.ajax({
+            type: 'POST',
+            url: '{{ semester_by_kurikulum_url }}',
+            data: data,
+            success: function(data){
+                let listSemesterID = data.list_semester_id;
+                if(listSemesterID.length == 0) return;
+
+                console.log('List semester: ' + data.list_semester_id);
+                let semesterCheckboxes = $('#id_semester_from_neosia').find('input:checkbox');
+
+                for(const semesterCheckbox of semesterCheckboxes){
+                    let checkboxValue = parseInt($(semesterCheckbox).val());
+                    if(listSemesterID.indexOf(checkboxValue) == -1){
+                        let hiddenSemesterID = $(semesterCheckbox).attr('id');
+
+                        let dataInTable = $('table#id_semester_from_neosia').find(`#${hiddenSemesterID}`).closest('tr');
+                        let dataInList = $('ol#id_semester_from_neosia').find(`#${hiddenSemesterID}`).closest('li');
+
+                        $(dataInTable).addClass('hidden');
+                        $(dataInList).addClass('hidden');
+                    }
+                }
+                
+            }
+        });
+    });
+</script>
+{% endblock script %}

@@ -1,5 +1,4 @@
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import redirect, render
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.urls import reverse, reverse_lazy
 from django.views.generic.base import View
 from django.views.generic.detail import DetailView
@@ -27,6 +26,11 @@ class KurikulumReadAllSyncView(FormView):
     form_class = KurikulumReadAllSyncForm
     template_name: str = 'kurikulum/read-all-sync-form.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['semester_by_kurikulum_url'] = reverse('kurikulum:semester-by-kurikulum')
+        return context
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs.update({'user': self.request.user})
@@ -37,10 +41,27 @@ class KurikulumReadAllSyncView(FormView):
 
         for kurikulum_id in kurikulum_ids:
             list_mata_kuliah_kurikulum = get_mata_kuliah_kurikulum(kurikulum_id, self.request.user.prodi.id_neosia)
-            list_semester = get_semester_by_kurikulum(kurikulum_id)
 
         self.success_url = reverse_lazy('kurikulum:read-all')
         return super().form_valid(form)
+
+
+class JSONSemesterByKurikulum(View):
+    def post(self, request: HttpRequest, *args, **kwargs):
+        print('POST: {}'.format(request.POST))
+        list_kurikulum_id: list = request.POST.get('list_kurikulum_id[]')
+        print('Kurikulum: {}'.format(list_kurikulum_id))
+
+        list_semester_id = []
+
+        for kurikulum_id in list_kurikulum_id:
+            print('Inspect: {}'.format(kurikulum_id))
+            semester_by_kurikulum = get_semester_by_kurikulum(kurikulum_id)
+            
+            for semester_id in semester_by_kurikulum:
+                list_semester_id.append(semester_id)
+
+        return JsonResponse({'list_semester_id': list_semester_id})
 
 
 class KurikulumReadSyncView(View):
@@ -52,6 +73,7 @@ class KurikulumReadSyncView(View):
     3. Update Semester in Kurikulum PK
     """
     pass
+
 
 class KurikulumReadAllView(ListView):
     """Read all Kurikulums from Program Studi X
@@ -72,8 +94,10 @@ class KurikulumReadAllView(ListView):
         }
         return context
 
+
 class KurikulumReadView(DetailView):
     pass
+
 
 class KurikulumDeleteView(DeleteView):
     pass
@@ -84,8 +108,10 @@ class KurikulumDeleteView(DeleteView):
 class MataKuliahKurikulumReadAllView(ListView):
     pass
 
+
 class MataKuliahKurikulumReadView(DetailView):
     pass
+
 
 class MataKuliahKurikulumDeleteView(DeleteView):
     pass

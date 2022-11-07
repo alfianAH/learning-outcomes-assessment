@@ -98,12 +98,12 @@ def get_user_profile(username:str, role: str):
         if settings.DEBUG: print(response.raw)
         return None
 
-def request_data_to_neosia(auth_url: str, parameters: dict, headers: dict):
+def request_data_to_neosia(auth_url: str, params: dict, headers: dict):
     """Request data to Neosia API
 
     Args:
         auth_url (str): Target URL
-        parameters (dict): Requested parameters
+        params (dict): Requested parameters
         headers (dict): Requested headers
 
     Returns:
@@ -111,8 +111,11 @@ def request_data_to_neosia(auth_url: str, parameters: dict, headers: dict):
     """
 
     try:
-        response = requests.post(auth_url, params=parameters, headers=headers)
+        response = requests.post(auth_url, params=params, headers=headers)
     except MissingSchema:
         if settings.DEBUG: print('There are no response')
         return None
+    except requests.exceptions.SSLError:
+        if settings.DEBUG: print("SSL Error")
+        response = requests.post(auth_url, params=params, headers=headers, verify=False)
     return response

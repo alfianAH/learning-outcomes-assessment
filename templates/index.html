@@ -8,6 +8,8 @@
     <title>Learning Outcomes Assessment</title>
 
     <link href="{% static 'public/css/index.css' %}" rel="stylesheet">
+    
+    <script src="{% static 'public/js/form-responsive.js' %}"></script>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,10 +28,11 @@
     {% block main %}
     
     {% endblock main %}
-    <script src="{% static 'public/js/index.js' %}"></script>
-    <script src="{% static 'public/js/form-wizard.js' %}"></script>
+    
     {% block script %}
     
     {% endblock script %}
+    <script src="{% static 'public/js/index.js' %}"></script>
+    <script src="{% static 'public/js/form-wizard.js' %}"></script>
 </body>
 </html>

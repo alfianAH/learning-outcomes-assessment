@@ -62,31 +62,8 @@
     </table>
 
     <script>
-        function onCheckboxChange(isChecked, element, closestSelector){
-            // Check property
-            $(element).prop('checked', isChecked);
-            let closestElement = $(element).closest(closestSelector);
-
-            // Add or remove active class
-            if(isChecked){
-                $(closestElement).addClass('active');
-            } else{
-                $(closestElement).removeClass('active');
-            }
-        }
-
         {% if id %}
-            let formId ="{{ id }}";
-            $("input:checkbox").on("change", function(){
-                let id = $(this).attr('id');
-                let isChecked = $(this).prop('checked');
-                
-                let listInputElement = $(`ol#${formId}`).find(`#${id}`);
-                let tableInputElement = $(`table#${formId}`).find(`#${id}`);
-                
-                onCheckboxChange(isChecked, listInputElement, '.list-item-model-a');
-                onCheckboxChange(isChecked, tableInputElement, 'tr');
-            });
+            onCheckboxClick('{{ id }}');
         {% endif %}
     </script>
 {% endwith %}

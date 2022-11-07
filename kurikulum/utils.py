@@ -11,13 +11,18 @@ SEMESTER_BY_KURIKULUM_URL = 'https://customapi.neosia.unhas.ac.id/getSemesterByK
 def request_data_to_neosia(auth_url: str, params: dict = {}, headers: dict = {}):
     headers['token'] = os.environ.get('NEOSIA_API_TOKEN')
     
-    response = requests.post(auth_url, params=params, headers=headers)
+    try:
+        response = requests.post(auth_url, params=params, headers=headers)
+    except requests.exceptions.SSLError:
+        if settings.DEBUG: 
+            print("SSL Error")
+            response = requests.post(auth_url, params=params, headers=headers, verify=False)
 
     if response.status_code == 200:
         json_response = response.json()
         
         if len(json_response) == 0: 
-            if settings.DEBUG: print('JSON is empty')
+            if settings.DEBUG: print('JSON is empty. {}'.format(response.url))
             return None
 
         return json_response
