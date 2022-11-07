@@ -83,46 +83,47 @@
         let isSemesterPage = targetPage === "#form-content-page-2";
         
         if(!isSemesterPage) return;
-        let listKurikulumID = [];
         let checkedKurikulums = $('#id_kurikulum_from_neosia').find('input:checkbox:checked');
 
         for(const checkedKurikulum of checkedKurikulums){
-            listKurikulumID.push($(checkedKurikulum).val());
-        }
-        
-        console.log('Checked kurikulum: ' + listKurikulumID);
+            let kurikulumID = $(checkedKurikulum).val();
+            console.log('Checked kurikulum: ' + kurikulumID);
 
-        let data = {
-            'csrfmiddlewaretoken': '{{ csrf_token }}',
-            'list_kurikulum_id': listKurikulumID
-        };
+            let data = {
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+                'kurikulum_id': kurikulumID
+            };
 
-        $.ajax({
-            type: 'POST',
-            url: '{{ semester_by_kurikulum_url }}',
-            data: data,
-            success: function(data){
-                let listSemesterID = data.list_semester_id;
-                if(listSemesterID.length == 0) return;
+            $.ajax({
+                type: 'POST',
+                url: '{{ semester_by_kurikulum_url }}',
+                data: data,
+                success: function(data){
+                    let listSemesterID = data.list_semester_id;
+                    if(listSemesterID.length == 0) return;
 
-                console.log('List semester: ' + data.list_semester_id);
-                let semesterCheckboxes = $('#id_semester_from_neosia').find('input:checkbox');
+                    console.log('List semester: ' + data.list_semester_id);
+                    let semesterCheckboxes = $('#id_semester_from_neosia').find('input:checkbox');
 
-                for(const semesterCheckbox of semesterCheckboxes){
-                    let checkboxValue = parseInt($(semesterCheckbox).val());
-                    if(listSemesterID.indexOf(checkboxValue) == -1){
+                    for(const semesterCheckbox of semesterCheckboxes){
+                        let checkboxValue = parseInt($(semesterCheckbox).val());
+
                         let hiddenSemesterID = $(semesterCheckbox).attr('id');
-
                         let dataInTable = $('table#id_semester_from_neosia').find(`#${hiddenSemesterID}`).closest('tr');
                         let dataInList = $('ol#id_semester_from_neosia').find(`#${hiddenSemesterID}`).closest('li');
 
-                        $(dataInTable).addClass('hidden');
-                        $(dataInList).addClass('hidden');
+                        if(listSemesterID.indexOf(checkboxValue) == -1){
+                            $(dataInTable).addClass('hidden');
+                            $(dataInList).addClass('hidden');
+                        } else{
+                            $(dataInTable).removeClass('hidden');
+                            $(dataInList).removeClass('hidden');
+                        }
                     }
+                    
                 }
-                
-            }
-        });
+            });
+        }
     });
 </script>
 {% endblock script %}

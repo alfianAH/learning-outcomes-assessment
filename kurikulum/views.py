@@ -48,19 +48,15 @@ class KurikulumReadAllSyncView(FormView):
 
 class JSONSemesterByKurikulum(View):
     def post(self, request: HttpRequest, *args, **kwargs):
-        print('POST: {}'.format(request.POST))
-        list_kurikulum_id: list = request.POST.get('list_kurikulum_id[]')
-        print('Kurikulum: {}'.format(list_kurikulum_id))
+        kurikulum_id: list = request.POST.get('kurikulum_id')
+        print('Kurikulum: {}'.format(kurikulum_id))
 
         list_semester_id = []
+        semester_by_kurikulum = get_semester_by_kurikulum(kurikulum_id)
 
-        for kurikulum_id in list_kurikulum_id:
-            print('Inspect: {}'.format(kurikulum_id))
-            semester_by_kurikulum = get_semester_by_kurikulum(kurikulum_id)
-            
-            for semester_id in semester_by_kurikulum:
-                list_semester_id.append(semester_id)
-
+        for semester_id in semester_by_kurikulum:
+            list_semester_id.append(semester_id)
+        
         return JsonResponse({'list_semester_id': list_semester_id})
 
 
