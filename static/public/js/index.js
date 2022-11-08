@@ -258,7 +258,8 @@ function pagination() {
 }
 
 function checkboxTable(element) {
-    let table = $(element);
+    let tableID = $(element).attr('id');
+    let table = $(`table#${tableID}`);
     
     table
         .find("thead th:nth-child(1) input[type='checkbox']")
@@ -374,7 +375,10 @@ var transitionEvent = whichTransitionEvent();
 console.log(transitionEvent);
 
 breadcrumb();
-checkboxTable("table.table-checkbox");
+let listTableCheckbox = $('table.table-checkbox');
+for (const tableCheckbox of listTableCheckbox) {
+    checkboxTable($(tableCheckbox));
+}
 darkModeHandler();
 listItemCheckbox(".list-item-model-a");
 listItemCheckbox(".list-item-model-b");
