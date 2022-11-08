@@ -327,7 +327,7 @@ function listItemCheckbox(element) {
 }
 
 function tableAccordion(element) {
-    toggleClass($(toggleClass($(element).closest('.table-row'), "open")).next(".table-details"), "open");
+    toggleClass($(toggleClass($(element).closest('tr'), "open")).next(".table-details"), "open");
 }
 
 function tabElement() {
