@@ -22,7 +22,7 @@
         {% endfor %}
     </ol>
 
-    <table class="table-css table-hover table-checkbox hidden md:table {% if widget.attrs.class %}{{ widget.attrs.class }}{% endif %}" 
+    <table class="table-css table-hover table-checkbox table-numbered hidden md:table {% if widget.attrs.class %}{{ widget.attrs.class }}{% endif %}" 
         {% if id %}id="{{ id }}"{% endif %}
         role="list">
         <thead>
@@ -49,7 +49,7 @@
                         <th scope="row" class="text-center checkbox">
                             {% include option.template_name with widget=option use_label=False %}
                         </th>
-                        <th scope="row" class="text-center number">{{ forloop.parentloop.counter }}</th>
+                        <th scope="row" class="text-center number"></th>
                         <td class="text-left">{{ option.label.nama }}</td>
 
                         {% if option.table_custom_field_template %}

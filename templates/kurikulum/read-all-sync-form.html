@@ -84,46 +84,48 @@
         
         if(!isSemesterPage) return;
         let checkedKurikulums = $('#id_kurikulum_from_neosia').find('input:checkbox:checked');
+        let listKurikulumID = []
 
         for(const checkedKurikulum of checkedKurikulums){
-            let kurikulumID = $(checkedKurikulum).val();
-            console.log('Checked kurikulum: ' + kurikulumID);
-
-            let data = {
-                'csrfmiddlewaretoken': '{{ csrf_token }}',
-                'kurikulum_id': kurikulumID
-            };
-
-            $.ajax({
-                type: 'POST',
-                url: '{{ semester_by_kurikulum_url }}',
-                data: data,
-                success: function(data){
-                    let listSemesterID = data.list_semester_id;
-                    if(listSemesterID.length == 0) return;
-
-                    console.log('List semester: ' + data.list_semester_id);
-                    let semesterCheckboxes = $('#id_semester_from_neosia').find('input:checkbox');
-
-                    for(const semesterCheckbox of semesterCheckboxes){
-                        let checkboxValue = parseInt($(semesterCheckbox).val());
-
-                        let hiddenSemesterID = $(semesterCheckbox).attr('id');
-                        let dataInTable = $('table#id_semester_from_neosia').find(`#${hiddenSemesterID}`).closest('tr');
-                        let dataInList = $('ol#id_semester_from_neosia').find(`#${hiddenSemesterID}`).closest('li');
-
-                        if(listSemesterID.indexOf(checkboxValue) == -1){
-                            $(dataInTable).addClass('hidden');
-                            $(dataInList).addClass('hidden');
-                        } else{
-                            $(dataInTable).removeClass('hidden');
-                            $(dataInList).removeClass('hidden');
-                        }
-                    }
-                    
-                }
-            });
+            listKurikulumID.push($(checkedKurikulum).val());
         }
+
+        console.log('Checked kurikulum: ' + listKurikulumID);
+
+        let data = {
+            'csrfmiddlewaretoken': '{{ csrf_token }}',
+            'list_kurikulum_id': JSON.stringify(listKurikulumID)
+        };
+
+        $.ajax({
+            type: 'POST',
+            url: '{{ semester_by_kurikulum_url }}',
+            data: data,
+            success: function(data){
+                let listSemesterID = data['list_semester_id'];
+                if(listSemesterID.length == 0 || listSemesterID == null) return;
+
+                console.log('List semester: ' + listSemesterID);
+                let semesterCheckboxes = $('#id_semester_from_neosia').find('input:checkbox');
+
+                for(const semesterCheckbox of semesterCheckboxes){
+                    let checkboxValue = parseInt($(semesterCheckbox).val());
+
+                    let hiddenSemesterID = $(semesterCheckbox).attr('id');
+                    let dataInTable = $('table#id_semester_from_neosia').find(`#${hiddenSemesterID}`).closest('tr');
+                    let dataInList = $('ol#id_semester_from_neosia').find(`#${hiddenSemesterID}`).closest('li');
+
+                    if(listSemesterID.indexOf(checkboxValue) == -1){
+                        $(dataInTable).addClass('hidden');
+                        $(dataInList).addClass('hidden');
+                    } else{
+                        $(dataInTable).removeClass('hidden');
+                        $(dataInList).removeClass('hidden');
+                    }
+                }
+                
+            }
+        });
     });
 </script>
 {% endblock script %}
