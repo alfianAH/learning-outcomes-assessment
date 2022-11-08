@@ -27,6 +27,8 @@
 
                     <h2 class="form-wizard-header list-item-title">{{ field.label }}</h2>
 
+                    {% include 'components/loading-overlay.html' %}
+
                     <div class="fade {% if forloop.first %}show active{% endif %}">
                         {% if field.help_text %}
                             <p>{{ field.help_text|safe }}</p>
@@ -34,6 +36,8 @@
 
                         <div class="form-group mb-3 mt-2 md:mt-3" >
                             {{ field }}
+
+                            <p class="text-center hidden no-data">Tidak ada data</p>
                             
                             {% if field.errors %}
                                 <ul>
@@ -78,8 +82,8 @@
 
 {% block script %}
 <script>
-    $('#next-btn').on("click", function(){
-        let targetPage = $(this).attr('data-target');
+    function semesterPage(navigation){
+        let targetPage = $(navigation).attr('data-target');
         let isSemesterPage = targetPage === "#form-content-page-2";
         
         if(!isSemesterPage) return;
@@ -90,8 +94,6 @@
             listKurikulumID.push($(checkedKurikulum).val());
         }
 
-        console.log('Checked kurikulum: ' + listKurikulumID);
-
         let data = {
             'csrfmiddlewaretoken': '{{ csrf_token }}',
             'list_kurikulum_id': JSON.stringify(listKurikulumID)
@@ -101,9 +103,22 @@
             type: 'POST',
             url: '{{ semester_by_kurikulum_url }}',
             data: data,
+            beforeSend: function(){
+                // Show loading
+                $('#form-content-page-2').find('#loading-overlay').removeClass('hidden');
+            },
             success: function(data){
+                // Hide loading
+                $('#form-content-page-2').find('#loading-overlay').addClass('hidden');
+
                 let listSemesterID = data['list_semester_id'];
-                if(listSemesterID.length == 0 || listSemesterID == null) return;
+                if(listSemesterID == null) return;
+                
+                if(listSemesterID.length == 0){
+                    $('#form-content-page-2').find('.no-data').removeClass('hidden');
+                } else{
+                    $('#form-content-page-2').find('.no-data').addClass('hidden');
+                }
 
                 console.log('List semester: ' + listSemesterID);
                 let semesterCheckboxes = $('#id_semester_from_neosia').find('input:checkbox');
@@ -116,9 +131,15 @@
                     let dataInList = $('ol#id_semester_from_neosia').find(`#${hiddenSemesterID}`).closest('li');
 
                     if(listSemesterID.indexOf(checkboxValue) == -1){
+                        // Actions when semester is not on checked kurikulum
+                        $(semesterCheckbox).prop('disabled', true);
+                        $(semesterCheckbox).prop('checked', false);
                         $(dataInTable).addClass('hidden');
                         $(dataInList).addClass('hidden');
                     } else{
+                        // Actions when semester is on checked kurikulum
+                        $(semesterCheckbox).prop('disabled', false);
+                        $(semesterCheckbox).prop('checked', true);
                         $(dataInTable).removeClass('hidden');
                         $(dataInList).removeClass('hidden');
                     }
@@ -126,6 +147,14 @@
                 
             }
         });
+    }
+    $('#next-btn').on("click", function(){
+        semesterPage(this);
+    });
+    $('#form-page-2').on("click", function(){
+        if(!$(this).hasClass('revealed') && !$(this).hasClass('latest')) return;
+        if($(this).hasClass('active')) return;
+        semesterPage(this);
     });
 </script>
 {% endblock script %}

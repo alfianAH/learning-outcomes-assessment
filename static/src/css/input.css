@@ -305,7 +305,7 @@
     }
 
     .form-wizard-content{
-        @apply space-y-2 md:space-y-3;
+        @apply relative space-y-2 md:space-y-3;
     }
 
     .form-wizard-content.disabled > .form-wizard-header{
