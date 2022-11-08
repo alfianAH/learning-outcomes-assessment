@@ -1815,7 +1815,14 @@ details.dropdown::marker {
 }
 
 .navbar-header:hover {
+  --tw-text-opacity: 1;
+  color: rgb(248 250 252 / var(--tw-text-opacity));
   text-decoration-line: none;
+}
+
+.navbar-header:active {
+  --tw-text-opacity: 1;
+  color: rgb(248 250 252 / var(--tw-text-opacity));
 }
 
 @media (min-width: 768px) {
@@ -2123,6 +2130,15 @@ details.dropdown::marker {
   margin-bottom: 1rem;
   width: 100%;
   vertical-align: top;
+}
+
+.table-numbered{
+  counter-reset: section;
+}
+
+.table-numbered > tbody > * > *.number::before{
+  content: counter(section) ".\20";
+  counter-increment: section;
 }
 
 .table-css > :not(caption) > * > * {

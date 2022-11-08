@@ -406,7 +406,7 @@
     }
 
     .navbar-header{
-        @apply font-bold ml-2.5 text-slate-50 text-base md:text-xl lg:text-3xl hover:no-underline;
+        @apply font-bold ml-2.5 text-slate-50 hover:text-slate-50 active:text-slate-50 text-base md:text-xl lg:text-3xl hover:no-underline;
     }
 
     /* Pagination */
@@ -532,6 +532,15 @@
         @apply w-full mb-4 align-top;
     }
     
+    .table-numbered{
+        counter-reset: section;
+    }
+
+    .table-numbered > tbody > * > *.number::before{
+        content: counter(section) ".\20";
+        counter-increment: section;
+    }
+
     .table-css > :not(caption) > * > *{
         @apply border-b border-l border-slate-400 first:border-l-transparent  dark:first:border-l-transparent px-1 py-2 md:px-2.5 md:py-2.5 xl:px-3 xl:py-3 text-sm md:text-base xl:text-lg;
     }
