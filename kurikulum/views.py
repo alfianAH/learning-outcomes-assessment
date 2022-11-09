@@ -1,13 +1,18 @@
 import json
 from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic.base import View
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import DeleteView, FormView
 from django.views.generic.list import ListView
-
+from formtools.wizard.views import SessionWizardView
 from .models import Kurikulum
-from .forms import KurikulumReadAllSyncForm
+from .forms import (
+    KurikulumReadAllSyncForm,
+    KurikulumFromNeosia,
+    SemesterFromNeosia,
+)
 from .utils import (
     get_mata_kuliah_kurikulum,
     get_semester_by_kurikulum,
@@ -15,6 +20,21 @@ from .utils import (
 
 
 # Create your views here.
+class KurikulumReadAllSyncFormWizardView(SessionWizardView):
+    template_name: str = 'kurikulum/read-all-sync-form.html'
+    form_list: list = [KurikulumFromNeosia, SemesterFromNeosia]
+
+    def get_form_kwargs(self, step=None):
+        form_kwargs = super().get_form_kwargs(step)
+        
+        form_kwargs.update({'user': self.request.user})
+        return form_kwargs
+
+    def done(self, form_list, **kwargs):
+        success_url = reverse('kurikulum:read-all')
+        return redirect(success_url)
+
+
 class KurikulumReadAllSyncView(FormView):
     """All kurikulums synchronization from Neosia
     What to do in sync:

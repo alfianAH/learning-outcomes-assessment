@@ -1,4 +1,5 @@
 {% extends 'home-view.html' %}
+{% load i18n %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{% url 'kurikulum:read-all' %}" role="listitem">Kurikulum</a></li>
@@ -8,74 +9,72 @@
 {% block content %}
 <form action="." method="post" class="space-y-2.5 xl:space-y-3">
     {% csrf_token %}
+    {{ wizard.management_form }}
 
     <div class="form-wizard">
         <nav role="navigation">
             <ol>
-                {% for _ in form %}
+                {% for _ in wizard.steps.all %}
                     <li class="form-wizard-page {% if forloop.first %}active{% endif %}" id="form-page-{{ forloop.counter }}" data-target="#form-content-page-{{ forloop.counter }}"></li>
                 {% endfor %}
             </ol>
         </nav>
 
-        <div class="form-wizard-parent list-numbered md:space-y-4">
-            {% for field in form %}
-                <div class="form-wizard-content {% if forloop.first %}active{% else %}hidden{% endif %}" 
-                    id="form-content-page-{{ forloop.counter }}" 
-                    aria-label="form-content-page-{{ forloop.counter }}" 
-                    data-page="#form-page-{{ forloop.counter }}">
+        <div class="form-wizard-parent md:space-y-4">
+            {% if wizard.form.forms %}
+                {{ wizard.form.management_form }}
+                {% for form in wizard.form.forms %}
+                    {{ form }}
+                {% endfor %}
+            {% else %}
+                {% for field in wizard.form %}
+                    <div class="form-wizard-content {% if forloop.first %}active{% else %}hidden{% endif %}" 
+                        id="form-content-page-{{ forloop.counter }}" 
+                        aria-label="form-content-page-{{ forloop.counter }}" 
+                        data-page="#form-page-{{ forloop.counter }}">
 
-                    <h2 class="form-wizard-header list-item-title">{{ field.label }}</h2>
+                        <h2 class="form-wizard-header list-item-title">{{ wizard.steps.step1 }}. {{ field.label }}</h2>
 
-                    {% include 'components/loading-overlay.html' %}
+                        {% include 'components/loading-overlay.html' %}
 
-                    <div class="fade {% if forloop.first %}show active{% endif %}">
-                        {% if field.help_text %}
-                            <p>{{ field.help_text|safe }}</p>
-                        {% endif %}
-
-                        <div class="form-group mb-3 mt-2 md:mt-3" >
-                            {{ field }}
-
-                            <p class="text-center hidden no-data">Tidak ada data</p>
-                            
-                            {% if field.errors %}
-                                <ul>
-                                {% for error in field.errors %}
-                                    <li>
-                                        <span class="form-error active">{{ error }}</span>
-                                    </li>
-                                {% endfor %}
-                                </ul>
+                        <div class="fade {% if forloop.first %}show active{% endif %}">
+                            {% if field.help_text %}
+                                <p>{{ field.help_text|safe }}</p>
                             {% endif %}
+
+                            <div class="form-group mb-3 mt-2 md:mt-3" >
+                                {{ field }}
+
+                                <p class="text-center hidden no-data">Tidak ada data</p>
+                                
+                                {% if field.errors %}
+                                    <ul>
+                                    {% for error in field.errors %}
+                                        <li>
+                                            <span class="form-error active">{{ error }}</span>
+                                        </li>
+                                    {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
 
     <div class="form-wizard-buttons">
-        <button class="btn btn-secondary btn-icon-start hidden" type="button" role="button" id="prev-btn" data-target="">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-chevron-left" focusable="False" role="img" aria-label="previous" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
-            </svg>
-            Sebelumnya
-        </button>
-
-        <button class="btn btn-success btn-icon-end" type="button" role="button" id="next-btn" data-target="#form-content-page-2">
-            Selanjutnya
-            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" focusable="False" role="img" aria-label="next" class="bi bi-chevron-right" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
-            </svg>
-        </button>
-
-        <button class="btn btn-success btn-icon-end hidden" type="submit" role="button" id="submit-btn">
-            Sinkronisasi
-            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" focusable="False" role="img" aria-label="submit" class="bi bi-check2" viewBox="0 0 16 16">
-                <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
-            </svg>
-        </button>
+        {% if wizard.steps.prev %}
+            <button class="btn btn-secondary btn-icon-start" name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}" role="button" id="prev-btn" data-target="">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-chevron-left" focusable="False" role="img" aria-label="previous" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+                </svg>
+                Sebelumnya
+            </button>
+        {% endif %}
+        
+        <input class="btn btn-success btn-icon-end" type="submit" value="{% if wizard.steps.next %}Selanjutnya{% else %}Sinkronisasi{% endif %}"/>
     </div>
 </form>
 {% endblock content %}
