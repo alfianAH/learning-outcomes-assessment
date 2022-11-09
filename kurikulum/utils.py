@@ -18,6 +18,11 @@ def request_data_to_neosia(auth_url: str, params: dict = {}, headers: dict = {})
         if settings.DEBUG: 
             print("SSL Error")
             response = requests.post(auth_url, params=params, headers=headers, verify=False)
+    except requests.exceptions.ConnectTimeout:
+        # TODO: ACTIONS ON CONNECT TIMEOUT
+        if settings.DEBUG:
+            print('Timeout')
+            return None
 
     if response.status_code == 200:
         json_response = response.json()
@@ -116,7 +121,7 @@ def get_semester_by_kurikulum(kurikulum_id: int):
     parameters = {
         'id_kurikulum': kurikulum_id
     }
-
+    # TODO: OPTIMIZE
     json_response = request_data_to_neosia(SEMESTER_BY_KURIKULUM_URL, params=parameters)
     list_semester_id = []
     semester_choices = []
