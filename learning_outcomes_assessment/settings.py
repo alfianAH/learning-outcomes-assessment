@@ -50,6 +50,7 @@ INSTALLED_APPS = [
 
     # Third party
     'django_htmx',
+    'formtools',
 
     # Internal
     'accounts',
