@@ -26,9 +26,27 @@ class KurikulumReadAllSyncFormWizardView(SessionWizardView):
 
     def get_form_kwargs(self, step=None):
         form_kwargs = super().get_form_kwargs(step)
+        if step is None: step = self.steps.current
+        if step == '0':
+            form_kwargs.update({'user': self.request.user})
         
-        form_kwargs.update({'user': self.request.user})
         return form_kwargs
+    
+    def get_form(self, step=None, data=None, files=None):
+        form = super().get_form(step, data, files)
+        if step is None: step = self.steps.current
+        if step == '1':
+            kurikulum_cleaned_data = self.get_cleaned_data_for_step('0').get('kurikulum_from_neosia')
+            semester_choices = []
+            
+            for kurikulum_id in kurikulum_cleaned_data:
+                semester_by_kurikulum = get_semester_by_kurikulum(kurikulum_id)
+                for semester_id in semester_by_kurikulum:
+                    semester_choices.append(semester_id)
+
+            print('Semester: {}'.format(semester_choices))
+            form.fields.get('semester_from_neosia').choices = semester_choices
+        return form
 
     def done(self, form_list, **kwargs):
         success_url = reverse('kurikulum:read-all')

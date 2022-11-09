@@ -7,6 +7,7 @@ KURIKULUM_URL = 'https://customapi.neosia.unhas.ac.id/getKurikulum'
 MATA_KULIAH_KURIKULUM_URL = 'https://customapi.neosia.unhas.ac.id/getMKbyKurikulumAndProdi'
 ALL_SEMESTER_URL = 'https://customapi.neosia.unhas.ac.id/getAllSemester'
 SEMESTER_BY_KURIKULUM_URL = 'https://customapi.neosia.unhas.ac.id/getSemesterByKurikulum'
+DETAIL_SEMESTER_URL = 'https://customapi.neosia.unhas.ac.id/getSemesterDetail'
 
 def request_data_to_neosia(auth_url: str, params: dict = {}, headers: dict = {}):
     headers['token'] = os.environ.get('NEOSIA_API_TOKEN')
@@ -102,16 +103,54 @@ def get_all_semester():
 
 
 def get_semester_by_kurikulum(kurikulum_id: int):
+    """Get semester by kurikulum
+
+    Args:
+        kurikulum_id (int): Kurikulum ID
+
+    Returns:
+        list: All semester by kurikulum ID
+    """
+
+    # Request semester by kurikulum
     parameters = {
         'id_kurikulum': kurikulum_id
     }
 
     json_response = request_data_to_neosia(SEMESTER_BY_KURIKULUM_URL, params=parameters)
     list_semester_id = []
+    semester_choices = []
     if json_response is None: return list_semester_id
     
+    # Get all semester IDs
     for semester_data in json_response:
         semester_id = semester_data['id_semester']
         list_semester_id.append(semester_id)
+
+    if len(list_semester_id) == 0: return semester_choices
+
+    # Get all detail semester by semester ID
+    for semester_id in list_semester_id:
+        parameters = {
+            'id_semester': semester_id
+        }
+        json_response = request_data_to_neosia(DETAIL_SEMESTER_URL, params=parameters)
+
+        if json_response is None: continue
     
-    return list_semester_id
+        for semester_data in json_response:
+            semester_choice = {
+                'id_neosia': semester_data['id'],
+                'tahun_ajaran': semester_data['tahun_ajaran'],
+                'jenis': semester_data['jenis'],
+                'nama': 'Semester {} {}'.format(
+                    semester_data['tahun_ajaran'],
+                    semester_data['jenis'].capitalize()
+                ),
+            }
+
+            # Convert it to input value, options
+            semester_choice = semester_data['id'], semester_choice
+            semester_choices.append(semester_choice)
+    
+    return semester_choices
