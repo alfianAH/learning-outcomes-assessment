@@ -85,25 +85,6 @@ class KurikulumReadAllSyncView(FormView):
         return super().form_valid(form)
 
 
-class JSONSemesterByKurikulum(View):
-    def post(self, request: HttpRequest, *args, **kwargs):
-        list_kurikulum_id: list = json.loads(request.POST.get('list_kurikulum_id'))
-        list_semester_id = []
-        
-        print('Kurikulum: {}'.format(type(list_kurikulum_id)))
-
-        for kurikulum_id in list_kurikulum_id:
-            print('Inspect: {}'.format(kurikulum_id))
-            semester_by_kurikulum = get_semester_by_kurikulum(kurikulum_id)
-
-            for semester_id in semester_by_kurikulum:
-                list_semester_id.append(semester_id)
-
-            print('Semester: {}'.format(semester_by_kurikulum))
-        
-        return JsonResponse({'list_semester_id': list_semester_id})
-
-
 class KurikulumReadSyncView(View):
     """Kurikulum synchronization from Neosia
     What to do in sync:

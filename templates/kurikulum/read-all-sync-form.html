@@ -30,8 +30,7 @@
                 {% for field in wizard.form %}
                     <div class="form-wizard-content {% if forloop.first %}active{% else %}hidden{% endif %}" 
                         id="form-content-page-{{ forloop.counter }}" 
-                        aria-label="form-content-page-{{ forloop.counter }}" 
-                        data-page="#form-page-{{ forloop.counter }}">
+                        aria-label="form-content-page-{{ forloop.counter }}">
 
                         <h2 class="form-wizard-header list-item-title">{{ wizard.steps.step1 }}. {{ field.label }}</h2>
 
@@ -66,7 +65,7 @@
 
     <div class="form-wizard-buttons">
         {% if wizard.steps.prev %}
-            <button class="btn btn-secondary btn-icon-start" name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}" role="button" id="prev-btn" data-target="">
+            <button class="btn btn-secondary btn-icon-start" name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}" role="button" id="prev-btn">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-chevron-left" focusable="False" role="img" aria-label="previous" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
                 </svg>
@@ -78,82 +77,3 @@
     </div>
 </form>
 {% endblock content %}
-
-{% block script %}
-<script>
-    function semesterPage(navigation){
-        let targetPage = $(navigation).attr('data-target');
-        let isSemesterPage = targetPage === "#form-content-page-2";
-        
-        if(!isSemesterPage) return;
-        let checkedKurikulums = $('#id_kurikulum_from_neosia').find('input:checkbox:checked');
-        let listKurikulumID = []
-
-        for(const checkedKurikulum of checkedKurikulums){
-            listKurikulumID.push($(checkedKurikulum).val());
-        }
-
-        let data = {
-            'csrfmiddlewaretoken': '{{ csrf_token }}',
-            'list_kurikulum_id': JSON.stringify(listKurikulumID)
-        };
-
-        $.ajax({
-            type: 'POST',
-            url: '{{ semester_by_kurikulum_url }}',
-            data: data,
-            beforeSend: function(){
-                // Show loading
-                $('#form-content-page-2').find('#loading-overlay').removeClass('hidden');
-            },
-            success: function(data){
-                // Hide loading
-                $('#form-content-page-2').find('#loading-overlay').addClass('hidden');
-
-                let listSemesterID = data['list_semester_id'];
-                if(listSemesterID == null) return;
-                
-                if(listSemesterID.length == 0){
-                    $('#form-content-page-2').find('.no-data').removeClass('hidden');
-                } else{
-                    $('#form-content-page-2').find('.no-data').addClass('hidden');
-                }
-
-                console.log('List semester: ' + listSemesterID);
-                let semesterCheckboxes = $('#id_semester_from_neosia').find('input:checkbox');
-
-                for(const semesterCheckbox of semesterCheckboxes){
-                    let checkboxValue = parseInt($(semesterCheckbox).val());
-
-                    let hiddenSemesterID = $(semesterCheckbox).attr('id');
-                    let dataInTable = $('table#id_semester_from_neosia').find(`#${hiddenSemesterID}`).closest('tr');
-                    let dataInList = $('ol#id_semester_from_neosia').find(`#${hiddenSemesterID}`).closest('li');
-
-                    if(listSemesterID.indexOf(checkboxValue) == -1){
-                        // Actions when semester is not on checked kurikulum
-                        $(semesterCheckbox).prop('disabled', true);
-                        $(semesterCheckbox).prop('checked', false);
-                        $(dataInTable).addClass('hidden');
-                        $(dataInList).addClass('hidden');
-                    } else{
-                        // Actions when semester is on checked kurikulum
-                        $(semesterCheckbox).prop('disabled', false);
-                        $(semesterCheckbox).prop('checked', true);
-                        $(dataInTable).removeClass('hidden');
-                        $(dataInList).removeClass('hidden');
-                    }
-                }
-                
-            }
-        });
-    }
-    $('#next-btn').on("click", function(){
-        semesterPage(this);
-    });
-    $('#form-page-2').on("click", function(){
-        if(!$(this).hasClass('revealed') && !$(this).hasClass('latest')) return;
-        if($(this).hasClass('active')) return;
-        semesterPage(this);
-    });
-</script>
-{% endblock script %}

@@ -1,8 +1,5 @@
 from django.urls import path
 from .views import (
-    JSONSemesterByKurikulum,
-
-    KurikulumReadAllSyncView,
     KurikulumReadAllSyncFormWizardView,
     KurikulumReadSyncView,
     KurikulumReadAllView,
@@ -19,7 +16,6 @@ app_name = 'kurikulum'
 urlpatterns = [
     path('', KurikulumReadAllView.as_view(), name='read-all'),
     path('sync/', KurikulumReadAllSyncFormWizardView.as_view(), name='read-all-sync'),
-    path('json/semester-by-kurikulum/', JSONSemesterByKurikulum.as_view(), name='semester-by-kurikulum'),
     path('<int:kurikulum_id>/sync/', KurikulumReadSyncView.as_view(), name='read-sync'),
     path('<int:kurikulum_id>/', KurikulumReadView.as_view(), name='read'),
     path('<int:kurikulum_id>/delete/', KurikulumDeleteView.as_view(), name='delete'),
