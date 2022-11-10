@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     # Internal
     'accounts',
     'kurikulum',
+    'semester',
 ]
 
 MIDDLEWARE = [

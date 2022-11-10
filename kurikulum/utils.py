@@ -1,4 +1,6 @@
 from django.conf import settings
+from .models import Kurikulum
+from semester.models import Semester
 import os
 import requests
 
@@ -36,6 +38,7 @@ def request_data_to_neosia(auth_url: str, params: dict = {}, headers: dict = {})
         if settings.DEBUG: print(response.raw)
         return None
 
+
 def get_kurikulum_by_prodi(prodi_id: int):
     parameters = {
         'prodi_kode': prodi_id
@@ -46,8 +49,14 @@ def get_kurikulum_by_prodi(prodi_id: int):
     if json_response is None: return tuple(kurikulum_choices)
 
     for kurikulum_data in json_response:
+        id_neosia = kurikulum_data['id']
+        
+        # Search in database
+        object_in_db = Kurikulum.objects.filter(id_neosia=id_neosia)
+        if object_in_db.exists(): continue
+
         kurikulum_choice = {
-            'id_neosia': kurikulum_data['id'],
+            'id_neosia': id_neosia,
             'prodi': kurikulum_data['id_prodi'],
             'nama': kurikulum_data['nama'],
             'tahun_mulai': kurikulum_data['tahun'],
@@ -58,6 +67,7 @@ def get_kurikulum_by_prodi(prodi_id: int):
         kurikulum_choices.append(kurikulum_choice)
     
     return tuple(kurikulum_choices)
+
 
 def get_mata_kuliah_kurikulum(kurikulum_id: int, prodi_id: int):
     parameters = {
@@ -107,6 +117,11 @@ def get_semester_by_kurikulum(kurikulum_id: int):
     # Get all semester IDs
     for semester_data in json_response:
         semester_id = semester_data['id_semester']
+        
+        # Search in database
+        object_in_db = Semester.objects.filter(id_neosia=semester_id)
+        if object_in_db.exists(): continue
+
         list_semester_id.append(semester_id)
 
     if len(list_semester_id) == 0: return semester_choices
