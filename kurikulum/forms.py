@@ -65,8 +65,25 @@ class SemesterFromNeosia(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.label_suffix = ""
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if len(self.fields['semester_from_neosia'].choices) == 0: return cleaned_data
+
+        # Clean kurikulum IDs
+        semester_from_neosia = cleaned_data.get('semester_from_neosia')
+        new_id_semester_from_neosia = []
         
-        semester_choices = get_all_semester()
-        self.fields['semester_from_neosia'].choices = semester_choices
+        for id in semester_from_neosia:
+            if id in new_id_semester_from_neosia: continue
+            new_id_semester_from_neosia.append(id)
+        
+        cleaned_data['semester_from_neosia'] = new_id_semester_from_neosia
+        is_semester_valid = len(new_id_semester_from_neosia) > 0
+        
+        if not is_semester_valid:
+            self.add_error('semester_from_neosia', 'Pilih minimal 1 (satu) semester')
 
-
+        if settings.DEBUG: print("Clean data: {}".format(cleaned_data))
+        
+        return cleaned_data
