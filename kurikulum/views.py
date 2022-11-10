@@ -79,6 +79,7 @@ class KurikulumReadAllSyncFormWizardView(SessionWizardView):
     def get_form(self, step=None, data=None, files=None):
         form = super().get_form(step, data, files)
         if step is None: step = self.steps.current
+        
         if step == '1':
             kurikulum_cleaned_data = self.get_cleaned_data_for_step('0').get('kurikulum_from_neosia')
             semester_choices = []
@@ -93,6 +94,8 @@ class KurikulumReadAllSyncFormWizardView(SessionWizardView):
 
     def done(self, form_list, **kwargs):
         success_url = reverse('kurikulum:read-all')
+        for form in form_list:
+            pass
         return redirect(success_url)
 
 

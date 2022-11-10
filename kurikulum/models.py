@@ -10,8 +10,7 @@ class Kurikulum(models.Model):
     prodi = models.ForeignKey(ProgramStudi, on_delete=models.CASCADE)
     nama = models.CharField(max_length=255, null=False)
     tahun_mulai = models.IntegerField(null=False)
-    tahun_akhir = models.IntegerField(null=False)
-    total_sks_lulus = models.PositiveSmallIntegerField(null=False)
+    total_sks_lulus = models.PositiveSmallIntegerField(null=True)
     is_active = models.BooleanField(null=False)
 
     def read_sync_url(self):
