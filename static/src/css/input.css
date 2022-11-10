@@ -170,7 +170,7 @@
 
     /* Buttons */
     .btn{
-        @apply flex flex-row items-center justify-center px-2 py-1 md:py-2 lg:px-2.5 rounded-md text-xs sm:text-sm md:text-base lg:text-lg border hover:border-slate-800 hover:no-underline h-min whitespace-nowrap dark:border-slate-100 transition-all max-w-min;
+        @apply flex flex-row items-center justify-center px-2 py-1 md:py-2 lg:px-2.5 rounded-md text-xs sm:text-sm md:text-base lg:text-lg border hover:border-slate-800 hover:no-underline h-min whitespace-nowrap dark:border-slate-100 transition-all max-w-min cursor-pointer;
     }
 
     .btn > svg{
@@ -289,7 +289,11 @@
     }
 
     .form-wizard-page{
-        @apply inline-block bg-stone-400 dark:bg-stone-500 w-4 h-4 lg:w-5 lg:h-5 rounded-full after:content-[""] after:flex after:border-stone-400 dark:after:border-stone-500 after:border after:my-auto after:mx-4 md:after:mx-auto md:after:my-4 lg:after:my-5 after:translate-y-2 md:after:translate-y-0 transition-all last:after:hidden mr-32 last:mr-0 after:w-32 md:mb-8 md:last:mb-0 md:mr-0 md:after:h-8 md:after:w-px;
+        @apply relative inline-block bg-stone-400 dark:bg-stone-500 w-4 h-4 lg:w-5 lg:h-5 rounded-full after:content-[""] after:flex after:border-stone-400 dark:after:border-stone-500 after:border after:my-auto after:mx-4 md:after:mx-auto md:after:my-4 lg:after:my-5 after:translate-y-2 md:after:translate-y-0 transition-all last:after:hidden mr-32 last:mr-0 after:w-32 md:mb-8 md:last:mb-0 md:mr-0 md:after:h-8 md:after:w-px;
+    }
+    
+    .form-wizard-page > button{
+        @apply absolute w-full h-full;
     }
 
     .form-wizard-page.revealed{

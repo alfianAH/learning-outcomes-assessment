@@ -15,12 +15,12 @@
         <nav role="navigation">
             <ol>
                 {% for step in wizard.steps.all %}
-                    <button class="form-wizard-page
+                    <li class="form-wizard-page
                         {% if step == wizard.steps.current %} active {% endif %}
                         {% if step in revealed_page and step != latest_page %} revealed {% endif %}
-                        {% if step == latest_page %} latest {% endif %}" 
-                        name="wizard_goto_step" type="submit" value="{{ step }}" role="button" {% if step not in revealed_page or step == wizard.steps.current %}disabled{% endif %}>
-                    </button>
+                        {% if step == latest_page %} latest {% endif %}">
+                        <button name="wizard_goto_step" type="submit" value="{{ step }}" role="button" {% if step not in revealed_page or step == wizard.steps.current %}disabled{% endif %}></button> 
+                    </li>
                 {% endfor %}
             </ol>
         </nav>

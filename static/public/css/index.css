@@ -856,6 +856,7 @@ th {
   max-width: -webkit-min-content;
   max-width: -moz-min-content;
   max-width: min-content;
+  cursor: pointer;
   flex-direction: row;
   align-items: center;
   justify-content: center;
@@ -1262,6 +1263,7 @@ details.dropdown::marker {
 }
 
 .form-wizard-page {
+  position: relative;
   margin-right: 8rem;
   display: inline-block;
   height: 1rem;
@@ -1344,6 +1346,12 @@ details.dropdown::marker {
     margin-top: 1.25rem;
     margin-bottom: 1.25rem;
   }
+}
+
+.form-wizard-page > button {
+  position: absolute;
+  height: 100%;
+  width: 100%;
 }
 
 .form-wizard-page.revealed {
@@ -2428,10 +2436,6 @@ details.dropdown::marker {
   width: 85%;
 }
 
-.max-w-\[128px\] {
-  max-width: 128px;
-}
-
 @-webkit-keyframes spin {
   to {
     transform: rotate(360deg);
@@ -2900,10 +2904,6 @@ details.dropdown::marker {
     display: table;
   }
 
-  .md\:table-cell {
-    display: table-cell;
-  }
-
   .md\:hidden {
     display: none;
   }
@@ -3003,10 +3003,6 @@ details.dropdown::marker {
     margin-right: 0.75rem;
   }
 
-  .xl\:table-cell {
-    display: table-cell;
-  }
-
   .xl\:h-10 {
     height: 2.5rem;
   }
@@ -3021,10 +3017,6 @@ details.dropdown::marker {
 
   .xl\:w-6 {
     width: 1.5rem;
-  }
-
-  .xl\:max-w-\[156px\] {
-    max-width: 156px;
   }
 
   .xl\:space-y-3 > :not([hidden]) ~ :not([hidden]) {
