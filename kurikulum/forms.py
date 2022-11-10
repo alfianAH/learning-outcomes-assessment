@@ -3,7 +3,6 @@ from django.conf import settings
 from widgets.widgets import ChoiceListInteractive
 from .utils import (
     get_kurikulum_by_prodi,
-    get_all_semester,
 )
 
 

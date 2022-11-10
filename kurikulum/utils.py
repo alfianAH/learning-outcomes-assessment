@@ -83,29 +83,6 @@ def get_mata_kuliah_kurikulum(kurikulum_id: int, prodi_id: int):
     
     return list_mata_kuliah_kurikulum
 
-def get_all_semester():
-    json_response = request_data_to_neosia(ALL_SEMESTER_URL)
-    semester_choices = []
-    if json_response is None: return tuple(semester_choices)
-
-    for semester_data in json_response:
-        semester_choice = {
-            'id_neosia': semester_data['id'],
-            'tahun_ajaran': semester_data['tahun_ajaran'],
-            'jenis': semester_data['jenis'],
-            'nama': 'Semester {} {}'.format(
-                semester_data['tahun_ajaran'],
-                semester_data['jenis'].capitalize()
-            ),
-        }
-
-        # Convert it to input value, options
-        semester_choice = semester_data['id'], semester_choice
-
-        semester_choices.append(semester_choice)
-    
-    return tuple(semester_choices)
-
 
 def get_semester_by_kurikulum(kurikulum_id: int):
     """Get semester by kurikulum
