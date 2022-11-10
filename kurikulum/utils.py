@@ -121,7 +121,7 @@ def get_semester_by_kurikulum(kurikulum_id: int):
     parameters = {
         'id_kurikulum': kurikulum_id
     }
-    # TODO: OPTIMIZE
+    # TODO: OPTIMIZE QUERY
     json_response = request_data_to_neosia(SEMESTER_BY_KURIKULUM_URL, params=parameters)
     list_semester_id = []
     semester_choices = []
@@ -142,20 +142,20 @@ def get_semester_by_kurikulum(kurikulum_id: int):
         json_response = request_data_to_neosia(DETAIL_SEMESTER_URL, params=parameters)
 
         if json_response is None: continue
-    
-        for semester_data in json_response:
-            semester_choice = {
-                'id_neosia': semester_data['id'],
-                'tahun_ajaran': semester_data['tahun_ajaran'],
-                'jenis': semester_data['jenis'],
-                'nama': 'Semester {} {}'.format(
-                    semester_data['tahun_ajaran'],
-                    semester_data['jenis'].capitalize()
-                ),
-            }
 
-            # Convert it to input value, options
-            semester_choice = semester_data['id'], semester_choice
-            semester_choices.append(semester_choice)
+        semester_data = json_response[0]
+        semester_choice = {
+            'id_neosia': semester_data['id'],
+            'tahun_ajaran': semester_data['tahun_ajaran'],
+            'jenis': semester_data['jenis'],
+            'nama': 'Semester {} {}'.format(
+                semester_data['tahun_ajaran'],
+                semester_data['jenis'].capitalize()
+            ),
+        }
+
+        # Convert it to input value, options
+        semester_choice = semester_data['id'], semester_choice
+        semester_choices.append(semester_choice)
     
     return semester_choices
