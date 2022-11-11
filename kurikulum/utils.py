@@ -1,11 +1,12 @@
 from django.conf import settings
 from .models import Kurikulum
-from semester.models import Semester
+from semester.models import SemesterKurikulum
 import os
 import requests
 
 
 KURIKULUM_URL = 'https://customapi.neosia.unhas.ac.id/getKurikulum'
+DETAIL_KURIKULUM_URL = 'https://customapi.neosia.unhas.ac.id/getKurikulumDetail'
 MATA_KULIAH_KURIKULUM_URL = 'https://customapi.neosia.unhas.ac.id/getMKbyKurikulumAndProdi'
 ALL_SEMESTER_URL = 'https://customapi.neosia.unhas.ac.id/getAllSemester'
 SEMESTER_BY_KURIKULUM_URL = 'https://customapi.neosia.unhas.ac.id/getSemesterByKurikulum'
@@ -39,7 +40,7 @@ def request_data_to_neosia(auth_url: str, params: dict = {}, headers: dict = {})
         return None
 
 
-def get_kurikulum_by_prodi(prodi_id: int):
+def get_kurikulum_by_prodi_choices(prodi_id: int):
     parameters = {
         'prodi_kode': prodi_id
     }
@@ -69,6 +70,26 @@ def get_kurikulum_by_prodi(prodi_id: int):
     return tuple(kurikulum_choices)
 
 
+def get_detail_kurikulum(kurikulum_id: int):
+    parameters = {
+        'id_kurikulum': kurikulum_id
+    }
+
+    json_response = request_data_to_neosia(DETAIL_KURIKULUM_URL, params=parameters)
+    if json_response is None: return None
+    kurikulum_detail = json_response[0]
+
+    kurikulum_data = {
+        'id_neosia': kurikulum_detail['id'],
+        'prodi': kurikulum_detail['id_prodi'],
+        'nama': kurikulum_detail['nama'],
+        'tahun_mulai': kurikulum_detail['tahun'],
+        'is_active': kurikulum_detail['is_current'] == 1,
+    }
+
+    return kurikulum_data
+
+
 def get_mata_kuliah_kurikulum(kurikulum_id: int, prodi_id: int):
     parameters = {
         'id_prodi': prodi_id,
@@ -83,8 +104,8 @@ def get_mata_kuliah_kurikulum(kurikulum_id: int, prodi_id: int):
         mata_kuliah = {
             'prodi': mata_kuliah_data['id_prodi'],
             'kurikulum': mata_kuliah_data['id_kurikulum'],
-            'id': mata_kuliah_data['id'],
-            'kode_mk': mata_kuliah_data['kode'],
+            'id_neosia': mata_kuliah_data['id'],
+            'kode': mata_kuliah_data['kode'],
             'nama': mata_kuliah_data['nama_resmi'],
             'sks': mata_kuliah_data['jumlah_sks']
         }
@@ -111,43 +132,76 @@ def get_semester_by_kurikulum(kurikulum_id: int):
     # TODO: OPTIMIZE QUERY
     json_response = request_data_to_neosia(SEMESTER_BY_KURIKULUM_URL, params=parameters)
     list_semester_id = []
-    semester_choices = []
     if json_response is None: return list_semester_id
     
     # Get all semester IDs
     for semester_data in json_response:
         semester_id = semester_data['id_semester']
-        
-        # Search in database
-        object_in_db = Semester.objects.filter(id_neosia=semester_id)
-        if object_in_db.exists(): continue
-
         list_semester_id.append(semester_id)
+    return list_semester_id
 
-    if len(list_semester_id) == 0: return semester_choices
+
+def get_detail_semester(semester_id: int):
+    """Get detail semester
+
+    Args:
+        semester_id (int): Semester ID
+
+    Returns:
+        dict: Semester detail
+    """
+
+    parameters = {
+        'id_semester': semester_id
+    }
+    json_response = request_data_to_neosia(DETAIL_SEMESTER_URL, params=parameters)
+
+    if json_response is None: return None
+
+    semester_data = json_response[0]
+    semester_detail = {
+        'id_neosia': semester_data['id'],
+        'tahun_ajaran': semester_data['tahun_ajaran'],
+        'jenis': semester_data['jenis'],
+        'nama': 'Semester {} {}'.format(
+            semester_data['tahun_ajaran'],
+            semester_data['jenis'].capitalize()
+        ),
+    }
+
+    return semester_detail
+
+
+def get_semester_by_kurikulum_choices(kurikulum_id: int):
+    """Get semester by kurikulum choices
+
+    Args:
+        kurikulum_id (int): Kurikulum ID
+
+    Returns:
+        list: All semester by kurikulum ID with detail semester
+    """
+
+    # Request semester by kurikulum
+    list_semester_id = get_semester_by_kurikulum(kurikulum_id)
+    new_list_semester_id = []
+    for semester_id in list_semester_id:
+        # Search in database
+        object_in_db = SemesterKurikulum.objects.filter(semester=int(semester_id))
+
+        if object_in_db.exists(): continue
+        new_list_semester_id.append(semester_id)
+
+    semester_choices = []
+    if len(new_list_semester_id) == 0: return semester_choices
 
     # Get all detail semester by semester ID
-    for semester_id in list_semester_id:
-        parameters = {
-            'id_semester': semester_id
-        }
-        json_response = request_data_to_neosia(DETAIL_SEMESTER_URL, params=parameters)
-
-        if json_response is None: continue
-
-        semester_data = json_response[0]
-        semester_choice = {
-            'id_neosia': semester_data['id'],
-            'tahun_ajaran': semester_data['tahun_ajaran'],
-            'jenis': semester_data['jenis'],
-            'nama': 'Semester {} {}'.format(
-                semester_data['tahun_ajaran'],
-                semester_data['jenis'].capitalize()
-            ),
-        }
+    for semester_id in new_list_semester_id:
+        semester_choice = get_detail_semester(semester_id)
+        if semester_choice is None: continue
 
         # Convert it to input value, options
-        semester_choice = semester_data['id'], semester_choice
+        semester_choice = semester_choice['id_neosia'], semester_choice
         semester_choices.append(semester_choice)
     
     return semester_choices

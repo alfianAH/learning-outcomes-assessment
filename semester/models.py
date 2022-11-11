@@ -10,10 +10,10 @@ class TipeSemester(models.TextChoices):
 
 
 class TahunAjaranManager(models.Manager):
-    def create_tahun_ajaran(self, tahun_ajaran: str):
+    def get_or_create_tahun_ajaran(self, tahun_ajaran: str):
         extracted_tahun_ajaran = extract_tahun_ajaran(tahun_ajaran)
-        new_object = self.create(**extracted_tahun_ajaran)
-        return new_object
+        filter_obj = self.get_or_create(**extracted_tahun_ajaran)
+        return filter_obj
 
 
 class TahunAjaran(models.Model):
@@ -28,9 +28,16 @@ class TahunAjaran(models.Model):
 
 class Semester(models.Model):
     id_neosia = models.BigIntegerField(primary_key=True, null=False, unique=True)
-
-    kurikulum = models.ForeignKey(Kurikulum, on_delete=models.CASCADE)
+    
     tahun_ajaran = models.ForeignKey(TahunAjaran, on_delete=models.CASCADE)
     
     nama = models.CharField(max_length=255, null=False)
     tipe_semester = models.PositiveSmallIntegerField(choices=TipeSemester.choices, null=False)
+
+    def __str__(self) -> str:
+        return self.nama
+
+
+class SemesterKurikulum(models.Model):
+    semester = models.ForeignKey(Semester, on_delete=models.CASCADE)
+    kurikulum = models.ForeignKey(Kurikulum, on_delete=models.CASCADE)

@@ -1,4 +1,5 @@
 import json
+from django.conf import settings
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -7,14 +8,25 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import DeleteView
 from django.views.generic.list import ListView
 from formtools.wizard.views import SessionWizardView
-from .models import Kurikulum
+
+from accounts.models import ProgramStudi
+from .models import Kurikulum, MataKuliahKurikulum
+from semester.models import (
+    Semester, 
+    TahunAjaran,
+    TipeSemester,
+    SemesterKurikulum,
+)
 from .forms import (
     KurikulumFromNeosia,
     SemesterFromNeosia,
 )
 from .utils import (
+    get_detail_kurikulum,
     get_mata_kuliah_kurikulum,
+    get_detail_semester,
     get_semester_by_kurikulum,
+    get_semester_by_kurikulum_choices,
 )
 
 
@@ -85,17 +97,145 @@ class KurikulumReadAllSyncFormWizardView(SessionWizardView):
             semester_choices = []
 
             for kurikulum_id in kurikulum_cleaned_data:
-                semester_by_kurikulum = get_semester_by_kurikulum(kurikulum_id)
+                semester_by_kurikulum = get_semester_by_kurikulum_choices(kurikulum_id)
                 for semester_id in semester_by_kurikulum:
                     semester_choices.append(semester_id)
 
             form.fields.get('semester_from_neosia').choices = semester_choices
         return form
 
+    def save_kurikulum(self, kurikulum_id: int):
+        kurikulum_detail = get_detail_kurikulum(kurikulum_id)
+        prodi_id = kurikulum_detail.get('prodi')
+        # Get Program studi object
+        prodi_obj = ProgramStudi.objects.get(id_neosia=prodi_id)
+        kurikulum_detail.pop('prodi')
+
+        Kurikulum.objects.get_or_create(prodi=prodi_obj, **kurikulum_detail)
+    
+    def save_mk_kurikulum(self, kurikulum_id: int):
+        user_prodi_id = self.request.user.prodi.id_neosia
+        list_mk_kurikulum = get_mata_kuliah_kurikulum(kurikulum_id, user_prodi_id)
+
+        for mk_kurikulum in list_mk_kurikulum:
+            kurikulum_mk_id = mk_kurikulum.get('kurikulum')
+            prodi_id = mk_kurikulum.get('prodi')
+
+            if int(kurikulum_mk_id) == kurikulum_id and int(prodi_id) == user_prodi_id:
+                # Get Program studi object
+                prodi_obj = ProgramStudi.objects.get(id_neosia=user_prodi_id)
+                kurikulum_obj = Kurikulum.objects.get(id_neosia=kurikulum_id)
+                mk_kurikulum.pop('prodi')
+                mk_kurikulum.pop('kurikulum')
+
+                mk_kurikulum_obj: MataKuliahKurikulum = MataKuliahKurikulum.objects.create(
+                    prodi=prodi_obj, 
+                    kurikulum=kurikulum_obj, 
+                    **mk_kurikulum
+                )
+                mk_kurikulum_obj.save()
+            else:
+                # TODO: ADD MESSAGE
+                if settings.DEBUG:
+                    print('''Kurikulum and Prodi are not match with database. 
+                    Given value: Kurikulum ID: {}, Prodi ID: {}
+                    Expected value: Kurikulum ID: {}, Prodi ID: {}'''.format(
+                        kurikulum_mk_id, prodi_id, 
+                        kurikulum_id, user_prodi_id
+                    ))
+    
+    def filter_semester_by_kurikulum(self, kurikulum_id: int):
+        semester_by_kurikulum = get_semester_by_kurikulum(kurikulum_id)
+        result = {
+            kurikulum_id: semester_by_kurikulum
+        }
+
+        return result
+
+    def save_semester(self, semester_id: int, semester_by_kurikulum: dict):
+        semester_detail = get_detail_semester(semester_id)
+        
+        # Extract tahun ajaran
+        tahun_ajaran = semester_detail.get('tahun_ajaran')
+        tahun_ajaran_obj = TahunAjaran.objects.get_or_create_tahun_ajaran(tahun_ajaran)
+        
+        # Get tipe semester
+        tipe_semester_str: str = semester_detail.get('jenis')
+        match(tipe_semester_str.lower()):
+            case 'ganjil':
+                tipe_semester = TipeSemester.GANJIL
+            case 'genap':
+                tipe_semester = TipeSemester.GENAP
+        
+        semester_obj = Semester.objects.get_or_create(
+            id_neosia = semester_detail.get('id_neosia'),
+            tahun_ajaran = tahun_ajaran_obj[0],
+            nama = semester_detail.get('nama'),
+            tipe_semester = tipe_semester,
+        )
+
+        # Get kurikulum
+        kurikulum_obj: Kurikulum = None
+        for kurikulum_id, list_semester_id in semester_by_kurikulum.items():
+            if semester_id not in list_semester_id: continue
+            kurikulum_obj = Kurikulum.objects.get(id_neosia=kurikulum_id)
+            break
+        
+        # If cannot get kurikulum object
+        if kurikulum_obj is None:
+            # Failed to save semester
+            # TODO: ADD MESSAGE
+            if settings.DEBUG:
+                print('Cannot find Kurikulum object with Semester ID: {}'.format(semester_id))
+            return False
+        
+        # Save semester kurikulum object
+        semester_kurikulum_obj = SemesterKurikulum.objects.create(
+            semester = semester_obj[0],
+            kurikulum = kurikulum_obj
+        )
+
+        semester_kurikulum_obj.save()
+
     def done(self, form_list, **kwargs):
+        cleaned_data = self.get_all_cleaned_data()
+        
+        kurikulum_data = cleaned_data.get('kurikulum_from_neosia')
+        semester_by_kurikulum = {}
+        semester_data = cleaned_data.get('semester_from_neosia')
         success_url = reverse('kurikulum:read-all')
-        for form in form_list:
-            pass
+
+        print('Kurikulum: {}'.format(kurikulum_data))
+        # Save kurikulum
+        for kurikulum_id in kurikulum_data:
+            try:
+                kurikulum_id = int(kurikulum_id)
+            except ValueError:
+                if settings.DEBUG:
+                    print('Cannot convert Kurikulum ID ("{}") to integer'.format(kurikulum_id))
+                # TODO: ADD MESSAGE
+                return redirect(success_url)
+            
+            self.save_kurikulum(kurikulum_id)
+
+            # Save mata kuliah kurikulum
+            self.save_mk_kurikulum(kurikulum_id)
+
+            # Get list semester by kurikulum
+            semester_by_kurikulum.update(self.filter_semester_by_kurikulum(kurikulum_id))
+
+        # Save list semester by kurikulum
+        for semester_id in semester_data:
+            try:
+                semester_id = int(semester_id)
+            except ValueError:
+                if settings.DEBUG:
+                    print('Cannot convert Semester ID ("{}") to integer'.format(semester_id))
+                # TODO: ADD MESSAGE
+                return redirect(success_url)
+                
+            self.save_semester(semester_id, semester_by_kurikulum)
+
         return redirect(success_url)
 
 
@@ -124,10 +264,9 @@ class KurikulumReadAllView(ListView):
         return objects
 
     def get_context_data(self, **kwargs):
-        context = {
-            'read_all_sync_url': reverse('kurikulum:read-all-sync')
-        }
-        return context
+        context = super().get_context_data(**kwargs)
+        context['read_all_sync_url'] = reverse('kurikulum:read-all-sync')
+        return super().get_context_data(**kwargs)
 
 
 class KurikulumReadView(DetailView):

@@ -2,7 +2,7 @@ from django import forms
 from django.conf import settings
 from widgets.widgets import ChoiceListInteractive
 from .utils import (
-    get_kurikulum_by_prodi,
+    get_kurikulum_by_prodi_choices,
 )
 
 
@@ -23,7 +23,7 @@ class KurikulumFromNeosia(forms.Form):
         self.user = kwargs.pop('user')
         super().__init__(*args, **kwargs)
         
-        kurikulum_choices = get_kurikulum_by_prodi(self.user.prodi.id_neosia)
+        kurikulum_choices = get_kurikulum_by_prodi_choices(self.user.prodi.id_neosia)
         self.fields['kurikulum_from_neosia'].choices = kurikulum_choices
 
     def clean(self):
