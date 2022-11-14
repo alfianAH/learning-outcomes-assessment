@@ -6,7 +6,7 @@
         {% for group, options, index in widget.optgroups %}
             {% for option in options %}
                 <li class="list-item-model-a" role="listitem">
-                    <div class="flex space-x-2.5">
+                    <div class="flex space-x-2.5 items-center">
                         {% include option.template_name with widget=option use_label=True %}
                         
                         {% if option.badge_template %}
