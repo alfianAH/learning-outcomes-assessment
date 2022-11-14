@@ -20,7 +20,7 @@ def request_data_to_neosia(auth_url: str, params: dict = {}, headers: dict = {})
     except requests.exceptions.SSLError:
         if settings.DEBUG: 
             print("SSL Error")
-            response = requests.post(auth_url, params=params, headers=headers, verify=False)
+            # response = requests.post(auth_url, params=params, headers=headers, verify=False)
     except requests.exceptions.ConnectTimeout:
         # TODO: ACTIONS ON CONNECT TIMEOUT
         if settings.DEBUG:
@@ -51,8 +51,8 @@ def get_kurikulum_by_prodi(prodi_id: int):
 
     for kurikulum_data in json_response:
         kurikulum = {
-            'id_neosia': kurikulum_data.get('id'),
-            'prodi': kurikulum_data.get('id_prodi'),
+            'id_neosia': kurikulum_data['id'],
+            'prodi': kurikulum_data['id_prodi'],
             'nama': kurikulum_data['nama'],
             'tahun_mulai': kurikulum_data['tahun'],
             'is_active': kurikulum_data['is_current'] == 1,
@@ -169,8 +169,8 @@ def get_kurikulum_by_prodi_choices(prodi_id: int):
     kurikulum_choices = []
 
     for kurikulum_data in json_response:
-        id_kurikulum = kurikulum_data.get('id')
-        id_prodi = kurikulum_data.get('id_prodi')
+        id_kurikulum = kurikulum_data['id_neosia']
+        id_prodi = kurikulum_data['prodi']
 
         mk_kurikulum_response = get_mata_kuliah_kurikulum(id_kurikulum, id_prodi)
         semester_by_kurikulum_response = get_semester_by_kurikulum(id_kurikulum)
@@ -189,8 +189,7 @@ def get_kurikulum_by_prodi_choices(prodi_id: int):
         # If all semester is already synchronized, continue
         if is_all_semester_sync: continue
         
-        kurikulum_choice = kurikulum_data['id'], kurikulum_data
-
+        kurikulum_choice = kurikulum_data['id_neosia'], kurikulum_data
         kurikulum_choices.append(kurikulum_choice)
     
     return tuple(kurikulum_choices)
