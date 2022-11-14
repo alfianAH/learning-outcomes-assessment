@@ -1,5 +1,5 @@
-{% if widget.wrap_label %}
-<div class="badge {% if widget.label.jenis|lower == "ganjil" %}badge-primary{% elif widget.label.jenis|lower == "genap" %}badge-success{% else %}badge-info{% endif %}">
-    {{ widget.label.jenis|capfirst }}
+{% if option.wrap_label %}
+<div class="badge {% if option.label.jenis|lower == "ganjil" %}badge-primary{% elif option.label.jenis|lower == "genap" %}badge-success{% else %}badge-info{% endif %}">
+    {{ option.label.jenis|capfirst }}
 </div>
 {% endif %}
