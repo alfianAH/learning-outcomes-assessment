@@ -10,12 +10,12 @@
                         {% include option.template_name with widget=option use_label=True %}
                         
                         {% if option.badge_template %}
-                            {% include option.badge_template with widget=option %}
+                            {% include option.badge_template %}
                         {% endif %}
                     </div>
                     
                     {% if option.list_custom_field_template %}
-                        {% include option.list_custom_field_template with widget=option %}
+                        {% include option.list_custom_field_template %}
                     {% endif %}
                 </li>
             {% endfor %}
@@ -53,7 +53,7 @@
                         <td class="text-left">{{ option.label.nama }}</td>
 
                         {% if option.table_custom_field_template %}
-                            {% include option.table_custom_field_template with widget=option %}
+                            {% include option.table_custom_field_template %}
                         {% endif %}
                     </tr>
                 {% endfor %}

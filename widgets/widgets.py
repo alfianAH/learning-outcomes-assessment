@@ -3,8 +3,8 @@ from django.forms import CheckboxSelectMultiple
 class ChoiceListInteractive(CheckboxSelectMultiple):
     is_required: bool = False
     input_type: str = 'checkbox'
-    template_name: str = 'custom-widgets/forms/widgets/checkbox_select.html'
-    option_template_name: str = 'custom-widgets/forms/widgets/checkbox_option.html'
+    template_name: str = 'custom-widgets/forms/widgets/checkbox-select-list-item-model-a.html'
+    option_template_name: str = 'custom-widgets/forms/widgets/checkbox-option.html'
     badge_template: str = None
     list_custom_field_template: str = None
     table_custom_field_template: str = None
