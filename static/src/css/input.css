@@ -312,12 +312,21 @@
         @apply relative space-y-2 md:space-y-3;
     }
 
+    .form-wizard-content .fade{
+        @apply space-y-2.5;
+    }
+
     .form-wizard-content.disabled > .form-wizard-header{
         @apply font-normal text-gray-400 dark:text-stone-600;
     }
 
     .form-wizard-content.disabled > .form-wizard-header {
         @apply absolute left-full max-h-0 overflow-hidden opacity-0 md:relative md:left-auto md:max-h-max md:overflow-visible md:opacity-100;
+    }
+
+    /* Header with icon */
+    .h-icon{
+        @apply flex flex-row space-x-2.5 lg:space-x-3;
     }
 
     /* List item */
@@ -432,6 +441,19 @@
 
     .page-link.disabled{
         @apply text-slate-300 dark:text-zinc-500 cursor-default hover:bg-slate-50 active:bg-slate-50 dark:hover:bg-zinc-700 dark:active:bg-zinc-700;
+    }
+
+    /* Selected indicator */
+    .selected-indicator{
+        @apply bg-slate-600 dark:bg-neutral-700 text-slate-100 p-2 md:p-2.5 xl:p-3 space-x-2 md:space-x-2.5 xl:space-x-3 rounded-md flex flex-row items-center;
+    }
+
+    .selected-indicator > span {
+        @apply w-full;
+    }
+
+    .selected-indicator.selected-indicator-btn{
+        @apply py-2 xl:py-2.5;
     }
 
     /* Sidebar */

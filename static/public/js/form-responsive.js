@@ -21,5 +21,15 @@ function onCheckboxClick(formId){
 
         onCheckboxChange(listInputElement, isChecked, '.list-item-model-a');
         onCheckboxChange(tableInputElement, isChecked, 'tr');
+        
+        // Update selected indicator
+        let selectedIndicatorLength = $(`#${formId}`).find('input:checkbox:checked').length;
+
+        if (selectedIndicatorLength > 0) {
+            $('.selected-indicator').removeClass('hidden');
+            $('#selected-indicator-status').text(`${selectedIndicatorLength} item dipilih`);
+        } else {
+            $('.selected-indicator').addClass('hidden');
+        }
     });
 }
