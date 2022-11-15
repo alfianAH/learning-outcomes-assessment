@@ -951,6 +951,10 @@ th {
 .btn > svg {
   height: 1rem;
   width: 1rem;
+  fill: #1e293b;
+}
+
+.dark .btn > svg {
   fill: #f1f5f9;
 }
 
@@ -1234,7 +1238,7 @@ th {
   --tw-bg-opacity: 1;
   background-color: rgb(30 41 59 / var(--tw-bg-opacity));
   --tw-text-opacity: 1;
-  color: rgb(30 41 59 / var(--tw-text-opacity));
+  color: rgb(241 245 249 / var(--tw-text-opacity));
 }
 
 .dark .btn-outline-dark {
@@ -1255,14 +1259,30 @@ th {
   --tw-bg-opacity: 1;
   background-color: rgb(226 232 240 / var(--tw-bg-opacity));
   --tw-text-opacity: 1;
-  color: rgb(241 245 249 / var(--tw-text-opacity));
+  color: rgb(30 41 59 / var(--tw-text-opacity));
 }
 
-.btn-light > svg,  .btn-outline-dark > svg {
+.btn-primary > svg,  .btn-success > svg,  .btn-danger > svg,  .btn-warning > svg,  .btn-secondary > svg {
+  fill: #f1f5f9;
+}
+
+.dark .btn-primary > svg, .dark  .btn-success > svg, .dark  .btn-danger > svg, .dark  .btn-warning > svg, .dark  .btn-secondary > svg {
+  fill: #f1f5f9;
+}
+
+.btn-outline-dark:hover > svg,  .btn-outline-dark:active > svg {
+  fill: #f1f5f9;
+}
+
+.dark .btn-outline-dark:hover > svg, .dark  .btn-outline-dark:active > svg {
   fill: #1e293b;
 }
 
-.dark .btn-light > svg, .dark  .btn-outline-dark > svg {
+.btn-light > svg {
+  fill: #1e293b;
+}
+
+.dark .btn-light > svg {
   fill: #f1f5f9;
 }
 
