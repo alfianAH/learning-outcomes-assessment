@@ -5,4 +5,11 @@
         {% include option.badge_template %}
     {% endif %}
 </td>
+{% else %}
+<td class="text-left">{{ option.tahun_mulai }}</td>
+<td class="text-left">
+    {% if badge_template %}
+        {% include badge_template %}
+    {% endif %}
+</td>
 {% endif %}

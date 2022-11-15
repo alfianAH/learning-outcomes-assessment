@@ -11,7 +11,7 @@ function onCheckboxChange(element, isChecked, closestSelector){
     }
 }
 
-function onCheckboxClick(formId){
+function onCheckboxClick(formId, listItemModel){
     $("input:checkbox").on("change", function () {
         let id = $(this).attr('id');
         let isChecked = $(this).prop('checked');
@@ -19,7 +19,7 @@ function onCheckboxClick(formId){
         let listInputElement = $(`ol#${formId}`).find(`#${id}`);
         let tableInputElement = $(`table#${formId}`).find(`#${id}`);
 
-        onCheckboxChange(listInputElement, isChecked, '.list-item-model-a');
+        onCheckboxChange(listInputElement, isChecked, listItemModel);
         onCheckboxChange(tableInputElement, isChecked, 'tr');
         
         // Update selected indicator

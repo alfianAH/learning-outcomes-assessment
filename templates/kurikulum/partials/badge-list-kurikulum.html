@@ -2,4 +2,8 @@
 <div class="badge {% if option.label.is_active %}badge-success{% else %}badge-info{% endif %}">
     {% if option.label.is_active %}Aktif{% else %}Non-aktif{% endif %}
 </div>
+{% else %}
+<div class="badge {% if option.is_active %}badge-success{% else %}badge-info{% endif %}">
+    {% if option.is_active %}Aktif{% else %}Non-aktif{% endif %}
+</div>
 {% endif %}

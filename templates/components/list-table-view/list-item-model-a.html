@@ -1,0 +1,100 @@
+<ol class="flex flex-col sm:grid sm:grid-cols-2 list-numbered md:hidden {% if classes %}{{ classes }}{% endif %}" 
+    {% if id %}id="{{ id }}"{% endif %}
+    role="list">
+
+    {% if use_widget %}
+        {% for group, options, index in widget.optgroups %}
+            {% for option in options %}
+                <li class="list-item-model-a" role="listitem">
+                    <div class="flex space-x-2.5 items-center">
+                        {% include option.template_name with widget=option use_label=True %}
+                        {% if option.badge_template %}
+                            {% include option.badge_template %}
+                        {% endif %}
+                    </div>
+
+                    {% if option.list_custom_field_template %}
+                        {% include option.list_custom_field_template %}
+                    {% endif %}
+                </li>
+            {% endfor %}
+        {% endfor %}
+    {% else %}
+        {% for option in options %}
+            <li class="list-item-model-a" role="listitem">
+                <div class="flex space-x-2.5 items-center">
+                    <label class="w-full flex space-x-2.5 items-center">
+                        <input type="checkbox" name="{{ input_name }}" {% if option.id_neosia %}value="{{ option.id_neosia }}" id="kurikulum-{{ option.id_neosia }}" {% else %}value="{{ option.id }}" id="kurikulum-{{ option.id_neosia }}" {% endif %}>
+                        <span class="list-item-title">{{ option.nama }}</span>
+                    </label>
+                    {% include badge_template %}
+                </div>
+
+                {% include list_custom_field_template %}
+            </li>
+        {% endfor %}
+    {% endif %}
+</ol>
+
+<table class="table-css table-hover table-checkbox table-numbered hidden md:table {% if classes %}{{ classes }}{% endif %}" 
+    {% if id %}id="{{ id }}"{% endif %}
+    role="list">
+    <thead>
+        <tr>
+            <th scope="col" class="text-center checkbox">
+                <input type="checkbox" name="table-checkbox" id="table-checkbox">
+            </th>
+            <th scope="col" class="text-center number">No.</th>
+            
+            {% if use_widget %}
+                {% for group, options, index in widget.optgroups|slice:":1" %}
+                    {% for option in options|slice:":1" %}
+                        {% if option.table_custom_field_header_template %}
+                            {% include option.table_custom_field_header_template %}
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+            {% else %}
+                {% include table_custom_field_header_template %}
+            {% endif %}
+        </tr>
+    </thead>
+
+    <tbody>
+        {% if use_widget %}
+            {% for group, options, index in widget.optgroups %}
+                {% for option in options %}
+                    <tr>
+                        <th scope="row" class="text-center checkbox">
+                            {% include option.template_name with widget=option use_label=False %}
+                        </th>
+                        <th scope="row" class="text-center number"></th>
+                        <td class="text-left">{{ option.label.nama }}</td>
+
+                        {% if option.table_custom_field_template %}
+                            {% include option.table_custom_field_template %}
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+        {% else %}
+            {% for option in options %}
+                <tr>
+                    <th scope="row" class="text-center checkbox">
+                        <input type="checkbox" name="{{ input_name }}" {% if option.id_neosia %}value="{{ option.id_neosia }}" id="kurikulum-{{ option.id_neosia }}" {% else %}value="{{ option.id }}" id="kurikulum-{{ option.id_neosia }}" {% endif %}>
+                    </th>
+                    <th scope="row" class="text-center number"></th>
+                    <td class="text-left">{{ option.nama }}</td>
+
+                    {% include table_custom_field_template %}
+                </tr>
+            {% endfor %}
+        {% endif %}
+    </tbody>
+</table>
+
+<script>
+    {% if id %}
+        onCheckboxClick('{{ id }}', '.list-item-model-a');
+    {% endif %}
+</script>

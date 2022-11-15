@@ -7,4 +7,13 @@
         </tr>
     </tbody>
 </table>
+{% else %}
+<table class="w-full table-strip">
+    <tbody class="space-y-1">
+        <tr class="flex px-3 py-1 space-x-2.5">
+            <td class="w-full">Tahun mulai</td>
+            <td>{{ option.tahun_mulai }}</td>
+        </tr>
+    </tbody>
+</table>
 {% endif %}
