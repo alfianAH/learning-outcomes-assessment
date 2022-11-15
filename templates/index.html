@@ -142,7 +142,7 @@
             </div>
         </div>
         
-        <div class="sidebar-backdrop hidden"></div>
+        <div class="backdrop hidden"></div>
 
         <nav role="navigation">
             <!-- Breadcrumb -->
@@ -179,6 +179,37 @@
         <h4 role="heading">Halo</h4>
         <h5 role="heading">Halo</h5>
         <h6 role="heading">Halo</h6>
+
+        <hr class="my-12">
+
+        <h1 class="my-4">Modal</h1>
+
+        <button class="btn btn-primary" data-target="#modal-id" onclick="openModal(this)">Open Modal</button>
+        <div class="modal" id="modal-id" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Testing</h3>
+                        <button class="btn border-none" type="button" data-dismiss="modal" onclick="closeModalByButton(this)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum, facilis porro? Enim consectetur explicabo omnis quidem aliquid? Sed, impedit provident?</p>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-dismiss="modal" onclick="closeModalByButton(this)">Tutup</button>
+                        <button class="btn btn-primary" type="button">Simpan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-12">
 
         <div class="flex">
             <span class="text-sm mr-2">Light</span>

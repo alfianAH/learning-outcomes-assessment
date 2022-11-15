@@ -76,20 +76,20 @@ function passwordHandler() {
 function showSidebar(button){
     const targetId = $(button).attr('data-target');
 
-    const target = $(targetId);
+    const sidebar = $(targetId);
     // Showing sidebar
-    target.addClass('showing');
+    sidebar.addClass('showing');
     // Show backdrop
-    const backdrop = $('.sidebar-backdrop');
+    const backdrop = $('.backdrop');
     backdrop.removeClass('hidden').addClass('fade show');
 
     // Show sidebar
-    target.one(transitionEvent, function () {
-        target.removeClass('showing').addClass('show');
+    sidebar.one(transitionEvent, function () {
+        sidebar.removeClass('showing').addClass('show');
     });
     
     backdrop.on('click', function () {
-        closeSidebar(target, backdrop);
+        closeSidebar(sidebar, backdrop);
     });
 }
 
@@ -105,10 +105,55 @@ function closeSidebar(sidebar, backdrop) {
     });
 }
 
+function openModal(button) {
+    const targetId = $(button).attr('data-target');
+
+    const modal = $(targetId);
+    // Showing modal
+    modal.addClass('show');
+    // modal.addClass('showing');
+    // Show backdrop
+    const backdrop = $('.backdrop');
+    backdrop.removeClass('hidden').addClass('fade show');
+
+    // Show modal
+    // modal.one(transitionEvent, function () {
+    //     modal.removeClass('showing').addClass('show');
+    // });
+    
+    backdrop.on('click', function () {
+        closeModal(modal, backdrop);
+    });
+}
+
+function closeModal(modal, backdrop) {
+    // Hide modal
+    // modal.addClass('hiding');
+
+    // modal.one(transitionEvent, function () {
+    //     // Remove backdrop
+    //     backdrop.removeClass('fade show').addClass('hidden');
+    //     // Remove modal's classses
+    //     modal.removeClass('hiding show');
+    // });
+
+    backdrop.removeClass('fade show').addClass('hidden');
+    // Remove modal's classses
+    modal.removeClass('hiding show');
+}
+
+function closeModalByButton(button) {
+    const targetClass = $(button).attr('data-dismiss');
+    const modal = $(`.${targetClass}`);
+    const backdrop = $('.backdrop');
+
+    closeModal(modal, backdrop);
+}
+
 function resetSidebarToDefault() {
     if ($(window).width() >= 1024) {
         // Remove backdrop
-        $('.sidebar-backdrop').removeClass('fade show').addClass('hidden');
+        $('.backdrop').removeClass('fade show').addClass('hidden');
 
         // Remove sidebar's classses
         $('.sidebar').removeClass('hiding show');

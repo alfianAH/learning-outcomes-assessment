@@ -120,6 +120,19 @@
 }
 
 @layer components{
+    /* Backdrop */
+    .backdrop {
+        @apply bg-black fixed top-0 left-0 z-40 w-full h-full;
+    }
+
+    .backdrop.fade{
+        @apply opacity-0;
+    }
+
+    .backdrop.show{
+        @apply opacity-50;
+    }
+
     /* Badge */
     .badge{
         @apply rounded-full px-2 py-1 xl:px-2.5 text-xs md:text-sm text-slate-100 w-min whitespace-nowrap;
@@ -408,6 +421,46 @@
         @apply -rotate-180;
     }
 
+    /* Modal */
+    .modal{
+        @apply fixed top-0 left-0 z-50 w-full h-full overflow-x-hidden overflow-y-hidden outline-0 hidden;
+    }
+
+    /* .modal.show:not(.hiding),
+    .modal.showing {
+        @apply transform-none;
+    }
+
+    .modal.hiding,
+    .modal.showing,
+    .modal.show {
+        @apply visible;
+    } */
+
+    .modal.show{
+        @apply block;
+    }
+
+    .modal-dialog{
+        @apply relative m-7 mx-auto pointer-events-auto max-w-lg;
+    }
+
+    .modal-content{
+        @apply relative flex flex-col w-full bg-slate-100 dark:bg-neutral-800 pointer-events-auto rounded-md;
+    }
+
+    .modal-header{
+        @apply flex flex-shrink-0 items-center p-4 justify-between;
+    }
+
+    .modal-body{
+        @apply relative flex-auto px-4 py-1;
+    }
+
+    .modal-footer{
+        @apply flex flex-shrink-0 flex-wrap items-center justify-end p-4 space-x-2.5;
+    }
+
     /* Navigation Bar */
     .navbar{
         @apply bg-slate-700 dark:bg-zinc-700 sticky top-0 lg:ml-80 py-3 pl-3 pr-8 z-30;
@@ -440,7 +493,7 @@
 
     /* Sidebar */
     .sidebar {
-        @apply bg-slate-600 dark:bg-zinc-600 flex flex-col fixed h-full invisible lg:visible overflow-x-hidden top-0 left-0 transition-transform duration-300 ease-in-out lg:transition-none -translate-x-full lg:transform-none w-64 lg:w-80 z-50;
+        @apply bg-slate-600 dark:bg-zinc-600 flex flex-col fixed h-full invisible lg:visible overflow-x-hidden top-0 left-0 transition-transform duration-300 ease-in-out lg:transition-none -translate-x-full lg:transform-none w-64 lg:w-80 z-50 lg:z-0;
     }
     
     .sidebar.show:not(.hiding),
@@ -452,18 +505,6 @@
     .sidebar.showing,
     .sidebar.show {
         @apply visible;
-    }
-
-    .sidebar-backdrop {
-        @apply bg-black fixed top-0 left-0 z-40 w-full h-full;
-    }
-
-    .sidebar-backdrop.fade{
-        @apply opacity-0;
-    }
-
-    .sidebar-backdrop.show{
-        @apply opacity-50;
     }
 
     .sidebar-body{

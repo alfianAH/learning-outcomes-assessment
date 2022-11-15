@@ -724,6 +724,27 @@ th {
   --tw-backdrop-sepia:  ;
 }
 
+/* Backdrop */
+
+.backdrop {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  z-index: 40;
+  height: 100%;
+  width: 100%;
+  --tw-bg-opacity: 1;
+  background-color: rgb(0 0 0 / var(--tw-bg-opacity));
+}
+
+.backdrop.fade {
+  opacity: 0;
+}
+
+.backdrop.show {
+  opacity: 0.5;
+}
+
 /* Badge */
 
 .badge {
@@ -2203,6 +2224,96 @@ details.dropdown::marker {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
+/* Modal */
+
+.modal {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  z-index: 50;
+  display: none;
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  outline-width: 0px;
+}
+
+/* .modal.show:not(.hiding),
+    .modal.showing {
+        @apply transform-none;
+    }
+
+    .modal.hiding,
+    .modal.showing,
+    .modal.show {
+        @apply visible;
+    } */
+
+.modal.show {
+  display: block;
+}
+
+.modal-dialog {
+  pointer-events: auto;
+  position: relative;
+  margin: 1.75rem;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 32rem;
+}
+
+.modal-content {
+  pointer-events: auto;
+  position: relative;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  border-radius: 0.375rem;
+  --tw-bg-opacity: 1;
+  background-color: rgb(241 245 249 / var(--tw-bg-opacity));
+}
+
+.dark .modal-content {
+  --tw-bg-opacity: 1;
+  background-color: rgb(38 38 38 / var(--tw-bg-opacity));
+}
+
+.modal-header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+}
+
+.modal-body {
+  position: relative;
+  flex: 1 1 auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.modal-footer {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.modal-footer > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 0;
+  margin-right: calc(0.625rem * var(--tw-space-x-reverse));
+  margin-left: calc(0.625rem * calc(1 - var(--tw-space-x-reverse)));
+}
+
+.modal-footer {
+  padding: 1rem;
+}
+
 /* Navigation Bar */
 
 .navbar {
@@ -2437,6 +2548,7 @@ details.dropdown::marker {
 @media (min-width: 1024px) {
   .sidebar {
     visibility: visible;
+    z-index: 0;
     width: 20rem;
     transform: none;
     transition-property: none;
@@ -2452,25 +2564,6 @@ details.dropdown::marker {
     .sidebar.showing, 
     .sidebar.show {
   visibility: visible;
-}
-
-.sidebar-backdrop {
-  position: fixed;
-  top: 0px;
-  left: 0px;
-  z-index: 40;
-  height: 100%;
-  width: 100%;
-  --tw-bg-opacity: 1;
-  background-color: rgb(0 0 0 / var(--tw-bg-opacity));
-}
-
-.sidebar-backdrop.fade {
-  opacity: 0;
-}
-
-.sidebar-backdrop.show {
-  opacity: 0.5;
 }
 
 .sidebar-body {
@@ -2881,6 +2974,11 @@ details.dropdown::marker {
   margin-bottom: 3rem;
 }
 
+.my-4 {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
 .my-0 {
   margin-top: 0px;
   margin-bottom: 0px;
@@ -3210,6 +3308,10 @@ details.dropdown::marker {
 
 .border-solid {
   border-style: solid;
+}
+
+.border-none {
+  border-style: none;
 }
 
 .border-slate-300 {
