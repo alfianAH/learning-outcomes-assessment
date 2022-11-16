@@ -411,8 +411,15 @@ function listItemRowCollapse(element) {
     });
 }
 
+function searchText(textElement, dataElement, searchedValue) {
+    let data = $(textElement).text();
+    let searchResult = data.toLowerCase().indexOf(searchedValue);
+
+    $(dataElement).css('display', searchResult > -1 ? '' : 'none');
+}
+
 function searchTextInList(formId) {
-    let value = $('#search-input').val().toLowerCase();
+    let searchedValue = $('#search-input').val().toLowerCase();
     
     let list = $(`ol#${formId}`);
     let listItems = $(list).find('li');
@@ -424,14 +431,8 @@ function searchTextInList(formId) {
         let listItem = $(listItems[i]).find('.list-item-title');
         let column = $(trows[i]).find('td')[0];
         
-        let listTitle = $(listItem).text();
-        let tableData = $(column).text();
-
-        let tableSearchResult = tableData.toLowerCase().indexOf(value);
-        let listSearchResult = listTitle.toLowerCase().indexOf(value);
-        
-        $(trows[i]).css("display", tableSearchResult > -1 ? "" : "none");
-        $(listItems[i]).css("display", listSearchResult > -1 ? "" : "none");
+        searchText(listItem, listItems[i], searchedValue);
+        searchText(column, trows[i], searchedValue);
     }
 }
 
