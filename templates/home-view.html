@@ -94,7 +94,7 @@
                 <span class="ml-5 text-slate-50">Beranda</span>
             </a>
 
-            <a href="{{ kurikulum_url }}" class="sidebar-item" role="menuitem link">
+            <a href="{% url 'kurikulum:read-all' %}" class="sidebar-item" role="menuitem link">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" role="img" aria-label="curriculum" focusable="False" 
                     class="bi bi-house
                         w-6 h-6 fill-slate-50" 
@@ -129,7 +129,7 @@
         </div>
     </div>
     
-    <div class="sidebar-backdrop hidden"></div>
+    <div class="backdrop hidden"></div>
 
     <nav role="navigation">
         <!-- Breadcrumb -->
