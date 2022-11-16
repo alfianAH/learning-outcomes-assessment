@@ -2227,31 +2227,32 @@ details.dropdown::marker {
 /* Modal */
 
 .modal {
+  visibility: hidden;
   position: fixed;
   top: 0px;
   left: 0px;
   z-index: 50;
-  display: none;
   height: 100%;
   width: 100%;
+  --tw-translate-y: -100%;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
   overflow-x: hidden;
   overflow-y: hidden;
   outline-width: 0px;
+  transition-property: transform;
+  transition-duration: 500ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* .modal.show:not(.hiding),
+.modal.show:not(.hiding), 
     .modal.showing {
-        @apply transform-none;
-    }
+  transform: none;
+}
 
-    .modal.hiding,
-    .modal.showing,
+.modal.hiding, 
+    .modal.showing, 
     .modal.show {
-        @apply visible;
-    } */
-
-.modal.show {
-  display: block;
+  visibility: visible;
 }
 
 .modal-dialog {
@@ -2261,6 +2262,11 @@ details.dropdown::marker {
   margin-left: auto;
   margin-right: auto;
   max-width: 32rem;
+  --tw-scale-x: 1;
+  --tw-scale-y: 1;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+  transition-duration: 300ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .modal-content {

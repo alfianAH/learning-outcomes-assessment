@@ -79,6 +79,7 @@ function showSidebar(button){
     const sidebar = $(targetId);
     // Showing sidebar
     sidebar.addClass('showing');
+    toggleClass($('body'), 'noscroll');
     // Show backdrop
     const backdrop = $('.backdrop');
     backdrop.removeClass('hidden').addClass('fade show');
@@ -102,6 +103,7 @@ function closeSidebar(sidebar, backdrop) {
         backdrop.removeClass('fade show').addClass('hidden');
         // Remove sidebar's classses
         sidebar.removeClass('hiding show');
+        toggleClass($('body'), 'noscroll');
     });
 }
 
@@ -110,36 +112,29 @@ function openModal(button) {
 
     const modal = $(targetId);
     // Showing modal
-    modal.addClass('show');
-    // modal.addClass('showing');
+    modal.addClass('showing');
+    toggleClass($('body'), 'noscroll');
     // Show backdrop
     const backdrop = $('.backdrop');
     backdrop.removeClass('hidden').addClass('fade show');
 
     // Show modal
-    // modal.one(transitionEvent, function () {
-    //     modal.removeClass('showing').addClass('show');
-    // });
-    
-    backdrop.on('click', function () {
-        closeModal(modal, backdrop);
+    modal.one(transitionEvent, function () {
+        modal.removeClass('showing').addClass('show');
     });
 }
 
 function closeModal(modal, backdrop) {
     // Hide modal
-    // modal.addClass('hiding');
+    modal.addClass('hiding');
 
-    // modal.one(transitionEvent, function () {
-    //     // Remove backdrop
-    //     backdrop.removeClass('fade show').addClass('hidden');
-    //     // Remove modal's classses
-    //     modal.removeClass('hiding show');
-    // });
-
-    backdrop.removeClass('fade show').addClass('hidden');
-    // Remove modal's classses
-    modal.removeClass('hiding show');
+    modal.one(transitionEvent, function () {
+        // Remove backdrop
+        backdrop.removeClass('fade show').addClass('hidden');
+        // Remove modal's classses
+        modal.removeClass('hiding show');
+        toggleClass($('body'), 'noscroll');
+    });
 }
 
 function closeModalByButton(button) {

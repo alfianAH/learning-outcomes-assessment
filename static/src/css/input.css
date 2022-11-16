@@ -423,10 +423,10 @@
 
     /* Modal */
     .modal{
-        @apply fixed top-0 left-0 z-50 w-full h-full overflow-x-hidden overflow-y-hidden outline-0 hidden;
+        @apply fixed top-0 left-0 z-50 w-full h-full overflow-x-hidden overflow-y-hidden outline-0 invisible transition-transform duration-500 ease-in-out -translate-y-full;
     }
-
-    /* .modal.show:not(.hiding),
+    
+    .modal.show:not(.hiding),
     .modal.showing {
         @apply transform-none;
     }
@@ -435,14 +435,10 @@
     .modal.showing,
     .modal.show {
         @apply visible;
-    } */
-
-    .modal.show{
-        @apply block;
     }
 
     .modal-dialog{
-        @apply relative m-7 mx-auto pointer-events-auto max-w-lg;
+        @apply relative m-7 mx-auto pointer-events-auto max-w-lg duration-300 ease-in-out scale-100;
     }
 
     .modal-content{
