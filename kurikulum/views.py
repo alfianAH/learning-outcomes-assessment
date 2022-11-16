@@ -17,6 +17,7 @@ from semester.models import (
     TipeSemester,
     SemesterKurikulum,
 )
+from .filters import KurikulumFilter
 from .forms import (
     KurikulumFromNeosia,
     SemesterFromNeosia,
@@ -258,14 +259,28 @@ class KurikulumReadAllView(ListView):
     paginate_by: int = 10
     template_name: str = 'kurikulum/home.html'
     ordering: list[str] = ['tahun_mulai']
+    kurikulum_filter = None
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        kurikulum_qs = self.model.objects.filter(prodi=request.user.prodi)
+        if kurikulum_qs.exists():
+            self.kurikulum_filter = KurikulumFilter(request.GET or None, queryset=kurikulum_qs)
+        return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        objects = self.model.objects.filter(prodi=self.request.user.prodi)
+        print(self.kurikulum_filter)
+        if self.kurikulum_filter is not None:
+            objects = self.kurikulum_filter.qs
+        else:
+            objects = self.model.objects.filter(prodi=self.request.user.prodi)
         return objects
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['read_all_sync_url'] = reverse('kurikulum:read-all-sync')
+        if self.kurikulum_filter is not None:
+            context['filter_form'] = self.kurikulum_filter.form
+            context['data_exist'] = True
         return context
 
 

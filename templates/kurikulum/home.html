@@ -7,7 +7,7 @@
 {% block content %}
 
 <div class="space-y-2 lg:space-y-3">
-    {% if object_list %}
+    {% if object_list or data_exist %}
         <h1 class="h-icon">
             <span>Data Kurikulum</span>
             <a href="{{ read_all_sync_url }}" type="button" class="btn btn-primary">
@@ -19,7 +19,12 @@
         </h1>
 
         {% include 'components/list-table-view/list-tools.html' with search_placeholder='Cari nama kurikulum...' %}
-        {% include 'kurikulum/partials/kurikulum-read-all-view.html' %}
+
+        {% if object_list %}
+            {% include 'kurikulum/partials/kurikulum-read-all-view.html' %}
+        {% else %}
+            <p>Tidak ditemukan data dengan filter yang diberikan</p>
+        {% endif %}
     {% else %}
         <h1>Belum ada data</h1>
         <a href="{{ read_all_sync_url }}" type="button" class="btn btn-primary btn-icon-start">

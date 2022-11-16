@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'django.forms',
 
     # Third party
+    'django_filters',
     'django_htmx',
     'formtools',
 

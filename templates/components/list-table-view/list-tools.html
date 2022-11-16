@@ -34,12 +34,14 @@
                         </div>
 
                         <div class="modal-body">
-                            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum, facilis porro? Enim consectetur explicabo omnis quidem aliquid? Sed, impedit provident?</p>
+                            {% if filter_form %}
+                                {{ filter_form.as_p }}
+                            {% endif %}
                         </div>
 
                         <div class="modal-footer">
                             <button class="btn btn-secondary" type="button" data-dismiss="modal" onclick="closeModalByButton(this)">Tutup</button>
-                            <button class="btn btn-primary" type="button">Simpan</button>
+                            <button class="btn btn-primary" type="submit">Simpan</button>
                         </div>
                     </div>
                 </div>
