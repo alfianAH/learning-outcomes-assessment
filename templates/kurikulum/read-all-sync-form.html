@@ -43,12 +43,12 @@
                                 <p>{{ field.help_text|safe }}</p>
                             {% endif %}
 
+                            {% include 'components/search-box.html' with search_by_js=True search_placeholder='Cari nama kurikulum...' %}
+
                             {% include 'components/list-table-view/selected-indicator.html' with selected_items_length=1 delete_button=False %}
 
                             <div class="form-group">
                                 {{ field }}
-
-                                <p class="text-center hidden no-data">Tidak ada data</p>
                                 
                                 {% if field.errors %}
                                     <ul>

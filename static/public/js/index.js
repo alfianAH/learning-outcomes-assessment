@@ -411,6 +411,30 @@ function listItemRowCollapse(element) {
     });
 }
 
+function searchTextInList(formId) {
+    let value = $('#search-input').val().toLowerCase();
+    
+    let list = $(`ol#${formId}`);
+    let listItems = $(list).find('li');
+
+    let tbody = $(`table#${formId}`).find('tbody');
+    let trows = $(tbody).find('tr');
+  
+    for (let i = 0; i < trows.length; i++) {
+        let listItem = $(listItems[i]).find('.list-item-title');
+        let column = $(trows[i]).find('td')[0];
+        
+        let listTitle = $(listItem).text();
+        let tableData = $(column).text();
+
+        let tableSearchResult = tableData.toLowerCase().indexOf(value);
+        let listSearchResult = listTitle.toLowerCase().indexOf(value);
+        
+        $(trows[i]).css("display", tableSearchResult > -1 ? "" : "none");
+        $(listItems[i]).css("display", listSearchResult > -1 ? "" : "none");
+    }
+}
+
 var transitionEvent = whichTransitionEvent();
 console.log(transitionEvent);
 

@@ -1,7 +1,7 @@
 <div>
     <form action="." method="get">
         <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2.5">
-            {% include 'components/search-box.html' %}
+            {% include 'components/search-box.html' with search_by_js=False %}
 
             <div class="flex flex-row space-x-2.5 w-full">
                 <button class="btn btn-icon-start btn-light max-w-none w-1/2 md:w-32 xl:w-36"  type="button" data-target="#filter-modal" onclick="openModal(this)">

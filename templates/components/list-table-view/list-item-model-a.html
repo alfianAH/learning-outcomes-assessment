@@ -60,7 +60,7 @@
         </tr>
     </thead>
 
-    <tbody>
+    <tbody id="table-body">
         {% if use_widget %}
             {% for group, options, index in widget.optgroups %}
                 {% for option in options %}
@@ -96,5 +96,8 @@
 <script>
     {% if id %}
         onCheckboxClick('{{ id }}', '.list-item-model-a');
+        $("#search-input").keyup(function(){
+            searchTextInList('{{ id }}');
+        });
     {% endif %}
 </script>

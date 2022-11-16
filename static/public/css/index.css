@@ -2994,6 +2994,10 @@ details.dropdown::marker {
   opacity: 0.75;
 }
 
+.filter {
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+
 .transition-all {
   transition-property: all;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -3191,6 +3195,10 @@ details.dropdown::marker {
     width: 20rem;
   }
 
+  .sm\:w-72 {
+    width: 18rem;
+  }
+
   .sm\:min-w-72 {
     min-width: 18rem;
   }
@@ -3277,6 +3285,10 @@ details.dropdown::marker {
 
   .md\:w-32 {
     width: 8rem;
+  }
+
+  .md\:w-96 {
+    width: 24rem;
   }
 
   .md\:min-w-96 {
