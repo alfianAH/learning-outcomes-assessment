@@ -133,8 +133,8 @@ function closeModal(modal, backdrop) {
         backdrop.removeClass('fade show').addClass('hidden');
         // Remove modal's classses
         modal.removeClass('hiding show');
-        toggleClass($('body'), 'noscroll');
     });
+    toggleClass($('body'), 'noscroll');
 }
 
 function closeModalByButton(button) {
