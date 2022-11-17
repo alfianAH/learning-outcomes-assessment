@@ -1,0 +1,14 @@
+<div class="bg-slate-50 dark:bg-neutral-700 border border-slate-200 dark:border-zinc-600 flex flex-row focus-within:border-slate-800 dark:focus-within:border-slate-100 items-center rounded-md space-x-2.5 min-w-full sm:min-w-72 md:min-w-96 px-2 py-1 md:py-2 lg:px-2.5">
+
+    <input type="type="{{ widget.type }}"" 
+        name="{{ widget.name }}" 
+        {% if widget.value != None %}value="{{ widget.value|stringformat:'s' }}"{% endif %} 
+        class="bg-transparent dark:bg-transparent focus:outline-none w-full placeholder:text-slate-400 dark:placeholder:text-zinc-400"
+        {% include "django/forms/widgets/attrs.html" %}>
+
+    <button type="submit" class="btn border-none p-0">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+        </svg>
+    </button>
+</div>

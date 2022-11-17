@@ -277,10 +277,12 @@ class KurikulumReadAllView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['read_all_sync_url'] = reverse('kurikulum:read-all-sync')
+        context['filter_template'] = 'kurikulum/partials/kurikulum-filter-form.html'
+        context['reset_url'] = reverse('kurikulum:read-all')
         if self.kurikulum_filter is not None:
             context['filter_form'] = self.kurikulum_filter.form
             context['data_exist'] = True
+        
         return context
 
 

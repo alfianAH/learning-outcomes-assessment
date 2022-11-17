@@ -1,4 +1,8 @@
 from django.forms import CheckboxSelectMultiple
+from django.forms.widgets import (
+    Input,
+    Select,
+)
 
 class ChoiceListInteractive(CheckboxSelectMultiple):
     is_required: bool = False
@@ -41,4 +45,17 @@ class ChoiceListInteractive(CheckboxSelectMultiple):
             option['table_custom_field_header_template'] = self.table_custom_field_header_template
         
         return option
-    
+
+
+class MyNumberInput(Input):
+    input_type: str = 'number'
+    template_name: str = 'custom-widgets/forms/widgets/number.html'
+
+
+class MySearchInput(Input):
+    input_type: str = 'text'
+    template_name: str = 'custom-widgets/forms/widgets/search-text-input.html'
+
+
+class MySelectInput(Select):
+    template_name: str = 'custom-widgets/forms/widgets/select.html'
