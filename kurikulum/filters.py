@@ -2,13 +2,15 @@ import django_filters as filter
 from distutils.util import strtobool
 from widgets.widgets import (
     MyNumberInput,
+    MyRadioInput,
     MySearchInput,
     MySelectInput,
 )
 from .models import Kurikulum
 
 
-KURIKULUM_IS_ACTIVE = (('', '-------'), ('true', 'Aktif'), ('false', 'Non-Aktif'))
+KURIKULUM_IS_ACTIVE = (('', '---------'), ('true', 'Aktif'), ('false', 'Non-Aktif'))
+KURIKULUM_ORDERING_BY = (('nama', 'Nama'), ('tahun_mulai', 'Tahun Mulai'), ('aktif', 'Keaktifan'))
 
 class KurikulumFilter(filter.FilterSet):
     nama = filter.CharFilter(
@@ -17,7 +19,8 @@ class KurikulumFilter(filter.FilterSet):
         label='Nama kurikulum',
         widget=MySearchInput(
             attrs={
-                'placeholder': 'Cari nama kurikulum...'
+                'placeholder': 'Cari nama kurikulum...',
+                'autocomplete': 'off'
             }
         ),
     )
@@ -32,6 +35,13 @@ class KurikulumFilter(filter.FilterSet):
         choices=KURIKULUM_IS_ACTIVE, 
         coerce=strtobool,
         widget=MySelectInput,
+    )
+    ordering_by = filter.ChoiceFilter(
+        label='Urutkan berdasarkan',
+        choices=KURIKULUM_ORDERING_BY,
+        widget=MyRadioInput,
+        empty_label=None,
+        initial='tahun_mulai'
     )
     
     class Meta:

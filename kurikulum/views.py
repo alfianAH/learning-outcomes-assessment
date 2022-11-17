@@ -264,21 +264,39 @@ class KurikulumReadAllView(ListView):
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         kurikulum_qs = self.model.objects.filter(prodi=request.user.prodi)
         if kurikulum_qs.exists():
-            self.kurikulum_filter = KurikulumFilter(request.GET or None, queryset=kurikulum_qs)
+            filter_data = {
+                'nama': request.GET.get('nama', ''),
+                'tahun_mulai': request.GET.get('tahun_mulai', ''),
+                'is_active': request.GET.get('is_active', ''),
+            }
+            self.ordering = request.GET.get('ordering_by', 'tahun_mulai')
+
+            self.kurikulum_filter = KurikulumFilter(
+                data=filter_data or None, 
+                queryset=kurikulum_qs
+            )
+
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        print(self.kurikulum_filter)
         if self.kurikulum_filter is not None:
             objects = self.kurikulum_filter.qs
         else:
             objects = self.model.objects.filter(prodi=self.request.user.prodi)
+
+        ordering = self.get_ordering()
+        if ordering:
+            if isinstance(ordering, str):
+                ordering = (ordering,)
+            objects = objects.order_by(*ordering)
         return objects
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['filter_template'] = 'kurikulum/partials/kurikulum-filter-form.html'
+        context['sort_template'] = 'kurikulum/partials/kurikulum-sort-form.html'
         context['reset_url'] = reverse('kurikulum:read-all')
+
         if self.kurikulum_filter is not None:
             context['filter_form'] = self.kurikulum_filter.form
             context['data_exist'] = True

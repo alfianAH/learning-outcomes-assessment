@@ -1,6 +1,20 @@
 <div class="bg-slate-50 dark:bg-neutral-700 border border-slate-200 dark:border-zinc-600 flex flex-row focus-within:border-slate-800 dark:focus-within:border-slate-100 items-center rounded-md space-x-2.5 min-w-full sm:min-w-72 md:min-w-96 px-2 py-1 md:py-2 lg:px-2.5">
 
-    <input type="text" name="q" placeholder="{{ search_placeholder }}" id="search-input" autocomplete="off" class="bg-transparent dark:bg-transparent focus:outline-none w-full placeholder:text-slate-400 dark:placeholder:text-zinc-400">
+    {% if widget %}
+    <input type="type="{{ widget.type }}"" 
+        name="{{ widget.name }}" 
+        {% if widget.value != None %}value="{{ widget.value|stringformat:'s' }}"{% endif %} 
+        class="bg-transparent dark:bg-transparent focus:outline-none w-full placeholder:text-slate-400 dark:placeholder:text-zinc-400"
+        {% include "django/forms/widgets/attrs.html" %}>
+    {% else %}
+    <input type="text" 
+        name="q" 
+        value="" 
+        class="bg-transparent dark:bg-transparent focus:outline-none w-full placeholder:text-slate-400 dark:placeholder:text-zinc-400"
+        placeholder="{{ search_placeholder }}" 
+        id="search-input" 
+        autocomplete="off">
+    {% endif %}
 
     <button type="{% if search_by_js %}button{% else %}submit{% endif %}" class="btn border-none p-0">
         <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">

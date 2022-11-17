@@ -1,5 +1,6 @@
 from django.forms import CheckboxSelectMultiple
 from django.forms.widgets import (
+    ChoiceWidget,
     Input,
     Select,
 )
@@ -8,7 +9,7 @@ class ChoiceListInteractive(CheckboxSelectMultiple):
     is_required: bool = False
     input_type: str = 'checkbox'
     template_name: str = 'custom-widgets/forms/widgets/checkbox-select-list-item-model-a.html'
-    option_template_name: str = 'custom-widgets/forms/widgets/checkbox-option.html'
+    option_template_name: str = 'custom-widgets/forms/widgets/checkbox-option-list-item-model-a.html'
     badge_template: str = None
     list_custom_field_template: str = None
     table_custom_field_template: str = None
@@ -59,3 +60,9 @@ class MySearchInput(Input):
 
 class MySelectInput(Select):
     template_name: str = 'custom-widgets/forms/widgets/select.html'
+
+
+class MyRadioInput(ChoiceWidget):
+    input_type: str = 'radio'
+    template_name: str = 'custom-widgets/forms/widgets/radio-input.html'
+    option_template_name: str = 'custom-widgets/forms/widgets/radio-option.html'
