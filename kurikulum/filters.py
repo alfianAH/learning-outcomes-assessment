@@ -1,4 +1,5 @@
 import django_filters as filter
+from django import forms
 from distutils.util import strtobool
 from widgets.widgets import (
     MyNumberInput,
@@ -36,14 +37,16 @@ class KurikulumFilter(filter.FilterSet):
         coerce=strtobool,
         widget=MySelectInput,
     )
-    ordering_by = filter.ChoiceFilter(
-        label='Urutkan berdasarkan',
-        choices=KURIKULUM_ORDERING_BY,
-        widget=MyRadioInput,
-        empty_label=None,
-        initial='tahun_mulai'
-    )
     
     class Meta:
         model = Kurikulum
         fields = ('nama', 'tahun_mulai', 'is_active')
+
+
+class KurikulumSort(forms.Form):
+    ordering_by = forms.ChoiceField(
+        choices=KURIKULUM_ORDERING_BY,
+        widget=MyRadioInput,
+        label='Urutkan berdasarkan',
+        initial='tahun_mulai',
+    )

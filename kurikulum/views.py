@@ -17,7 +17,7 @@ from semester.models import (
     TipeSemester,
     SemesterKurikulum,
 )
-from .filters import KurikulumFilter
+from .filters import KurikulumFilter, KurikulumSort
 from .forms import (
     KurikulumFromNeosia,
     SemesterFromNeosia,
@@ -258,8 +258,9 @@ class KurikulumReadAllView(ListView):
     model = Kurikulum
     paginate_by: int = 10
     template_name: str = 'kurikulum/home.html'
-    ordering: list[str] = ['tahun_mulai']
+    ordering: str = 'tahun_mulai'
     kurikulum_filter = None
+    kurikulum_sort = None
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         kurikulum_qs = self.model.objects.filter(prodi=request.user.prodi)
@@ -269,12 +270,15 @@ class KurikulumReadAllView(ListView):
                 'tahun_mulai': request.GET.get('tahun_mulai', ''),
                 'is_active': request.GET.get('is_active', ''),
             }
-            self.ordering = request.GET.get('ordering_by', 'tahun_mulai')
+            sort_data = {
+                'ordering_by': request.GET.get('ordering_by', self.ordering)
+            }
 
             self.kurikulum_filter = KurikulumFilter(
                 data=filter_data or None, 
                 queryset=kurikulum_qs
             )
+            self.kurikulum_sort = KurikulumSort(data=sort_data)
 
         return super().get(request, *args, **kwargs)
 
@@ -291,6 +295,11 @@ class KurikulumReadAllView(ListView):
             objects = objects.order_by(*ordering)
         return objects
 
+    def get_ordering(self):
+        if self.kurikulum_sort.is_valid():
+            self.ordering = self.kurikulum_sort.cleaned_data.get('ordering_by', 'tahun_mulai')
+        return super().get_ordering()
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['filter_template'] = 'kurikulum/partials/kurikulum-filter-form.html'
@@ -300,6 +309,9 @@ class KurikulumReadAllView(ListView):
         if self.kurikulum_filter is not None:
             context['filter_form'] = self.kurikulum_filter.form
             context['data_exist'] = True
+
+        if self.kurikulum_sort is not None:
+            context['sort_form'] = self.kurikulum_sort
         
         return context
 
