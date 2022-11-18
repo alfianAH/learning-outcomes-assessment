@@ -21,17 +21,17 @@
         {% endfor %}
     {% else %}
         {% for option in options %}
-            <li class="list-item-model-a" role="listitem">
+            <li class="list-item-model-a active:active transition-all" role="listitem">
                 <div class="flex space-x-2.5 items-center">
                     <label class="w-full flex space-x-2.5 items-center">
                         <input type="checkbox" name="{{ input_name }}" {% if option.id_neosia %}value="{{ option.id_neosia }}" id="kurikulum-{{ option.id_neosia }}" {% else %}value="{{ option.id }}" id="kurikulum-{{ option.id_neosia }}" {% endif %}>
-                        <span class="list-item-title">{{ option.nama }} Lorem ipsum, dolor sit amet consectetur adipisicing elit. Nulla repudiandae similique mollitia cumque dolorum, necessitatibus esse rerum recusandae doloremque? Rem!</span>
+                        <span class="list-item-title">{{ option.nama }}</span>
                         {% include badge_template %}
                     </label>
                 </div>
                 
                 <div>
-                    <a href="{{ option.read_detail_url }}" class="cursor-pointer text-inherit hover:no-underline">
+                    <a href="javascript:void();" class="cursor-pointer text-inherit hover:no-underline active:text-inherit transition-none">
                         {% include list_custom_field_template %}
                     </a>
                 </div>
