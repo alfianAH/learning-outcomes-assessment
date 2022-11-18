@@ -2851,6 +2851,7 @@ details.dropdown::marker {
   padding-right: 0.25rem;
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
+  vertical-align: top;
   font-size: 0.875rem;
   line-height: 1.25rem;
 }
@@ -2883,6 +2884,12 @@ details.dropdown::marker {
     font-size: 1.125rem;
     line-height: 1.75rem;
   }
+}
+
+.table-css > :not(caption) > * > *.one-line {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .table-css > :not(caption) > * > *.checkbox {
