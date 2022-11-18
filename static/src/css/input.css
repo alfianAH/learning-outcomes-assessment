@@ -135,7 +135,7 @@
 
     /* Badge */
     .badge{
-        @apply rounded-full px-2 xl:px-2.5 text-xs md:text-sm text-slate-100 w-min whitespace-nowrap;
+        @apply rounded-full px-2 xl:px-2.5 py-1 text-xs md:text-sm text-slate-100 w-min whitespace-nowrap;
     }
 
     .badge-primary{
@@ -220,6 +220,10 @@
 
     .btn-light{
         @apply bg-slate-50 dark:bg-neutral-700 border-neutral-300 dark:border-transparent text-slate-800 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-neutral-600 active:text-slate-800 active:bg-slate-300 dark:active:bg-neutral-500 dark:active:text-slate-100;
+    }
+
+    .btn-outline-light{
+        @apply bg-slate-50 dark:bg-neutral-700 border border-slate-800 dark:border-slate-100 text-slate-800 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-neutral-600 active:bg-slate-300 dark:active:bg-neutral-500;
     }
     
     .btn-outline-dark{
@@ -613,7 +617,7 @@
     }
 
     .table-css > :not(caption) > * > *{
-        @apply border-b border-l border-slate-400 first:border-l-transparent  dark:first:border-l-transparent px-1 py-2 md:px-2.5 md:py-2.5 xl:px-3 xl:py-3 text-sm md:text-base xl:text-lg;
+        @apply border-b border-l border-slate-400 first:border-l-transparent  dark:first:border-l-transparent px-1 py-2 md:px-2.5 md:py-2.5 xl:px-3 xl:py-3 text-sm md:text-base xl:text-lg align-top;
     }
 
     .table-css > :not(caption) > * > *.checkbox{
@@ -689,6 +693,10 @@
 
     .noscroll{
         @apply overflow-hidden pr-2;
+    }
+
+    .one-line{
+        @apply overflow-hidden overflow-ellipsis whitespace-nowrap;
     }
 
     #dark-mode-toggle:checked ~ label div.toggle-circle{

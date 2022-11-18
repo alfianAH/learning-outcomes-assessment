@@ -69,11 +69,13 @@
             {% for group, options, index in widget.optgroups %}
                 {% for option in options %}
                     <tr>
-                        <th scope="row" class="text-center checkbox">
+                        <th scope="col" class="text-center checkbox">
                             {% include option.template_name with widget=option use_label=False %}
                         </th>
-                        <th scope="row" class="text-center number"></th>
-                        <td class="text-left">{{ option.label.nama }}</td>
+                        <th scope="col" class="text-center number"></th>
+                        <td class="text-left max-w-xs flex">
+                            <span class="one-line">{{ option.label.nama }}</span>
+                        </td>
 
                         {% if option.table_custom_field_template %}
                             {% include option.table_custom_field_template %}
@@ -88,10 +90,10 @@
                         <input type="checkbox" name="{{ input_name }}" {% if option.id_neosia %}value="{{ option.id_neosia }}" id="kurikulum-{{ option.id_neosia }}" {% else %}value="{{ option.id }}" id="kurikulum-{{ option.id_neosia }}" {% endif %}>
                     </th>
                     <th class="text-center number"></th>
-                    <td class="text-left {% if open_button %} group flex flex-row items-center relative {% endif %}">
-                        {{ option.nama }}
+                    <td scope="col" class="text-left max-w-xs{% if open_button %} group flex flex-row items-center relative {% endif %}">
+                        <span class="one-line">{{ option.nama }}</span>
                         {% if open_button %}
-                        <a href="{{ option.read_detail_url }}" class="btn btn-outline-dark absolute right-4 h-7 invisible group-hover:visible">
+                        <a href="{{ option.read_detail_url }}" class="btn btn-outline-light absolute right-4 h-7 invisible group-hover:visible">
                             Buka
                             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-chevron-right ml-1 sm:ml-1 !w-4 !h-4" viewBox="0 0 16 16">
                                 <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
