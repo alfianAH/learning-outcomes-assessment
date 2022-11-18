@@ -590,6 +590,10 @@
         @apply flex font-bold pt-2 text-sm lg:text-xl justify-center items-center transition-all;
     }
 
+    .tab-title > span{
+        @apply w-[calc(100%-(0.625rem+0.5rem))] lg:w-[calc(100%-(0.625rem*2))] px-2;
+    }
+
     .tab-item.disabled > .tab-title{
         @apply text-slate-400 dark:text-neutral-600;
     }
