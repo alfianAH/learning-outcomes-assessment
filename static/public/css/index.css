@@ -2886,12 +2886,6 @@ details.dropdown::marker {
   }
 }
 
-.table-css > :not(caption) > * > *.one-line {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .table-css > :not(caption) > * > *.checkbox {
   width: 3.5rem;
 }
@@ -3224,6 +3218,10 @@ details.dropdown::marker {
 
 .w-5 {
   width: 1.25rem;
+}
+
+.w-80 {
+  width: 20rem;
 }
 
 .w-full {
@@ -3606,6 +3604,12 @@ details.dropdown::marker {
 .noscroll {
   overflow: hidden;
   padding-right: 0.5rem;
+}
+
+.one-line {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 #dark-mode-toggle:checked ~ label div.toggle-circle {

@@ -620,10 +620,6 @@
         @apply border-b border-l border-slate-400 first:border-l-transparent  dark:first:border-l-transparent px-1 py-2 md:px-2.5 md:py-2.5 xl:px-3 xl:py-3 text-sm md:text-base xl:text-lg align-top;
     }
 
-    .table-css > :not(caption) > * > *.one-line{
-        @apply overflow-hidden overflow-ellipsis whitespace-nowrap;
-    }
-
     .table-css > :not(caption) > * > *.checkbox{
         @apply w-14;
     }
@@ -697,6 +693,10 @@
 
     .noscroll{
         @apply overflow-hidden pr-2;
+    }
+
+    .one-line{
+        @apply overflow-hidden overflow-ellipsis whitespace-nowrap;
     }
 
     #dark-mode-toggle:checked ~ label div.toggle-circle{
