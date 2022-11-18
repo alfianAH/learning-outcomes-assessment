@@ -25,9 +25,9 @@
                 <div class="flex space-x-2.5 items-center">
                     <label class="w-full flex space-x-2.5 items-center">
                         <input type="checkbox" name="{{ input_name }}" {% if option.id_neosia %}value="{{ option.id_neosia }}" id="kurikulum-{{ option.id_neosia }}" {% else %}value="{{ option.id }}" id="kurikulum-{{ option.id_neosia }}" {% endif %}>
-                        <span class="list-item-title">{{ option.nama }}</span>
+                        <span class="list-item-title">{{ option.nama }} Lorem ipsum, dolor sit amet consectetur adipisicing elit. Nulla repudiandae similique mollitia cumque dolorum, necessitatibus esse rerum recusandae doloremque? Rem!</span>
+                        {% include badge_template %}
                     </label>
-                    {% include badge_template %}
                 </div>
                 
                 <div>
