@@ -1,10 +1,13 @@
-{% if option.wrap_label %}
 <table class="w-full table-strip">
     <tbody class="space-y-1">
         <tr class="flex px-3 py-1 space-x-2.5">
-            <td class="w-full">Tahun ajaran</td>
-            <td>{{ option.label.tahun_ajaran }}</td>
+            {% if option.wrap_label %}
+                <td class="w-full">Tahun ajaran</td>
+                <td>{{ option.label.tahun_ajaran }}</td>
+            {% else %}
+                <td class="w-full">Tahun ajaran</td>
+                <td>{{ option.tahun_ajaran }}</td>
+            {% endif %}
         </tr>
     </tbody>
 </table>
-{% endif %}

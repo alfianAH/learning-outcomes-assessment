@@ -1,0 +1,60 @@
+{% extends 'home-view.html' %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'kurikulum:read-all' %}" role="listitem">Kurikulum</a></li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">Detail</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<h1>{{ object.nama }}</h1>
+
+<table>
+    <tr>
+        <td>Tahun mulai</td>
+        <td>:</td>
+        <td>{{ object.tahun_mulai }}</td>
+    </tr>
+    <tr>
+        <td>Minimal SKS kelulusan</td>
+        <td>:</td>
+        <td>{{ object.min_sks }}</td>
+    </tr>
+    <tr>
+        <td>Keaktifan</td>
+        <td>:</td>
+        <td>{% include 'kurikulum/partials/badge-list-kurikulum.html' with option=object %}</td>
+    </tr>
+</table>
+
+<ul class="tab" role="tablist">
+    <li class="tab-item w-40" id="tab-1" data-target="#tab-semester-pane" role="presentation">
+        <div class="tab-title">
+            <span class="one-line">Semester</span>
+
+            <div class="w-2 h-2 lg:w-2.5 lg:h-2.5 ml-2.5 badge-warning rounded-full"></div>
+        </div>
+
+        <div class="tab-item-line"></div>
+    </li>
+
+    <li class="tab-item disabled w-40 lg:w-44" id="tab-2" data-target="#tab-mk-pane" role="presentation">
+        <div class="tab-title">
+            <span class="one-line">Mata Kuliah</span>
+
+            <div class="w-2 h-2 lg:w-2.5 lg:h-2.5 ml-2.5 badge-warning  rounded-full"></div>
+        </div>
+
+        <div class="tab-item-line"></div>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="tab-semester-pane" role="tabpanel" aria-labelledby="tab-semester">
+        {% include 'components/list-table-view/list-item-model-a.html' with use_widget=False open_button=True id='semester-list-content' input_name='id_semester' options=object.get_semester badge_template=semester_badge_template list_custom_field_template=semester_list_custom_field_template table_custom_field_header_template=semester_table_custom_field_header_template table_custom_field_template=semester_table_custom_field_template %}
+    </div>
+
+    <div class="tab-pane fade" role="tabpanel" id="tab-mk-pane" aria-labelledby="tab-mata-kuliah">
+        {% include 'components/list-table-view/list-item-model-a.html' with use_widget=False open_button=True id='semester-list-content' input_name='id_semester' options=object.get_mata_kuliah_kurikulum list_custom_field_template=mk_list_custom_field_template table_custom_field_header_template=mk_table_custom_field_header_template table_custom_field_template=mk_table_custom_field_template %}
+    </div>
+</div>
+{% endblock content %}

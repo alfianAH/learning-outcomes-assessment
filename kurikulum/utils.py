@@ -154,7 +154,7 @@ def get_detail_semester(semester_id: int):
     semester_detail = {
         'id_neosia': semester_data['id'],
         'tahun_ajaran': semester_data['tahun_ajaran'],
-        'jenis': semester_data['jenis'],
+        'tipe_semester': semester_data['jenis'],
         'nama': 'Semester {} {}'.format(
             semester_data['tahun_ajaran'],
             semester_data['jenis'].capitalize()

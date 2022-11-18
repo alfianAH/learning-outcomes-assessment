@@ -24,15 +24,20 @@
             <li class="list-item-model-a active:active transition-all" role="listitem">
                 <div class="flex space-x-2.5 items-center">
                     <label class="w-full flex space-x-2.5 items-center">
-                        <input type="checkbox" name="{{ input_name }}" {% if option.id_neosia %}value="{{ option.id_neosia }}" id="kurikulum-{{ option.id_neosia }}" {% else %}value="{{ option.id }}" id="kurikulum-{{ option.id_neosia }}" {% endif %}>
-                        <span class="list-item-title">{{ option.nama }}</span>
-                        {% include badge_template %}
+                        <input type="checkbox" name="{{ input_name }}" {% if option.id_neosia %}value="{{ option.id_neosia }}" id="kurikulum-{{ option.id_neosia }}" {% else %}value="{{ option.id }}" id="kurikulum-{{ option.id }}" {% endif %}>
+                        <span class="list-item-title" title="{{ option.nama }}">{{ option.nama }}</span>
+
+                        {% if badge_template %}
+                            {% include badge_template %}
+                        {% endif %}
                     </label>
                 </div>
                 
                 <div>
-                    <a href="javascript:void();" class="cursor-pointer text-inherit hover:no-underline active:text-inherit transition-none">
-                        {% include list_custom_field_template %}
+                    <a href="{{ option.read_detail_url }}" class="cursor-pointer text-inherit hover:no-underline active:text-inherit transition-none">
+                        {% if list_custom_field_template %}
+                            {% include list_custom_field_template %}
+                        {% endif %}
                     </a>
                 </div>
             </li>
@@ -59,7 +64,9 @@
                     {% endfor %}
                 {% endfor %}
             {% else %}
-                {% include table_custom_field_header_template %}
+                {% if table_custom_field_header_template %}
+                    {% include table_custom_field_header_template %}
+                {% endif %}
             {% endif %}
         </tr>
     </thead>
@@ -70,12 +77,11 @@
                 {% for option in options %}
                     <tr>
                         <th scope="col" class="text-center checkbox">
-                            {% include option.template_name with widget=option use_label=False %}
+                            {% if option.template_name %}
+                                {% include option.template_name with widget=option use_label=False %}
+                            {% endif %}
                         </th>
                         <th scope="col" class="text-center number"></th>
-                        <td class="text-left max-w-xs flex">
-                            <span class="one-line">{{ option.label.nama }}</span>
-                        </td>
 
                         {% if option.table_custom_field_template %}
                             {% include option.table_custom_field_template %}
@@ -87,22 +93,13 @@
             {% for option in options %}
                 <tr>
                     <th class="text-center checkbox">
-                        <input type="checkbox" name="{{ input_name }}" {% if option.id_neosia %}value="{{ option.id_neosia }}" id="kurikulum-{{ option.id_neosia }}" {% else %}value="{{ option.id }}" id="kurikulum-{{ option.id_neosia }}" {% endif %}>
+                        <input type="checkbox" name="{{ input_name }}" {% if option.id_neosia %}value="{{ option.id_neosia }}" id="kurikulum-{{ option.id_neosia }}" {% else %}value="{{ option.id }}" id="kurikulum-{{ option.id }}" {% endif %}>
                     </th>
                     <th class="text-center number"></th>
-                    <td scope="col" class="text-left max-w-xs{% if open_button %} group flex flex-row items-center relative {% endif %}">
-                        <span class="one-line">{{ option.nama }}</span>
-                        {% if open_button %}
-                        <a href="{{ option.read_detail_url }}" class="btn btn-outline-light absolute right-4 h-7 invisible group-hover:visible">
-                            Buka
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-chevron-right ml-1 sm:ml-1 !w-4 !h-4" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
-                            </svg>
-                        </a>
-                        {% endif %}
-                    </td>
-
-                    {% include table_custom_field_template %}
+                    
+                    {% if table_custom_field_template %}
+                        {% include table_custom_field_template %}
+                    {% endif %}
                 </tr>
             {% endfor %}
         {% endif %}

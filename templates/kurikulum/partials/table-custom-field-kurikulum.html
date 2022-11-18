@@ -1,15 +1,29 @@
 {% if option.wrap_label %}
-<td class="text-left">{{ option.label.tahun_mulai }}</td>
-<td class="text-left">
-    {% if option.badge_template %}
-        {% include option.badge_template %}
-    {% endif %}
-</td>
+    <td class="text-left max-w-xs flex">
+        <span class="one-line" title="{{ option.label.nama }}">{{ option.label.nama }}</span>
+    </td>
+    <td class="text-left">{{ option.label.tahun_mulai }}</td>
+    <td class="text-left">
+        {% if option.badge_template %}
+            {% include option.badge_template %}
+        {% endif %}
+    </td>
 {% else %}
-<td class="text-left">{{ option.tahun_mulai }}</td>
-<td class="text-left">
-    {% if badge_template %}
-        {% include badge_template %}
-    {% endif %}
-</td>
+    <td scope="col" class="text-left max-w-xs{% if open_button and option.read_detail_url %} group flex flex-row items-center relative {% endif %}">
+        <span class="one-line" title="{{ option.nama }}">{{ option.nama }}</span>
+        {% if open_button and option.read_detail_url %}
+        <a href="{{ option.read_detail_url }}" class="btn btn-outline-light absolute right-4 h-7 invisible group-hover:visible">
+            Buka
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-chevron-right ml-1 sm:ml-1 !w-4 !h-4" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+            </svg>
+        </a>
+        {% endif %}
+    </td>
+    <td class="text-left">{{ option.tahun_mulai }}</td>
+    <td class="text-left">
+        {% if badge_template %}
+            {% include badge_template %}
+        {% endif %}
+    </td>
 {% endif %}

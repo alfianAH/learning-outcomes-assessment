@@ -1,6 +1,6 @@
 import json
 from django.conf import settings
-from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic.base import View
@@ -161,7 +161,7 @@ class KurikulumReadAllSyncFormWizardView(SessionWizardView):
         tahun_ajaran_obj = TahunAjaran.objects.get_or_create_tahun_ajaran(tahun_ajaran)
         
         # Get tipe semester
-        tipe_semester_str: str = semester_detail.get('jenis')
+        tipe_semester_str: str = semester_detail.get('tipe_semester')
         match(tipe_semester_str.lower()):
             case 'ganjil':
                 tipe_semester = TipeSemester.GANJIL
@@ -317,7 +317,29 @@ class KurikulumReadAllView(ListView):
 
 
 class KurikulumReadView(DetailView):
-    pass
+    model = Kurikulum
+    pk_url_kwarg: str = 'kurikulum_id'
+    template_name: str = 'kurikulum/detail-view.html'
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        kurikulum_obj: Kurikulum = self.get_object()
+        if kurikulum_obj.prodi.id_neosia != request.user.prodi.id_neosia:
+            return HttpResponse(status_code=404)
+        
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'semester_badge_template': 'kurikulum/partials/badge-list-semester.html',
+            'semester_list_custom_field_template': 'kurikulum/partials/list-custom-field-semester.html',
+            'semester_table_custom_field_header_template': 'kurikulum/partials/table-custom-field-header-semester.html',
+            'semester_table_custom_field_template': 'kurikulum/partials/table-custom-field-semester.html',
+            'mk_list_custom_field_template': 'kurikulum/partials/list-custom-field-mk.html',
+            'mk_table_custom_field_header_template': 'kurikulum/partials/table-custom-field-header-mk.html',
+            'mk_table_custom_field_template': 'kurikulum/partials/table-custom-field-mk.html',
+        })
+        return context
 
 
 class KurikulumDeleteView(DeleteView):

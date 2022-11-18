@@ -33,6 +33,18 @@ class Kurikulum(models.Model):
             'kurikulum_id': self.id_neosia
         })
 
+    def get_mata_kuliah_kurikulum(self):
+        return self.matakuliahkurikulum_set.all()
+
+    def get_semester(self):
+        print('Semester: {}'.format(self.semesterkurikulum_set.all()))
+        list_semester_kurikulum_obj = self.semesterkurikulum_set.all()
+        list_semester = []
+        for semester_kurikulum_obj in list_semester_kurikulum_obj:
+            list_semester.append(semester_kurikulum_obj.semester)
+        
+        return list_semester
+
 
 class MataKuliahKurikulum(models.Model):
     id_neosia = models.BigIntegerField(primary_key=True, null=False, unique=True)
@@ -42,3 +54,6 @@ class MataKuliahKurikulum(models.Model):
     kode = models.CharField(max_length=100, null=False)
     nama = models.CharField(max_length=255, null=False)
     sks = models.PositiveSmallIntegerField(null=False)
+
+    def __str__(self) -> str:
+        return self.nama
