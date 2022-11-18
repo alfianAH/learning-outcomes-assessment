@@ -2778,32 +2778,27 @@ details.dropdown::marker {
 .tab-title {
   display: flex;
   align-items: center;
-  justify-content: center;
   padding-top: 0.5rem;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  font-weight: 700;
   transition-property: all;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
-}
-
-@media (min-width: 1024px) {
-  .tab-title {
-    font-size: 1.25rem;
-    line-height: 1.75rem;
-  }
 }
 
 .tab-title > span {
   width: calc(100% - (0.625rem + 0.5rem));
   padding-left: 0.5rem;
   padding-right: 0.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 700;
 }
 
 @media (min-width: 1024px) {
   .tab-title > span {
     width: calc(100% - (0.625rem * 2));
+    font-size: 1.25rem;
+    line-height: 1.75rem;
   }
 }
 
@@ -3252,12 +3247,12 @@ details.dropdown::marker {
   width: calc(100% - 10rem);
 }
 
-.w-32 {
-  width: 8rem;
-}
-
 .w-2 {
   width: 0.5rem;
+}
+
+.w-32 {
+  width: 8rem;
 }
 
 .w-2\.5 {
