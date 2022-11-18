@@ -753,8 +753,6 @@ th {
   border-radius: 9999px;
   padding-left: 0.5rem;
   padding-right: 0.5rem;
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
   font-size: 0.75rem;
   line-height: 1rem;
   --tw-text-opacity: 1;
@@ -1201,12 +1199,64 @@ th {
   color: rgb(241 245 249 / var(--tw-text-opacity));
 }
 
+.btn-outline-dark {
+  border-width: 1px;
+  --tw-border-opacity: 1;
+  border-color: rgb(30 41 59 / var(--tw-border-opacity));
+  background-color: transparent;
+  --tw-text-opacity: 1;
+  color: rgb(30 41 59 / var(--tw-text-opacity));
+}
+
+.btn-outline-dark:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(51 65 85 / var(--tw-bg-opacity));
+  --tw-text-opacity: 1;
+  color: rgb(241 245 249 / var(--tw-text-opacity));
+}
+
+.btn-outline-dark:active {
+  --tw-bg-opacity: 1;
+  background-color: rgb(30 41 59 / var(--tw-bg-opacity));
+  --tw-text-opacity: 1;
+  color: rgb(241 245 249 / var(--tw-text-opacity));
+}
+
+.dark .btn-outline-dark {
+  --tw-border-opacity: 1;
+  border-color: rgb(241 245 249 / var(--tw-border-opacity));
+  --tw-text-opacity: 1;
+  color: rgb(241 245 249 / var(--tw-text-opacity));
+}
+
+.dark .btn-outline-dark:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(241 245 249 / var(--tw-bg-opacity));
+  --tw-text-opacity: 1;
+  color: rgb(30 41 59 / var(--tw-text-opacity));
+}
+
+.dark .btn-outline-dark:active {
+  --tw-bg-opacity: 1;
+  background-color: rgb(226 232 240 / var(--tw-bg-opacity));
+  --tw-text-opacity: 1;
+  color: rgb(30 41 59 / var(--tw-text-opacity));
+}
+
 .btn-primary > svg, .btn-success > svg, .btn-danger > svg, .btn-warning > svg, .btn-secondary > svg {
   fill: #f1f5f9;
 }
 
 .dark .btn-primary > svg,.dark  .btn-success > svg,.dark  .btn-danger > svg,.dark  .btn-warning > svg,.dark  .btn-secondary > svg {
   fill: #f1f5f9;
+}
+
+.btn-outline-dark:hover > svg, .btn-outline-dark:active > svg {
+  fill: #f1f5f9;
+}
+
+.dark .btn-outline-dark:hover > svg,.dark  .btn-outline-dark:active > svg {
+  fill: #1e293b;
 }
 
 .btn-light > svg {
@@ -2694,6 +2744,10 @@ details.dropdown::marker {
   background-color: rgb(64 64 64 / var(--tw-bg-opacity));
 }
 
+.invisible {
+  visibility: hidden;
+}
+
 .collapse {
   visibility: collapse;
 }
@@ -2702,8 +2756,16 @@ details.dropdown::marker {
   position: static;
 }
 
+.absolute {
+  position: absolute;
+}
+
 .relative {
   position: relative;
+}
+
+.right-4 {
+  right: 1rem;
 }
 
 .mx-auto {
@@ -2756,6 +2818,10 @@ details.dropdown::marker {
   margin-right: 0.75rem;
 }
 
+.ml-1 {
+  margin-left: 0.25rem;
+}
+
 .block {
   display: block;
 }
@@ -2800,6 +2866,14 @@ details.dropdown::marker {
   height: 1.25rem;
 }
 
+.h-7 {
+  height: 1.75rem;
+}
+
+.\!h-4 {
+  height: 1rem !important;
+}
+
 .max-h-10 {
   max-height: 2.5rem;
 }
@@ -2830,6 +2904,10 @@ details.dropdown::marker {
 
 .w-full {
   width: 100%;
+}
+
+.\!w-4 {
+  width: 1rem !important;
 }
 
 .w-1\/2 {
@@ -3108,6 +3186,14 @@ details.dropdown::marker {
   color: rgb(30 41 59 / var(--tw-text-opacity));
 }
 
+.text-inherit {
+  color: inherit;
+}
+
+.no-underline {
+  text-decoration-line: none;
+}
+
 .opacity-25 {
   opacity: 0.25;
 }
@@ -3185,6 +3271,10 @@ details.dropdown::marker {
   border-color: rgb(30 41 59 / var(--tw-border-opacity));
 }
 
+.hover\:no-underline:hover {
+  text-decoration-line: none;
+}
+
 .focus\:border-b-2:focus {
   border-bottom-width: 2px;
 }
@@ -3204,6 +3294,10 @@ details.dropdown::marker {
   outline-offset: 2px;
 }
 
+.group:hover .group-hover\:visible {
+  visibility: visible;
+}
+
 .group:hover .group-hover\:fill-rose-400 {
   fill: #fb7185;
 }
@@ -3211,6 +3305,10 @@ details.dropdown::marker {
 .group:hover .group-hover\:text-rose-400 {
   --tw-text-opacity: 1;
   color: rgb(251 113 133 / var(--tw-text-opacity));
+}
+
+.peer:invalid ~ .peer-invalid\:block {
+  display: block;
 }
 
 .peer:invalid ~ .peer-invalid\:fill-red-600 {
@@ -3319,6 +3417,10 @@ details.dropdown::marker {
 }
 
 @media (min-width: 640px) {
+  .sm\:ml-1 {
+    margin-left: 0.25rem;
+  }
+
   .sm\:grid {
     display: grid;
   }

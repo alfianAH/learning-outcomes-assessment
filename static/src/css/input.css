@@ -135,7 +135,7 @@
 
     /* Badge */
     .badge{
-        @apply rounded-full px-2 py-1 xl:px-2.5 text-xs md:text-sm text-slate-100 w-min whitespace-nowrap;
+        @apply rounded-full px-2 xl:px-2.5 text-xs md:text-sm text-slate-100 w-min whitespace-nowrap;
     }
 
     .badge-primary{

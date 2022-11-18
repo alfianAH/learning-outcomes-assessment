@@ -18,7 +18,7 @@ class Kurikulum(models.Model):
             'kurikulum_id': self.id_neosia
         })
 
-    def read_kurikulum_url(self):
+    def read_detail_url(self):
         return reverse('kurikulum:read', kwargs={
             'kurikulum_id': self.id_neosia
         })
