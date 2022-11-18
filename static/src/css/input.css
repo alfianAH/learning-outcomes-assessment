@@ -587,11 +587,11 @@
     }
 
     .tab-title{
-        @apply flex pt-2 items-center transition-all;
+        @apply flex pt-2 items-center justify-center transition-all;
     }
 
     .tab-title > span{
-        @apply w-[calc(100%-(0.625rem+0.5rem))] lg:w-[calc(100%-(0.625rem*2))] px-2 font-bold text-sm lg:text-xl text-center;
+        @apply w-min px-2 font-bold text-sm lg:text-xl text-center;
     }
 
     .tab-item.disabled > .tab-title{

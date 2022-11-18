@@ -2778,6 +2778,7 @@ details.dropdown::marker {
 .tab-title {
   display: flex;
   align-items: center;
+  justify-content: center;
   padding-top: 0.5rem;
   transition-property: all;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -2785,7 +2786,9 @@ details.dropdown::marker {
 }
 
 .tab-title > span {
-  width: calc(100% - (0.625rem + 0.5rem));
+  width: -webkit-min-content;
+  width: -moz-min-content;
+  width: min-content;
   padding-left: 0.5rem;
   padding-right: 0.5rem;
   text-align: center;
@@ -2796,7 +2799,6 @@ details.dropdown::marker {
 
 @media (min-width: 1024px) {
   .tab-title > span {
-    width: calc(100% - (0.625rem * 2));
     font-size: 1.25rem;
     line-height: 1.75rem;
   }
