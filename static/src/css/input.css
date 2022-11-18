@@ -135,7 +135,7 @@
 
     /* Badge */
     .badge{
-        @apply rounded-full px-2 py-1 xl:px-2.5 text-xs md:text-sm text-slate-100 w-min whitespace-nowrap;
+        @apply rounded-full px-2 xl:px-2.5 text-xs md:text-sm text-slate-100 w-min whitespace-nowrap;
     }
 
     .badge-primary{
@@ -183,7 +183,7 @@
 
     /* Buttons */
     .btn{
-        @apply flex flex-row items-center justify-center px-2 py-1 md:py-2 lg:px-2.5 rounded-md text-xs sm:text-sm md:text-base lg:text-lg border hover:border-slate-800 hover:no-underline h-min whitespace-nowrap dark:border-slate-100 transition-all max-w-min;
+        @apply flex flex-row items-center justify-center px-2 py-1 md:py-2 lg:px-2.5 rounded-md text-xs sm:text-sm md:text-base lg:text-lg border hover:border-slate-800 hover:no-underline h-min whitespace-nowrap dark:border-slate-100 transition-all max-w-min cursor-pointer;
     }
 
     .btn > svg{
@@ -220,6 +220,10 @@
 
     .btn-light{
         @apply bg-slate-50 dark:bg-neutral-700 border-neutral-300 dark:border-transparent text-slate-800 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-neutral-600 active:text-slate-800 active:bg-slate-300 dark:active:bg-neutral-500 dark:active:text-slate-100;
+    }
+
+    .btn-outline-light{
+        @apply bg-slate-50 dark:bg-neutral-700 border border-slate-800 dark:border-slate-100 text-slate-800 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-neutral-600 active:bg-slate-300 dark:active:bg-neutral-500;
     }
     
     .btn-outline-dark{
@@ -310,7 +314,11 @@
     }
 
     .form-wizard-page{
-        @apply inline-block bg-stone-400 dark:bg-stone-500 w-4 h-4 lg:w-5 lg:h-5 rounded-full after:content-[""] after:flex after:border-stone-400 dark:after:border-stone-500 after:border after:my-auto after:mx-4 md:after:mx-auto md:after:my-4 lg:after:my-5 after:translate-y-2 md:after:translate-y-0 transition-all last:after:hidden mr-32 last:mr-0 after:w-32 md:mb-8 md:last:mb-0 md:mr-0 md:after:h-8 md:after:w-px;
+        @apply relative inline-block bg-stone-400 dark:bg-stone-500 w-4 h-4 lg:w-5 lg:h-5 rounded-full after:content-[""] after:flex after:border-stone-400 dark:after:border-stone-500 after:border after:my-auto after:mx-4 md:after:mx-auto md:after:my-4 lg:after:my-5 after:translate-y-2 md:after:translate-y-0 transition-all last:after:hidden mr-32 last:mr-0 after:w-32 md:mb-8 md:last:mb-0 md:mr-0 md:after:h-8 md:after:w-px;
+    }
+    
+    .form-wizard-page > button{
+        @apply absolute w-full h-full;
     }
 
     .form-wizard-page.revealed{
@@ -326,7 +334,11 @@
     }
 
     .form-wizard-content{
-        @apply space-y-2 md:space-y-3;
+        @apply relative space-y-2 md:space-y-3;
+    }
+
+    .form-wizard-content .fade{
+        @apply space-y-2.5;
     }
 
     .form-wizard-content.disabled > .form-wizard-header{
@@ -335,6 +347,11 @@
 
     .form-wizard-content.disabled > .form-wizard-header {
         @apply absolute left-full max-h-0 overflow-hidden opacity-0 md:relative md:left-auto md:max-h-max md:overflow-visible md:opacity-100;
+    }
+
+    /* Header with icon */
+    .h-icon{
+        @apply flex flex-row space-x-2.5 lg:space-x-3;
     }
 
     /* List item */
@@ -357,7 +374,7 @@
 
     /* Model A */
     .list-item-model-a{
-        @apply px-2 pt-2 pb-3 mt-2.5 sm:even:ml-2.5 space-y-2 w-full border-b border-b-slate-400;
+        @apply px-2 pt-2 pb-3 sm:even:ml-2.5 space-y-2 w-full border-b border-b-slate-400;
     }
 
     .list-item-model-a.active{
@@ -485,6 +502,19 @@
 
     .page-link.disabled{
         @apply text-slate-300 dark:text-zinc-500 cursor-default hover:bg-slate-50 active:bg-slate-50 dark:hover:bg-zinc-700 dark:active:bg-zinc-700;
+    }
+
+    /* Selected indicator */
+    .selected-indicator{
+        @apply bg-slate-600 dark:bg-neutral-700 text-slate-100 p-2 md:p-2.5 xl:p-3 space-x-2 md:space-x-2.5 xl:space-x-3 rounded-md flex flex-row items-center dark:border dark:border-slate-100;
+    }
+
+    .selected-indicator > span {
+        @apply w-full;
+    }
+
+    .selected-indicator.selected-indicator-btn{
+        @apply py-2 xl:py-2.5;
     }
 
     /* Sidebar */
