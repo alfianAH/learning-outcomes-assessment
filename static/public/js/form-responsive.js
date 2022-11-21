@@ -23,13 +23,16 @@ function onCheckboxClick(formId, listItemModel){
         onCheckboxChange(tableInputElement, isChecked, 'tr');
         
         // Update selected indicator
-        let selectedIndicatorLength = $(`#${formId}`).find('input:checkbox:checked').length;
+        let form = $(`#${formId}`);
+        let selectedIndicatorLength = form.find('input:checkbox:checked').length;
+        let selectedIndicator = form.siblings('.selected-indicator');
+        let selectedIndicatorStatus = selectedIndicator.find('#selected-indicator-status');
 
         if (selectedIndicatorLength > 0) {
-            $('.selected-indicator').removeClass('hidden');
-            $('#selected-indicator-status').text(`${selectedIndicatorLength} item dipilih`);
+            $(selectedIndicator).removeClass('hidden');
+            $(selectedIndicatorStatus).text(`${selectedIndicatorLength} item dipilih`);
         } else {
-            $('.selected-indicator').addClass('hidden');
+            $(selectedIndicator).addClass('hidden');
         }
     });
 }

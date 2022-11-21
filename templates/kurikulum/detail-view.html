@@ -50,11 +50,19 @@
 
 <div class="tab-content">
     <div class="tab-pane fade show active" id="tab-semester-pane" role="tabpanel" aria-labelledby="tab-semester">
-        {% include 'components/list-table-view/list-item-model-a.html' with use_widget=False open_button=True id='semester-list-content' input_name='id_semester' options=object.get_semester badge_template=semester_badge_template list_custom_field_template=semester_list_custom_field_template table_custom_field_header_template=semester_table_custom_field_header_template table_custom_field_template=semester_table_custom_field_template %}
+        {% include 'components/list-table-view/list-tools.html' %}
+
+        {% include 'components/list-table-view/selected-indicator.html' with delete_button=True %}
+        
+        {% include 'components/list-table-view/list-item-model-a.html' with use_widget=False open_button=True id='semester-list-content' prefix_id=semester_prefix_id input_name='id_semester' options=object.get_semester badge_template=semester_badge_template list_custom_field_template=semester_list_custom_field_template table_custom_field_header_template=semester_table_custom_field_header_template table_custom_field_template=semester_table_custom_field_template %}
     </div>
 
     <div class="tab-pane fade" role="tabpanel" id="tab-mk-pane" aria-labelledby="tab-mata-kuliah">
-        {% include 'components/list-table-view/list-item-model-a.html' with use_widget=False open_button=True id='semester-list-content' input_name='id_semester' options=object.get_mata_kuliah_kurikulum list_custom_field_template=mk_list_custom_field_template table_custom_field_header_template=mk_table_custom_field_header_template table_custom_field_template=mk_table_custom_field_template %}
+        {% include 'components/list-table-view/list-tools.html' with filter_template=mk_filter_template sort_template=mk_sort_template filter_form=mk_filter_form sort_form=mk_sort_form %}
+        
+        {% include 'components/list-table-view/selected-indicator.html' with delete_button=True %}
+
+        {% include 'components/list-table-view/list-item-model-a.html' with use_widget=False open_button=True id='mk-list-content' prefix_id=mk_prefix_id input_name='id_semester' options=object.get_mata_kuliah_kurikulum list_custom_field_template=mk_list_custom_field_template table_custom_field_header_template=mk_table_custom_field_header_template table_custom_field_template=mk_table_custom_field_template %}
     </div>
 </div>
 {% endblock content %}

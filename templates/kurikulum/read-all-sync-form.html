@@ -45,9 +45,9 @@
 
                             {% include 'components/search-box.html' with search_by_js=True search_placeholder='Cari nama kurikulum...' %}
 
-                            {% include 'components/list-table-view/selected-indicator.html' with selected_items_length=1 delete_button=False %}
+                            <div class="form-group space-y-2.5">
+                                {% include 'components/list-table-view/selected-indicator.html' with delete_button=False %}
 
-                            <div class="form-group">
                                 {{ field }}
                                 
                                 {% if field.errors %}

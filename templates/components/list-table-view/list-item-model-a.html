@@ -24,7 +24,7 @@
             <li class="list-item-model-a active:active transition-all" role="listitem">
                 <div class="flex space-x-2.5 items-center">
                     <label class="w-full flex space-x-2.5 items-center">
-                        <input type="checkbox" name="{{ input_name }}" {% if option.id_neosia %}value="{{ option.id_neosia }}" id="kurikulum-{{ option.id_neosia }}" {% else %}value="{{ option.id }}" id="kurikulum-{{ option.id }}" {% endif %}>
+                        <input type="checkbox" name="{{ input_name }}" {% if option.id_neosia %}value="{{ option.id_neosia }}" id="{{ prefix_id }}{{ option.id_neosia }}" {% else %}value="{{ option.id }}" id="{{ prefix_id }}{{ option.id }}" {% endif %}>
                         <span class="list-item-title" title="{{ option.nama }}">{{ option.nama }}</span>
 
                         {% if badge_template %}
@@ -93,7 +93,7 @@
             {% for option in options %}
                 <tr>
                     <th class="text-center checkbox">
-                        <input type="checkbox" name="{{ input_name }}" {% if option.id_neosia %}value="{{ option.id_neosia }}" id="kurikulum-{{ option.id_neosia }}" {% else %}value="{{ option.id }}" id="kurikulum-{{ option.id }}" {% endif %}>
+                        <input type="checkbox" name="{{ input_name }}" {% if option.id_neosia %}value="{{ option.id_neosia }}" id="{{ prefix_id }}{{ option.id_neosia }}" {% else %}value="{{ option.id }}" id="{{ prefix_id }}{{ option.id }}" {% endif %}>
                     </th>
                     <th class="text-center number"></th>
                     

@@ -37,7 +37,6 @@ class Kurikulum(models.Model):
         return self.matakuliahkurikulum_set.all()
 
     def get_semester(self):
-        print('Semester: {}'.format(self.semesterkurikulum_set.all()))
         list_semester_kurikulum_obj = self.semesterkurikulum_set.all()
         list_semester = []
         for semester_kurikulum_obj in list_semester_kurikulum_obj:

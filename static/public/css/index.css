@@ -2972,16 +2972,16 @@ details.dropdown::marker {
   width: 0.5rem;
 }
 
-.\!w-4 {
-  width: 1rem !important;
-}
-
 .w-1\/2 {
   width: 50%;
 }
 
 .w-80 {
   width: 20rem;
+}
+
+.\!w-4 {
+  width: 1rem !important;
 }
 
 .w-\[85\%\] {
@@ -2992,12 +2992,12 @@ details.dropdown::marker {
   min-width: 100%;
 }
 
-.max-w-xs {
-  max-width: 20rem;
-}
-
 .max-w-none {
   max-width: none;
+}
+
+.max-w-xs {
+  max-width: 20rem;
 }
 
 @-webkit-keyframes spin {
