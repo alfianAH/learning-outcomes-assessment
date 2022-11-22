@@ -10,6 +10,7 @@ from django.views.generic.list import ListView
 from formtools.wizard.views import SessionWizardView
 
 from accounts.models import ProgramStudi
+from semester.filters import SemesterFilter, SemesterSort
 from .models import Kurikulum, MataKuliahKurikulum
 from semester.models import (
     Semester, 
@@ -341,6 +342,8 @@ class KurikulumReadView(DetailView):
             return HttpResponse(status_code=404)
 
         mk_kurikulum_qs = kurikulum_obj.get_mk_kurikulum()
+        semester_ids = kurikulum_obj.get_semester_ids()
+        semester_qs = Semester.objects.filter(id_neosia__in=semester_ids)
         
         if mk_kurikulum_qs.exists():
             filter_data = {
@@ -359,6 +362,24 @@ class KurikulumReadView(DetailView):
 
             if self.mk_kurikulum_sort.is_valid():
                 self.mk_kurikulum_ordering = self.mk_kurikulum_sort.cleaned_data.get('mk_ordering_by', 'nama')
+
+        if semester_qs.exists():
+            filter_data = {
+                'semester_nama': request.GET.get('semester_nama', ''),
+                'semester_tipe_semester': request.GET.get('semester_tipe_semester', ''),
+            }
+            sort_data = {
+                'semester_ordering_by': request.GET.get('semester_ordering_by')
+            }
+
+            self.semester_filter = SemesterFilter(
+                data=filter_data or None, 
+                queryset=semester_qs
+            )
+            self.semester_sort = SemesterSort(data=sort_data)
+
+            if self.semester_sort.is_valid():
+                self.semester_ordering = self.semester_sort.cleaned_data.get('semester_ordering_by', 'nama')
         
         return super().get(request, *args, **kwargs)
     
@@ -401,6 +422,8 @@ class KurikulumReadView(DetailView):
             'mk_prefix_id': 'mk-',
             
             'semester_objects': semester_objects,
+            'semester_filter_template': 'kurikulum/partials/semester-filter-form.html',
+            'semester_sort_template': 'kurikulum/partials/semester-sort-form.html',
             'semester_badge_template': 'kurikulum/partials/badge-list-semester.html',
             'semester_list_custom_field_template': 'kurikulum/partials/list-custom-field-semester.html',
             'semester_table_custom_field_header_template': 'kurikulum/partials/table-custom-field-header-semester.html',
@@ -418,7 +441,7 @@ class KurikulumReadView(DetailView):
         if self.semester_filter is not None:
             context['semester_filter_form'] = self.semester_filter.form
         if self.semester_sort is not None:
-            context['semester_sor_form'] = self.semester_sort
+            context['semester_sort_form'] = self.semester_sort
 
         return context
 

@@ -51,7 +51,8 @@
 
 <div class="tab-content">
     <div class="tab-pane fade {% if GET %}{% if GET.semester_nama and GET.semester_tipe_semester or GET.semester_ordering_by %}show active{% endif %}{% else %}show active{% endif %}" id="tab-semester-pane" role="tabpanel" aria-labelledby="tab-semester">
-        {% include 'components/list-table-view/list-tools.html' %}
+
+        {% include 'components/list-table-view/list-tools.html' with search_field=semester_filter_form.semester_nama prefix_id=semester_prefix_id filter_template=semester_filter_template sort_template=semester_sort_template filter_form=semester_filter_form sort_form=semester_sort_form ordering_by_field=semester_sort_form.semester_ordering_by %}
 
         {% include 'components/list-table-view/selected-indicator.html' with delete_button=True %}
         
@@ -63,7 +64,7 @@
     </div>
 
     <div class="tab-pane fade {% if GET.mk_nama and GET.mk_sks or GET.mk_ordering_by %}show active{% endif %}" role="tabpanel" id="tab-mk-pane" aria-labelledby="tab-mata-kuliah">
-        {% include 'components/list-table-view/list-tools.html' with search_field=mk_filter_form.mk_nama filter_template=mk_filter_template sort_template=mk_sort_template filter_form=mk_filter_form sort_form=mk_sort_form ordering_by_field=mk_sort_form.mk_ordering_by %}
+        {% include 'components/list-table-view/list-tools.html' with search_field=mk_filter_form.mk_nama prefix_id=mk_prefix_id filter_template=mk_filter_template sort_template=mk_sort_template filter_form=mk_filter_form sort_form=mk_sort_form ordering_by_field=mk_sort_form.mk_ordering_by %}
         
         {% include 'components/list-table-view/selected-indicator.html' with delete_button=True %}
 
