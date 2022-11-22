@@ -242,6 +242,11 @@
         @apply fill-slate-800 dark:fill-slate-100;
     }
 
+    /* Content */
+    #content{
+        @apply space-y-2;
+    }
+
     /* Dropdown */
     details.dropdown{
         @apply marker:hidden;
@@ -559,7 +564,7 @@
     }
 
     .tab-content > .tab-pane{
-        @apply hidden;
+        @apply hidden space-y-2.5;
     }
 
     .tab-content > .active{

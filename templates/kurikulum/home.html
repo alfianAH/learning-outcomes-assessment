@@ -18,7 +18,7 @@
             </a>
         </h1>
 
-        {% include 'components/list-table-view/list-tools.html' %}
+        {% include 'components/list-table-view/list-tools.html' with search_field=filter_form.nama %}
 
         {% if object_list %}
             {% include 'kurikulum/partials/kurikulum-read-all-view.html' %}

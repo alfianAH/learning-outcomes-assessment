@@ -26,8 +26,9 @@
     </tr>
 </table>
 
+{% with request.GET as GET %}
 <ul class="tab" role="tablist">
-    <li class="tab-item w-40" id="tab-1" data-target="#tab-semester-pane" role="presentation">
+    <li class="tab-item w-40 {% if GET %}{% if GET.semester_nama and GET.semester_tipe_semester or GET.semester_ordering_by %}  {% else %} disabled {% endif %}{% endif %}" id="tab-1" data-target="#tab-semester-pane" role="presentation">
         <div class="tab-title">
             <span class="one-line">Semester</span>
 
@@ -37,7 +38,7 @@
         <div class="tab-item-line"></div>
     </li>
 
-    <li class="tab-item disabled w-40 lg:w-44" id="tab-2" data-target="#tab-mk-pane" role="presentation">
+    <li class="tab-item w-40 lg:w-44 {% if GET.mk_nama or GET.mk_sks or GET.mk_ordering_by %} {% else %} disabled {% endif %}" id="tab-2" data-target="#tab-mk-pane" role="presentation">
         <div class="tab-title">
             <span class="one-line">Mata Kuliah</span>
 
@@ -49,20 +50,29 @@
 </ul>
 
 <div class="tab-content">
-    <div class="tab-pane fade show active" id="tab-semester-pane" role="tabpanel" aria-labelledby="tab-semester">
+    <div class="tab-pane fade {% if GET %}{% if GET.semester_nama and GET.semester_tipe_semester or GET.semester_ordering_by %}show active{% endif %}{% else %}show active{% endif %}" id="tab-semester-pane" role="tabpanel" aria-labelledby="tab-semester">
         {% include 'components/list-table-view/list-tools.html' %}
 
         {% include 'components/list-table-view/selected-indicator.html' with delete_button=True %}
         
-        {% include 'components/list-table-view/list-item-model-a.html' with use_widget=False open_button=True id='semester-list-content' prefix_id=semester_prefix_id input_name='id_semester' options=object.get_semester badge_template=semester_badge_template list_custom_field_template=semester_list_custom_field_template table_custom_field_header_template=semester_table_custom_field_header_template table_custom_field_template=semester_table_custom_field_template %}
+        {% if semester_objects %}
+            {% include 'components/list-table-view/list-item-model-a.html' with use_widget=False open_button=True id='semester-list-content' prefix_id=semester_prefix_id input_name='id_semester' options=semester_objects badge_template=semester_badge_template list_custom_field_template=semester_list_custom_field_template table_custom_field_header_template=semester_table_custom_field_header_template table_custom_field_template=semester_table_custom_field_template %}
+        {% else %}
+            <p>Tidak ditemukan data dengan filter yang diberikan</p>
+        {% endif %}
     </div>
 
-    <div class="tab-pane fade" role="tabpanel" id="tab-mk-pane" aria-labelledby="tab-mata-kuliah">
-        {% include 'components/list-table-view/list-tools.html' with filter_template=mk_filter_template sort_template=mk_sort_template filter_form=mk_filter_form sort_form=mk_sort_form %}
+    <div class="tab-pane fade {% if GET.mk_nama and GET.mk_sks or GET.mk_ordering_by %}show active{% endif %}" role="tabpanel" id="tab-mk-pane" aria-labelledby="tab-mata-kuliah">
+        {% include 'components/list-table-view/list-tools.html' with search_field=mk_filter_form.mk_nama filter_template=mk_filter_template sort_template=mk_sort_template filter_form=mk_filter_form sort_form=mk_sort_form ordering_by_field=mk_sort_form.mk_ordering_by %}
         
         {% include 'components/list-table-view/selected-indicator.html' with delete_button=True %}
 
-        {% include 'components/list-table-view/list-item-model-a.html' with use_widget=False open_button=True id='mk-list-content' prefix_id=mk_prefix_id input_name='id_semester' options=object.get_mata_kuliah_kurikulum list_custom_field_template=mk_list_custom_field_template table_custom_field_header_template=mk_table_custom_field_header_template table_custom_field_template=mk_table_custom_field_template %}
+        {% if mk_objects %}
+            {% include 'components/list-table-view/list-item-model-a.html' with use_widget=False open_button=True id='mk-list-content' prefix_id=mk_prefix_id input_name='id_semester' options=mk_objects list_custom_field_template=mk_list_custom_field_template table_custom_field_header_template=mk_table_custom_field_header_template table_custom_field_template=mk_table_custom_field_template %}
+        {% else %}
+            <p>Tidak ditemukan data dengan filter yang diberikan</p>
+        {% endif %}
     </div>
 </div>
+{% endwith %}
 {% endblock content %}

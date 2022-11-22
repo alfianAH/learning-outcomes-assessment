@@ -33,16 +33,13 @@ class Kurikulum(models.Model):
             'kurikulum_id': self.id_neosia
         })
 
-    def get_mata_kuliah_kurikulum(self):
+    def get_mk_kurikulum(self):
         return self.matakuliahkurikulum_set.all()
 
-    def get_semester(self):
-        list_semester_kurikulum_obj = self.semesterkurikulum_set.all()
-        list_semester = []
-        for semester_kurikulum_obj in list_semester_kurikulum_obj:
-            list_semester.append(semester_kurikulum_obj.semester)
+    def get_semester_ids(self):
+        list_semester_id = self.semesterkurikulum_set.values_list('semester__id_neosia', flat=True)
         
-        return list_semester
+        return list_semester_id
 
 
 class MataKuliahKurikulum(models.Model):

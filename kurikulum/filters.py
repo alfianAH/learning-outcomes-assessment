@@ -18,7 +18,7 @@ KURIKULUM_IS_ACTIVE = (
 KURIKULUM_ORDERING_BY = (
     ('nama', 'Nama'), 
     ('tahun_mulai', 'Tahun Mulai'), 
-    ('aktif', 'Keaktifan')
+    ('is_active', 'Keaktifan')
 )
 MK_KURIKULUM_ORDERING_BY = (
     ('kode', 'Kode MK'),
@@ -66,7 +66,7 @@ class KurikulumSort(forms.Form):
 
 
 class MataKuliahKurikulumFilter(filter.FilterSet):
-    nama = filter.CharFilter(
+    mk_nama = filter.CharFilter(
         field_name='nama', 
         lookup_expr='icontains', 
         label='Nama Mata Kuliah',
@@ -77,7 +77,7 @@ class MataKuliahKurikulumFilter(filter.FilterSet):
             }
         ),
     )
-    sks = filter.NumberFilter(
+    mk_sks = filter.NumberFilter(
         field_name='sks',
         label='SKS',
         widget=MyNumberInput,
@@ -89,7 +89,7 @@ class MataKuliahKurikulumFilter(filter.FilterSet):
 
 
 class MataKuliahKurikulumSort(forms.Form):
-    ordering_by = forms.ChoiceField(
+    mk_ordering_by = forms.ChoiceField(
         choices=MK_KURIKULUM_ORDERING_BY,
         widget=MyRadioInput,
         label='Urutkan berdasarkan',

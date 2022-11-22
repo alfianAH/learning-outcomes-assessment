@@ -1264,6 +1264,14 @@ th {
   fill: #f1f5f9;
 }
 
+/* Content */
+
+#content > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(0.5rem * var(--tw-space-y-reverse));
+}
+
 /* Dropdown */
 
 details.dropdown *::marker {
@@ -2521,6 +2529,12 @@ details.dropdown::marker {
 
 .tab-content > .tab-pane {
   display: none;
+}
+
+.tab-content > .tab-pane > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(0.625rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(0.625rem * var(--tw-space-y-reverse));
 }
 
 .tab-content > .active {

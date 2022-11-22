@@ -308,7 +308,7 @@ class KurikulumReadAllView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['filter_template'] = 'kurikulum/partials/kurikulum-filter-form.html'
-        context['sort_template'] = 'kurikulum/partials/sort-form.html'
+        context['sort_template'] = 'kurikulum/partials/kurikulum-sort-form.html'
         context['reset_url'] = reverse('kurikulum:read-all')
         context['kurikulum_list_prefix_id'] = 'kurikulum-'
 
@@ -326,25 +326,29 @@ class KurikulumReadView(DetailView):
     model = Kurikulum
     pk_url_kwarg: str = 'kurikulum_id'
     template_name: str = 'kurikulum/detail-view.html'
+
     mk_kurikulum_filter: MataKuliahKurikulumFilter = None
     mk_kurikulum_sort: MataKuliahKurikulumSort = None
+    mk_kurikulum_ordering: str = 'nama'
+
     semester_filter = None
     semester_sort = None
+    semester_ordering: str = 'nama'
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         kurikulum_obj: Kurikulum = self.get_object()
         if kurikulum_obj.prodi.id_neosia != request.user.prodi.id_neosia:
             return HttpResponse(status_code=404)
 
-        mk_kurikulum_qs = kurikulum_obj.get_mata_kuliah_kurikulum()
+        mk_kurikulum_qs = kurikulum_obj.get_mk_kurikulum()
         
         if mk_kurikulum_qs.exists():
             filter_data = {
-                'nama': request.GET.get('nama', ''),
-                'sks': request.GET.get('sks', ''),
+                'mk_nama': request.GET.get('mk_nama', ''),
+                'mk_sks': request.GET.get('mk_sks', ''),
             }
             sort_data = {
-                'ordering_by': request.GET.get('ordering_by')
+                'mk_ordering_by': request.GET.get('mk_ordering_by')
             }
 
             self.mk_kurikulum_filter = MataKuliahKurikulumFilter(
@@ -352,30 +356,70 @@ class KurikulumReadView(DetailView):
                 queryset=mk_kurikulum_qs
             )
             self.mk_kurikulum_sort = MataKuliahKurikulumSort(data=sort_data)
+
+            if self.mk_kurikulum_sort.is_valid():
+                self.mk_kurikulum_ordering = self.mk_kurikulum_sort.cleaned_data.get('mk_ordering_by', 'nama')
         
         return super().get(request, *args, **kwargs)
+    
+    def get_objects_queryset(self, filter_form, queryset, order_by):
+        if filter_form is not None:
+            objects = filter_form.qs
+        else:
+            objects = queryset
+
+        ordering = order_by
+        if ordering:
+            if isinstance(ordering, str):
+                ordering = (ordering,)
+            objects = objects.order_by(*ordering)
+        return objects
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        mk_objects = self.get_objects_queryset(
+            self.mk_kurikulum_filter,
+            self.get_object().get_mk_kurikulum(),
+            self.mk_kurikulum_ordering
+        )
+
+        semester_ids = self.get_object().get_semester_ids()
+        semester_qs = Semester.objects.filter(id_neosia__in=semester_ids)
+        semester_objects = self.get_objects_queryset(
+            self.semester_filter,
+            semester_qs,
+            self.semester_ordering
+        )
+
         context.update({
+            'mk_objects': mk_objects,
             'mk_filter_template': 'kurikulum/partials/mk-kurikulum-filter-form.html',
-            'mk_sort_template': 'kurikulum/partials/sort-form.html',
+            'mk_sort_template': 'kurikulum/partials/mk-kurikulum-sort-form.html',
             'mk_list_custom_field_template': 'kurikulum/partials/list-custom-field-mk.html',
             'mk_table_custom_field_header_template': 'kurikulum/partials/table-custom-field-header-mk.html',
             'mk_table_custom_field_template': 'kurikulum/partials/table-custom-field-mk.html',
             'mk_prefix_id': 'mk-',
+            
+            'semester_objects': semester_objects,
             'semester_badge_template': 'kurikulum/partials/badge-list-semester.html',
             'semester_list_custom_field_template': 'kurikulum/partials/list-custom-field-semester.html',
             'semester_table_custom_field_header_template': 'kurikulum/partials/table-custom-field-header-semester.html',
             'semester_table_custom_field_template': 'kurikulum/partials/table-custom-field-semester.html',
             'semester_prefix_id': 'semester-',
+            
+            'reset_url': self.get_object().read_detail_url()
         })
 
         if self.mk_kurikulum_filter is not None:
             context['mk_filter_form'] = self.mk_kurikulum_filter.form
-
         if self.mk_kurikulum_sort is not None:
             context['mk_sort_form'] = self.mk_kurikulum_sort
+        
+        if self.semester_filter is not None:
+            context['semester_filter_form'] = self.semester_filter.form
+        if self.semester_sort is not None:
+            context['semester_sor_form'] = self.semester_sort
+
         return context
 
 
