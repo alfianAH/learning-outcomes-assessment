@@ -332,8 +332,8 @@ class KurikulumReadView(DetailView):
     mk_kurikulum_sort: MataKuliahKurikulumSort = None
     mk_kurikulum_ordering: str = 'nama'
 
-    semester_filter = None
-    semester_sort = None
+    semester_filter: SemesterFilter = None
+    semester_sort: SemesterSort = None
     semester_ordering: str = 'nama'
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
@@ -351,7 +351,7 @@ class KurikulumReadView(DetailView):
                 'mk_sks': request.GET.get('mk_sks', ''),
             }
             sort_data = {
-                'mk_ordering_by': request.GET.get('mk_ordering_by')
+                'mk_ordering_by': request.GET.get('mk_ordering_by', self.mk_kurikulum_ordering)
             }
 
             self.mk_kurikulum_filter = MataKuliahKurikulumFilter(
@@ -369,7 +369,7 @@ class KurikulumReadView(DetailView):
                 'semester_tipe_semester': request.GET.get('semester_tipe_semester', ''),
             }
             sort_data = {
-                'semester_ordering_by': request.GET.get('semester_ordering_by')
+                'semester_ordering_by': request.GET.get('semester_ordering_by', self.semester_ordering)
             }
 
             self.semester_filter = SemesterFilter(
