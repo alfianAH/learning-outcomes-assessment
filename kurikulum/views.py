@@ -95,18 +95,38 @@ class KurikulumReadAllSyncFormWizardView(SessionWizardView):
         self.revealed_page.append(new_page)
         self.storage.extra_data.update({'revealed_page': json.dumps(self.revealed_page)})
     
-    def get_form(self, step=None, data=None, files=None):
-        form = super().get_form(step, data, files)
-        if step is None: step = self.steps.current
+    def render_next_step(self, form, **kwargs):
+        next_step = self.steps.next
         
-        if step == '1':
-            kurikulum_cleaned_data = self.get_cleaned_data_for_step('0').get('kurikulum_from_neosia')
+        if next_step == '1':
+            kurikulum_cleaned_data = form.cleaned_data.get('kurikulum_from_neosia')
             semester_choices = []
 
             for kurikulum_id in kurikulum_cleaned_data:
                 semester_by_kurikulum = get_semester_by_kurikulum_choices(kurikulum_id)
                 for semester_id in semester_by_kurikulum:
                     semester_choices.append(semester_id)
+
+            # Set extra data for semester choices
+            self.storage.extra_data.update({'semester_choices': json.dumps(semester_choices)})
+        return super().render_next_step(form, **kwargs)
+
+    def get_form(self, step=None, data=None, files=None):
+        form = super().get_form(step, data, files)
+        if step is None: step = self.steps.current
+        
+        if step == '1':
+            # Get semester choices from storage
+            extra_data = self.storage.extra_data
+            semester_choices = extra_data.get('semester_choices')
+
+            # Extra data will be none at the first time
+            if semester_choices is None:
+                # Set default value
+                semester_choices = []
+            else:
+                # Load JSON value if there is extra data
+                semester_choices = json.loads(semester_choices)
 
             form.fields.get('semester_from_neosia').choices = semester_choices
         return form
@@ -125,6 +145,10 @@ class KurikulumReadAllSyncFormWizardView(SessionWizardView):
         list_mk_kurikulum = get_mata_kuliah_kurikulum(kurikulum_id, user_prodi_id)
 
         for mk_kurikulum in list_mk_kurikulum:
+            # If MK Kurikulum is already saved, continue
+            mk_kurikulum_obj = MataKuliahKurikulum.objects.filter(id_neosia=mk_kurikulum.get('id_neosia'))
+            if mk_kurikulum_obj.exists(): continue
+
             kurikulum_mk_id = mk_kurikulum.get('kurikulum')
             prodi_id = mk_kurikulum.get('prodi')
 
