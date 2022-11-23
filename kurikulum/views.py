@@ -423,6 +423,7 @@ class KurikulumReadView(DetailView):
             'mk_table_custom_field_header_template': 'kurikulum/partials/table-custom-field-header-mk.html',
             'mk_table_custom_field_template': 'kurikulum/partials/table-custom-field-mk.html',
             'mk_prefix_id': 'mk-',
+            'mk_bulk_delete_url': self.get_object().get_mk_bulk_delete(),
             
             'semester_objects': semester_objects,
             'semester_filter_template': 'kurikulum/partials/semester-filter-form.html',
@@ -432,6 +433,7 @@ class KurikulumReadView(DetailView):
             'semester_table_custom_field_header_template': 'kurikulum/partials/table-custom-field-header-semester.html',
             'semester_table_custom_field_template': 'kurikulum/partials/table-custom-field-semester.html',
             'semester_prefix_id': 'semester-',
+            'semester_bulk_delete_url': '',
             
             'reset_url': self.get_object().read_detail_url()
         })
@@ -460,10 +462,6 @@ class KurikulumBulkDeleteView(View):
         return redirect(reverse('kurikulum:read-all'))
 
 
-class KurikulumDeleteView(DeleteView):
-    pass
-
-
 # Mata Kuliah Kurikulum
 
 class MataKuliahKurikulumReadAllView(ListView):
@@ -472,6 +470,20 @@ class MataKuliahKurikulumReadAllView(ListView):
 
 class MataKuliahKurikulumReadView(DetailView):
     pass
+
+
+class MataKuliahKurikulumBulkDeleteView(DeleteView):
+    model = Kurikulum
+    pk_url_kwarg: str = 'kurikulum_id'
+
+    def post(self, request: HttpRequest, *args, **kwargs):
+        list_mk_kurikulum = request.POST.getlist('id_mk_kurikulum')
+        list_mk_kurikulum = [*set(list_mk_kurikulum)]
+
+        if len(list_mk_kurikulum) > 0:
+            MataKuliahKurikulum.objects.filter(id_neosia__in=list_mk_kurikulum).delete()
+            
+        return redirect(self.get_object().read_detail_url())
 
 
 class MataKuliahKurikulumDeleteView(DeleteView):

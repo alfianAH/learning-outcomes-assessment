@@ -73,7 +73,7 @@
                 {% csrf_token %}
 
                 {% include 'components/list-table-view/selected-indicator.html' with delete_button=True %}
-                {% include 'components/list-table-view/list-item-model-a.html' with use_widget=False open_button=True id='mk-list-content' prefix_id=mk_prefix_id input_name='id_semester' options=mk_objects list_custom_field_template=mk_list_custom_field_template table_custom_field_header_template=mk_table_custom_field_header_template table_custom_field_template=mk_table_custom_field_template %}
+                {% include 'components/list-table-view/list-item-model-a.html' with use_widget=False open_button=True id='mk-list-content' prefix_id=mk_prefix_id input_name='id_mk_kurikulum' options=mk_objects list_custom_field_template=mk_list_custom_field_template table_custom_field_header_template=mk_table_custom_field_header_template table_custom_field_template=mk_table_custom_field_template %}
             </form>
         {% else %}
             <p>Tidak ditemukan data dengan filter yang diberikan</p>

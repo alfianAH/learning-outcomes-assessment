@@ -41,6 +41,11 @@ class Kurikulum(models.Model):
         
         return list_semester_id
 
+    def get_mk_bulk_delete(self):
+        return reverse('kurikulum:mk-bulk-delete', kwargs={
+            'kurikulum_id': self.id_neosia
+        })
+
 
 class MataKuliahKurikulum(models.Model):
     id_neosia = models.BigIntegerField(primary_key=True, null=False, unique=True)
