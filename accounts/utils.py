@@ -3,13 +3,13 @@ from django.conf import settings
 from django.urls import reverse
 import requests
 from requests import Request, Session
-from requests.exceptions import MissingSchema
+from requests.exceptions import MissingSchema, SSLError
 
 from .enums import RoleChoices
 
 
 MBERKAS_OAUTH_TOKEN_URL = 'https://mberkas.unhas.ac.id/oauth/token'
-MBERKAS_OAUTH_BEARER = ''
+MBERKAS_OAUTH_BEARER = 'https://mberkas.unhas.ac.id/api/checkStatus'
 
 MHS_PROFILE_URL = "https://customapi.neosia.unhas.ac.id/GetProfilMhs"
 DOSEN_PROFILE_URL = ""
@@ -122,9 +122,15 @@ def validate_user(access_token: str):
 
     if access_token is None: return None
 
-    response = requests.get(MBERKAS_OAUTH_BEARER, headers={
-        'Authorization': 'Bearer {}'.format(access_token)
-    })
+    try:
+        response = requests.get(MBERKAS_OAUTH_BEARER, headers={
+            'Authorization': 'Bearer {}'.format(access_token)
+        })
+    except SSLError:
+        if settings.DEBUG: print('SSL Error')
+        response = requests.get(MBERKAS_OAUTH_BEARER, verify=False, headers={
+            'Authorization': 'Bearer {}'.format(access_token)
+        })
 
     if response.status_code == 200:
         user = response.json()

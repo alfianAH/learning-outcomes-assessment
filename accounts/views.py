@@ -30,9 +30,9 @@ def login_oauth_view(request: HttpRequest):
 def oauth_callback(request: HttpRequest):
     code = request.GET['code']
     access_token = get_oauth_access_token(code)
-    # user = validate_user(access_token)
+    user = validate_user(access_token)
 
-    return JsonResponse({'access_token': access_token})
+    return JsonResponse({'access_token': user})
 
 def logout_view(request: HttpRequest):
     logout(request)
