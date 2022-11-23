@@ -18,9 +18,8 @@ def request_data_to_neosia(auth_url: str, params: dict = {}, headers: dict = {})
     try:
         response = requests.post(auth_url, params=params, headers=headers)
     except requests.exceptions.SSLError:
-        if settings.DEBUG: 
-            print("SSL Error")
-            # response = requests.post(auth_url, params=params, headers=headers, verify=False)
+        if settings.DEBUG: print("SSL Error")
+        response = requests.post(auth_url, params=params, headers=headers, verify=False)
     except requests.exceptions.ConnectTimeout:
         # TODO: ACTIONS ON CONNECT TIMEOUT
         if settings.DEBUG:
