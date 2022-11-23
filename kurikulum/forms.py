@@ -31,14 +31,10 @@ class KurikulumFromNeosia(forms.Form):
 
         # Clean kurikulum IDs
         kurikulum_from_neosia = cleaned_data.get('kurikulum_from_neosia')
-        new_id_kurikulum_from_neosia = []
+        kurikulum_from_neosia = [*set(kurikulum_from_neosia)]
         
-        for id in kurikulum_from_neosia:
-            if id in new_id_kurikulum_from_neosia: continue
-            new_id_kurikulum_from_neosia.append(id)
-        
-        cleaned_data['kurikulum_from_neosia'] = new_id_kurikulum_from_neosia
-        is_kurikulum_valid = len(new_id_kurikulum_from_neosia) > 0
+        cleaned_data['kurikulum_from_neosia'] = kurikulum_from_neosia
+        is_kurikulum_valid = len(kurikulum_from_neosia) > 0
         
         if not is_kurikulum_valid:
             self.add_error('kurikulum_from_neosia', 'Pilih minimal 1 (satu) kurikulum')

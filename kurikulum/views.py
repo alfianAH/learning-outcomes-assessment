@@ -308,10 +308,13 @@ class KurikulumReadAllView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['filter_template'] = 'kurikulum/partials/kurikulum-filter-form.html'
-        context['sort_template'] = 'kurikulum/partials/kurikulum-sort-form.html'
-        context['reset_url'] = reverse('kurikulum:read-all')
-        context['kurikulum_list_prefix_id'] = 'kurikulum-'
+        context.update({
+            'bulk_delete_url': reverse('kurikulum:bulk-delete'),
+            'filter_template': 'kurikulum/partials/kurikulum-filter-form.html',
+            'sort_template': 'kurikulum/partials/kurikulum-sort-form.html',
+            'reset_url': reverse('kurikulum:read-all'),
+            'kurikulum_list_prefix_id': 'kurikulum-'
+        })
 
         if self.kurikulum_filter is not None:
             context['filter_form'] = self.kurikulum_filter.form
@@ -444,6 +447,17 @@ class KurikulumReadView(DetailView):
             context['semester_sort_form'] = self.semester_sort
 
         return context
+
+
+class KurikulumBulkDeleteView(View):
+    def post(self, request: HttpRequest, *args, **kwargs):
+        list_kurikulum = request.POST.getlist('id_kurikulum')
+        list_kurikulum = [*set(list_kurikulum)]
+
+        if len(list_kurikulum) > 0:
+            Kurikulum.objects.filter(id_neosia__in=list_kurikulum).delete()
+            
+        return redirect(reverse('kurikulum:read-all'))
 
 
 class KurikulumDeleteView(DeleteView):

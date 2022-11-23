@@ -1,10 +1,9 @@
-<div class="space-y-2.5 py-2.5 md:p-3">
-    <div hx-include="#kurikulum-list" hx-target="#">
+<div>
+    <form action="{{ bulk_delete_url }}" method="post" class="space-y-2.5 py-2.5 md:p-3">
+        {% csrf_token %}
+
         {% include 'components/list-table-view/selected-indicator.html' with delete_button=True %}
-    </div>
-    <div>
-        <form id="kurikulum-list">
-            {% include 'components/list-table-view/list-item-model-a.html' with use_widget=False open_button=True id='kurikulum-list-content' prefix_id=kurikulum_list_prefix_id input_name='id_kurikulum' options=object_list badge_template='kurikulum/partials/badge-list-kurikulum.html' list_custom_field_template='kurikulum/partials/list-custom-field-kurikulum.html' table_custom_field_header_template='kurikulum/partials/table-custom-field-header-kurikulum.html' table_custom_field_template='kurikulum/partials/table-custom-field-kurikulum.html' %}
-        </form>
-    </div>
+        
+        {% include 'components/list-table-view/list-item-model-a.html' with use_widget=False open_button=True id='kurikulum-list-content' prefix_id=kurikulum_list_prefix_id input_name='id_kurikulum' options=object_list badge_template='kurikulum/partials/badge-list-kurikulum.html' list_custom_field_template='kurikulum/partials/list-custom-field-kurikulum.html' table_custom_field_header_template='kurikulum/partials/table-custom-field-header-kurikulum.html' table_custom_field_template='kurikulum/partials/table-custom-field-kurikulum.html' %}
+    </form>
 </div>

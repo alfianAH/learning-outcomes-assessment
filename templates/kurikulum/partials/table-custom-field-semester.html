@@ -1,5 +1,5 @@
 {% if option.wrap_label %}
-    <td class="text-left max-w-xs flex">
+    <td class="text-left">
         <span class="one-line" title="{{ option.label.nama }}">{{ option.label.nama }}</span>
     </td>
     <td class="text-left">{{ option.label.tahun_ajaran }}</td>
@@ -9,7 +9,7 @@
         {% endif %}
     </td>
 {% else %}
-    <td scope="col" class="text-left max-w-xs{% if open_button and option.read_detail_url %} group flex flex-row items-center relative {% endif %}">
+    <td scope="col" class="text-left {% if open_button and option.read_detail_url %} group flex max-w-xs flex-row items-center relative {% endif %}">
         <span class="one-line" title="{{ option.nama }}">{{ option.nama }}</span>
         {% if open_button and option.read_detail_url %}
             <a href="{{ option.read_detail_url }}" class="btn btn-outline-light absolute right-4 h-7 invisible group-hover:visible">
