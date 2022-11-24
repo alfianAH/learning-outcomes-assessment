@@ -42,8 +42,12 @@
                             {% if field.help_text %}
                                 <p>{{ field.help_text|safe }}</p>
                             {% endif %}
-
-                            {% include 'components/search-box.html' with search_by_js=True search_placeholder='Cari nama kurikulum...' %}
+                            
+                            {% if wizard.steps.current == '0' %}
+                                {% include 'components/search-box.html' with search_by_js=True search_placeholder='Cari nama kurikulum...' %}
+                            {% elif wizard.steps.current == '1' %}
+                                {% include 'components/search-box.html' with search_by_js=True search_placeholder='Cari nama semester...' %}
+                            {% endif %}
 
                             <div class="form-group space-y-2.5">
                                 {% include 'components/list-table-view/selected-indicator.html' with delete_button=False %}
