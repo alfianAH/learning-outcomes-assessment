@@ -17,7 +17,7 @@ class KurikulumFromNeosia(forms.Form):
             table_custom_field_header_template='kurikulum/partials/table-custom-field-header-kurikulum.html',
         ),
         label = 'Tambahkan Kurikulum dari Neosia',
-        help_text = 'Data di bawah ini merupakan data baru dari Neosia dan belum ditemukan dalam database. Beri centang pada item yang ingin anda tambahkan.',
+        help_text = 'Data di bawah ini merupakan data baru dari Neosia dan belum ditemukan dalam database. Beri centang pada item yang ingin anda tambahkan.<br>Note: Data kurikulum yang tidak bisa dicentang berarti kurikulum tidak memiliki data semester di Neosia.',
         required = False,
     )
 
