@@ -3217,6 +3217,14 @@ details.dropdown::marker {
   text-align: center;
 }
 
+.align-middle {
+  vertical-align: middle;
+}
+
+.\!align-middle {
+  vertical-align: middle !important;
+}
+
 .text-2xl {
   font-size: 1.5rem;
   line-height: 2rem;

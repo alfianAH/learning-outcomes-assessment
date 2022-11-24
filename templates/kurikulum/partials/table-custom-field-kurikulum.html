@@ -3,7 +3,7 @@
         <span class="one-line" title="{{ option.label.nama }}">{{ option.label.nama }}</span>
     </td>
     <td class="text-left">{{ option.label.tahun_mulai }}</td>
-    <td class="text-left">
+    <td class="text-left !align-middle">
         {% if option.badge_template %}
             {% include option.badge_template %}
         {% endif %}
@@ -21,7 +21,7 @@
         {% endif %}
     </td>
     <td class="text-left">{{ option.tahun_mulai }}</td>
-    <td class="text-left">
+    <td class="text-left !align-middle">
         {% if badge_template %}
             {% include badge_template %}
         {% endif %}
