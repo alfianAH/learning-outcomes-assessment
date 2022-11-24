@@ -4,13 +4,20 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from urllib.parse import urlencode
 import os
+from .forms import MahasiswaAuthForm
 from .utils import get_oauth_access_token, validate_user
 
 
 # Create your views here.
 def login_view(request: HttpRequest):
+    form = MahasiswaAuthForm(request, data=request.POST or None)
+
+    if form.is_valid():
+        pass
+
     context = {
-        'oauth_url': reverse('accounts:oauth')
+        'oauth_url': reverse('accounts:oauth'),
+        'form': form
     }
     return render(request, 'accounts/login.html', context=context)
 
