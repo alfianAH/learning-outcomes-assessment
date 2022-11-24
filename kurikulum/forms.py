@@ -1,8 +1,10 @@
 from django import forms
 from django.conf import settings
+from semester.models import Semester
 from widgets.widgets import ChoiceListInteractive
 from .utils import (
     get_kurikulum_by_prodi_choices,
+    get_semester_by_kurikulum,
 )
 
 
@@ -24,6 +26,30 @@ class KurikulumFromNeosia(forms.Form):
         super().__init__(*args, **kwargs)
         
         kurikulum_choices = get_kurikulum_by_prodi_choices(self.user.prodi.id_neosia)
+
+        for i, (kurikulum_id, _) in enumerate(kurikulum_choices):
+            semester_by_kurikulum = get_semester_by_kurikulum(kurikulum_id)
+
+            if len(semester_by_kurikulum) > 0: 
+                is_all_semester_sync = True
+                for semester_data in semester_by_kurikulum:
+                    semester_id = semester_data['id_neosia']
+                    semester_in_db = Semester.objects.filter(id_neosia=int(semester_id))
+                    if semester_in_db.exists(): continue
+                    # Break and set to False if kurikulum has one or more semester to sync
+                    is_all_semester_sync = False
+                    break
+                
+                # If all semester is already synchronized, remove kurikulum choices
+                if is_all_semester_sync: 
+                    kurikulum_choices.pop(i)
+                continue
+            
+            # Set input with kurikulum that has no semester to false
+            self.fields.get('kurikulum_from_neosia').widget.condition_dict.update({
+                kurikulum_id: False
+            })
+        
         self.fields['kurikulum_from_neosia'].choices = kurikulum_choices
 
     def clean(self):

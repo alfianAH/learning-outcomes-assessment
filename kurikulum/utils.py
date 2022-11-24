@@ -95,7 +95,7 @@ def get_mata_kuliah_kurikulum(kurikulum_id: int, prodi_id: int):
         mata_kuliah = {
             'prodi': mata_kuliah_data['id_prodi'],
             'kurikulum': mata_kuliah_data['id_kurikulum'],
-            'id_neosia': mata_kuliah_data['id'],
+            'id_neosia': mata_kuliah_data['id_mata_kuliah'],
             'kode': mata_kuliah_data['kode'],
             'nama': mata_kuliah_data['nama_resmi'],
             'sks': mata_kuliah_data['jumlah_sks']
@@ -107,29 +107,36 @@ def get_mata_kuliah_kurikulum(kurikulum_id: int, prodi_id: int):
 
 
 def get_semester_by_kurikulum(kurikulum_id: int):
-    """Get semester by kurikulum
+    """Get semesters by kurikulum
 
     Args:
         kurikulum_id (int): Kurikulum ID
 
     Returns:
-        list: All semester by kurikulum ID
+        list: All semesters by kurikulum
     """
 
     # Request semester by kurikulum
     parameters = {
         'id_kurikulum': kurikulum_id
     }
-    # TODO: OPTIMIZE QUERY
     json_response = request_data_to_neosia(SEMESTER_BY_KURIKULUM_URL, params=parameters)
-    list_semester_id = []
-    if json_response is None: return list_semester_id
+    list_semester = []
+    if json_response is None: return list_semester
     
-    # Get all semester IDs
+    # Get all semester
     for semester_data in json_response:
-        semester_id = semester_data['id_semester']
-        list_semester_id.append(semester_id)
-    return list_semester_id
+        semester = {
+            'id_neosia': semester_data['id_semester'],
+            'tahun_ajaran': semester_data['tahun_ajaran'],
+            'tipe_semester': semester_data['jenis'],
+            'nama': 'Semester {} {}'.format(
+                semester_data['tahun_ajaran'],
+                semester_data['jenis'].capitalize()
+            ),
+        }
+        list_semester.append(semester)
+    return list_semester
 
 
 def get_detail_semester(semester_id: int):
@@ -168,30 +175,10 @@ def get_kurikulum_by_prodi_choices(prodi_id: int):
     kurikulum_choices = []
 
     for kurikulum_data in json_response:
-        id_kurikulum = kurikulum_data['id_neosia']
-        id_prodi = kurikulum_data['prodi']
-
-        mk_kurikulum_response = get_mata_kuliah_kurikulum(id_kurikulum, id_prodi)
-        semester_by_kurikulum_response = get_semester_by_kurikulum(id_kurikulum)
-        
-        if len(mk_kurikulum_response) == 0 and len(semester_by_kurikulum_response) == 0: continue
-        
-        # Search in database
-        is_all_semester_sync = True
-        for semester_id in semester_by_kurikulum_response:
-            semester_in_db = Semester.objects.filter(id_neosia=int(semester_id))
-            if semester_in_db.exists(): continue
-            # Break and set to False if kurikulum has one or more semester to sync
-            is_all_semester_sync = False
-            break
-        
-        # If all semester is already synchronized, continue
-        if is_all_semester_sync: continue
-        
         kurikulum_choice = kurikulum_data['id_neosia'], kurikulum_data
         kurikulum_choices.append(kurikulum_choice)
     
-    return tuple(kurikulum_choices)
+    return kurikulum_choices
 
 
 def get_semester_by_kurikulum_choices(kurikulum_id: int):
@@ -205,25 +192,18 @@ def get_semester_by_kurikulum_choices(kurikulum_id: int):
     """
 
     # Request semester by kurikulum
-    list_semester_id = get_semester_by_kurikulum(kurikulum_id)
-    new_list_semester_id = []
-    for semester_id in list_semester_id:
+    list_semester = get_semester_by_kurikulum(kurikulum_id)
+    semester_choices = []
+
+    # Get all detail semester by semester ID
+    for semester_data in list_semester:
+        semester_id = semester_data['id_neosia']
         # Search in database
         object_in_db = SemesterKurikulum.objects.filter(semester=int(semester_id))
         if object_in_db.exists(): continue
 
-        new_list_semester_id.append(semester_id)
-
-    semester_choices = []
-    if len(new_list_semester_id) == 0: return semester_choices
-
-    # Get all detail semester by semester ID
-    for semester_id in new_list_semester_id:
-        semester_choice = get_detail_semester(semester_id)
-        if semester_choice is None: continue
-
         # Convert it to input value, options
-        semester_choice = semester_choice['id_neosia'], semester_choice
+        semester_choice = semester_data['id_neosia'], semester_data
         semester_choices.append(semester_choice)
     
     return semester_choices

@@ -14,6 +14,7 @@ class ChoiceListInteractive(CheckboxSelectMultiple):
     list_custom_field_template: str = None
     table_custom_field_template: str = None
     table_custom_field_header_template: str = None
+    condition_dict: dict = {}
 
     def __init__(self, 
         badge_template: str = None, 
@@ -29,6 +30,14 @@ class ChoiceListInteractive(CheckboxSelectMultiple):
 
     def create_option(self, *args, **kwargs):
         option = super().create_option(*args, **kwargs)
+        if len(self.condition_dict.items()) != 0:
+            for key, value in self.condition_dict.items():
+                # check the right value
+                if option['value'] != key: continue
+                # If value is true, continue
+                if value: continue
+                # If value is False, make it disabled
+                option['attrs']['disabled'] = ''
         
         # Add badget template
         if self.badge_template is not None:

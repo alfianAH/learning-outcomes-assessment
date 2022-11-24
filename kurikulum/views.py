@@ -1,4 +1,5 @@
 import json
+from collections import OrderedDict
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
@@ -181,7 +182,9 @@ class KurikulumReadAllSyncFormWizardView(SessionWizardView):
             kurikulum_id: semester_by_kurikulum
         }
 
-        return result
+        sorted_result_by_kurikulum_id = OrderedDict(sorted(result.items()))
+
+        return sorted_result_by_kurikulum_id
 
     def save_semester(self, semester_id: int, semester_by_kurikulum: dict):
         semester_detail = get_detail_semester(semester_id)
@@ -207,7 +210,8 @@ class KurikulumReadAllSyncFormWizardView(SessionWizardView):
 
         # Get kurikulum
         kurikulum_obj: Kurikulum = None
-        for kurikulum_id, list_semester_id in semester_by_kurikulum.items():
+        for kurikulum_id, list_semester_data in semester_by_kurikulum.items():
+            list_semester_id = [semester_data['id_neosia'] for semester_data in list_semester_data]
             if semester_id not in list_semester_id: continue
             kurikulum_obj = Kurikulum.objects.get(id_neosia=kurikulum_id)
             break
