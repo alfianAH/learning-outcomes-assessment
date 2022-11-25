@@ -1,9 +1,11 @@
 from django.http import HttpRequest, JsonResponse
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, authenticate
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from urllib.parse import urlencode
 import os
+
+from accounts.enums import RoleChoices
 from .forms import MahasiswaAuthForm
 from .utils import get_oauth_access_token, validate_user
 
@@ -13,7 +15,8 @@ def login_view(request: HttpRequest):
     form = MahasiswaAuthForm(request, data=request.POST or None)
 
     if form.is_valid():
-        pass
+        login(request, user=form.get_user())
+        return redirect('/')
 
     context = {
         'oauth_url': reverse('accounts:oauth'),
@@ -38,8 +41,16 @@ def oauth_callback(request: HttpRequest):
     code = request.GET['code']
     access_token = get_oauth_access_token(code)
     user = validate_user(access_token)
+    is_admin = user.get('administrator') == 1
+    if is_admin:
+        user = authenticate(request, user=user, role=RoleChoices.ADMIN_PRODI)
+    else:
+        user = authenticate(request, user=user, role=RoleChoices.DOSEN)
+    
+    login(request, user=user)
 
-    return JsonResponse({'access_token': user})
+    return redirect('/')
+    # return JsonResponse(user)
 
 def logout_view(request: HttpRequest):
     logout(request)

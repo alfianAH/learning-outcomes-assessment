@@ -11,9 +11,10 @@ from .enums import RoleChoices
 MBERKAS_OAUTH_TOKEN_URL = 'https://mberkas.unhas.ac.id/oauth/token'
 MBERKAS_OAUTH_BEARER = 'https://mberkas.unhas.ac.id/api/checkStatus'
 
-MHS_PROFILE_URL = "https://customapi.neosia.unhas.ac.id/GetProfilMhs"
-DOSEN_PROFILE_URL = ""
-ADMIN_PROFILE_URL = ""
+MHS_AUTH_URL = 'https://customapi.neosia.unhas.ac.id/checkMahasiswa2'
+
+MHS_PROFILE_URL = 'https://customapi.neosia.unhas.ac.id/GetProfilMhs'
+DOSEN_PROFILE_URL = 'http://apps.unhas.ac.id/nusoap/serviceApps.php'
 
 
 def get_user_profile(user: dict, role: str):
@@ -27,34 +28,32 @@ def get_user_profile(user: dict, role: str):
         dict: JSON response from Neosia API
     """
 
-    parameters = {}
-    headers = {
-        "token": os.environ.get("NEOSIA_API_TOKEN")
-    }
-
     # Request authenticated user's profile
     match(role):
-        case RoleChoices.ADMIN_PRODI:
-            response = request_data_to_neosia(ADMIN_PROFILE_URL, parameters, headers)
-        case RoleChoices.DOSEN:
-            response = request_data_to_neosia(DOSEN_PROFILE_URL, parameters, headers)
+        # case RoleChoices.DOSEN:
+        #     response = request_data_to_neosia(DOSEN_PROFILE_URL, parameters, headers)
         case RoleChoices.MAHASISWA:
-            parameters["nim"] = user['username']
+            parameters = {
+                'nim': user
+            }
+            headers = {
+                'token': os.environ.get('NEOSIA_API_TOKEN')
+            }
             response = request_data_to_neosia(MHS_PROFILE_URL, parameters, headers)
     
-    if response is None: return None
+            if response is None: return None
 
-    if response.status_code == 200:
-        json_response = response.json()
+            if response.status_code == 200:
+                json_response = response.json()
 
-        # Return None if the request has no data
-        if len(json_response["data"]) == 0: return None
-        
-        user_profile = json_response["data"][0]
-        return user_profile
-    else:
-        print(response)
-        return None
+                # Return None if the request has no data
+                if len(json_response['data']) == 0: return None
+                
+                user_profile = json_response['data'][0]
+                return user_profile
+            else:
+                if settings.DEBUG: print(response.reason)
+                return None
 
 def request_data_to_neosia(auth_url: str, parameters: dict, headers: dict):
     """Request data to Neosia API
@@ -137,4 +136,29 @@ def validate_user(access_token: str):
         return user
     else:
         if settings.DEBUG: print(response.raw)
+        return None
+
+def validate_mahasiswa(username: str, password: str):
+    parameters = {
+        'username': username,
+        'password': password
+    }
+    headers = {
+        'token': os.environ.get('NEOSIA_API_TOKEN')
+    }
+
+    response = request_data_to_neosia(MHS_AUTH_URL, parameters, headers)
+
+    if response is None: return None
+
+    if response.status_code == 200:
+        json_response = response.json()
+
+        # Return None if the request is not success
+        if json_response['success'] == '0': return None
+        
+        user = json_response['data']
+        return user
+    else:
+        print(response)
         return None

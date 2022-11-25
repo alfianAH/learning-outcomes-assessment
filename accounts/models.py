@@ -13,7 +13,7 @@ class Fakultas(models.Model):
 
 
 class ProgramStudi(models.Model):
-    fakultas = models.ForeignKey(Fakultas, on_delete=models.CASCADE)
+    fakultas = models.ForeignKey(Fakultas, on_delete=models.CASCADE, null=True)
     id_neosia = models.IntegerField(unique=True, null=False, primary_key=True)
     nama = models.CharField(max_length=100, null=False)
 
@@ -25,8 +25,8 @@ class UserOAuthManager(UserManager):
     def create_admin_prodi_user(self, user: dict, prodi: ProgramStudi):
         admin_prodi_group, _ = Group.objects.get_or_create(name='Admin Program Studi')
         new_user = self.create_user(
-            user['nip'],
-            user['nama_admin'],
+            user['username'],
+            user['nama'],
             RoleChoices.ADMIN_PRODI,
             prodi
         )
@@ -37,8 +37,8 @@ class UserOAuthManager(UserManager):
     def create_dosen_user(self, user: dict, prodi: ProgramStudi):
         dosen_group, _ = Group.objects.get_or_create(name='Dosen')
         new_user = self.create_user(
-            user['nip'],
-            user['nama_dosen'],
+            user['username'],
+            user['nama'],
             RoleChoices.DOSEN,
             prodi
         )
@@ -77,9 +77,9 @@ class MyUser(AbstractUser):
     password = None
     
     objects = UserOAuthManager()
-    prodi = models.ForeignKey(ProgramStudi, on_delete=models.CASCADE)
+    prodi = models.ForeignKey(ProgramStudi, on_delete=models.CASCADE, null=True)
     username = models.CharField(max_length=50, unique=True, null=False)
-    name = models.CharField(max_length=100, null=False)
+    name = models.CharField(max_length=255, null=False)
     role = models.CharField(max_length=1, choices=RoleChoices.choices, null=False)
 
     def __str__(self) -> str:
