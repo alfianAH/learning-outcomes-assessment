@@ -1746,6 +1746,10 @@ details.dropdown::marker {
   background-color: transparent;
 }
 
+.form-wizard-parent {
+  width: 100%;
+}
+
 .form-wizard-content {
   position: relative;
 }
@@ -1869,12 +1873,6 @@ details.dropdown::marker {
   padding-right: 0.5rem;
   padding-top: 0.5rem;
   padding-bottom: 0.75rem;
-}
-
-@media (min-width: 640px) {
-  .list-item-model-a:nth-child(even) {
-    margin-left: 0.625rem;
-  }
 }
 
 .list-item-model-a.active {
@@ -2003,6 +2001,31 @@ details.dropdown::marker {
 .dark .list-item-model-c.active {
   --tw-bg-opacity: 1;
   background-color: rgb(63 63 70 / var(--tw-bg-opacity));
+}
+
+.list-item-model-c .list-item-model-a {
+  border-radius: 0.375rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .list-item-model-c .list-item-model-a {
+    padding-left: 0.625rem;
+    padding-right: 0.625rem;
+    padding-top: 0.625rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .list-item-model-c .list-item-model-a {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    padding-top: 0.75rem;
+    padding-bottom: 1rem;
+  }
 }
 
 /* Model D */
@@ -2886,6 +2909,14 @@ details.dropdown::marker {
   margin-left: 0.625rem;
 }
 
+.mt-2\.5 {
+  margin-top: 0.625rem;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
 .ml-1 {
   margin-left: 0.25rem;
 }
@@ -3148,6 +3179,16 @@ details.dropdown::marker {
 
 .bg-transparent {
   background-color: transparent;
+}
+
+.bg-emerald-300 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(110 231 183 / var(--tw-bg-opacity));
+}
+
+.bg-rose-300 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(253 164 175 / var(--tw-bg-opacity));
 }
 
 .bg-neutral-300 {
@@ -3559,6 +3600,16 @@ details.dropdown::marker {
   background-color: transparent;
 }
 
+.dark .dark\:bg-emerald-900 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(6 78 59 / var(--tw-bg-opacity));
+}
+
+.dark .dark\:bg-rose-900 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(136 19 55 / var(--tw-bg-opacity));
+}
+
 .dark .dark\:bg-zinc-600 {
   --tw-bg-opacity: 1;
   background-color: rgb(82 82 91 / var(--tw-bg-opacity));
@@ -3670,6 +3721,12 @@ details.dropdown::marker {
     --tw-space-y-reverse: 0;
     margin-top: calc(0px * calc(1 - var(--tw-space-y-reverse)));
     margin-bottom: calc(0px * var(--tw-space-y-reverse));
+  }
+
+  .sm\:space-x-3 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 0;
+    margin-right: calc(0.75rem * var(--tw-space-x-reverse));
+    margin-left: calc(0.75rem * calc(1 - var(--tw-space-x-reverse)));
   }
 
   .sm\:space-x-2\.5 > :not([hidden]) ~ :not([hidden]) {

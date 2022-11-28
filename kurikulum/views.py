@@ -28,6 +28,7 @@ from .filters import (
 from .forms import (
     KurikulumFromNeosia,
     SemesterFromNeosia,
+    UpdateKurikulum,
 )
 from .utils import (
     get_detail_kurikulum,
@@ -41,7 +42,7 @@ from .utils import (
 # Create your views here.
 class KurikulumReadAllSyncFormWizardView(SessionWizardView):
     template_name: str = 'kurikulum/read-all-sync-form.html'
-    form_list: list = [KurikulumFromNeosia, SemesterFromNeosia]
+    form_list: list = [KurikulumFromNeosia, SemesterFromNeosia, UpdateKurikulum]
     latest_page: str = '0'
     revealed_page: list = []
 
@@ -50,7 +51,7 @@ class KurikulumReadAllSyncFormWizardView(SessionWizardView):
         if step is None: step = self.steps.current
         self.update_latest_page(step)
         self.update_revealed_page(step)
-        if step == '0':
+        if step == '0' or step == '2':
             form_kwargs.update({'user': self.request.user})
         
         return form_kwargs

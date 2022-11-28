@@ -1,16 +1,20 @@
 from django import forms
 from django.conf import settings
 from semester.models import SemesterKurikulum
-from widgets.widgets import ChoiceListInteractive
+from widgets.widgets import (
+    ChoiceListInteractiveModelA,
+    UpdateChoiceList,
+)
 from .utils import (
     get_kurikulum_by_prodi_choices,
     get_semester_by_kurikulum,
+    get_update_kurikulum_choices,
 )
 
 
 class KurikulumFromNeosia(forms.Form):
     kurikulum_from_neosia = forms.MultipleChoiceField(
-        widget=ChoiceListInteractive(
+        widget=ChoiceListInteractiveModelA(
             badge_template='kurikulum/partials/badge-list-kurikulum.html',
             list_custom_field_template='kurikulum/partials/list-custom-field-kurikulum.html',
             table_custom_field_template='kurikulum/partials/table-custom-field-kurikulum.html',
@@ -73,7 +77,7 @@ class KurikulumFromNeosia(forms.Form):
 
 class SemesterFromNeosia(forms.Form):
     semester_from_neosia = forms.MultipleChoiceField(
-        widget=ChoiceListInteractive(
+        widget=ChoiceListInteractiveModelA(
             badge_template='kurikulum/partials/badge-list-semester.html',
             list_custom_field_template='kurikulum/partials/list-custom-field-semester.html',
             table_custom_field_template='kurikulum/partials/table-custom-field-semester.html',
@@ -101,10 +105,33 @@ class SemesterFromNeosia(forms.Form):
             new_id_semester_from_neosia.append(id)
         
         cleaned_data['semester_from_neosia'] = new_id_semester_from_neosia
-        is_semester_valid = len(new_id_semester_from_neosia) > 0
+
+        if settings.DEBUG: print("Clean data: {}".format(cleaned_data))
         
-        if not is_semester_valid:
-            self.add_error('semester_from_neosia', 'Pilih minimal 1 (satu) semester')
+        return cleaned_data
+
+
+class UpdateKurikulum(forms.Form):
+    update_data_kurikulum = forms.MultipleChoiceField(
+        widget=UpdateChoiceList(
+            badge_template='kurikulum/partials/badge-list-kurikulum.html',
+            list_custom_field_template='kurikulum/partials/list-custom-field-kurikulum.html',
+        ),
+        label = 'Update Data Kurikulum',
+        help_text = 'Data yang berwarna hijau merupakan data terbaru dari Neosia.<br>Data yang berwarna merah merupakan data lama pada sistem ini.<br>Beri centang pada item yang ingin anda update.',
+        required = False,
+    )
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user')
+        super().__init__(*args, **kwargs)
+
+        update_kurikulum_choices = get_update_kurikulum_choices(self.user.prodi.id_neosia)
+
+        self.fields['update_data_kurikulum'].choices = update_kurikulum_choices
+
+    def clean(self):
+        cleaned_data = super().clean()
 
         if settings.DEBUG: print("Clean data: {}".format(cleaned_data))
         

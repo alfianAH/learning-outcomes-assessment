@@ -219,3 +219,32 @@ def get_semester_by_kurikulum_choices(kurikulum_id: int):
         semester_choices.append(semester_choice)
     
     return semester_choices
+
+
+def get_update_kurikulum_choices(prodi_id: int):
+    json_response = get_kurikulum_by_prodi(prodi_id)
+    update_kurikulum_choices = []
+
+    for kurikulum_data in json_response:
+        id_kurikulum = kurikulum_data['id_neosia']
+
+        try:
+            kurikulum_obj = Kurikulum.objects.get(id_neosia=id_kurikulum)
+        except Kurikulum.DoesNotExist:
+            continue
+        except Kurikulum.MultipleObjectsReturned:
+            if settings.DEBUG: print('Kurikulum object returns multiple objects. ID: {}'.format(id_kurikulum))
+            continue
+        
+        isDataOkay = kurikulum_obj.id_neosia == id_kurikulum and kurikulum_obj.nama == kurikulum_data['nama'] and kurikulum_obj.is_active == kurikulum_data['is_active'] and kurikulum_obj.tahun_mulai == kurikulum_data['tahun_mulai']
+
+        if isDataOkay: continue
+
+        update_kurikulum_data = {
+            'new': kurikulum_data,
+            'old': kurikulum_obj,
+        }
+        update_kurikulum_choice = id_kurikulum, update_kurikulum_data
+        update_kurikulum_choices.append(update_kurikulum_choice)
+
+    return update_kurikulum_choices
