@@ -374,7 +374,7 @@
 
     /* Model A */
     .list-item-model-a{
-        @apply px-2 pt-2 pb-3 sm:even:ml-2.5 space-y-2 w-full border-b border-b-slate-400;
+        @apply px-2 pt-2 pb-3 space-y-2 w-full border-b border-b-slate-400;
     }
 
     .list-item-model-a.active{
