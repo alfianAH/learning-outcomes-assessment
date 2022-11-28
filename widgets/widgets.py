@@ -5,11 +5,11 @@ from django.forms.widgets import (
     Select,
 )
 
-class ChoiceListInteractive(CheckboxSelectMultiple):
+class ChoiceListInteractiveModelA(CheckboxSelectMultiple):
     is_required: bool = False
     input_type: str = 'checkbox'
-    template_name: str = 'custom-widgets/forms/widgets/checkbox-select-list-item-model-a.html'
-    option_template_name: str = 'custom-widgets/forms/widgets/checkbox-option-list-item-model-a.html'
+    template_name: str = 'custom-widgets/forms/widgets/list-item-model-a/checkbox-select-list-item-model-a.html'
+    option_template_name: str = 'custom-widgets/forms/widgets/list-item-model-a/checkbox-option-list-item-model-a.html'
     badge_template: str = None
     list_custom_field_template: str = None
     table_custom_field_template: str = None
