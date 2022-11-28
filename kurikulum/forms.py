@@ -1,6 +1,6 @@
 from django import forms
 from django.conf import settings
-from semester.models import Semester
+from semester.models import SemesterKurikulum
 from widgets.widgets import ChoiceListInteractive
 from .utils import (
     get_kurikulum_by_prodi_choices,
@@ -31,10 +31,11 @@ class KurikulumFromNeosia(forms.Form):
             semester_by_kurikulum = get_semester_by_kurikulum(kurikulum_id)
 
             if len(semester_by_kurikulum) > 0: 
+                # Check in database
                 is_all_semester_sync = True
                 for semester_data in semester_by_kurikulum:
                     semester_id = semester_data['id_neosia']
-                    semester_in_db = Semester.objects.filter(id_neosia=int(semester_id))
+                    semester_in_db = SemesterKurikulum.objects.filter(semester=int(semester_id), kurikulum=kurikulum_id)
                     if semester_in_db.exists(): continue
                     # Break and set to False if kurikulum has one or more semester to sync
                     is_all_semester_sync = False
