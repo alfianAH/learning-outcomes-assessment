@@ -330,6 +330,9 @@ class KurikulumReadAllView(ListView):
         return objects
 
     def get_ordering(self):
+        if self.kurikulum_sort is None:
+            return super().get_ordering()
+        
         if self.kurikulum_sort.is_valid():
             self.ordering = self.kurikulum_sort.cleaned_data.get('ordering_by', 'tahun_mulai')
         return super().get_ordering()

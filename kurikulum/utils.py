@@ -89,18 +89,30 @@ def get_mata_kuliah_kurikulum(kurikulum_id: int, prodi_id: int):
 
     json_response = request_data_to_neosia(MATA_KULIAH_KURIKULUM_URL, params=parameters)
     list_mata_kuliah_kurikulum = []
+    list_id_mk_kurikulum = []
     if json_response is None: return list_mata_kuliah_kurikulum
 
     for mata_kuliah_data in json_response:
+        id_mk_kurikulum = mata_kuliah_data['id_mata_kuliah']
+        sks_mk_kurikulum = mata_kuliah_data['jumlah_sks']
+
+        # Add all SKS to existing MK Kurikulum
+        if id_mk_kurikulum in list_id_mk_kurikulum:
+            for mk_kurikulum in list_mata_kuliah_kurikulum:
+                if mk_kurikulum['id_neosia'] != id_mk_kurikulum: continue
+                mk_kurikulum['sks'] += sks_mk_kurikulum
+            continue
+
         mata_kuliah = {
             'prodi': mata_kuliah_data['id_prodi'],
             'kurikulum': mata_kuliah_data['id_kurikulum'],
-            'id_neosia': mata_kuliah_data['id_mata_kuliah'],
+            'id_neosia': id_mk_kurikulum,
             'kode': mata_kuliah_data['kode'],
             'nama': mata_kuliah_data['nama_resmi'],
-            'sks': mata_kuliah_data['jumlah_sks']
+            'sks': sks_mk_kurikulum,
         }
 
+        list_id_mk_kurikulum.append(id_mk_kurikulum)
         list_mata_kuliah_kurikulum.append(mata_kuliah)
     
     return list_mata_kuliah_kurikulum
