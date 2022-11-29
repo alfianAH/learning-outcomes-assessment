@@ -29,13 +29,15 @@ from .forms import (
     KurikulumFromNeosia,
     BulkUpdateKurikulum,
 )
+from .utils import (
+    get_detail_kurikulum,
+    get_mata_kuliah_kurikulum,
+)
 from semester.forms import(
     SemesterFromNeosia,
     BulkUpdateSemester,
 )
-from .utils import (
-    get_detail_kurikulum,
-    get_mata_kuliah_kurikulum,
+from semester.utils import(
     get_detail_semester,
     get_semester_by_kurikulum,
     get_semester_by_kurikulum_choices,

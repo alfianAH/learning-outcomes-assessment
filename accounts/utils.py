@@ -1,8 +1,6 @@
 from django.conf import settings
-from requests.exceptions import MissingSchema
 import os
-import requests
-
+from learning_outcomes_assessment.utils import request_data_to_neosia
 from .enums import RoleChoices
 
 
@@ -97,25 +95,3 @@ def get_user_profile(username:str, role: str):
     else:
         if settings.DEBUG: print(response.raw)
         return None
-
-def request_data_to_neosia(auth_url: str, params: dict, headers: dict):
-    """Request data to Neosia API
-
-    Args:
-        auth_url (str): Target URL
-        params (dict): Requested parameters
-        headers (dict): Requested headers
-
-    Returns:
-        Response: Response from Neosia API
-    """
-
-    try:
-        response = requests.post(auth_url, params=params, headers=headers)
-    except MissingSchema:
-        if settings.DEBUG: print('There are no response')
-        return None
-    except requests.exceptions.SSLError:
-        if settings.DEBUG: print("SSL Error")
-        response = requests.post(auth_url, params=params, headers=headers, verify=False)
-    return response

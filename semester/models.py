@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from kurikulum.models import Kurikulum
-from .utils import extract_tahun_ajaran
+from learning_outcomes_assessment.utils import extract_tahun_ajaran
 
 # Create your models here.
 class TipeSemester(models.IntegerChoices):

@@ -4,7 +4,10 @@ from django.conf import settings
 from .utils import (
     get_update_semester_choices,
 )
-from widgets.widgets import ChoiceListInteractiveModelA, UpdateChoiceList
+from learning_outcomes_assessment.widgets import (
+    ChoiceListInteractiveModelA, 
+    UpdateChoiceList,
+)
 
 
 class SemesterFromNeosia(forms.Form):

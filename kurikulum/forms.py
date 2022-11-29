@@ -1,13 +1,15 @@
 from django import forms
 from django.conf import settings
 from semester.models import SemesterKurikulum
-from widgets.widgets import (
+from learning_outcomes_assessment.widgets import (
     ChoiceListInteractiveModelA,
     UpdateChoiceList,
 )
+from semester.utils import (
+    get_semester_by_kurikulum,
+)
 from .utils import (
     get_kurikulum_by_prodi_choices,
-    get_semester_by_kurikulum,
     get_update_kurikulum_choices,
 )
 

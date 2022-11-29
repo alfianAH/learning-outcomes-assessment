@@ -1,7 +1,7 @@
 import django_filters as filter
 from django import forms
 from distutils.util import strtobool
-from widgets.widgets import (
+from learning_outcomes_assessment.widgets import (
     MyNumberInput,
     MyRadioInput,
     MySearchInput,
