@@ -520,11 +520,13 @@ class KurikulumReadView(DetailView):
         })
 
         if self.mk_kurikulum_filter is not None:
+            context['mk_data_exist'] = True
             context['mk_filter_form'] = self.mk_kurikulum_filter.form
         if self.mk_kurikulum_sort is not None:
             context['mk_sort_form'] = self.mk_kurikulum_sort
         
         if self.semester_filter is not None:
+            context['semester_data_exist'] = True
             context['semester_filter_form'] = self.semester_filter.form
         if self.semester_sort is not None:
             context['semester_sort_form'] = self.semester_sort
