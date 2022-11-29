@@ -27,8 +27,10 @@ from .filters import (
 )
 from .forms import (
     KurikulumFromNeosia,
-    SemesterFromNeosia,
     BulkUpdateKurikulum,
+)
+from semester.forms import(
+    SemesterFromNeosia,
 )
 from .utils import (
     get_detail_kurikulum,
@@ -319,15 +321,17 @@ class KurikulumBulkUpdateView(FormView):
         return redirect(self.success_url)
 
 
-class KurikulumReadSyncView(View):
+class KurikulumReadSyncView(SessionWizardView):
     """Kurikulum synchronization from Neosia
     What to do in sync:
     1. Create Mata Kuliah Kurikulum
     2. Create Semester in Kurikulum PK
-        1. Create Mata Kuliah Semester
     3. Update Semester in Kurikulum PK
     """
-    pass
+    template_name: str = 'kurikulum/read-all-sync-form.html'
+    form_list: list = [KurikulumFromNeosia, SemesterFromNeosia]
+    latest_page: str = '0'
+    revealed_page: list = []
 
 
 class KurikulumReadAllView(ListView):
@@ -502,12 +506,12 @@ class KurikulumReadView(DetailView):
             'mk_bulk_delete_url': self.get_object().get_mk_bulk_delete(),
             
             'semester_objects': semester_objects,
-            'semester_filter_template': 'kurikulum/partials/semester-filter-form.html',
-            'semester_sort_template': 'kurikulum/partials/semester-sort-form.html',
-            'semester_badge_template': 'kurikulum/partials/badge-list-semester.html',
-            'semester_list_custom_field_template': 'kurikulum/partials/list-custom-field-semester.html',
-            'semester_table_custom_field_header_template': 'kurikulum/partials/table-custom-field-header-semester.html',
-            'semester_table_custom_field_template': 'kurikulum/partials/table-custom-field-semester.html',
+            'semester_filter_template': 'semester/partials/semester-filter-form.html',
+            'semester_sort_template': 'semester/partials/semester-sort-form.html',
+            'semester_badge_template': 'semester/partials/badge-list-semester.html',
+            'semester_list_custom_field_template': 'semester/partials/list-custom-field-semester.html',
+            'semester_table_custom_field_header_template': 'semester/partials/table-custom-field-header-semester.html',
+            'semester_table_custom_field_template': 'semester/partials/table-custom-field-semester.html',
             'semester_prefix_id': 'semester-',
             'semester_bulk_delete_url': self.get_object().get_semester_bulk_delete(),
             
