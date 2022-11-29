@@ -56,3 +56,7 @@ def extract_tahun_ajaran(tahun_ajaran: str) -> dict:
         print('Tahun ajaran difference is too far. Tahun ajaran awal: {}, Tahun ajaran akhir: {}'.format(tahun_ajaran_awal, tahun_ajaran_akhir))
 
     return result
+
+
+def get_update_semester_choices(kurikulum_id: int):
+    pass

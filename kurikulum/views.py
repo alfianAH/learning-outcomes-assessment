@@ -31,6 +31,7 @@ from .forms import (
 )
 from semester.forms import(
     SemesterFromNeosia,
+    BulkUpdateSemester,
 )
 from .utils import (
     get_detail_kurikulum,
@@ -329,7 +330,7 @@ class KurikulumReadSyncView(SessionWizardView):
     3. Update Semester in Kurikulum PK
     """
     template_name: str = 'kurikulum/read-all-sync-form.html'
-    form_list: list = [KurikulumFromNeosia, SemesterFromNeosia]
+    form_list: list = [SemesterFromNeosia, BulkUpdateSemester]
     latest_page: str = '0'
     revealed_page: list = []
 

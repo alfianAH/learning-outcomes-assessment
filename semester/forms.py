@@ -41,3 +41,22 @@ class SemesterFromNeosia(forms.Form):
         if settings.DEBUG: print("Clean data: {}".format(cleaned_data))
         
         return cleaned_data
+
+
+class BulkUpdateSemester(forms.Form):
+    update_data_semester = forms.MultipleChoiceField(
+        widget=UpdateChoiceList(
+            badge_template='semester/partials/badge-list-semester.html',
+            list_custom_field_template='semester/partials/list-custom-field-semester.html',
+        ),
+        label = 'Update Data Semester',
+        help_text = 'Data yang berwarna hijau merupakan data terbaru dari Neosia.<br>Data yang berwarna merah merupakan data lama pada sistem ini.<br>Beri centang pada item yang ingin anda update.',
+        required = False,
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        update_semester_choices = get_update_semester_choices(self.user.prodi.id_neosia)
+
+        self.fields['update_data_semester'].choices = update_semester_choices
