@@ -423,11 +423,16 @@ function searchTextInList(formId) {
     
     let list = $(`ol#${formId}`);
     let listItems = $(list).find('li');
-
+    
     let tbody = $(`table#${formId}`).find('tbody');
     let trows = $(tbody).find('tr');
+
+    rowsLength = listItems.length;
+    if (rowsLength == 0) {
+        rowsLength == trows.length;
+    }
   
-    for (let i = 0; i < trows.length; i++) {
+    for (let i = 0; i < rowsLength; i++) {
         let listItem = $(listItems[i]).find('.list-item-title');
         let column = $(trows[i]).find('td')[0];
         

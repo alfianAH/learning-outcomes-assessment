@@ -4,6 +4,7 @@ from .views import (
     KurikulumReadSyncView,
     KurikulumReadAllView,
     KurikulumReadView,
+    KurikulumBulkUpdateView,
     KurikulumBulkDeleteView,
 
     MataKuliahKurikulumReadView,
@@ -16,8 +17,9 @@ from .views import (
 app_name = 'kurikulum'
 urlpatterns = [
     path('', KurikulumReadAllView.as_view(), name='read-all'),
-    path('sync/', KurikulumReadAllSyncFormWizardView.as_view(), name='read-all-sync'),
+    path('create/', KurikulumReadAllSyncFormWizardView.as_view(), name='read-all-sync'),
     path('delete/', KurikulumBulkDeleteView.as_view(), name='bulk-delete'),
+    path('update/', KurikulumBulkUpdateView.as_view(), name='bulk-update'),
     path('<int:kurikulum_id>/sync/', KurikulumReadSyncView.as_view(), name='read-sync'),
     path('<int:kurikulum_id>/', KurikulumReadView.as_view(), name='read'),
 

@@ -3,10 +3,10 @@ from collections import OrderedDict
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views.generic.base import View
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import DeleteView
+from django.views.generic.edit import DeleteView, FormView
 from django.views.generic.list import ListView
 from formtools.wizard.views import SessionWizardView
 
@@ -28,7 +28,7 @@ from .filters import (
 from .forms import (
     KurikulumFromNeosia,
     SemesterFromNeosia,
-    UpdateKurikulum,
+    BulkUpdateKurikulum,
 )
 from .utils import (
     get_detail_kurikulum,
@@ -42,7 +42,7 @@ from .utils import (
 # Create your views here.
 class KurikulumReadAllSyncFormWizardView(SessionWizardView):
     template_name: str = 'kurikulum/read-all-sync-form.html'
-    form_list: list = [KurikulumFromNeosia, SemesterFromNeosia, UpdateKurikulum]
+    form_list: list = [KurikulumFromNeosia, SemesterFromNeosia]
     latest_page: str = '0'
     revealed_page: list = []
 
@@ -233,6 +233,11 @@ class KurikulumReadAllSyncFormWizardView(SessionWizardView):
 
         semester_kurikulum_obj.save()
 
+    def update_kurikulum(self, kurikulum_id: int):
+        kurikulum_obj = Kurikulum.objects.filter(id_neosia=kurikulum_id)
+        new_kurikulum_data = get_detail_kurikulum(kurikulum_id)
+        kurikulum_obj.update(**new_kurikulum_data)
+
     def done(self, form_list, **kwargs):
         cleaned_data = self.get_all_cleaned_data()
         
@@ -240,8 +245,7 @@ class KurikulumReadAllSyncFormWizardView(SessionWizardView):
         semester_by_kurikulum = {}
         semester_data = cleaned_data.get('semester_from_neosia')
         success_url = reverse('kurikulum:read-all')
-
-        print('Kurikulum: {}'.format(kurikulum_data))
+        
         # Save kurikulum
         for kurikulum_id in kurikulum_data:
             try:
@@ -273,6 +277,46 @@ class KurikulumReadAllSyncFormWizardView(SessionWizardView):
             self.save_semester(semester_id, semester_by_kurikulum)
 
         return redirect(success_url)
+
+
+class KurikulumBulkUpdateView(FormView):
+    form_class = BulkUpdateKurikulum
+    template_name: str = 'kurikulum/kurikulum-update-view.html'
+    success_url = reverse_lazy('kurikulum:read-all')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+    
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        form = self.get_form(form_class=self.form_class)
+        
+        if len(form.fields.get('update_data_kurikulum').choices) == 0:
+            # TODO: ADD MESSAGE
+            return redirect(self.success_url)
+        return super().get(request, *args, **kwargs)
+
+    def update_kurikulum(self, kurikulum_id: int):
+        kurikulum_obj = Kurikulum.objects.filter(id_neosia=kurikulum_id)
+        new_kurikulum_data = get_detail_kurikulum(kurikulum_id)
+        print(kurikulum_obj.update(**new_kurikulum_data))
+    
+    def form_valid(self, form) -> HttpResponse:
+        update_kurikulum_data = form.cleaned_data.get('update_data_kurikulum', [])
+
+        # Update kurikulum
+        for kurikulum_id in update_kurikulum_data:
+            try:
+                kurikulum_id = int(kurikulum_id)
+            except ValueError:
+                if settings.DEBUG:
+                    print('Cannot convert Kurikulum ID ("{}") to integer'.format(kurikulum_id))
+                # TODO: ADD MESSAGE
+                return redirect(self.success_url)
+
+            self.update_kurikulum(kurikulum_id)
+        return redirect(self.success_url)
 
 
 class KurikulumReadSyncView(View):

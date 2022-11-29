@@ -1810,6 +1810,7 @@ details.dropdown::marker {
 .h-icon {
   display: flex;
   flex-direction: row;
+  align-items: center;
 }
 
 .h-icon > :not([hidden]) ~ :not([hidden]) {
@@ -3697,6 +3698,10 @@ details.dropdown::marker {
     margin-left: 0.25rem;
   }
 
+  .sm\:block {
+    display: block;
+  }
+
   .sm\:grid {
     display: grid;
   }
@@ -3811,6 +3816,12 @@ details.dropdown::marker {
     --tw-space-y-reverse: 0;
     margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
     margin-bottom: calc(1rem * var(--tw-space-y-reverse));
+  }
+
+  .md\:space-y-3 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-y-reverse: 0;
+    margin-top: calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));
+    margin-bottom: calc(0.75rem * var(--tw-space-y-reverse));
   }
 
   .md\:p-3 {

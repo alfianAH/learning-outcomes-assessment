@@ -1,0 +1,29 @@
+{% extends 'home-view.html' %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'kurikulum:read-all' %}" role="listitem">Kurikulum</a></li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">Update</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<form action="." method="post" class="space-y-2 md:space-y-3">
+    {% csrf_token %}
+
+    {% with form.update_data_kurikulum as field %}
+        <h2>{{ field.label }}</h2>
+
+        {% if field.help_text %}
+            <p>{{ field.help_text|safe }}</p>
+        {% endif %}
+
+        {% include 'components/search-box.html' with search_by_js=True search_placeholder='Cari nama kurikulum...' %}
+
+        {{ field }}
+    {% endwith %}
+
+    <div class="form-wizard-buttons">
+        <a href="{% url 'kurikulum:read-all' %}" class="btn btn-secondary">Kembali</a>
+        <button type="submit" class="btn btn-success">Update</button>
+    </div>
+</form>
+{% endblock %}

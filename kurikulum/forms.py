@@ -111,7 +111,7 @@ class SemesterFromNeosia(forms.Form):
         return cleaned_data
 
 
-class UpdateKurikulum(forms.Form):
+class BulkUpdateKurikulum(forms.Form):
     update_data_kurikulum = forms.MultipleChoiceField(
         widget=UpdateChoiceList(
             badge_template='kurikulum/partials/badge-list-kurikulum.html',
@@ -129,10 +129,3 @@ class UpdateKurikulum(forms.Form):
         update_kurikulum_choices = get_update_kurikulum_choices(self.user.prodi.id_neosia)
 
         self.fields['update_data_kurikulum'].choices = update_kurikulum_choices
-
-    def clean(self):
-        cleaned_data = super().clean()
-
-        if settings.DEBUG: print("Clean data: {}".format(cleaned_data))
-        
-        return cleaned_data

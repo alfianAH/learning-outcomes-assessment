@@ -360,7 +360,7 @@
 
     /* Header with icon */
     .h-icon{
-        @apply flex flex-row space-x-2.5 lg:space-x-3;
+        @apply flex flex-row space-x-2.5 lg:space-x-3 items-center;
     }
 
     /* List item */
