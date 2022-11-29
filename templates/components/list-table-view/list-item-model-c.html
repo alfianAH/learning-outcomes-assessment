@@ -44,6 +44,7 @@
 
 <script>
     {% if id %}
+        onCheckboxClick('{{ id }}', '.list-item-model-c');
         $("#search-input").keyup(function(){
             searchTextInList('{{ id }}');
         });

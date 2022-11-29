@@ -18,6 +18,8 @@
 
         {% include 'components/search-box.html' with search_by_js=True search_placeholder='Cari nama kurikulum...' %}
 
+        {% include 'components/list-table-view/selected-indicator.html' with delete_button=False %}
+
         {{ field }}
     {% endwith %}
 
