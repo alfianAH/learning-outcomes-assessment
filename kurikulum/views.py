@@ -454,11 +454,11 @@ class KurikulumReadView(DetailView):
 
         context.update({
             'mk_objects': mk_objects,
-            'mk_filter_template': 'kurikulum/partials/mk-kurikulum-filter-form.html',
-            'mk_sort_template': 'kurikulum/partials/mk-kurikulum-sort-form.html',
-            'mk_list_custom_field_template': 'kurikulum/partials/list-custom-field-mk.html',
-            'mk_table_custom_field_header_template': 'kurikulum/partials/table-custom-field-header-mk.html',
-            'mk_table_custom_field_template': 'kurikulum/partials/table-custom-field-mk.html',
+            'mk_filter_template': 'mata-kuliah/partials/mk-kurikulum-filter-form.html',
+            'mk_sort_template': 'mata-kuliah/partials/mk-kurikulum-sort-form.html',
+            'mk_list_custom_field_template': 'mata-kuliah/partials/list-custom-field-mk.html',
+            'mk_table_custom_field_header_template': 'mata-kuliah/partials/table-custom-field-header-mk.html',
+            'mk_table_custom_field_template': 'mata-kuliah/partials/table-custom-field-mk.html',
             'mk_prefix_id': 'mk-',
             'mk_bulk_delete_url': self.get_object().get_mk_bulk_delete(),
             
