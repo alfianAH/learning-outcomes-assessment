@@ -526,7 +526,65 @@ class KurikulumBulkDeleteView(View):
 
 # Mata Kuliah Kurikulum
 class MataKuliahKurikulumCreateView(FormView):
-    pass
+    form_class = MataKuliahKurikulumCreateForm
+    template_name: str = 'mata-kuliah/mk-kurikulum-create-view.html'
+    kurikulum_id: int = None
+    prodi_id: int = None
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        form = self.get_form(form_class=self.form_class)
+        
+        # If there are no choices, redirect back
+        if len(form.fields.get('mk_from_neosia').choices) == 0:
+            # TODO: ADD MESSAGE
+            return redirect(self.success_url)
+        
+        return super().get(request, *args, **kwargs)
+
+    def get_form(self, form_class = None):
+        form = super().get_form(form_class)
+        
+        self.kurikulum_id = self.kwargs.get('kurikulum_id')
+        self.success_url = reverse('kurikulum:read', kwargs={
+            'kurikulum_id': self.kurikulum_id
+        })
+
+        self.prodi_id = self.request.user.prodi.id_neosia
+
+        mk_kurikulum_choices = get_mk_kurikulum_choices(self.kurikulum_id, self.prodi_id)
+
+        form.fields.get('mk_from_neosia').choices = mk_kurikulum_choices
+        
+        return form
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'detail_kurikulum_url': self.success_url
+        })
+        return context
+
+    def form_valid(self, form) -> HttpResponse:
+        list_mk_id = form.cleaned_data.get('mk_from_neosia')
+        kurikulum_obj = Kurikulum.objects.get(id_neosia=self.kurikulum_id)
+        prodi_obj = ProgramStudi.objects.get(id_neosia=self.prodi_id)
+        
+        list_mk_kurikulum = get_mk_kurikulum(self.kurikulum_id, self.prodi_id)
+        
+        for mk_kurikulum in list_mk_kurikulum:
+            if str(mk_kurikulum['id_neosia']) not in list_mk_id: continue
+
+            deleted_items = ['prodi', 'kurikulum']
+            [mk_kurikulum.pop(item) for item in deleted_items]
+
+            mk_kurikulum_obj: MataKuliahKurikulum = MataKuliahKurikulum.objects.create(
+                prodi=prodi_obj, 
+                kurikulum=kurikulum_obj, 
+                **mk_kurikulum
+            )
+            mk_kurikulum_obj.save()
+        
+        return redirect(self.success_url)
 
 
 class MataKuliahKurikulumReadView(DetailView):
