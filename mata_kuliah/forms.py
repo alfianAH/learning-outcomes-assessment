@@ -37,7 +37,6 @@ class MataKuliahKurikulumCreateForm(forms.Form):
 class MataKuliahKurikulumBulkUpdateForm(forms.Form):
     update_data_mk_kurikulum = forms.MultipleChoiceField(
         widget=UpdateChoiceList(
-            badge_template='mata-kuliah/partials/badge-list-mk.html',
             list_custom_field_template='mata-kuliah/partials/list-custom-field-mk.html',
         ),
         label = 'Update Data Mata Kuliah Kurikulum',
@@ -46,8 +45,10 @@ class MataKuliahKurikulumBulkUpdateForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
+        kurikulum_id = kwargs.pop('kurikulum_id')
+        prodi_id = kwargs.pop('prodi_id')
         super().__init__(*args, **kwargs)
 
-        update_mk_kurikulum_choices = get_update_mk_kurikulum_choices()
+        update_mk_kurikulum_choices = get_update_mk_kurikulum_choices(kurikulum_id, prodi_id)
 
         self.fields['update_data_mk_kurikulum'].choices = update_mk_kurikulum_choices

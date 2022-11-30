@@ -1,3 +1,4 @@
+from django.conf import settings
 from learning_outcomes_assessment.utils import request_data_to_neosia
 from .models import MataKuliahKurikulum
 
@@ -80,5 +81,30 @@ def get_mk_kurikulum_choices(kurikulum_id: int, prodi_id: int):
     return mk_kurikulum_choices
 
 
-def get_update_mk_kurikulum_choices(kurikulum_id: int):
-    pass
+def get_update_mk_kurikulum_choices(kurikulum_id: int, prodi_id: int):
+    json_response = get_mk_kurikulum(kurikulum_id, prodi_id)
+    update_mk_kurikulum_choices = []
+
+    for mk_kurikulum_data in json_response:
+        id_mk_kurikulum = mk_kurikulum_data['id_neosia']
+
+        try:
+            mk_kurikulum_obj = MataKuliahKurikulum.objects.get(id_neosia=id_mk_kurikulum)
+        except MataKuliahKurikulum.DoesNotExist:
+            continue
+        except MataKuliahKurikulum.MultipleObjectsReturned:
+            if settings.DEBUG: print('Kurikulum object returns multiple objects. ID: {}'.format(id_mk_kurikulum))
+            continue
+        
+        isDataOkay = mk_kurikulum_obj.id_neosia == id_mk_kurikulum and mk_kurikulum_obj.nama == mk_kurikulum_data['nama'] and mk_kurikulum_obj.sks == mk_kurikulum_data['sks'] and mk_kurikulum_obj.kode == mk_kurikulum_data['kode']
+
+        if isDataOkay: continue
+
+        update_mk_kurikulum_data = {
+            'new': mk_kurikulum_data,
+            'old': mk_kurikulum_obj,
+        }
+        update_mk_kurikulum_choice = id_mk_kurikulum, update_mk_kurikulum_data
+        update_mk_kurikulum_choices.append(update_mk_kurikulum_choice)
+
+    return update_mk_kurikulum_choices

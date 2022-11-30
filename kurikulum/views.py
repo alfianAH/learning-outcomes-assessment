@@ -295,7 +295,7 @@ class KurikulumBulkUpdateView(FormView):
     def update_kurikulum(self, kurikulum_id: int):
         kurikulum_obj = Kurikulum.objects.filter(id_neosia=kurikulum_id)
         new_kurikulum_data = get_detail_kurikulum(kurikulum_id)
-        print(kurikulum_obj.update(**new_kurikulum_data))
+        kurikulum_obj.update(**new_kurikulum_data)
     
     def form_valid(self, form) -> HttpResponse:
         update_kurikulum_data = form.cleaned_data.get('update_data_kurikulum', [])
@@ -560,7 +560,7 @@ class MataKuliahKurikulumCreateView(FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'detail_kurikulum_url': self.success_url
+            'kurikulum_id': self.kurikulum_id
         })
         return context
 
@@ -592,7 +592,59 @@ class MataKuliahKurikulumReadView(DetailView):
 
 
 class MataKuliahKurikulumUpdateView(FormView):
-    pass
+    form_class = MataKuliahKurikulumBulkUpdateForm
+    template_name: str = 'mata-kuliah/mk-kurikulum-update-view.html'
+    kurikulum_id: int = None
+    prodi_id: int = None
+
+    def get_form(self, form_class = None):
+        self.kurikulum_id = self.kwargs.get('kurikulum_id')
+        self.prodi_id = self.request.user.prodi.id_neosia
+        self.success_url = reverse('kurikulum:read', kwargs={
+            'kurikulum_id': self.kurikulum_id
+        })
+        
+        return super().get_form(form_class)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()        
+        kwargs['kurikulum_id'] = self.kurikulum_id
+        kwargs['prodi_id'] = self.prodi_id
+        return kwargs
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        form = self.get_form(form_class=self.form_class)
+        
+        if len(form.fields.get('update_data_mk_kurikulum').choices) == 0:
+            # TODO: ADD MESSAGE
+            return redirect(self.success_url)
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'kurikulum_id': self.kurikulum_id
+        })
+        return context
+
+    def update_mk_kurikulum(self, list_mk_kurikulum_id: int):
+        list_mk_kurikulum = get_mk_kurikulum(self.kurikulum_id, self.prodi_id)
+        
+        for mk_kurikulum in list_mk_kurikulum:
+            if str(mk_kurikulum['id_neosia']) not in list_mk_kurikulum_id: continue
+
+            deleted_items = ['prodi', 'kurikulum']
+            [mk_kurikulum.pop(item) for item in deleted_items]
+
+            mk_kurikulum_obj = MataKuliahKurikulum.objects.filter(id_neosia=mk_kurikulum['id_neosia'])
+            mk_kurikulum_obj.update(**mk_kurikulum)
+
+    def form_valid(self, form) -> HttpResponse:
+        update_mk_kurikulum_data = form.cleaned_data.get('update_data_mk_kurikulum')
+
+        self.update_mk_kurikulum(update_mk_kurikulum_data)
+        
+        return super().form_valid(form)
 
 
 class MataKuliahKurikulumBulkDeleteView(DeleteView):
