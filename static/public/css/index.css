@@ -2548,7 +2548,7 @@ details.dropdown::marker {
 }
 
 .tab-content {
-  margin-top: 0.625rem;
+  margin: 0.625rem;
 }
 
 .tab-content > .tab-pane {

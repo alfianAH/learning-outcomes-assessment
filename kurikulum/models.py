@@ -28,26 +28,43 @@ class Kurikulum(models.Model):
             'kurikulum_id': self.id_neosia
         })
 
-    def read_all_mata_kuliah_kurikulum_url(self):
-        return reverse('kurikulum:mk-read-all', kwargs={
-            'kurikulum_id': self.id_neosia
-        })
-
+    # Mata Kuliah Kurikulum
     def get_mk_kurikulum(self):
         return self.matakuliahkurikulum_set.all()
-
-    def get_semester_ids(self):
-        list_semester_id = self.semesterkurikulum_set.values_list('semester__id_neosia', flat=True)
-        
-        return list_semester_id
 
     def get_mk_bulk_delete(self):
         return reverse('kurikulum:mk-bulk-delete', kwargs={
             'kurikulum_id': self.id_neosia
         })
+    
+    def get_mk_create(self):
+        return reverse('kurikulum:mk-create', kwargs={
+            'kurikulum_id': self.id_neosia
+        })
+
+    def get_mk_update(self):
+        return reverse('kurikulum:mk-update', kwargs={
+            'kurikulum_id': self.id_neosia
+        })
+
+    # Semester Kurikulum
+    def get_semester_ids(self):
+        list_semester_id = self.semesterkurikulum_set.values_list('semester__id_neosia', flat=True)
+        
+        return list_semester_id
 
     def get_semester_bulk_delete(self):
         return reverse('kurikulum:semester-bulk-delete', kwargs={
+            'kurikulum_id': self.id_neosia
+        })
+    
+    def get_semester_create(self):
+        return reverse('kurikulum:semester-create', kwargs={
+            'kurikulum_id': self.id_neosia
+        })
+
+    def get_semester_update(self):
+        return reverse('kurikulum:semester-update', kwargs={
             'kurikulum_id': self.id_neosia
         })
 

@@ -568,7 +568,7 @@
     }
 
     .tab-content{
-        @apply mt-2.5;
+        @apply m-2.5;
     }
 
     .tab-content > .tab-pane{

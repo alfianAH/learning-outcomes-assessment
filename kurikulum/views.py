@@ -288,17 +288,6 @@ class KurikulumBulkUpdateView(FormView):
         return redirect(self.success_url)
 
 
-class KurikulumReadSyncView(MySessionWizardView):
-    """Kurikulum synchronization from Neosia
-    What to do in sync:
-    1. Create Mata Kuliah Kurikulum
-    2. Create Semester in Kurikulum PK
-    3. Update Semester in Kurikulum PK
-    """
-    template_name: str = 'kurikulum/read-sync-form.html'
-    form_list: list = [SemesterFromNeosia, BulkUpdateSemester]
-
-
 class KurikulumReadAllView(ListView):
     """Read all Kurikulums from Program Studi X
     """
@@ -510,8 +499,15 @@ class KurikulumBulkDeleteView(View):
 
 
 # Mata Kuliah Kurikulum
+class MataKuliahKurikulumCreateView(FormView):
+    pass
+
 
 class MataKuliahKurikulumReadView(DetailView):
+    pass
+
+
+class MataKuliahKurikulumUpdateView(FormView):
     pass
 
 
@@ -530,6 +526,13 @@ class MataKuliahKurikulumBulkDeleteView(DeleteView):
 
 
 # Semester Kurikulum
+class SemesterKurikulumCreateView(FormView):
+    pass
+
+
+class SemesterKurikulumUpdateView(FormView):
+    pass
+
 
 class SemesterKurikulumBulkDeleteView(DeleteView):
     model = Kurikulum
