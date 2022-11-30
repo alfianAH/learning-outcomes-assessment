@@ -14,7 +14,7 @@ from .utils import (
 )
 
 
-class KurikulumFromNeosia(forms.Form):
+class KurikulumCreateForm(forms.Form):
     kurikulum_from_neosia = forms.MultipleChoiceField(
         widget=ChoiceListInteractiveModelA(
             badge_template='kurikulum/partials/badge-list-kurikulum.html',
@@ -77,7 +77,7 @@ class KurikulumFromNeosia(forms.Form):
         return cleaned_data
 
 
-class BulkUpdateKurikulum(forms.Form):
+class KurikulumBulkUpdateForm(forms.Form):
     update_data_kurikulum = forms.MultipleChoiceField(
         widget=UpdateChoiceList(
             badge_template='kurikulum/partials/badge-list-kurikulum.html',

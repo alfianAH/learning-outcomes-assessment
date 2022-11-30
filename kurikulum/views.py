@@ -11,34 +11,44 @@ from django.views.generic.list import ListView
 from learning_outcomes_assessment.wizard.views import MySessionWizardView
 
 from accounts.models import ProgramStudi
-from semester.filters import SemesterFilter, SemesterSort
 from .models import Kurikulum
+from .filters import (
+    KurikulumFilter, 
+    KurikulumSort,
+)
+from .forms import (
+    KurikulumCreateForm,
+    KurikulumBulkUpdateForm,
+)
+from .utils import (
+    get_detail_kurikulum,
+)
 from mata_kuliah.models import MataKuliahKurikulum
+from mata_kuliah.filters import (
+    MataKuliahKurikulumFilter,
+    MataKuliahKurikulumSort,
+)
+from mata_kuliah.forms import (
+    MataKuliahKurikulumCreateForm,
+    MataKuliahKurikulumBulkUpdateForm
+)
+from mata_kuliah.utils import(
+    get_mk_kurikulum,
+    get_mk_kurikulum_choices,
+)
 from semester.models import (
     Semester, 
     TahunAjaran,
     TipeSemester,
     SemesterKurikulum,
 )
-from .filters import (
-    KurikulumFilter, 
-    KurikulumSort,
-)
-from mata_kuliah.filters import (
-    MataKuliahKurikulumFilter,
-    MataKuliahKurikulumSort,
-)
-from .forms import (
-    KurikulumFromNeosia,
-    BulkUpdateKurikulum,
-)
-from .utils import (
-    get_detail_kurikulum,
-    get_mata_kuliah_kurikulum,
+from semester.filters import (
+    SemesterFilter, 
+    SemesterSort
 )
 from semester.forms import(
-    SemesterFromNeosia,
-    BulkUpdateSemester,
+    SemesterKurikulumCreateForm,
+    SemesterKurikulumBulkUpdateForm,
 )
 from semester.utils import(
     get_detail_semester,
@@ -50,12 +60,12 @@ from semester.utils import(
 # Create your views here.
 class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
     template_name: str = 'kurikulum/read-all-sync-form.html'
-    form_list: list = [KurikulumFromNeosia, SemesterFromNeosia]
+    form_list: list = [KurikulumCreateForm, SemesterKurikulumCreateForm, MataKuliahKurikulumCreateForm]
 
     def get_form_kwargs(self, step=None):
         form_kwargs = super().get_form_kwargs(step)
         
-        if step == '0' or step == '2':
+        if step == '0':
             form_kwargs.update({'user': self.request.user})
         
         return form_kwargs
@@ -72,42 +82,66 @@ class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
                 context.update({
                     'search_placeholder': 'Cari nama semester...'
                 })
+            case '2':
+                context.update({
+                    'search_placeholder': 'Cari nama mata kuliah...'
+                })
         return context
 
     def render_next_step(self, form, **kwargs):
         next_step = self.steps.next
         
-        if next_step == '1':
-            kurikulum_cleaned_data = form.cleaned_data.get('kurikulum_from_neosia')
-            semester_choices = []
+        match(next_step): 
+            case '1':
+                kurikulum_cleaned_data = self.get_cleaned_data_for_step('0').get('kurikulum_from_neosia')
+                semester_choices = []
 
-            for kurikulum_id in kurikulum_cleaned_data:
-                semester_by_kurikulum = get_semester_by_kurikulum_choices(kurikulum_id)
-                for semester_id in semester_by_kurikulum:
-                    semester_choices.append(semester_id)
+                for kurikulum_id in kurikulum_cleaned_data:
+                    list_semester_by_kurikulum = get_semester_by_kurikulum_choices(kurikulum_id)
+                    for semester_choice in list_semester_by_kurikulum:
+                        semester_choices.append(semester_choice)
 
-            # Set extra data for semester choices
-            self.storage.extra_data.update({'semester_choices': json.dumps(semester_choices)})
+                # Set extra data for semester choices
+                self.storage.extra_data.update({'semester_choices': json.dumps(semester_choices)})
+            case '2':
+                kurikulum_cleaned_data = self.get_cleaned_data_for_step('0').get('kurikulum_from_neosia')
+                prodi_id = self.request.user.prodi.id_neosia
+                mk_kurikulum_choices = []
+                
+                for kurikulum_id in kurikulum_cleaned_data:
+                    list_mk_kurikulum = get_mk_kurikulum_choices(kurikulum_id, prodi_id)
+                    for mk_kurikulum_choice in list_mk_kurikulum:
+                        mk_kurikulum_choices.append(mk_kurikulum_choice)
+
+                # Set extra data for semester choices
+                self.storage.extra_data.update({'mk_kurikulum_choices': json.dumps(mk_kurikulum_choices)})
+
         return super().render_next_step(form, **kwargs)
+
+    def set_form_choices(self, form, choice_key: str, field_key: str):
+        # Get choices from storage
+        extra_data = self.storage.extra_data
+        choices = extra_data.get(choice_key)
+
+        # Extra data will be none at the first time
+        if choices is None:
+            # Set default value
+            choices = []
+        else:
+            # Load JSON value if there is extra data
+            choices = json.loads(choices)
+
+        form.fields.get(field_key).choices = choices
 
     def get_form(self, step=None, data=None, files=None):
         form = super().get_form(step, data, files)
         if step is None: step = self.steps.current
         
-        if step == '1':
-            # Get semester choices from storage
-            extra_data = self.storage.extra_data
-            semester_choices = extra_data.get('semester_choices')
-
-            # Extra data will be none at the first time
-            if semester_choices is None:
-                # Set default value
-                semester_choices = []
-            else:
-                # Load JSON value if there is extra data
-                semester_choices = json.loads(semester_choices)
-
-            form.fields.get('semester_from_neosia').choices = semester_choices
+        match(step):
+            case '1':
+                self.set_form_choices(form, 'semester_choices', 'semester_from_neosia')
+            case '2':
+                self.set_form_choices(form, 'mk_kurikulum_choices', 'mk_from_neosia')
         return form
 
     def save_kurikulum(self, kurikulum_id: int):
@@ -119,24 +153,21 @@ class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
 
         Kurikulum.objects.get_or_create(prodi=prodi_obj, **kurikulum_detail)
     
-    def save_mk_kurikulum(self, kurikulum_id: int):
-        user_prodi_id = self.request.user.prodi.id_neosia
-        list_mk_kurikulum = get_mata_kuliah_kurikulum(kurikulum_id, user_prodi_id)
+    def save_mk_kurikulum(self, list_mk_id: list[int]):
+        list_kurikulum_id = self.get_cleaned_data_for_step('0').get('kurikulum_from_neosia')
+        prodi_id = self.request.user.prodi.id_neosia
+        prodi_obj = ProgramStudi.objects.get(id_neosia=prodi_id)
 
-        for mk_kurikulum in list_mk_kurikulum:
-            # If MK Kurikulum is already saved, continue
-            mk_kurikulum_obj = MataKuliahKurikulum.objects.filter(id_neosia=mk_kurikulum.get('id_neosia'))
-            if mk_kurikulum_obj.exists(): continue
+        for kurikulum_id in list_kurikulum_id:
+            kurikulum_obj = Kurikulum.objects.get(id_neosia=kurikulum_id)
 
-            kurikulum_mk_id = mk_kurikulum.get('kurikulum')
-            prodi_id = mk_kurikulum.get('prodi')
+            list_mk_kurikulum = get_mk_kurikulum(kurikulum_id, prodi_id)
+            
+            for mk_kurikulum in list_mk_kurikulum:
+                if str(mk_kurikulum['id_neosia']) not in list_mk_id: continue
 
-            if int(kurikulum_mk_id) == kurikulum_id and int(prodi_id) == user_prodi_id:
-                # Get Program studi object
-                prodi_obj = ProgramStudi.objects.get(id_neosia=user_prodi_id)
-                kurikulum_obj = Kurikulum.objects.get(id_neosia=kurikulum_id)
-                mk_kurikulum.pop('prodi')
-                mk_kurikulum.pop('kurikulum')
+                deleted_items = ['prodi', 'kurikulum']
+                [mk_kurikulum.pop(item) for item in deleted_items]
 
                 mk_kurikulum_obj: MataKuliahKurikulum = MataKuliahKurikulum.objects.create(
                     prodi=prodi_obj, 
@@ -144,15 +175,6 @@ class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
                     **mk_kurikulum
                 )
                 mk_kurikulum_obj.save()
-            else:
-                # TODO: ADD MESSAGE
-                if settings.DEBUG:
-                    print('''Kurikulum and Prodi are not match with database. 
-                    Given value: Kurikulum ID: {}, Prodi ID: {}
-                    Expected value: Kurikulum ID: {}, Prodi ID: {}'''.format(
-                        kurikulum_mk_id, prodi_id, 
-                        kurikulum_id, user_prodi_id
-                    ))
     
     def filter_semester_by_kurikulum(self, kurikulum_id: int):
         semester_by_kurikulum = get_semester_by_kurikulum(kurikulum_id)
@@ -216,6 +238,7 @@ class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
         kurikulum_data = cleaned_data.get('kurikulum_from_neosia')
         semester_by_kurikulum = {}
         semester_data = cleaned_data.get('semester_from_neosia')
+        mk_kurikulum_data = cleaned_data.get('mk_from_neosia')
         success_url = reverse('kurikulum:read-all')
         
         # Save kurikulum
@@ -229,9 +252,6 @@ class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
                 return redirect(success_url)
             
             self.save_kurikulum(kurikulum_id)
-
-            # Save mata kuliah kurikulum
-            self.save_mk_kurikulum(kurikulum_id)
 
             # Get list semester by kurikulum
             semester_by_kurikulum.update(self.filter_semester_by_kurikulum(kurikulum_id))
@@ -247,12 +267,15 @@ class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
                 return redirect(success_url)
                 
             self.save_semester(semester_id, semester_by_kurikulum)
+        
+        # Save mata kuliah kurikulum
+        self.save_mk_kurikulum(mk_kurikulum_data)
 
         return redirect(success_url)
 
 
 class KurikulumBulkUpdateView(FormView):
-    form_class = BulkUpdateKurikulum
+    form_class = KurikulumBulkUpdateForm
     template_name: str = 'kurikulum/kurikulum-update-view.html'
     success_url = reverse_lazy('kurikulum:read-all')
 

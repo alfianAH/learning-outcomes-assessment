@@ -10,7 +10,7 @@ from learning_outcomes_assessment.widgets import (
 )
 
 
-class SemesterFromNeosia(forms.Form):
+class SemesterKurikulumCreateForm(forms.Form):
     semester_from_neosia = forms.MultipleChoiceField(
         widget=ChoiceListInteractiveModelA(
             badge_template='semester/partials/badge-list-semester.html',
@@ -33,20 +33,16 @@ class SemesterFromNeosia(forms.Form):
 
         # Clean kurikulum IDs
         semester_from_neosia = cleaned_data.get('semester_from_neosia')
-        new_id_semester_from_neosia = []
+        semester_from_neosia = [*set(semester_from_neosia)]
         
-        for id in semester_from_neosia:
-            if id in new_id_semester_from_neosia: continue
-            new_id_semester_from_neosia.append(id)
-        
-        cleaned_data['semester_from_neosia'] = new_id_semester_from_neosia
+        cleaned_data['semester_from_neosia'] = semester_from_neosia
 
         if settings.DEBUG: print("Clean data: {}".format(cleaned_data))
         
         return cleaned_data
 
 
-class BulkUpdateSemester(forms.Form):
+class SemesterKurikulumBulkUpdateForm(forms.Form):
     update_data_semester = forms.MultipleChoiceField(
         widget=UpdateChoiceList(
             badge_template='semester/partials/badge-list-semester.html',

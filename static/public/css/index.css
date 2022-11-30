@@ -3046,6 +3046,18 @@ details.dropdown::marker {
   max-width: 20rem;
 }
 
+.max-w-md {
+  max-width: 28rem;
+}
+
+.max-w-lg {
+  max-width: 32rem;
+}
+
+.max-w-sm {
+  max-width: 24rem;
+}
+
 @-webkit-keyframes spin {
   to {
     transform: rotate(360deg);
