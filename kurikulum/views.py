@@ -57,6 +57,20 @@ class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
         
         return form_kwargs
 
+    def get_context_data(self, form, **kwargs):
+        context = super().get_context_data(form, **kwargs)
+
+        match(self.steps.current):
+            case '0':
+                context.update({
+                    'search_placeholder': 'Cari nama kurikulum...'
+                })
+            case '1':
+                context.update({
+                    'search_placeholder': 'Cari nama semester...'
+                })
+        return context
+
     def render_next_step(self, form, **kwargs):
         next_step = self.steps.next
         
@@ -281,7 +295,7 @@ class KurikulumReadSyncView(MySessionWizardView):
     2. Create Semester in Kurikulum PK
     3. Update Semester in Kurikulum PK
     """
-    template_name: str = 'kurikulum/read-all-sync-form.html'
+    template_name: str = 'kurikulum/read-sync-form.html'
     form_list: list = [SemesterFromNeosia, BulkUpdateSemester]
 
 

@@ -11,7 +11,7 @@
         name="q" 
         value="" 
         class="bg-transparent dark:bg-transparent focus:outline-none w-full placeholder:text-slate-400 dark:placeholder:text-zinc-400"
-        placeholder="{{ search_placeholder }}" 
+        placeholder="{{ search_placeholder|default:'Cari...' }}" 
         id="search-input" 
         autocomplete="off">
     {% endif %}
