@@ -12,7 +12,8 @@ from learning_outcomes_assessment.wizard.views import MySessionWizardView
 
 from accounts.models import ProgramStudi
 from semester.filters import SemesterFilter, SemesterSort
-from .models import Kurikulum, MataKuliahKurikulum
+from .models import Kurikulum
+from mata_kuliah.models import MataKuliahKurikulum
 from semester.models import (
     Semester, 
     TahunAjaran,
@@ -22,6 +23,8 @@ from semester.models import (
 from .filters import (
     KurikulumFilter, 
     KurikulumSort,
+)
+from mata_kuliah.filters import (
     MataKuliahKurikulumFilter,
     MataKuliahKurikulumSort,
 )

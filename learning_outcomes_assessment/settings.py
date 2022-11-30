@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     # Internal
     'accounts',
     'kurikulum',
+    'mata_kuliah',
     'semester',
 ]
 

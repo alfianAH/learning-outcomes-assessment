@@ -7,7 +7,7 @@ from learning_outcomes_assessment.widgets import (
     MySearchInput,
     MySelectInput,
 )
-from .models import Kurikulum, MataKuliahKurikulum
+from .models import Kurikulum
 
 
 KURIKULUM_IS_ACTIVE = (
@@ -19,11 +19,6 @@ KURIKULUM_ORDERING_BY = (
     ('nama', 'Nama'), 
     ('tahun_mulai', 'Tahun Mulai'), 
     ('is_active', 'Keaktifan')
-)
-MK_KURIKULUM_ORDERING_BY = (
-    ('kode', 'Kode MK'),
-    ('nama', 'Nama'),
-    ('sks', 'SKS'),
 )
 
 class KurikulumFilter(filter.FilterSet):
@@ -62,36 +57,4 @@ class KurikulumSort(forms.Form):
         widget=MyRadioInput,
         label='Urutkan berdasarkan',
         initial='tahun_mulai',
-    )
-
-
-class MataKuliahKurikulumFilter(filter.FilterSet):
-    mk_nama = filter.CharFilter(
-        field_name='nama', 
-        lookup_expr='icontains', 
-        label='Nama Mata Kuliah',
-        widget=MySearchInput(
-            attrs={
-                'placeholder': 'Cari nama mata kuliah...',
-                'autocomplete': 'off'
-            }
-        ),
-    )
-    mk_sks = filter.NumberFilter(
-        field_name='sks',
-        label='SKS',
-        widget=MyNumberInput,
-    )
-
-    class Meta:
-        model = MataKuliahKurikulum
-        fields = ('nama', 'sks')
-
-
-class MataKuliahKurikulumSort(forms.Form):
-    mk_ordering_by = forms.ChoiceField(
-        choices=MK_KURIKULUM_ORDERING_BY,
-        widget=MyRadioInput,
-        label='Urutkan berdasarkan',
-        initial='nama',
     )
