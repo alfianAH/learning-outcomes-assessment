@@ -183,7 +183,7 @@
 
     /* Buttons */
     .btn{
-        @apply flex flex-row items-center justify-center px-2 py-1 md:py-2 lg:px-2.5 rounded-md text-xs sm:text-sm md:text-base lg:text-lg border hover:border-slate-800 hover:no-underline h-min whitespace-nowrap dark:border-slate-100 transition-all max-w-min cursor-pointer;
+        @apply flex flex-row items-center justify-center px-2 py-1 md:py-2 lg:px-2.5 rounded-md text-xs sm:text-sm md:text-base lg:text-lg border hover:border-slate-800 hover:no-underline h-min whitespace-nowrap dark:border-slate-100 transition-all cursor-pointer;
     }
 
     .btn > svg{

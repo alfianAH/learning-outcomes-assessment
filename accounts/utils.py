@@ -1,6 +1,5 @@
 from django.conf import settings
 import os
-# from learning_outcomes_assessment.utils import request_data_to_neosia
 from django.conf import settings
 from django.urls import reverse
 import requests

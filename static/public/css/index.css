@@ -872,9 +872,6 @@ th {
   height: -webkit-min-content;
   height: -moz-min-content;
   height: min-content;
-  max-width: -webkit-min-content;
-  max-width: -moz-min-content;
-  max-width: min-content;
   cursor: pointer;
   flex-direction: row;
   align-items: center;
