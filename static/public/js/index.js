@@ -434,7 +434,7 @@ function searchTextInList(formId) {
   
     for (let i = 0; i < rowsLength; i++) {
         let listItem = $(listItems[i]).find('.list-item-title');
-        let column = $(trows[i]).find('td')[0];
+        let column = $(trows[i]).find('td.field-nama');
         
         searchText(listItem, listItems[i], searchedValue);
         searchText(column, trows[i], searchedValue);
