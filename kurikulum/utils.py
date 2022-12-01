@@ -75,7 +75,7 @@ def get_update_kurikulum_choices(prodi_id: int):
             if settings.DEBUG: print('Kurikulum object returns multiple objects. ID: {}'.format(id_kurikulum))
             continue
         
-        isDataOkay = kurikulum_obj.id_neosia == id_kurikulum and kurikulum_obj.nama == kurikulum_data['nama'] and kurikulum_obj.is_active == kurikulum_data['is_active'] and kurikulum_obj.tahun_mulai == kurikulum_data['tahun_mulai']
+        isDataOkay = kurikulum_obj.nama == kurikulum_data['nama'] and kurikulum_obj.is_active == kurikulum_data['is_active'] and kurikulum_obj.tahun_mulai == kurikulum_data['tahun_mulai']
 
         if isDataOkay: continue
 

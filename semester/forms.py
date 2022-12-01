@@ -54,8 +54,9 @@ class SemesterKurikulumBulkUpdateForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
+        kurikulum_id = kwargs.pop('kurikulum_id')
         super().__init__(*args, **kwargs)
 
-        update_semester_choices = get_update_semester_choices(self.user.prodi.id_neosia)
+        update_semester_choices = get_update_semester_choices(kurikulum_id)
 
         self.fields['update_data_semester'].choices = update_semester_choices

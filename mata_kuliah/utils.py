@@ -96,7 +96,7 @@ def get_update_mk_kurikulum_choices(kurikulum_id: int, prodi_id: int):
             if settings.DEBUG: print('Kurikulum object returns multiple objects. ID: {}'.format(id_mk_kurikulum))
             continue
         
-        isDataOkay = mk_kurikulum_obj.id_neosia == id_mk_kurikulum and mk_kurikulum_obj.nama == mk_kurikulum_data['nama'] and mk_kurikulum_obj.sks == mk_kurikulum_data['sks'] and mk_kurikulum_obj.kode == mk_kurikulum_data['kode']
+        isDataOkay = mk_kurikulum_obj.nama == mk_kurikulum_data['nama'] and mk_kurikulum_obj.sks == mk_kurikulum_data['sks'] and mk_kurikulum_obj.kode == mk_kurikulum_data['kode']
 
         if isDataOkay: continue
 

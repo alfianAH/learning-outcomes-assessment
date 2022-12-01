@@ -1,6 +1,6 @@
 from django.conf import settings
 from learning_outcomes_assessment.utils import request_data_to_neosia
-from .models import SemesterKurikulum
+from .models import Semester, SemesterKurikulum
 
 
 SEMESTER_BY_KURIKULUM_URL = 'https://customapi.neosia.unhas.ac.id/getSemesterByKurikulum'
@@ -100,4 +100,31 @@ def get_semester_by_kurikulum_choices(kurikulum_id: int):
 
 
 def get_update_semester_choices(kurikulum_id: int):
-    pass
+    # Request semester by kurikulum
+    json_response = get_semester_by_kurikulum(kurikulum_id)
+    update_semester_choices = []
+
+    for semester_data in json_response:
+        id_semester = semester_data['id_neosia']
+
+        try:
+            semester_obj = Semester.objects.get(id_neosia=id_semester)
+        except Semester.DoesNotExist:
+            continue
+        except Semester.MultipleObjectsReturned:
+            if settings.DEBUG: print('Kurikulum object returns multiple objects. ID: {}'.format(id_semester))
+            continue
+
+        isDataOkay = semester_obj.nama == semester_data['nama'] and str(semester_obj.tahun_ajaran) == semester_data['tahun_ajaran'] and semester_obj.get_tipe_semester_display().lower() == semester_data['tipe_semester'].lower()
+
+        if isDataOkay: continue
+
+        update_semester_data = {
+            'new': semester_data,
+            'old': semester_obj,
+        }
+
+        update_semester_choice = id_semester, update_semester_data
+        update_semester_choices.append(update_semester_choice)
+
+    return update_semester_choices

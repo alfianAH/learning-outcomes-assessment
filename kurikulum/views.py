@@ -749,7 +749,66 @@ class SemesterKurikulumCreateView(FormView):
 
 
 class SemesterKurikulumUpdateView(FormView):
-    pass
+    form_class = SemesterKurikulumBulkUpdateForm
+    template_name: str = 'semester/semester-kurikulum-update-view.html'
+    kurikulum_id: int = None
+
+    def get_form(self, form_class = None):
+        self.kurikulum_id = self.kwargs.get('kurikulum_id')
+        self.success_url = reverse('kurikulum:read', kwargs={
+            'kurikulum_id': self.kurikulum_id
+        })
+        
+        return super().get_form(form_class)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()        
+        kwargs['kurikulum_id'] = self.kurikulum_id
+        return kwargs
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        form = self.get_form(form_class=self.form_class)
+        
+        if len(form.fields.get('update_data_semester').choices) == 0:
+            # TODO: ADD MESSAGE
+            return redirect(self.success_url)
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'kurikulum_id': self.kurikulum_id
+        })
+        return context
+
+    def update_semester(self, semester_id: int):
+        semester_detail = get_detail_semester(semester_id)
+        # Extract tahun ajaran
+        tahun_ajaran = semester_detail.get('tahun_ajaran')
+        tahun_ajaran_obj = TahunAjaran.objects.get_or_create_tahun_ajaran(tahun_ajaran)
+        
+        # Get tipe semester
+        tipe_semester_str: str = semester_detail.get('tipe_semester')
+        match(tipe_semester_str.lower()):
+            case 'ganjil':
+                tipe_semester = TipeSemester.GANJIL
+            case 'genap':
+                tipe_semester = TipeSemester.GENAP
+        
+        semester_obj = Semester.objects.filter(id_neosia = semester_detail['id_neosia'])
+        semester_obj.update(
+            tahun_ajaran = tahun_ajaran_obj[0],
+            nama = semester_detail.get('nama'),
+            tipe_semester = tipe_semester
+        )
+
+    def form_valid(self, form) -> HttpResponse:
+        update_semester_data = form.cleaned_data.get('update_data_semester')
+
+        for semester_id in update_semester_data:
+            self.update_semester(semester_id)
+        
+        return super().form_valid(form)
 
 
 class SemesterKurikulumBulkDeleteView(DeleteView):
