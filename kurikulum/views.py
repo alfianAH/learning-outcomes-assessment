@@ -347,16 +347,11 @@ class KurikulumReadAllView(ListView):
 
     def get_queryset(self):
         if self.kurikulum_filter is not None:
-            objects = self.kurikulum_filter.qs
+            self.queryset = self.kurikulum_filter.qs
         else:
-            objects = self.model.objects.filter(prodi=self.request.user.prodi)
+            self.queryset = self.model.objects.filter(prodi=self.request.user.prodi)
 
-        ordering = self.get_ordering()
-        if ordering:
-            if isinstance(ordering, str):
-                ordering = (ordering,)
-            objects = objects.order_by(*ordering)
-        return objects
+        return super().get_queryset()
 
     def get_ordering(self):
         if self.kurikulum_sort is None:
@@ -370,10 +365,14 @@ class KurikulumReadAllView(ListView):
         context = super().get_context_data(**kwargs)
         context.update({
             'bulk_delete_url': reverse('kurikulum:bulk-delete'),
+            'reset_url': reverse('kurikulum:read-all'),
+            'kurikulum_list_prefix_id': 'kurikulum-',
+            'badge_template':'kurikulum/partials/badge-list-kurikulum.html',
+            'list_custom_field_template':'kurikulum/partials/list-custom-field-kurikulum.html',
+            'table_custom_field_header_template':'kurikulum/partials/table-custom-field-header-kurikulum.html',
+            'table_custom_field_template':'kurikulum/partials/table-custom-field-kurikulum.html',
             'filter_template': 'kurikulum/partials/kurikulum-filter-form.html',
             'sort_template': 'kurikulum/partials/kurikulum-sort-form.html',
-            'reset_url': reverse('kurikulum:read-all'),
-            'kurikulum_list_prefix_id': 'kurikulum-'
         })
 
         if self.kurikulum_filter is not None:
