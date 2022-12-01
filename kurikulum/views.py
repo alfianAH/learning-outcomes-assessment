@@ -530,12 +530,13 @@ class MataKuliahKurikulumCreateView(FormView):
     template_name: str = 'mata-kuliah/mk-kurikulum-create-view.html'
     kurikulum_id: int = None
     prodi_id: int = None
+    form_field_name: str = 'mk_from_neosia'
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         form = self.get_form(form_class=self.form_class)
         
         # If there are no choices, redirect back
-        if len(form.fields.get('mk_from_neosia').choices) == 0:
+        if len(form.fields.get(self.form_field_name).choices) == 0:
             # TODO: ADD MESSAGE
             return redirect(self.success_url)
         
@@ -553,7 +554,7 @@ class MataKuliahKurikulumCreateView(FormView):
 
         mk_kurikulum_choices = get_mk_kurikulum_choices(self.kurikulum_id, self.prodi_id)
 
-        form.fields.get('mk_from_neosia').choices = mk_kurikulum_choices
+        form.fields.get(self.form_field_name).choices = mk_kurikulum_choices
         
         return form
 
@@ -565,7 +566,7 @@ class MataKuliahKurikulumCreateView(FormView):
         return context
 
     def form_valid(self, form) -> HttpResponse:
-        list_mk_id = form.cleaned_data.get('mk_from_neosia')
+        list_mk_id = form.cleaned_data.get(self.form_field_name)
         kurikulum_obj = Kurikulum.objects.get(id_neosia=self.kurikulum_id)
         prodi_obj = ProgramStudi.objects.get(id_neosia=self.prodi_id)
         
@@ -596,6 +597,7 @@ class MataKuliahKurikulumUpdateView(FormView):
     template_name: str = 'mata-kuliah/mk-kurikulum-update-view.html'
     kurikulum_id: int = None
     prodi_id: int = None
+    form_field_name: str = 'update_data_mk_kurikulum'
 
     def get_form(self, form_class = None):
         self.kurikulum_id = self.kwargs.get('kurikulum_id')
@@ -615,7 +617,7 @@ class MataKuliahKurikulumUpdateView(FormView):
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         form = self.get_form(form_class=self.form_class)
         
-        if len(form.fields.get('update_data_mk_kurikulum').choices) == 0:
+        if len(form.fields.get(self.form_field_name).choices) == 0:
             # TODO: ADD MESSAGE
             return redirect(self.success_url)
         return super().get(request, *args, **kwargs)
@@ -640,7 +642,7 @@ class MataKuliahKurikulumUpdateView(FormView):
             mk_kurikulum_obj.update(**mk_kurikulum)
 
     def form_valid(self, form) -> HttpResponse:
-        update_mk_kurikulum_data = form.cleaned_data.get('update_data_mk_kurikulum')
+        update_mk_kurikulum_data = form.cleaned_data.get(self.form_field_name)
 
         self.update_mk_kurikulum(update_mk_kurikulum_data)
         
@@ -666,12 +668,13 @@ class SemesterKurikulumCreateView(FormView):
     form_class = SemesterKurikulumCreateForm
     template_name: str = 'semester/semester-kurikulum-create-view.html'
     kurikulum_id: int = None
+    form_field_name: str = 'semester_from_neosia'
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         form = self.get_form(form_class=self.form_class)
         
         # If there are no choices, redirect back
-        if len(form.fields.get('semester_from_neosia').choices) == 0:
+        if len(form.fields.get(self.form_field_name).choices) == 0:
             # TODO: ADD MESSAGE
             return redirect(self.success_url)
         
@@ -687,7 +690,7 @@ class SemesterKurikulumCreateView(FormView):
         semester_choices = get_semester_by_kurikulum_choices(self.kurikulum_id)
         print(semester_choices)
 
-        form.fields.get('semester_from_neosia').choices = semester_choices
+        form.fields.get(self.form_field_name).choices = semester_choices
 
         return form
 
@@ -732,7 +735,7 @@ class SemesterKurikulumCreateView(FormView):
         semester_kurikulum_obj.save()
 
     def form_valid(self, form) -> HttpResponse:
-        list_semester_id = form.cleaned_data.get('semester_from_neosia')
+        list_semester_id = form.cleaned_data.get(self.form_field_name)
 
         for semester_id in list_semester_id:
             try:
@@ -752,6 +755,7 @@ class SemesterKurikulumUpdateView(FormView):
     form_class = SemesterKurikulumBulkUpdateForm
     template_name: str = 'semester/semester-kurikulum-update-view.html'
     kurikulum_id: int = None
+    form_field_name: str = 'update_data_semester'
 
     def get_form(self, form_class = None):
         self.kurikulum_id = self.kwargs.get('kurikulum_id')
@@ -769,7 +773,7 @@ class SemesterKurikulumUpdateView(FormView):
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         form = self.get_form(form_class=self.form_class)
         
-        if len(form.fields.get('update_data_semester').choices) == 0:
+        if len(form.fields.get(self.form_field_name).choices) == 0:
             # TODO: ADD MESSAGE
             return redirect(self.success_url)
         return super().get(request, *args, **kwargs)
@@ -803,7 +807,7 @@ class SemesterKurikulumUpdateView(FormView):
         )
 
     def form_valid(self, form) -> HttpResponse:
-        update_semester_data = form.cleaned_data.get('update_data_semester')
+        update_semester_data = form.cleaned_data.get(self.form_field_name)
 
         for semester_id in update_semester_data:
             self.update_semester(semester_id)
