@@ -13,6 +13,9 @@ class Kurikulum(models.Model):
     total_sks_lulus = models.PositiveSmallIntegerField(null=True)
     is_active = models.BooleanField(null=False)
 
+    def __str__(self) -> str:
+        return self.nama
+
     def read_sync_url(self):
         return reverse('kurikulum:read-sync', kwargs={
             'kurikulum_id': self.id_neosia

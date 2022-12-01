@@ -589,7 +589,9 @@ class MataKuliahKurikulumCreateView(FormView):
 
 
 class MataKuliahKurikulumReadView(DetailView):
-    pass
+    model = MataKuliahKurikulum
+    pk_url_kwarg: str = 'mk_id'
+    template_name: str = 'mata-kuliah/mk-kurikulum-detail-view.html'
 
 
 class MataKuliahKurikulumUpdateView(FormView):

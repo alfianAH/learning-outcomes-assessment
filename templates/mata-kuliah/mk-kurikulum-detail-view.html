@@ -1,0 +1,29 @@
+{% extends 'home-view.html' %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'kurikulum:read-all' %}" role="listitem">Kurikulum</a></li>
+<li class="breadcrumb-item"><a href="{{ object.read_kurikulum }}" role="listitem">Detail</a></li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">Detail MK</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<h1>{{ object.nama }}</h1>
+
+<div class="table-div">
+    <div class="tr-div">
+        <div class="w-20 sm:w-32 md:w-40 xl:w-48">Kurikulum</div>
+        <div>:</div>
+        <div>{{ object.kurikulum }}</div>
+    </div>
+    <div class="tr-div">
+        <div class="w-20 sm:w-32 md:w-40 xl:w-48">Kode</div>
+        <div>:</div>
+        <div>{{ object.kode }}</div>
+    </div>
+    <div class="tr-div">
+        <div class="w-20 sm:w-32 md:w-40 xl:w-48">SKS</div>
+        <div>:</div>
+        <div>{{ object.sks }}</div>
+    </div>
+</div>
+{% endblock content %}

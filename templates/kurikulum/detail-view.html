@@ -8,31 +8,29 @@
 {% block content %}
 <h1>{{ object.nama }}</h1>
 
-<table>
-    <tr>
-        <td class="w-40 md:w-52 xl:w-64">Tahun mulai</td>
-        <td>:</td>
-        <td>{{ object.tahun_mulai }}</td>
-    </tr>
-    <tr>
-        <td class="w-40 md:w-52 xl:w-64">Minimal SKS kelulusan</td>
-        <td>:</td>
-        <td>{{ object.min_sks }}</td>
-    </tr>
-    <tr>
-        <td class="w-40 md:w-52 xl:w-64">Keaktifan</td>
-        <td>:</td>
-        <td>{% include 'kurikulum/partials/badge-list-kurikulum.html' with option=object %}</td>
-    </tr>
-</table>
+<div class="table-div">
+    <div class="tr-div">
+        <div class="w-40 md:w-52 xl:w-64">Tahun mulai</div>
+        <div>:</div>
+        <div>{{ object.tahun_mulai }}</div>
+    </div>
+    <div class="tr-div">
+        <div class="w-40 md:w-52 xl:w-64">Minimal SKS kelulusan</div>
+        <div>:</div>
+        <div>{{ object.min_sks }}</div>
+    </div>
+    <div class="tr-div">
+        <div class="w-40 md:w-52 xl:w-64">Keaktifan</div>
+        <div>:</div>
+        <div>{% include 'kurikulum/partials/badge-list-kurikulum.html' with option=object %}</div>
+    </div>
+</div>
 
 {% with request.GET as GET %}
 <ul class="tab" role="tablist">
     <li class="tab-item w-40 {% if GET %}{% if GET.semester_nama and GET.semester_tipe_semester or GET.semester_ordering_by %}  {% else %} disabled {% endif %}{% endif %}" id="tab-1" data-target="#tab-semester-pane" role="presentation">
         <div class="tab-title">
             <span class="one-line">Semester</span>
-
-            <div class="w-2 h-2 lg:w-2.5 lg:h-2.5 ml-2.5 badge-warning rounded-full"></div>
         </div>
 
         <div class="tab-item-line"></div>
@@ -41,8 +39,6 @@
     <li class="tab-item w-40 lg:w-44 {% if GET.mk_nama or GET.mk_sks or GET.mk_ordering_by %} {% else %} disabled {% endif %}" id="tab-2" data-target="#tab-mk-pane" role="presentation">
         <div class="tab-title">
             <span class="one-line">Mata Kuliah</span>
-
-            <div class="w-2 h-2 lg:w-2.5 lg:h-2.5 ml-2.5 badge-warning  rounded-full"></div>
         </div>
 
         <div class="tab-item-line"></div>

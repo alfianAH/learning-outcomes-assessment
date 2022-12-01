@@ -793,16 +793,6 @@ th {
   background-color: rgb(6 95 70 / var(--tw-bg-opacity));
 }
 
-.badge-warning {
-  --tw-bg-opacity: 1;
-  background-color: rgb(245 158 11 / var(--tw-bg-opacity));
-}
-
-.dark .badge-warning {
-  --tw-bg-opacity: 1;
-  background-color: rgb(146 64 14 / var(--tw-bg-opacity));
-}
-
 .badge-info {
   border-width: 1px;
   --tw-bg-opacity: 1;
@@ -2832,6 +2822,30 @@ details.dropdown::marker {
   background-color: rgb(64 64 64 / var(--tw-bg-opacity));
 }
 
+/* Table with div */
+
+.table-div {
+  display: flex;
+  flex-direction: column;
+}
+
+.table-div > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(0.5rem * var(--tw-space-y-reverse));
+}
+
+.table-div > .tr-div {
+  display: flex;
+  flex-direction: row;
+}
+
+.table-div > .tr-div > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 0;
+  margin-right: calc(0.5rem * var(--tw-space-x-reverse));
+  margin-left: calc(0.5rem * calc(1 - var(--tw-space-x-reverse)));
+}
+
 .invisible {
   visibility: hidden;
 }
@@ -2906,10 +2920,6 @@ details.dropdown::marker {
   margin-right: 0.75rem;
 }
 
-.ml-2\.5 {
-  margin-left: 0.625rem;
-}
-
 .mt-2\.5 {
   margin-top: 0.625rem;
 }
@@ -2920,10 +2930,6 @@ details.dropdown::marker {
 
 .ml-1 {
   margin-left: 0.25rem;
-}
-
-.mr-0 {
-  margin-right: 0px;
 }
 
 .block {
@@ -2970,10 +2976,6 @@ details.dropdown::marker {
   height: 1.25rem;
 }
 
-.h-2 {
-  height: 0.5rem;
-}
-
 .h-7 {
   height: 1.75rem;
 }
@@ -3018,8 +3020,8 @@ details.dropdown::marker {
   width: 10rem;
 }
 
-.w-2 {
-  width: 0.5rem;
+.w-20 {
+  width: 5rem;
 }
 
 .w-1\/2 {
@@ -3119,16 +3121,16 @@ details.dropdown::marker {
   margin-left: calc(0.5rem * calc(1 - var(--tw-space-x-reverse)));
 }
 
-.space-y-2\.5 > :not([hidden]) ~ :not([hidden]) {
-  --tw-space-y-reverse: 0;
-  margin-top: calc(0.625rem * calc(1 - var(--tw-space-y-reverse)));
-  margin-bottom: calc(0.625rem * var(--tw-space-y-reverse));
-}
-
 .space-y-2 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-y-reverse: 0;
   margin-top: calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));
   margin-bottom: calc(0.5rem * var(--tw-space-y-reverse));
+}
+
+.space-y-2\.5 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(0.625rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(0.625rem * var(--tw-space-y-reverse));
 }
 
 .space-y-1 > :not([hidden]) ~ :not([hidden]) {
@@ -3718,6 +3720,10 @@ details.dropdown::marker {
     width: 20rem;
   }
 
+  .sm\:w-32 {
+    width: 8rem;
+  }
+
   .sm\:min-w-72 {
     min-width: 18rem;
   }
@@ -3812,6 +3818,10 @@ details.dropdown::marker {
     width: 13rem;
   }
 
+  .md\:w-40 {
+    width: 10rem;
+  }
+
   .md\:w-32 {
     width: 8rem;
   }
@@ -3882,24 +3892,8 @@ details.dropdown::marker {
     display: none;
   }
 
-  .lg\:h-2\.5 {
-    height: 0.625rem;
-  }
-
-  .lg\:h-2 {
-    height: 0.5rem;
-  }
-
   .lg\:w-\[480px\] {
     width: 480px;
-  }
-
-  .lg\:w-2\.5 {
-    width: 0.625rem;
-  }
-
-  .lg\:w-2 {
-    width: 0.5rem;
   }
 
   .lg\:w-44 {
@@ -3976,6 +3970,10 @@ details.dropdown::marker {
 
   .xl\:w-64 {
     width: 16rem;
+  }
+
+  .xl\:w-48 {
+    width: 12rem;
   }
 
   .xl\:w-36 {

@@ -697,6 +697,15 @@
     .table-strip tr{
         @apply odd:bg-slate-200 dark:odd:bg-neutral-700  rounded-lg;
     }
+
+    /* Table with div */
+    .table-div{
+        @apply flex flex-col space-y-2;
+    }
+
+    .table-div > .tr-div{
+        @apply flex flex-row space-x-2;
+    }
 }
 
 @layer utilities{

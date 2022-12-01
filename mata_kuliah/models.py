@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 from accounts.models import ProgramStudi
 from kurikulum.models import Kurikulum
@@ -15,3 +16,14 @@ class MataKuliahKurikulum(models.Model):
 
     def __str__(self) -> str:
         return self.nama
+
+    def read_kurikulum(self):
+        return reverse('kurikulum:read', kwargs={
+            'kurikulum_id': self.kurikulum.id_neosia
+        })
+
+    def read_detail_url(self):
+        return reverse('kurikulum:mk-read', kwargs={
+            'kurikulum_id': self.kurikulum.id_neosia,
+            'mk_id': self.id_neosia
+        })
