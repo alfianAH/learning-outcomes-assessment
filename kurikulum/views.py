@@ -2,7 +2,7 @@ import json
 from collections import OrderedDict
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic.base import View
 from django.views.generic.detail import DetailView
@@ -663,7 +663,89 @@ class MataKuliahKurikulumBulkDeleteView(DeleteView):
 
 # Semester Kurikulum
 class SemesterKurikulumCreateView(FormView):
-    pass
+    form_class = SemesterKurikulumCreateForm
+    template_name: str = 'semester/semester-kurikulum-create-view.html'
+    kurikulum_id: int = None
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        form = self.get_form(form_class=self.form_class)
+        
+        # If there are no choices, redirect back
+        if len(form.fields.get('semester_from_neosia').choices) == 0:
+            # TODO: ADD MESSAGE
+            return redirect(self.success_url)
+        
+        return super().get(request, *args, **kwargs)
+
+    def get_form(self, form_class = None):
+        form = super().get_form(form_class)
+        self.kurikulum_id = self.kwargs.get('kurikulum_id')
+        self.success_url = reverse('kurikulum:read', kwargs={
+            'kurikulum_id': self.kurikulum_id
+        })
+
+        semester_choices = get_semester_by_kurikulum_choices(self.kurikulum_id)
+        print(semester_choices)
+
+        form.fields.get('semester_from_neosia').choices = semester_choices
+
+        return form
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'kurikulum_id': self.kurikulum_id
+        })
+        return context
+
+    def save_semester(self, semester_id: int):
+        semester_detail = get_detail_semester(semester_id)
+        
+        # Extract tahun ajaran
+        tahun_ajaran = semester_detail.get('tahun_ajaran')
+        tahun_ajaran_obj = TahunAjaran.objects.get_or_create_tahun_ajaran(tahun_ajaran)
+        
+        # Get tipe semester
+        tipe_semester_str: str = semester_detail.get('tipe_semester')
+        match(tipe_semester_str.lower()):
+            case 'ganjil':
+                tipe_semester = TipeSemester.GANJIL
+            case 'genap':
+                tipe_semester = TipeSemester.GENAP
+        
+        semester_obj = Semester.objects.get_or_create(
+            id_neosia = semester_detail.get('id_neosia'),
+            tahun_ajaran = tahun_ajaran_obj[0],
+            nama = semester_detail.get('nama'),
+            tipe_semester = tipe_semester,
+        )
+
+        # Get kurikulum
+        kurikulum_obj: Kurikulum = get_object_or_404(Kurikulum, id_neosia=self.kurikulum_id)
+        
+        # Save semester kurikulum object
+        semester_kurikulum_obj = SemesterKurikulum.objects.create(
+            semester = semester_obj[0],
+            kurikulum = kurikulum_obj
+        )
+
+        semester_kurikulum_obj.save()
+
+    def form_valid(self, form) -> HttpResponse:
+        list_semester_id = form.cleaned_data.get('semester_from_neosia')
+
+        for semester_id in list_semester_id:
+            try:
+                semester_id = int(semester_id)
+            except ValueError:
+                if settings.DEBUG:
+                    print('Cannot convert Semester ID ("{}") to integer'.format(semester_id))
+                # TODO: ADD MESSAGE
+                return redirect(self.success_url)
+                
+            self.save_semester(semester_id)
+        
+        return super().form_valid(form)
 
 
 class SemesterKurikulumUpdateView(FormView):
