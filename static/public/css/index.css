@@ -2846,6 +2846,7 @@ details.dropdown::marker {
 .table-div > .tr-div {
   display: flex;
   flex-direction: row;
+  align-items: center;
 }
 
 .table-div > .tr-div > :not([hidden]) ~ :not([hidden]) {
