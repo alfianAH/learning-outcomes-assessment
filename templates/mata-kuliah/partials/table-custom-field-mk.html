@@ -9,12 +9,7 @@
     <td scope="col" class="text-left field-nama {% if open_button and option.read_detail_url %} flex max-w-sm flex-row items-center relative {% endif %}">
         <span class="one-line" title="{{ option.nama }}">{{ option.nama }}</span>
         {% if open_button and option.read_detail_url %}
-            <a href="{{ option.read_detail_url }}" class="btn btn-outline-light absolute right-4 h-7 invisible group-hover:visible opacity-0 group-hover:opacity-100 group-hover:transition-opacity group-hover:ease-in-out group-hover:duration-500">
-                Buka
-                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-chevron-right ml-1 sm:ml-1 !w-4 !h-4" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
-                </svg>
-            </a>
+            {% include 'components/button/open-list-item-button.html' %}
         {% endif %}
     </td>
     <td class="text-left">{{ option.sks }}</td>
