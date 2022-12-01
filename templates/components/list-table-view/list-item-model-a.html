@@ -91,7 +91,7 @@
             {% endfor %}
         {% else %}
             {% for option in options %}
-                <tr>
+                <tr class="{% if open_button and option.read_detail_url %} group {% endif %}">
                     <th class="text-center checkbox">
                         <input type="checkbox" name="{{ input_name }}" {% if option.id_neosia %}value="{{ option.id_neosia }}" id="{{ prefix_id }}{{ option.id_neosia }}" {% else %}value="{{ option.id }}" id="{{ prefix_id }}{{ option.id }}" {% endif %}>
                     </th>
