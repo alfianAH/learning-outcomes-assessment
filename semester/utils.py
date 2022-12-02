@@ -89,7 +89,7 @@ def get_semester_by_kurikulum_choices(kurikulum_id: int):
     for semester_data in list_semester:
         semester_id = semester_data['id_neosia']
         # Search in database
-        object_in_db = SemesterKurikulum.objects.filter(semester=int(semester_id))
+        object_in_db = SemesterKurikulum.objects.filter(kurikulum=kurikulum_id, semester=int(semester_id))
         if object_in_db.exists(): continue
 
         # Convert it to input value, options

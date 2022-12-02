@@ -1,0 +1,24 @@
+{% if option.wrap_label %}
+    <td class="text-left field-nama">
+        <span class="one-line" title="{{ option.label.nama }}">{{ option.label.nama }}</span>
+    </td>
+    <td class="text-left">{{ option.label.tahun_ajaran }}</td>
+    <td class="text-left !align-middle">
+        {% if option.badge_template %}
+            {% include option.badge_template %}
+        {% endif %}
+    </td>
+{% else %}
+    <td scope="col" class="text-left field-nama {% if open_button and option.read_detail_url %} flex max-w-xs flex-row items-center relative {% endif %}">
+        <span class="one-line" title="{{ option.semester.nama }}">{{ option.semester.nama }}</span>
+        {% if open_button and option.read_detail_url %}
+            {% include 'components/button/open-list-item-button.html' %}
+        {% endif %}
+    </td>
+    <td class="text-left">{{ option.semester.tahun_ajaran }}</td>
+    <td class="text-left !align-middle">
+        {% if badge_template %}
+            {% include badge_template %}
+        {% endif %}
+    </td>
+{% endif %}

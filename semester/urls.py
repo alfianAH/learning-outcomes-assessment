@@ -1,10 +1,12 @@
 from django.urls import path
 from .views import(
-    SemesterHomeView,
+    SemesterReadAllView,
+    SemesterReadView
 )
 
 
 app_name = 'semester'
 urlpatterns = [
-    path('', SemesterHomeView.as_view(), name='read-all'),
+    path('', SemesterReadAllView.as_view(), name='read-all'),
+    path('<int:semester_kurikulum_id>', SemesterReadAllView.as_view(), name='read'),
 ]

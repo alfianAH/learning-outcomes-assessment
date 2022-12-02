@@ -230,8 +230,6 @@ class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
             kurikulum = kurikulum_obj
         )
 
-        semester_kurikulum_obj.save()
-
     def done(self, form_list, **kwargs):
         cleaned_data = self.get_all_cleaned_data()
         
@@ -582,7 +580,6 @@ class MataKuliahKurikulumCreateView(FormView):
                 kurikulum=kurikulum_obj, 
                 **mk_kurikulum
             )
-            mk_kurikulum_obj.save()
         
         return redirect(self.success_url)
 
@@ -732,8 +729,6 @@ class SemesterKurikulumCreateView(FormView):
             semester = semester_obj[0],
             kurikulum = kurikulum_obj
         )
-
-        semester_kurikulum_obj.save()
 
     def form_valid(self, form) -> HttpResponse:
         list_semester_id = form.cleaned_data.get(self.form_field_name)

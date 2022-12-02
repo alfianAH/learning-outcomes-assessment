@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from kurikulum.models import Kurikulum
@@ -23,6 +24,9 @@ class TahunAjaran(models.Model):
     tahun_ajaran_awal = models.IntegerField(null=False)
     tahun_ajaran_akhir = models.IntegerField(null=False)
 
+    class Meta:
+        ordering = ('tahun_ajaran_awal', 'tahun_ajaran_akhir')
+
     def __str__(self) -> str:
         return '{}/{}'.format(self.tahun_ajaran_awal, self.tahun_ajaran_akhir)
 
@@ -42,3 +46,8 @@ class Semester(models.Model):
 class SemesterKurikulum(models.Model):
     semester = models.ForeignKey(Semester, on_delete=models.CASCADE)
     kurikulum = models.ForeignKey(Kurikulum, on_delete=models.CASCADE)
+
+    def read_detail_url(self):
+        return reverse('semester:read', kwargs={
+            'semester_kurikulum_id': self.pk
+        })

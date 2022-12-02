@@ -1,0 +1,15 @@
+{% if option.wrap_label %}
+<div class="badge {% if option.label.tipe_semester|lower == "ganjil" %}badge-primary{% elif option.label.tipe_semester|lower == "genap" %}badge-success{% else %}badge-info{% endif %}">
+    {{ option.label.tipe_semester|capfirst }}
+</div>
+{% else %}
+    {% if option.semester.get_tipe_semester_display %}
+        <div class="badge {% if option.semester.get_tipe_semester_display|lower == "ganjil" %}badge-primary{% elif option.semester.get_tipe_semester_display|lower == "genap" %}badge-success{% else %}badge-info{% endif %}">
+            {{ option.semester.get_tipe_semester_display|capfirst }}
+        </div>
+    {% else %}
+        <div class="badge {% if option.semester.tipe_semester|lower == "ganjil" %}badge-primary{% elif option.semester.tipe_semester|lower == "genap" %}badge-success{% else %}badge-info{% endif %}">
+            {{ option.semester.tipe_semester|capfirst }}
+        </div>
+    {% endif %}
+{% endif %}

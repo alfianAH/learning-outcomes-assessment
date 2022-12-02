@@ -6,7 +6,9 @@ from django.views.generic.edit import DeleteView, FormView
 from django.views.generic.list import ListView
 from .filters import(
     SemesterFilter,
+    SemesterKurikulumFilter,
     SemesterSort,
+    SemesterKurikulumSort
 )
 from .models import(
     Semester, 
@@ -15,33 +17,33 @@ from .models import(
 
 
 # Create your views here.
-class SemesterHomeView(ListView):
-    model = Semester
+class SemesterReadAllView(ListView):
+    model = SemesterKurikulum
     paginate_by: int = 10
     template_name: str = 'semester/home.html'
-    ordering: str = 'nama'
-    semester_filter = None
-    semester_sort = None
+    ordering: str = 'semester__nama'
+    semester_filter: SemesterKurikulumFilter = None
+    semester_sort: SemesterKurikulumSort = None
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         if request.user.prodi is None: raise Http404()
-        
-        semester_qs = self.model.objects.filter(semesterkurikulum__kurikulum__prodi__id_neosia=request.user.prodi.id_neosia)
+
+        semester_qs = self.model.objects.filter(kurikulum__prodi__id_neosia=request.user.prodi.id_neosia)
 
         if semester_qs.exists():
             filter_data = {
-                'semester_nama': request.GET.get('semester_nama', ''),
-                'semester_tipe_semester': request.GET.get('semester_tipe_semester', ''),
+                'nama': request.GET.get('nama', ''),
+                'tipe_semester': request.GET.get('tipe_semester', ''),
             }
             sort_data = {
-                'semester_ordering_by': request.GET.get('semester_ordering_by', self.ordering)
+                'ordering_by': request.GET.get('ordering_by', self.ordering)
             }
 
-            self.semester_filter = SemesterFilter(
+            self.semester_filter = SemesterKurikulumFilter(
                 data=filter_data or None, 
                 queryset=semester_qs
             )
-            self.semester_sort = SemesterSort(data=sort_data)
+            self.semester_sort = SemesterKurikulumSort(data=sort_data, initial={'ordering_by': 'semester__nama'})
 
         return super().get(request, *args, **kwargs)
 
@@ -52,7 +54,7 @@ class SemesterHomeView(ListView):
             prodi_id = self.request.user.prodi.id_neosia
 
             self.queryset = self.model.objects.filter(
-                semesterkurikulum__kurikulum__prodi__id_neosia=prodi_id
+                kurikulum__prodi__id_neosia=prodi_id
             )
         return super().get_queryset()
 
@@ -61,7 +63,8 @@ class SemesterHomeView(ListView):
             return super().get_ordering()
         
         if self.semester_sort.is_valid():
-            self.ordering = self.semester_sort.cleaned_data.get('semester_ordering_by', 'nama')
+            self.ordering = self.semester_sort.cleaned_data.get('ordering_by', 'semester__nama')
+        
         return super().get_ordering()
 
     def get_context_data(self, **kwargs):
@@ -70,11 +73,12 @@ class SemesterHomeView(ListView):
             # 'bulk_delete_url': reverse('semester:bulk-delete'),
             'reset_url': reverse('semester:read-all'),
             'semester_list_prefix_id': 'semester-',
-            'badge_template': 'semester/partials/badge-list-semester.html',
+            'badge_template': 'semester/partials/badge-list-semester-kurikulum.html',
+            'list_item_name': 'semester/partials/list-item-name-semester-kurikulum.html',
             'list_custom_field_template': 'semester/partials/list-custom-field-semester.html',
             'table_custom_field_header_template': 'semester/partials/table-custom-field-header-semester.html',
-            'table_custom_field_template': 'semester/partials/table-custom-field-semester.html',
-            'filter_template': 'semester/partials/semester-filter-form.html',
+            'table_custom_field_template': 'semester/partials/table-custom-field-semester-kurikulum.html',
+            'filter_template': 'semester/partials/semester-kurikulum-filter-form.html',
             'sort_template': 'semester/partials/semester-sort-form.html',
         })
 
@@ -85,3 +89,8 @@ class SemesterHomeView(ListView):
         if self.semester_sort is not None:
             context['sort_form'] = self.semester_sort
         return context
+
+
+class SemesterReadView(DetailView):
+    model = SemesterKurikulum
+    pk_url_kwarg: str = 'semester_kurikulum_id'
