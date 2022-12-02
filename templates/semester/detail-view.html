@@ -1,0 +1,14 @@
+{% extends 'home-view.html' %}
+
+{% block title %}
+Semester - 
+{% endblock title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'semester:read-all' %}" role="listitem">Semester</a></li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">Detail</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<h1>{{ object.semester.nama }}</h1>
+{% endblock content %}

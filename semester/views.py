@@ -94,3 +94,4 @@ class SemesterReadAllView(ListView):
 class SemesterReadView(DetailView):
     model = SemesterKurikulum
     pk_url_kwarg: str = 'semester_kurikulum_id'
+    template_name: str = 'semester/detail-view.html'
