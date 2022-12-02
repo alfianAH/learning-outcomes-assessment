@@ -3050,12 +3050,6 @@ details.dropdown::marker {
   min-width: 100%;
 }
 
-.max-w-min {
-  max-width: -webkit-min-content;
-  max-width: -moz-min-content;
-  max-width: min-content;
-}
-
 .max-w-none {
   max-width: none;
 }
@@ -3066,6 +3060,12 @@ details.dropdown::marker {
 
 .max-w-sm {
   max-width: 24rem;
+}
+
+.max-w-min {
+  max-width: -webkit-min-content;
+  max-width: -moz-min-content;
+  max-width: min-content;
 }
 
 @-webkit-keyframes spin {
