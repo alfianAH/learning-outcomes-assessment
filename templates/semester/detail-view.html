@@ -10,36 +10,34 @@ Semester -
 {% endblock breadcrumb %}
 
 {% block content %}
-<div class="space-y-2 lg:space-y-3">
-    <h1>{{ object.semester.nama }}</h1>
+<h1>{{ object.semester.nama }}</h1>
 
-    <ul class="w-full text-center sm:text-start space-y-2 sm:space-y-0 sm:space-x-2 xl:space-x-10">
-        <li class="link-item-icon">
-            <a href="javascript:void(0);">
-                <div class="rounded-full bg-slate-500 w-48 h-48"></div>
-                <span>
-                    Mata Kuliah Semester
-                </span>
-            </a>
-        </li>
+<ul class="w-full text-center sm:text-start space-y-2 sm:space-y-0 sm:space-x-2 xl:space-x-10">
+    <li class="link-item-icon">
+        <a href="javascript:void(0);">
+            <div class="rounded-full bg-slate-500 w-48 h-48"></div>
+            <span>
+                Mata Kuliah Semester
+            </span>
+        </a>
+    </li>
 
-        <li class="link-item-icon">
-            <a href="javascript:void(0);" class="link-with-icon">
-                <div class="rounded-full bg-slate-500 w-48 h-48"></div>
-                <span>
-                    Performance Indicators
-                </span>
-            </a>
-        </li>
+    <li class="link-item-icon">
+        <a href="javascript:void(0);" class="link-with-icon">
+            <div class="rounded-full bg-slate-500 w-48 h-48"></div>
+            <span>
+                Performance Indicators
+            </span>
+        </a>
+    </li>
 
-        <li class="link-item-icon">
-            <a href="{{ object.read_all_ilo_url }}" class="link-with-icon">
-                <div class="rounded-full bg-slate-500 w-48 h-48"></div>
-                <span>
-                    Intended Learning Outcomes
-                </span>
-            </a>
-        </li>
-    </ul>
-</div>
+    <li class="link-item-icon">
+        <a href="{{ object.read_all_ilo_url }}" class="link-with-icon">
+            <div class="rounded-full bg-slate-500 w-48 h-48"></div>
+            <span>
+                Intended Learning Outcomes
+            </span>
+        </a>
+    </li>
+</ul>
 {% endblock content %}

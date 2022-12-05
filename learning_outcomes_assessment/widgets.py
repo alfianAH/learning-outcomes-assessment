@@ -3,6 +3,7 @@ from django.forms.widgets import (
     ChoiceWidget,
     Input,
     Select,
+    Textarea,
 )
 
 class ChoiceListInteractiveModelA(CheckboxSelectMultiple):
@@ -90,6 +91,15 @@ class UpdateChoiceList(CheckboxSelectMultiple):
 class MyNumberInput(Input):
     input_type: str = 'number'
     template_name: str = 'custom-widgets/forms/widgets/number.html'
+
+
+class MyTextInput(Input):
+    input_type: str = 'text'
+    template_name: str = 'custom-widgets/forms/widgets/text.html'
+
+
+class MyTextareaInput(Textarea):
+    template_name: str = 'custom-widgets/forms/widgets/textarea.html'
 
 
 class MySearchInput(Input):

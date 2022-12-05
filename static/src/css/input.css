@@ -244,7 +244,7 @@
 
     /* Content */
     #content{
-        @apply space-y-2;
+        @apply space-y-2 lg:space-y-3;
     }
 
     /* Dropdown */
@@ -314,7 +314,7 @@
         @apply list-none flex flex-wrap justify-center md:flex-col md:justify-start md:p-2 lg:p-3;
     }
 
-    .form-wizard-buttons{
+    .form-buttons{
         @apply flex flex-row space-x-2.5 justify-end;
     }
 

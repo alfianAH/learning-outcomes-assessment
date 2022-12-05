@@ -1267,6 +1267,14 @@ th {
   margin-bottom: calc(0.5rem * var(--tw-space-y-reverse));
 }
 
+@media (min-width: 1024px) {
+  #content > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-y-reverse: 0;
+    margin-top: calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));
+    margin-bottom: calc(0.75rem * var(--tw-space-y-reverse));
+  }
+}
+
 /* Dropdown */
 
 details.dropdown *::marker {
@@ -1541,13 +1549,13 @@ details.dropdown::marker {
   }
 }
 
-.form-wizard-buttons {
+.form-buttons {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
 }
 
-.form-wizard-buttons > :not([hidden]) ~ :not([hidden]) {
+.form-buttons > :not([hidden]) ~ :not([hidden]) {
   --tw-space-x-reverse: 0;
   margin-right: calc(0.625rem * var(--tw-space-x-reverse));
   margin-left: calc(0.625rem * calc(1 - var(--tw-space-x-reverse)));
@@ -3812,6 +3820,14 @@ details.dropdown::marker {
 }
 
 @media (min-width: 640px) {
+  .sm\:ml-2\.5 {
+    margin-left: 0.625rem;
+  }
+
+  .sm\:ml-2 {
+    margin-left: 0.5rem;
+  }
+
   .sm\:ml-1 {
     margin-left: 0.25rem;
   }
@@ -3908,6 +3924,10 @@ details.dropdown::marker {
 
   .md\:mt-2 {
     margin-top: 0.5rem;
+  }
+
+  .md\:mt-3 {
+    margin-top: 0.75rem;
   }
 
   .md\:table {
@@ -4034,12 +4054,6 @@ details.dropdown::marker {
     margin-left: calc(1.5rem * calc(1 - var(--tw-space-x-reverse)));
   }
 
-  .lg\:space-y-3 > :not([hidden]) ~ :not([hidden]) {
-    --tw-space-y-reverse: 0;
-    margin-top: calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));
-    margin-bottom: calc(0.75rem * var(--tw-space-y-reverse));
-  }
-
   .lg\:p-8 {
     padding: 2rem;
   }
@@ -4094,5 +4108,11 @@ details.dropdown::marker {
     --tw-space-y-reverse: 0;
     margin-top: calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));
     margin-bottom: calc(0.75rem * var(--tw-space-y-reverse));
+  }
+
+  .xl\:space-y-4 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-y-reverse: 0;
+    margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
+    margin-bottom: calc(1rem * var(--tw-space-y-reverse));
   }
 }

@@ -1,5 +1,9 @@
 {% extends 'home-view.html' %}
 
+{% block title %}
+ILO - 
+{% endblock title %}
+
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{% url 'semester:read-all' %}" role="listitem">Semester</a></li>
 <li class="breadcrumb-item"><a href="{% url 'semester:read' semester_kurikulum_id=semester_obj.id %}" role="listitem">Detail</a></li>
@@ -7,6 +11,107 @@
 {% endblock breadcrumb %}
 
 {% block content %}
-<h1>Intended Learning Outcomes</h1>
-{{ semester_obj.semester.nama }}
+<div class="h-icon">
+    <h1>Intended Learning Outcomes</h1>
+    <button class="btn btn-success"  type="button" data-target="#create-modal" onclick="openModal(this)" hx-get="{{ create_ilo_url }}" hx-target="#create-modal-form" hx-trigger="click">
+        <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+        </svg>
+        <span class="hidden sm:block sm:ml-2.5">Tambah data</span>
+    </button>
+    <a href="{{ create_ilo_url }}" class="btn btn-success" type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+        </svg>
+        <span class="hidden sm:block sm:ml-2.5">Tambah data</span>
+    </a>
+</div>
+
+<p>{{ semester_obj.semester.nama }}</p>
+
+<div>
+    {% if create_ilo_url %}
+    <div class="modal" id="create-modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Tambah ILO</h3>
+                    <button class="btn border-none" type="button" data-dismiss="modal" onclick="closeModalByButton(this)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="modal-body" id="create-modal-form">
+                    
+                </div>
+
+                <div class="modal-footer">
+                    {% comment %} <button class="btn btn-secondary" type="button" data-dismiss="modal" onclick="closeModalByButton(this)">Tutup</button>
+                    <button class="btn btn-primary" type="submit">Simpan</button> {% endcomment %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if filter_template %}
+    <div class="modal" id="{% if prefix_id %}{{ prefix_id }}{% endif %}filter-modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Masukkan Filter</h3>
+                    <button class="btn border-none" type="button" data-dismiss="modal" onclick="closeModalByButton(this)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    {% include filter_template %}
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal" onclick="closeModalByButton(this)">Tutup</button>
+                    {% if request.GET %}
+                    <a href="{{ reset_url }}" class="btn btn-warning">Reset</a>
+                    {% endif %}
+                    <button class="btn btn-primary" type="submit">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if sort_template %}
+    <div class="modal" id="{% if prefix_id %}{{ prefix_id }}{% endif %}sort-modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Urutkan</h3>
+                    <button class="btn border-none" type="button" data-dismiss="modal" onclick="closeModalByButton(this)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    {% include sort_template %}
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal" onclick="closeModalByButton(this)">Tutup</button>
+                    {% if request.GET %}
+                    <a href="{{ reset_url }}" class="btn btn-warning">Reset</a>
+                    {% endif %}
+                    <button class="btn btn-primary" type="submit">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
 {% endblock content %}

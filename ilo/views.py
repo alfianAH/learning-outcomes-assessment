@@ -1,7 +1,11 @@
 from django.http import HttpRequest, HttpResponse
+from django.urls import reverse_lazy
+from django.views.generic.base import View
 from django.views.generic.list import ListView
+from django.views.generic.edit import DeleteView, FormView
 from django.shortcuts import get_object_or_404
 from .models import Ilo
+from .forms import IloCreateForm
 from semester.models import SemesterKurikulum
 
 
@@ -22,6 +26,13 @@ class IloReadAllView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'semester_obj': self.semester_obj
+            'semester_obj': self.semester_obj,
+            'create_ilo_url': self.semester_obj.create_ilo_url(),
         })
         return context
+
+
+class IloCreateView(FormView):
+    form_class = IloCreateForm
+    template_name: str = 'ilo/partials/ilo-create-view.html'
+    success_url = reverse_lazy('semester:ilo:read-all')
