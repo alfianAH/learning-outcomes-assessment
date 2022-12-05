@@ -1,0 +1,12 @@
+{% extends 'home-view.html' %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'semester:read-all' %}" role="listitem">Semester</a></li>
+<li class="breadcrumb-item"><a href="{% url 'semester:read' semester_kurikulum_id=semester_obj.id %}" role="listitem">Detail</a></li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">ILO</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<h1>Intended Learning Outcomes</h1>
+{{ semester_obj.semester.nama }}
+{% endblock content %}

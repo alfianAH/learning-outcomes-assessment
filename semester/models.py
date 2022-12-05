@@ -51,3 +51,8 @@ class SemesterKurikulum(models.Model):
         return reverse('semester:read', kwargs={
             'semester_kurikulum_id': self.pk
         })
+
+    def read_all_ilo_url(self):
+        return reverse('semester:ilo:read-all', kwargs={
+            'semester_kurikulum_id': self.pk
+        })

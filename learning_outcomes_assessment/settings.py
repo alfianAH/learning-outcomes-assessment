@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'kurikulum',
     'mata_kuliah',
     'semester',
+    'ilo',
 ]
 
 MIDDLEWARE = [
