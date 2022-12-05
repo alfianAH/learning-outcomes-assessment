@@ -363,6 +363,15 @@
         @apply flex flex-row space-x-2.5 lg:space-x-3 items-center;
     }
 
+    /* Link with icon */
+    .link-item-icon{
+        @apply items-center w-min text-center p-4;
+    }
+
+    .link-item-icon > a{
+        @apply flex flex-col space-y-4 text-slate-800 dark:text-slate-100 active:text-slate-800 dark:active:text-slate-100 font-bold text-base md:text-lg xl:text-xl;
+    }
+
     /* List item */
     .list-item-title{
         @apply w-full font-bold sm:w-fit whitespace-nowrap overflow-hidden overflow-ellipsis;

@@ -1822,6 +1822,65 @@ details.dropdown::marker {
   }
 }
 
+/* Link with icon */
+
+.link-item-icon {
+  width: -webkit-min-content;
+  width: -moz-min-content;
+  width: min-content;
+  align-items: center;
+  padding: 1rem;
+  text-align: center;
+}
+
+.link-item-icon > a {
+  display: flex;
+  flex-direction: column;
+}
+
+.link-item-icon > a > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(1rem * var(--tw-space-y-reverse));
+}
+
+.link-item-icon > a {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 700;
+  --tw-text-opacity: 1;
+  color: rgb(30 41 59 / var(--tw-text-opacity));
+}
+
+.link-item-icon > a:active {
+  --tw-text-opacity: 1;
+  color: rgb(30 41 59 / var(--tw-text-opacity));
+}
+
+.dark .link-item-icon > a {
+  --tw-text-opacity: 1;
+  color: rgb(241 245 249 / var(--tw-text-opacity));
+}
+
+.dark .link-item-icon > a:active {
+  --tw-text-opacity: 1;
+  color: rgb(241 245 249 / var(--tw-text-opacity));
+}
+
+@media (min-width: 768px) {
+  .link-item-icon > a {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .link-item-icon > a {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+}
+
 /* List item */
 
 .list-item-title {
@@ -2982,6 +3041,10 @@ details.dropdown::marker {
   height: 1.25rem;
 }
 
+.h-48 {
+  height: 12rem;
+}
+
 .h-7 {
   height: 1.75rem;
 }
@@ -3030,6 +3093,10 @@ details.dropdown::marker {
   width: 5rem;
 }
 
+.w-48 {
+  width: 12rem;
+}
+
 .\!w-4 {
   width: 1rem !important;
 }
@@ -3050,6 +3117,12 @@ details.dropdown::marker {
   min-width: 100%;
 }
 
+.max-w-min {
+  max-width: -webkit-min-content;
+  max-width: -moz-min-content;
+  max-width: min-content;
+}
+
 .max-w-none {
   max-width: none;
 }
@@ -3060,12 +3133,6 @@ details.dropdown::marker {
 
 .max-w-sm {
   max-width: 24rem;
-}
-
-.max-w-min {
-  max-width: -webkit-min-content;
-  max-width: -moz-min-content;
-  max-width: min-content;
 }
 
 @-webkit-keyframes spin {
@@ -3980,6 +4047,15 @@ details.dropdown::marker {
   .lg\:px-2 {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
+  }
+
+  .lg\:px-5 {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  .lg\:pl-5 {
+    padding-left: 1.25rem;
   }
 
   .lg\:text-start {

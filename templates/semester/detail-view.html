@@ -10,5 +10,36 @@ Semester -
 {% endblock breadcrumb %}
 
 {% block content %}
-<h1>{{ object.semester.nama }}</h1>
+<div class="space-y-2 lg:space-y-3">
+    <h1>{{ object.semester.nama }}</h1>
+
+    <ul class="flex flex-col masonry w-full">
+        <li class="link-item-icon">
+            <a href="javascript:void(0);">
+                <div class="rounded-full bg-slate-500 w-48 h-48"></div>
+                <span>
+                    Mata Kuliah Semester
+                </span>
+            </a>
+        </li>
+
+        <li class="link-item-icon">
+            <a href="javascript:void(0);" class="link-with-icon">
+                <div class="rounded-full bg-slate-500 w-48 h-48"></div>
+                <span>
+                    Performance Indicator
+                </span>
+            </a>
+        </li>
+
+        <li class="link-item-icon">
+            <a href="javascript:void(0);" class="link-with-icon">
+                <div class="rounded-full bg-slate-500 w-48 h-48"></div>
+                <span>
+                    Intended Learning Outcomes
+                </span>
+            </a>
+        </li>
+    </ul>
+</div>
 {% endblock content %}
