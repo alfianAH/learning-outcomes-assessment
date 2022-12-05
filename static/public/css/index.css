@@ -1825,6 +1825,7 @@ details.dropdown::marker {
 /* Link with icon */
 
 .link-item-icon {
+  display: inline-block;
   width: -webkit-min-content;
   width: -moz-min-content;
   width: min-content;
@@ -3843,6 +3844,12 @@ details.dropdown::marker {
     flex-direction: row;
   }
 
+  .sm\:space-x-2 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 0;
+    margin-right: calc(0.5rem * var(--tw-space-x-reverse));
+    margin-left: calc(0.5rem * calc(1 - var(--tw-space-x-reverse)));
+  }
+
   .sm\:space-y-0 > :not([hidden]) ~ :not([hidden]) {
     --tw-space-y-reverse: 0;
     margin-top: calc(0px * calc(1 - var(--tw-space-y-reverse)));
@@ -3861,12 +3868,6 @@ details.dropdown::marker {
     margin-left: calc(0.625rem * calc(1 - var(--tw-space-x-reverse)));
   }
 
-  .sm\:space-x-2 > :not([hidden]) ~ :not([hidden]) {
-    --tw-space-x-reverse: 0;
-    margin-right: calc(0.5rem * var(--tw-space-x-reverse));
-    margin-left: calc(0.5rem * calc(1 - var(--tw-space-x-reverse)));
-  }
-
   .sm\:rounded-lg {
     border-radius: 0.5rem;
   }
@@ -3883,6 +3884,10 @@ details.dropdown::marker {
   .sm\:bg-neutral-50 {
     --tw-bg-opacity: 1;
     background-color: rgb(250 250 250 / var(--tw-bg-opacity));
+  }
+
+  .sm\:text-start {
+    text-align: start;
   }
 
   .dark .dark\:sm\:border-slate-100 {
@@ -4049,15 +4054,6 @@ details.dropdown::marker {
     padding-right: 0.5rem;
   }
 
-  .lg\:px-5 {
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
-  }
-
-  .lg\:pl-5 {
-    padding-left: 1.25rem;
-  }
-
   .lg\:text-start {
     text-align: start;
   }
@@ -4088,9 +4084,37 @@ details.dropdown::marker {
     width: 9rem;
   }
 
+  .xl\:justify-between {
+    justify-content: space-between;
+  }
+
+  .xl\:space-x-3 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 0;
+    margin-right: calc(0.75rem * var(--tw-space-x-reverse));
+    margin-left: calc(0.75rem * calc(1 - var(--tw-space-x-reverse)));
+  }
+
   .xl\:space-y-3 > :not([hidden]) ~ :not([hidden]) {
     --tw-space-y-reverse: 0;
     margin-top: calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));
     margin-bottom: calc(0.75rem * var(--tw-space-y-reverse));
+  }
+
+  .xl\:space-x-0 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 0;
+    margin-right: calc(0px * var(--tw-space-x-reverse));
+    margin-left: calc(0px * calc(1 - var(--tw-space-x-reverse)));
+  }
+
+  .xl\:space-x-5 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 0;
+    margin-right: calc(1.25rem * var(--tw-space-x-reverse));
+    margin-left: calc(1.25rem * calc(1 - var(--tw-space-x-reverse)));
+  }
+
+  .xl\:space-x-10 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 0;
+    margin-right: calc(2.5rem * var(--tw-space-x-reverse));
+    margin-left: calc(2.5rem * calc(1 - var(--tw-space-x-reverse)));
   }
 }

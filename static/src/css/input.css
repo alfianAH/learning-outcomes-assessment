@@ -365,7 +365,7 @@
 
     /* Link with icon */
     .link-item-icon{
-        @apply items-center w-min text-center p-4;
+        @apply items-center w-min text-center p-4 inline-block;
     }
 
     .link-item-icon > a{
