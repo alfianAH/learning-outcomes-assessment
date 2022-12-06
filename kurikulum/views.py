@@ -9,6 +9,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import DeleteView, FormView
 from django.views.generic.list import ListView
 from learning_outcomes_assessment.wizard.views import MySessionWizardView
+from learning_outcomes_assessment.list_view.views import ListViewModelA
 
 from accounts.models import ProgramStudi
 from .models import Kurikulum
@@ -312,7 +313,7 @@ class KurikulumBulkUpdateView(FormView):
         return redirect(self.success_url)
 
 
-class KurikulumReadAllView(ListView):
+class KurikulumReadAllView(ListViewModelA):
     """Read all Kurikulums from Program Studi X
     """
     
@@ -320,8 +321,22 @@ class KurikulumReadAllView(ListView):
     paginate_by: int = 10
     template_name: str = 'kurikulum/home.html'
     ordering: str = 'tahun_mulai'
-    kurikulum_filter = None
-    kurikulum_sort = None
+    sort_form_ordering_by_key: str = 'ordering_by'
+
+    filter_form: KurikulumFilter = None
+    sort_form: KurikulumSort = None
+
+    bulk_delete_url: str = reverse_lazy('kurikulum:bulk-delete')
+    reset_url: str = reverse_lazy('kurikulum:read-all')
+    input_name: str = 'id_kurikulum'
+    list_id: str = 'kurikulum-list-content'
+    list_prefix_id: str = 'kurikulum-'
+    badge_template: str = 'kurikulum/partials/badge-list-kurikulum.html'
+    list_custom_field_template: str = 'kurikulum/partials/list-custom-field-kurikulum.html'
+    table_custom_field_header_template: str = 'kurikulum/partials/table-custom-field-header-kurikulum.html'
+    table_custom_field_template: str = 'kurikulum/partials/table-custom-field-kurikulum.html'
+    filter_template: str = 'kurikulum/partials/kurikulum-filter-form.html'
+    sort_template: str = 'kurikulum/partials/kurikulum-sort-form.html'
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         kurikulum_qs = self.model.objects.filter(prodi=request.user.prodi)
@@ -335,52 +350,18 @@ class KurikulumReadAllView(ListView):
                 'ordering_by': request.GET.get('ordering_by', self.ordering)
             }
 
-            self.kurikulum_filter = KurikulumFilter(
+            self.filter_form = KurikulumFilter(
                 data=filter_data or None, 
                 queryset=kurikulum_qs
             )
-            self.kurikulum_sort = KurikulumSort(data=sort_data)
+            self.sort_form = KurikulumSort(data=sort_data)
 
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        if self.kurikulum_filter is not None:
-            self.queryset = self.kurikulum_filter.qs
-        else:
-            self.queryset = self.model.objects.filter(prodi=self.request.user.prodi)
+        self.queryset = self.model.objects.filter(prodi=self.request.user.prodi)
 
         return super().get_queryset()
-
-    def get_ordering(self):
-        if self.kurikulum_sort is None:
-            return super().get_ordering()
-        
-        if self.kurikulum_sort.is_valid():
-            self.ordering = self.kurikulum_sort.cleaned_data.get('ordering_by', 'tahun_mulai')
-        return super().get_ordering()
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({
-            'bulk_delete_url': reverse('kurikulum:bulk-delete'),
-            'reset_url': reverse('kurikulum:read-all'),
-            'kurikulum_list_prefix_id': 'kurikulum-',
-            'badge_template':'kurikulum/partials/badge-list-kurikulum.html',
-            'list_custom_field_template':'kurikulum/partials/list-custom-field-kurikulum.html',
-            'table_custom_field_header_template':'kurikulum/partials/table-custom-field-header-kurikulum.html',
-            'table_custom_field_template':'kurikulum/partials/table-custom-field-kurikulum.html',
-            'filter_template': 'kurikulum/partials/kurikulum-filter-form.html',
-            'sort_template': 'kurikulum/partials/kurikulum-sort-form.html',
-        })
-
-        if self.kurikulum_filter is not None:
-            context['filter_form'] = self.kurikulum_filter.form
-            context['data_exist'] = True
-
-        if self.kurikulum_sort is not None:
-            context['sort_form'] = self.kurikulum_sort
-        
-        return context
 
 
 class KurikulumReadView(DetailView):
