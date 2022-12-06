@@ -14,15 +14,7 @@
 
         {{ field }}
 
-        {% if field.errors %}
-            <ul>
-            {% for error in field.errors %}
-                <li>
-                    <span class="form-error active">{{ error }}</span>
-                </li>
-            {% endfor %}
-            </ul>
-        {% endif %}
+        {% include 'components/form/form-errors.html' with errors=field.errors %}
     {% endfor %}
 
     <div class="form-buttons">

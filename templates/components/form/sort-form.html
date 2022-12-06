@@ -2,5 +2,5 @@
     <span class="form-label">{{ ordering_by_field.label }}</span>
     {{ ordering_by_field }}
     <span class="form-error peer-invalid:block">Pilih salah satu</span>
-    <span class="form-error secondary">Lorem ipsum dolor sit amet.</span>
+    {% include 'components/form/form-errors.html' with errors=ordering_by_field.errors %}
 </div>

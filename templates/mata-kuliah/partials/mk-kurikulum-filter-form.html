@@ -1,5 +1,5 @@
 <div class="mb-3">
     <label for="{{ filter_form.mk_sks.id_for_label }}" class="form-label">{{ filter_form.mk_sks.label }}</label>
     {{ filter_form.mk_sks }}
-    <span class="form-error secondary">Lorem ipsum dolor sit amet.</span>
+    {% include 'components/form/form-errors.html' with errors=filter_form.mk_sks.errors %}
 </div>

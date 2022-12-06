@@ -40,16 +40,8 @@
                                 {% include 'components/list-table-view/selected-indicator.html' with delete_button=False %}
 
                                 {{ field }}
-                                
-                                {% if field.errors %}
-                                    <ul>
-                                    {% for error in field.errors %}
-                                        <li>
-                                            <span class="form-error active">{{ error }}</span>
-                                        </li>
-                                    {% endfor %}
-                                    </ul>
-                                {% endif %}
+
+                                {% include 'components/form/form-errors.html' with errors=field.errors %}
                             </div>
                         </div>
                     </div>
