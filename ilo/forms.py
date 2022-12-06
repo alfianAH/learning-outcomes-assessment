@@ -5,6 +5,7 @@ from learning_outcomes_assessment.widgets import(
     MyTextInput,
     MyTextareaInput,
 )
+from random import randint
 
 
 class IloCreateForm(forms.ModelForm):
@@ -12,10 +13,17 @@ class IloCreateForm(forms.ModelForm):
         model = Ilo
         fields = ['nama', 'satisfactory_level', 'deskripsi']
         widgets = {
-            'nama': MyTextInput(),
+            'nama': MyTextInput(attrs={
+                'placeholder': 'ILO {}'.format(randint(1, 5)),
+            }),
+            'satisfactory_level': MyNumberInput(attrs={
+                'placeholder': 'Masukkan satisfactory level',
+                'min': 0,
+                'max': 100,
+            }),
             'deskripsi': MyTextareaInput(attrs={
                 'cols': 30,
-                'rows': 5
+                'rows': 3,
+                'placeholder': 'Masukkan deskripsi',
             }),
-            'satisfactory_level': MyNumberInput(),
         }

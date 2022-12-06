@@ -1,0 +1,21 @@
+<table class="w-full table-strip">
+    <tbody class="space-y-1">
+        <tr class="flex px-3 py-1 space-x-2.5">
+            <td class="w-full">Satisfactory level</td>
+            {% if option.wrap_label %}
+                <td>{{ option.label.satisfactory_level }}</td>
+            {% else %}
+                <td>{{ option.satisfactory_level }}</td>
+            {% endif %}
+        </tr>
+
+        <tr class="flex px-3 py-1 space-x-2.5">
+            <td class="w-full">Persentase capaian ILO</td>
+            {% if option.wrap_label %}
+                <td>{{ option.label.persentase_capaian_ilo }}</td>
+            {% else %}
+                <td>{{ option.persentase_capaian_ilo|default:0 }}</td>
+            {% endif %}
+        </tr>
+    </tbody>
+</table>

@@ -1,12 +1,12 @@
 from django.urls import path
 from .views import(
     IloReadAllView,
-    IloCreateView
+    IloCreateHxView
 )
 
 
 app_name = 'ilo'
 urlpatterns = [
     path('', IloReadAllView.as_view(), name='read-all'),
-    path('create/', IloCreateView.as_view(), name='create'),
+    path('hx/create/', IloCreateHxView.as_view(), name='hx-create'),
 ]

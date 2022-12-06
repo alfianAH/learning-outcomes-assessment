@@ -1,4 +1,8 @@
-<form action="." method="post" hx-post="{{ create_ilo_url }}">
+<form action="." method="post" 
+    hx-post="{{ create_ilo_url }}"
+    hx-target="body"
+    hx-swap="outerHTML"
+    hx-trigger="submit">
     {% csrf_token %}
     
     <div class="space-y-2.5 md:space-y-3">
@@ -22,7 +26,7 @@
     <p>Untuk menduplikasi ILO dari semester lain, klik <a href="javascript:void(0);">di sini</a></p>
     </div>
     
-    <div class="form-buttons mt-2.5 md:mt-3">
+    <div class="form-buttons my-2.5 md:my-3">
         <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closeModalByButton(this)">Batal</button>
         <button type="submit" class="btn btn-success">Tambah</button>
     </div>
