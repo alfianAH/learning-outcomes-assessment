@@ -35,11 +35,17 @@
                                 <p>{{ field.help_text|safe }}</p>
                             {% endif %}
                             
-                            {% include 'components/search-box.html' with search_by_js=True %}
+                            {% if field.field.choices|length != 0 %}
+                                {% include 'components/search-box.html' with search_by_js=True %}
+                            {% endif %}
                             <div class="form-group space-y-2.5">
                                 {% include 'components/list-table-view/selected-indicator.html' with delete_button=False %}
-
-                                {{ field }}
+                                
+                                {% if field.field.choices|length == 0 %}
+                                    <p>Semua data sudah ada di database sistem. Silakan tekan tombol Selanjutnya/Sinkronisasi untuk melanjutkan.</p>
+                                {% else %}
+                                    {{ field }}
+                                {% endif %}
 
                                 {% include 'components/form/form-errors.html' with errors=field.errors %}
                             </div>

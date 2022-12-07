@@ -268,7 +268,8 @@ class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
             self.save_semester(semester_id, semester_by_kurikulum)
         
         # Save mata kuliah kurikulum
-        self.save_mk_kurikulum(mk_kurikulum_data)
+        if len(mk_kurikulum_data) != 0:
+            self.save_mk_kurikulum(mk_kurikulum_data)
 
         return redirect(success_url)
 
