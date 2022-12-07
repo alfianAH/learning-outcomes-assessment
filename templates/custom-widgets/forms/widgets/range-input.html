@@ -1,0 +1,5 @@
+<input class="form-control invalid:border-rose-500 dark:invalid:border-rose-600 peer w-[calc((100%-8px-10px*2)/2)]"
+    type="{{ widget.type }}"
+    name="{{ widget.name }}"
+    {% if widget.value != None %}value="{{ widget.value|stringformat:'s' }}"{% endif %}
+    {% include "django/forms/widgets/attrs.html" %}>

@@ -3,8 +3,9 @@ from django import forms
 from learning_outcomes_assessment.widgets import (
     MyNumberInput,
     MyRadioInput,
+    MyRangeInput,
     MySearchInput,
-    MySelectInput,
+    MyRangeWidget,
 )
 from .models import Ilo
 
@@ -27,15 +28,41 @@ class IloFilter(filter.FilterSet):
             }
         ),
     )
-    satisfactory_level = filter.NumberFilter(
+    satisfactory_level = filter.RangeFilter(
         field_name='satisfactory_level',
         label='Satisfactory level',
-        widget=MyNumberInput,
+        widget=MyRangeWidget(
+            widgets=(
+                MyRangeInput(attrs={
+                    'placeholder': '0',
+                    'min': 0,
+                    'max': 100,
+                }),
+                MyRangeInput(attrs={
+                    'placeholder': '100',
+                    'min': 0,
+                    'max': 100,
+                })
+            )
+        ),
     )
-    persentase_capaian_ilo = filter.NumberFilter(
+    persentase_capaian_ilo = filter.RangeFilter(
         field_name='persentase_capaian_ilo',
         label='Persentase Capaian ILO',
-        widget=MyNumberInput,
+        widget=MyRangeWidget(
+            widgets=(
+                MyRangeInput(attrs={
+                    'placeholder': '0',
+                    'min': 0,
+                    'max': 100,
+                }),
+                MyRangeInput(attrs={
+                    'placeholder': '100',
+                    'min': 0,
+                    'max': 100,
+                })
+            )
+        ),
     )
     
     class Meta:

@@ -5,6 +5,8 @@ from django.forms.widgets import (
     Select,
     Textarea,
 )
+from django_filters.widgets import SuffixedMultiWidget
+
 
 class ChoiceListInteractiveModelA(CheckboxSelectMultiple):
     is_required: bool = False
@@ -96,6 +98,19 @@ class MyNumberInput(Input):
 class MyTextInput(Input):
     input_type: str = 'text'
     template_name: str = 'custom-widgets/forms/widgets/text.html'
+
+
+class MyRangeInput(Input):
+    input_type: str = 'number'
+    template_name: str = 'custom-widgets/forms/widgets/range-input.html'
+
+
+class MyRangeWidget(SuffixedMultiWidget):
+    template_name: str = 'custom-widgets/forms/widgets/multiwidget.html'
+    suffixes = ["min", "max"]
+
+    def __init__(self, widgets, attrs=None):
+        super().__init__(widgets, attrs)
 
 
 class MyTextareaInput(Textarea):

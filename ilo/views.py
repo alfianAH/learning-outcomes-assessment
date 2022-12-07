@@ -49,8 +49,10 @@ class IloReadAllView(ListViewModelA):
         if ilo_qs.exists():
             filter_data = {
                 'nama': request.GET.get('nama', ''),
-                'satisfactory_level': request.GET.get('satisfactory_level', ''),
-                'persentase_capaian_ilo': request.GET.get('persentase_capaian_ilo', ''),
+                'satisfactory_level_min': request.GET.get('satisfactory_level_min', ''),
+                'satisfactory_level_max': request.GET.get('satisfactory_level_max', ''),
+                'persentase_capaian_ilo_min': request.GET.get('persentase_capaian_ilo_min', ''),
+                'persentase_capaian_ilo_max': request.GET.get('persentase_capaian_ilo_max', ''),
             }
             sort_data = {
                 self.sort_form_ordering_by_key: request.GET.get(self.sort_form_ordering_by_key, self.ordering)

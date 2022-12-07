@@ -3128,6 +3128,14 @@ details.dropdown::marker {
   width: 20rem;
 }
 
+.w-64 {
+  width: 16rem;
+}
+
+.w-\[calc\(\(100\%-8px-10px\*2\)\/2\)\] {
+  width: calc((100% - 8px - 10px * 2) / 2);
+}
+
 .w-\[85\%\] {
   width: 85%;
 }
