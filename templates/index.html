@@ -1563,6 +1563,21 @@
         </div>
 
         <div class="mb-3">
+            <label for="input-text" class="form-label">Number</label>
+            <div class="flex flex-row items-center space-x-2.5 w-64">
+                <input type="number" id="input-text" 
+                    class="form-control invalid:border-rose-500 dark:invalid:border-rose-600 peer w-[calc((100%-8px-10px*2)/2)]" 
+                    min=0 max=5 placeholder="Field">
+                <span>-</span>
+                <input type="number" id="input-text" 
+                    class="form-control invalid:border-rose-500 dark:invalid:border-rose-600 peer w-[calc((100%-8px-10px*2)/2)]" 
+                    min=0 max=5 placeholder="Field">
+            </div>
+            <span class="form-error peer-invalid:block">Angka yang dimasukkan harus berada di antara 0-5</span>
+            <span class="form-error secondary">Lorem ipsum dolor sit amet.</span>
+        </div>
+
+        <div class="mb-3">
             <label for="input-text" class="form-label">Column Number</label>
             <input type="number" id="input-text" class="form-control col-form-control invalid:border-rose-500 dark:invalid:border-rose-600 peer" min=0 max=5 placeholder="Field">
             <span class="form-error peer-invalid:block">Angka yang dimasukkan harus berada di antara 0-5</span>

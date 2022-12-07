@@ -3267,6 +3267,64 @@ details.dropdown::marker {
   width: 85%;
 }
 
+.w-min {
+  width: -webkit-min-content;
+  width: -moz-min-content;
+  width: min-content;
+}
+
+.w-\[\] {
+  width: ;
+}
+
+.w-\[100\%\] {
+  width: 100%;
+}
+
+.w-\[calc100\%\] {
+  width: calc100%;
+}
+
+.w-\[calc\(100\%\)\] {
+  width: calc(100%);
+}
+
+.w-\[calc\(100\%-\)\] {
+  width: calc(100% - );
+}
+
+.w-\[calc\(100\%-8\)\] {
+  width: calc(100% - 8);
+}
+
+.w-\[calc\(100\%-8x\)\] {
+  width: calc(100% - 8x);
+}
+
+.w-\[calc\(100\%-8x-10px\)\] {
+  width: calc(100% - 8x - 10px);
+}
+
+.w-\[calc\(100\%-8x-10px\*2\)\] {
+  width: calc(100% - 8x - 10px * 2);
+}
+
+.w-\[calc\(50\%-8x-10px\*2\)\] {
+  width: calc(50% - 8x - 10px * 2);
+}
+
+.w-\[calc\(\(100\%-8x-10px\*2\)\)\] {
+  width: calc((100% - 8x - 10px * 2));
+}
+
+.w-\[calc\(\(100\%-8x-10px\*2\)\/2\)\] {
+  width: calc((100% - 8x - 10px * 2) / 2);
+}
+
+.w-\[calc\(\(100\%-8px-10px\*2\)\/2\)\] {
+  width: calc((100% - 8px - 10px * 2) / 2);
+}
+
 .max-w-xs {
   max-width: 20rem;
 }
