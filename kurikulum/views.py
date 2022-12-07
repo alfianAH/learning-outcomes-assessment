@@ -805,7 +805,6 @@ class SemesterKurikulumBulkDeleteView(DeleteView):
         list_semester_kurikulum = [*set(list_semester_kurikulum)]
 
         if len(list_semester_kurikulum) > 0:
-            print(list_semester_kurikulum)
             SemesterKurikulum.objects.filter(semester__in=list_semester_kurikulum, kurikulum=kurikulum_id).delete()
             
         return redirect(self.get_object().read_detail_url())

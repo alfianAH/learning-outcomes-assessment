@@ -1,4 +1,5 @@
 from django.http import Http404, HttpRequest, HttpResponse
+from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic.base import View
 from django.views.generic.detail import DetailView
@@ -28,7 +29,7 @@ class SemesterReadAllView(ListViewModelA):
     semester_filter: SemesterKurikulumFilter = None
     semester_sort: SemesterKurikulumSort = None
 
-    bulk_delete_url: str = ''
+    bulk_delete_url: str = reverse_lazy('semester:bulk-delete')
     reset_url: str = reverse_lazy('semester:read-all')
     list_id: str = 'semester-list-content'
     input_name: str = 'id_semester'
@@ -79,3 +80,17 @@ class SemesterReadView(DetailView):
     model = SemesterKurikulum
     pk_url_kwarg: str = 'semester_kurikulum_id'
     template_name: str = 'semester/detail-view.html'
+
+
+class SemesterBulkDeleteView(FormView):
+    success_url = reverse_lazy('semester:read-all')
+
+    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        list_semester_kurikulum = request.POST.getlist('id_semester')
+        list_semester_kurikulum = [*set(list_semester_kurikulum)]
+
+        if len(list_semester_kurikulum) > 0:
+            print(list_semester_kurikulum)
+            SemesterKurikulum.objects.filter(id__in=list_semester_kurikulum).delete()
+        
+        return redirect(self.get_success_url())
