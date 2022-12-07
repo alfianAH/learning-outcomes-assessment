@@ -2,7 +2,8 @@ import django_filters as filter
 from django import forms
 from distutils.util import strtobool
 from learning_outcomes_assessment.widgets import (
-    MyNumberInput,
+    MyRangeInput,
+    MyRangeWidget,
     MyRadioInput,
     MySearchInput,
     MySelectInput,
@@ -33,10 +34,19 @@ class KurikulumFilter(filter.FilterSet):
             }
         ),
     )
-    tahun_mulai = filter.NumberFilter(
+    tahun_mulai = filter.RangeFilter(
         field_name='tahun_mulai',
         label='Tahun mulai',
-        widget=MyNumberInput,
+        widget=MyRangeWidget(
+            widgets=(
+                MyRangeInput(attrs={
+                    'placeholder': '2010',
+                }),
+                MyRangeInput(attrs={
+                    'placeholder': '2022',
+                })
+            )
+        ),
     )
     is_active = filter.TypedChoiceFilter(
         field_name='is_active', 

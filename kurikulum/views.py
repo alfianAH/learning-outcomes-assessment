@@ -344,7 +344,8 @@ class KurikulumReadAllView(ListViewModelA):
         if kurikulum_qs.exists():
             filter_data = {
                 'nama': request.GET.get('nama', ''),
-                'tahun_mulai': request.GET.get('tahun_mulai', ''),
+                'tahun_mulai_min': request.GET.get('tahun_mulai_min', ''),
+                'tahun_mulai_max': request.GET.get('tahun_mulai_max', ''),
                 'is_active': request.GET.get('is_active', ''),
             }
             sort_data = {
