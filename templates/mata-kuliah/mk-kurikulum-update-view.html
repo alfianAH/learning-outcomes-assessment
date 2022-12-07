@@ -1,5 +1,9 @@
 {% extends 'home-view.html' %}
 
+{% block title %}
+Update Mata Kuliah - 
+{% endblock title %}
+
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{% url 'kurikulum:read-all' %}" role="listitem">Kurikulum</a></li>
 <li class="breadcrumb-item"><a href="{% url 'kurikulum:read' kurikulum_id=kurikulum_id %}" role="listitem">Detail</a></li>

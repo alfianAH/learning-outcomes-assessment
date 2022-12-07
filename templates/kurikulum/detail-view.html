@@ -5,6 +5,10 @@
 <li class="breadcrumb-item active" aria-current="page" role="listitem">Detail</li>
 {% endblock breadcrumb %}
 
+{% block title %}
+{{ object.nama }} - 
+{% endblock title %}
+
 {% block content %}
 <h1>{{ object.nama }}</h1>
 
