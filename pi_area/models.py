@@ -7,6 +7,9 @@ class AssessmentArea(models.Model):
     semester = models.ForeignKey(SemesterKurikulum, on_delete=models.CASCADE)
     nama = models.CharField(max_length=100)
 
+    def __str__(self) -> str:
+        return self.nama
+
     def get_pi_area(self):
         return self.performanceindicatorarea_set.all()
 
@@ -14,3 +17,6 @@ class AssessmentArea(models.Model):
 class PerformanceIndicatorArea(models.Model):
     assessment_area = models.ForeignKey(AssessmentArea, on_delete=models.CASCADE)
     pi_code = models.CharField(max_length=20)
+
+    def __str__(self) -> str:
+        return self.pi_code

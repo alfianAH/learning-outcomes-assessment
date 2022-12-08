@@ -3004,6 +3004,10 @@ details.dropdown::marker {
   margin-right: 0.75rem;
 }
 
+.ml-4 {
+  margin-left: 1rem;
+}
+
 .ml-1 {
   margin-left: 0.25rem;
 }
@@ -4115,6 +4119,12 @@ details.dropdown::marker {
 
   .xl\:w-36 {
     width: 9rem;
+  }
+
+  .xl\:space-x-3 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 0;
+    margin-right: calc(0.75rem * var(--tw-space-x-reverse));
+    margin-left: calc(0.75rem * calc(1 - var(--tw-space-x-reverse)));
   }
 
   .xl\:space-x-10 > :not([hidden]) ~ :not([hidden]) {
