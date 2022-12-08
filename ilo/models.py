@@ -1,10 +1,10 @@
 from django.db import models
 from django.urls import reverse
-from semester.models import SemesterKurikulum
+from pi_area.models import PerformanceIndicatorArea
 
 # Create your models here.
 class Ilo(models.Model):
-    semester = models.ForeignKey(SemesterKurikulum, on_delete=models.CASCADE)
+    pi_area = models.ForeignKey(PerformanceIndicatorArea, on_delete=models.CASCADE)
 
     nama = models.CharField(max_length=255, null=False)
     deskripsi = models.TextField(null=False)
