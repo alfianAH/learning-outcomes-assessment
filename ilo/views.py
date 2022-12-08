@@ -44,7 +44,7 @@ class IloReadAllView(ListViewModelA):
         return super().setup(request, *args, **kwargs)
     
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        ilo_qs = self.model.objects.filter(semester=self.semester_obj.pk)
+        ilo_qs = self.model.objects.filter(pi_area__assessment_area__semester=self.semester_obj.pk)
 
         if ilo_qs.exists():
             filter_data = {
@@ -67,7 +67,7 @@ class IloReadAllView(ListViewModelA):
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        self.queryset = self.model.objects.filter(semester=self.semester_obj.pk)
+        self.queryset = self.model.objects.filter(pi_area__assessment_area__semester=self.semester_obj.pk)
         return super().get_queryset()
     
     def get_context_data(self, **kwargs):

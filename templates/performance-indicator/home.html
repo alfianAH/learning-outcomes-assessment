@@ -1,0 +1,54 @@
+{% extends 'home-view.html' %}
+
+{% block title %}
+Performance Indicators - 
+{% endblock title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'semester:read-all' %}" role="listitem">Semester</a></li>
+<li class="breadcrumb-item"><a href="{% url 'semester:read' semester_kurikulum_id=semester_obj.id %}" role="listitem">Detail</a></li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">PI</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+{% if object_list or data_exist %}
+    <div class="h-icon justify-between">
+        <h1>Performance Indicators</h1>
+        <div class="flex flex-row space-x-2.5 xl:space-x-3">
+            <button class="btn btn-primary" type="button" data-target="#create-modal" onclick="openModal(this)" hx-get="{{ create_ilo_url }}" hx-target="#create-modal-form" hx-trigger="click">
+                <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                </svg>
+                <span class="hidden sm:block sm:ml-2.5">Tambah</span>
+            </button>
+
+            <button class="btn btn-warning" type="button" data-target="#create-modal" onclick="openModal(this)" hx-get="{{ create_ilo_url }}" hx-target="#create-modal-form" hx-trigger="click">
+                <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                </svg>
+                <span class="hidden sm:block sm:ml-2.5">Kunci</span>
+            </button>
+
+            <button class="btn btn-success" type="button" data-target="#create-modal" onclick="openModal(this)" hx-get="{{ create_ilo_url }}" hx-target="#create-modal-form" hx-trigger="click">
+                <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                </svg>
+                <span class="hidden sm:block sm:ml-2.5">Download</span>
+            </button>
+        </div>
+    </div>
+
+    <p>{{ semester_obj.semester.nama }}</p>
+{% else %}
+<h1>Performance Indicators</h1>
+<p>{{ semester_obj.semester.nama }}</p>
+<button class="btn btn-success" type="button" data-target="#create-modal" onclick="openModal(this)" hx-get="{{ create_ilo_url }}" hx-target="#create-modal-form" hx-trigger="click">
+    <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+    </svg>
+    <span class="hidden sm:block sm:ml-2.5">Tambah area penilaian</span>
+</button>
+{% endif %}
+
+
+{% endblock content %}

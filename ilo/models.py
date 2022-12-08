@@ -13,5 +13,5 @@ class Ilo(models.Model):
 
     def read_semester(self):
         return reverse('semester:read', kwargs={
-            'semester_id': self.semester.pk
+            'semester_id': self.pi_area.assessment_area.semester.pk
         })
