@@ -112,7 +112,16 @@ def get_update_semester_choices(kurikulum_id: int):
         except Semester.DoesNotExist:
             continue
         except Semester.MultipleObjectsReturned:
-            if settings.DEBUG: print('Kurikulum object returns multiple objects. ID: {}'.format(id_semester))
+            if settings.DEBUG: print('Semester object returns multiple objects. ID: {}'.format(id_semester))
+            continue
+        
+        # Filter if semester is in semester kurikulum
+        try:
+            SemesterKurikulum.objects.get(semester=id_semester, kurikulum=kurikulum_id)
+        except SemesterKurikulum.DoesNotExist:
+            continue
+        except SemesterKurikulum.MultipleObjectsReturned:
+            if settings.DEBUG: print('Semester Kurikulum object returns multiple objects. Kurikulum ID: {}, Semester Id: {}'.format(kurikulum_id, id_semester))
             continue
 
         isDataOkay = semester_obj.nama == semester_data['nama'] and str(semester_obj.tahun_ajaran) == semester_data['tahun_ajaran'] and semester_obj.get_tipe_semester_display().lower() == semester_data['tipe_semester'].lower()

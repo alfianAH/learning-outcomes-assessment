@@ -188,26 +188,29 @@ class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
         return sorted_result_by_kurikulum_id
 
     def save_semester(self, semester_id: int, semester_by_kurikulum: dict):
-        semester_detail = get_detail_semester(semester_id)
-        
-        # Extract tahun ajaran
-        tahun_ajaran = semester_detail.get('tahun_ajaran')
-        tahun_ajaran_obj = TahunAjaran.objects.get_or_create_tahun_ajaran(tahun_ajaran)
-        
-        # Get tipe semester
-        tipe_semester_str: str = semester_detail.get('tipe_semester')
-        match(tipe_semester_str.lower()):
-            case 'ganjil':
-                tipe_semester = TipeSemester.GANJIL
-            case 'genap':
-                tipe_semester = TipeSemester.GENAP
-        
-        semester_obj = Semester.objects.get_or_create(
-            id_neosia = semester_detail.get('id_neosia'),
-            tahun_ajaran = tahun_ajaran_obj[0],
-            nama = semester_detail.get('nama'),
-            tipe_semester = tipe_semester,
-        )
+        try:
+            semester_obj = Semester.objects.get(id_neosia=semester_id)
+        except Semester.DoesNotExist:
+            semester_detail = get_detail_semester(semester_id)
+            
+            # Extract tahun ajaran
+            tahun_ajaran = semester_detail.get('tahun_ajaran')
+            tahun_ajaran_obj = TahunAjaran.objects.get_or_create_tahun_ajaran(tahun_ajaran)
+            
+            # Get tipe semester
+            tipe_semester_str: str = semester_detail.get('tipe_semester')
+            match(tipe_semester_str.lower()):
+                case 'ganjil':
+                    tipe_semester = TipeSemester.GANJIL
+                case 'genap':
+                    tipe_semester = TipeSemester.GENAP
+            
+            semester_obj = Semester.objects.create(
+                id_neosia = semester_detail.get('id_neosia'),
+                tahun_ajaran = tahun_ajaran_obj[0],
+                nama = semester_detail.get('nama'),
+                tipe_semester = tipe_semester,
+            )
 
         # Get kurikulum
         kurikulum_obj: Kurikulum = None
@@ -223,11 +226,11 @@ class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
             # TODO: ADD MESSAGE
             if settings.DEBUG:
                 print('Cannot find Kurikulum object with Semester ID: {}'.format(semester_id))
-            return False
+            return
         
         # Save semester kurikulum object
-        semester_kurikulum_obj = SemesterKurikulum.objects.create(
-            semester = semester_obj[0],
+        SemesterKurikulum.objects.create(
+            semester = semester_obj,
             kurikulum = kurikulum_obj
         )
 
