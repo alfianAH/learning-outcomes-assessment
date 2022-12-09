@@ -1,7 +1,7 @@
-from django.http import HttpRequest, HttpResponse
+from django.http import Http404, HttpRequest, HttpResponse
 from django.forms.models import inlineformset_factory
 from django.shortcuts import get_object_or_404, redirect
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, DeleteView
 
 from semester.models import SemesterKurikulum
 from .forms import (
@@ -53,7 +53,7 @@ class PIAreaCreateView(CreateView):
         self.formset = self.FormsetClass(request.POST)
         print('Formset: {}'.format(self.formset.is_valid()))
         print('Form: {}'.format(form.is_valid()))
-        
+
         if all([self.formset.is_valid(), form.is_valid()]):
             return self.form_valid(form)
         else:
@@ -70,3 +70,15 @@ class PIAreaCreateView(CreateView):
             pi_area.save()
         
         return redirect(self.success_url)
+
+
+class AssessmentAreaDeleteView(DeleteView):
+    model = AssessmentArea
+    pk_url_kwarg = 'area_id'
+
+    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if not request.htmx: raise Http404
+        assessment_area_obj: AssessmentArea = self.get_object()
+        self.success_url = assessment_area_obj.get_read_pi_url()
+        
+        return super().post(request, *args, **kwargs)

@@ -23,6 +23,17 @@ class AssessmentArea(models.Model):
 
     def get_pi_area(self):
         return self.performanceindicatorarea_set.all()
+    
+    def get_read_pi_url(self):
+        return reverse('semester:performance_indicator:read-all', kwargs={
+            'semester_kurikulum_id': self.semester.pk
+        })
+
+    def get_delete_area_url(self):
+        return reverse('semester:performance_indicator:pi_area:delete', kwargs={
+            'semester_kurikulum_id': self.semester.pk,
+            'area_id': self.pk
+        })
 
 
 class PerformanceIndicatorArea(models.Model):
