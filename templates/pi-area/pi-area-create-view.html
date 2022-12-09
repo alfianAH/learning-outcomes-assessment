@@ -53,7 +53,7 @@ Tambah Performance Indicators -
             {% endfor %}
         </div>
 
-        <button class="btn btn-primary btn-icon-start ml-4" id="add-form">
+        <button type="button" class="btn btn-primary btn-icon-start ml-4" id="add-form">
             <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
                 <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
             </svg>
@@ -69,23 +69,6 @@ Tambah Performance Indicators -
 
 {% block script %}
 <script>
-    $('#add-form').on('click', function(e){
-        if (e) {
-            e.preventDefault()
-        }
-        
-        const currentFormCount = $('.added-form').length; // + 1
-        const copyEmptyFormEl = $('#empty-form').clone(true);
-
-        copyEmptyFormEl.removeClass('hidden').addClass('added-form mb-3');
-        copyEmptyFormEl.attr('id', `form-${currentFormCount}`);
-        
-        const regex = new RegExp('__prefix__', 'g');
-        copyEmptyFormEl.html(copyEmptyFormEl.html().replace(regex, currentFormCount));
-
-        $('#id_performanceindicatorarea_set-TOTAL_FORMS').val(currentFormCount + 1);
-        // now add new empty form element to our html form
-        $('#form-list').append(copyEmptyFormEl);
-    });
+    addMoreForm('#id_performanceindicatorarea_set-TOTAL_FORMS');
 </script>
 {% endblock script %}
