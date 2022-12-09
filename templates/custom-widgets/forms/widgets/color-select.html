@@ -1,0 +1,22 @@
+<div class="flex flex-row space-x-3 items-center">
+    <select name="{{ widget.name }}" 
+        class="form-control invalid:border-rose-500 dark:invalid:border-rose-600 peer"
+        {% include "django/forms/widgets/attrs.html" %}>
+
+        {% for group_name, group_choices, group_index in widget.optgroups %}
+            {% if group_name %}
+                <optgroup label="{{ group_name }}">
+            {% endif %}
+            
+            {% for option in group_choices %}
+                {% include option.template_name with widget=option %}
+            {% endfor %}
+
+            {% if group_name %}
+                </optgroup>
+            {% endif %}
+        {% endfor %}
+    </select>
+
+    <div id="color-result" class="w-5 h-5 rounded-full"></div>
+</div>

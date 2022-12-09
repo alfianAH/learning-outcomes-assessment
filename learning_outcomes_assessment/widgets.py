@@ -126,6 +126,11 @@ class MySelectInput(Select):
     template_name: str = 'custom-widgets/forms/widgets/select.html'
 
 
+class MyColorSelectInput(Select):
+    template_name: str = 'custom-widgets/forms/widgets/color-select.html'
+    option_template_name: str = 'custom-widgets/forms/widgets/color-select-option.html'
+
+
 class MyRadioInput(ChoiceWidget):
     input_type: str = 'radio'
     template_name: str = 'custom-widgets/forms/widgets/radio-input.html'

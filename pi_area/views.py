@@ -51,6 +51,8 @@ class PIAreaCreateView(CreateView):
     def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         form = self.get_form()
         self.formset = self.FormsetClass(request.POST)
+        print('Formset: {}'.format(self.formset.is_valid()))
+        print('Form: {}'.format(form.is_valid()))
         
         if all([self.formset.is_valid(), form.is_valid()]):
             return self.form_valid(form)

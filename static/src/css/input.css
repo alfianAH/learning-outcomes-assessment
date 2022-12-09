@@ -162,6 +162,35 @@
         @apply border border-slate-800 dark:border-slate-50 bg-transparent text-slate-800 dark:text-slate-50
     }
 
+    /* Badge custom */
+    .badge-custom-blue{
+        @apply bg-indigo-600 dark:bg-indigo-800;
+    }
+
+    .badge-custom-green{
+        @apply bg-lime-500 dark:bg-lime-800;
+    }
+
+    .badge-custom-red{
+        @apply bg-pink-500 dark:bg-pink-800;
+    }
+
+    .badge-custom-gray{
+        @apply bg-gray-300 text-neutral-600 dark:bg-slate-600 dark:text-slate-100;
+    }
+
+    .badge-custom-orange{
+        @apply bg-orange-500 dark:bg-orange-700;
+    }
+
+    .badge-custom-yellow{
+        @apply bg-yellow-500 dark:bg-yellow-600;
+    }
+
+    .badge-custom-purple{
+        @apply bg-purple-500 dark:bg-purple-700;
+    }
+
     /* Breadcrumb */
     .breadcrumb{
         @apply list-none flex flex-row flex-wrap items-center mb-3;

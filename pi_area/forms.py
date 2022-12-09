@@ -1,5 +1,8 @@
 from django import forms
-from learning_outcomes_assessment.widgets import MyTextInput
+from learning_outcomes_assessment.widgets import (
+    MyTextInput,
+    MyColorSelectInput
+)
 from .models import(
     AssessmentArea,
     PerformanceIndicatorArea,
@@ -9,14 +12,16 @@ from .models import(
 class AssessmentAreaForm(forms.ModelForm):
     class Meta:
         model = AssessmentArea
-        fields = ['nama']
+        fields = ['nama', 'color']
         labels = {
-            'nama': 'Nama area'
+            'nama': 'Nama area',
+            'color': 'Warna',
         }
         widgets = {
             'nama': MyTextInput(attrs={
                 'placeholder': 'Area: attitude, knowledge, ...'
-            })
+            }),
+            'color': MyColorSelectInput
         }
 
 

@@ -7,7 +7,7 @@
             
             <div class="flex flex-row items-center space-x-2.5 md:space-x-3 w-full">
                 <label for="{{ prefix_id }}{{ object.id }}" class="flex flex-col w-full space-y-2 md:space-y-2.5 xl:space-y-3">
-                    <div class="badge badge-primary mt-1">{{ object.assessment_area.nama }}</div>
+                    <div class="badge {{ object.assessment_area.get_color_display }} mt-1">{{ object.assessment_area.nama }}</div>
                     <span class="font-bold text-sm md:text-base xl:text-xl">{{ object.pi_code }}</span>
                 </label>
                 
