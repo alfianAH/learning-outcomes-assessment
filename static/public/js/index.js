@@ -145,6 +145,25 @@ function closeModalByButton(button) {
     closeModal(modal, backdrop);
 }
 
+function addToast(toastType, message) {
+    let toastContainer = $('.toast-container');
+    let toastElement = toastContainer.find(`.toast-example.${toastType}.fade`).clone(true);
+
+    toastElement.find('.toast-body').text = message;
+    toastContainer.append(toastElement);
+
+    // Show toast
+    toastElement.removeClass('toast-example').addClass('show');
+
+    setTimeout(function () {
+        toastElement.removeClass('show').addClass('hide');
+
+        toastElement.one(transitionEvent, function () {
+            toastElement.remove();
+        });
+    }, 3000);
+}
+
 function resetSidebarToDefault() {
     if ($(window).width() >= 1024) {
         // Remove backdrop
