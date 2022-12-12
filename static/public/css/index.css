@@ -3071,6 +3071,14 @@ details.dropdown::marker {
   }
 }
 
+.toast.fade {
+  opacity: 0;
+}
+
+.toast.show {
+  opacity: 1;
+}
+
 .toast.info {
   --tw-border-opacity: 1;
   border-color: rgb(3 105 161 / var(--tw-border-opacity));

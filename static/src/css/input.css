@@ -694,6 +694,14 @@
         @apply bg-slate-300 dark:bg-neutral-600 border border-slate-400 dark:border-neutral-400 w-52 sm:w-80 md:w-96 lg:w-80 xl:w-96 pointer-events-auto rounded-lg;
     }
 
+    .toast.fade{
+        @apply opacity-0;
+    }
+
+    .toast.show{
+        @apply opacity-100;
+    }
+
     .toast.info{
         @apply bg-sky-600 dark:bg-sky-800 border-sky-700 text-slate-100;
     }

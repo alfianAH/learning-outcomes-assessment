@@ -147,21 +147,75 @@ function closeModalByButton(button) {
 
 function addToast(toastType, message) {
     let toastContainer = $('.toast-container');
-    let toastElement = toastContainer.find(`.toast-example.${toastType}.fade`).clone(true);
+    let toastElement = toastContainer.find(`.toast-example.${toastType}`).clone(true);
 
     toastElement.find('.toast-body').text = message;
     toastContainer.append(toastElement);
 
-    // Show toast
-    toastElement.removeClass('toast-example').addClass('show');
+    // Remove hide from toast
+    toastElement.removeClass('toast-example hidden');
 
+    // Set timeout to make fade transition. I don't know why.
     setTimeout(function () {
-        toastElement.removeClass('show').addClass('hide');
-
+        toastElement.addClass('show');
+        
         toastElement.one(transitionEvent, function () {
-            toastElement.remove();
+            // Remove show after 3s
+            setTimeout(function () {
+                removeToast(toastElement);
+            }, 3000);
         });
-    }, 3000);
+    }, 150);
+}
+
+function removeToast(toastElement) {
+    $(toastElement).removeClass('show');
+                
+    $(toastElement).one(transitionEvent, function () {
+        $(toastElement).remove();
+    });
+}
+
+function toastHandler() {
+    const TOAST_LIMIT = 3;
+
+    $('.toast-container').on('DOMNodeInserted', function (event) {
+        let children = $(this).children('.toast:not(.toast-example)');
+        if (children.length == 0) return;
+
+        let toastChildrenLength = children.length + 1;
+        console.log(children);
+
+        if (toastChildrenLength > TOAST_LIMIT) {
+            console.log('remove');
+            for (let i = toastChildrenLength - 2; i >= TOAST_LIMIT+1; i--) {
+                if(children[i] !== null){
+                    removeToast(children[i]);
+                }
+            }
+        }
+    });
+}
+
+function addRandomToast() {
+    let toastType = Math.floor(Math.random() * 5);
+
+    switch (toastType) {
+        case 1:
+            addToast('info', 'lorem');
+            break;
+        case 2:
+            addToast('success', 'lorem');
+            break;
+        case 3:
+            addToast('warning', 'lorem');
+            break;
+        case 4:
+            addToast('error', 'lorem');
+            break;
+        default:
+            break;
+    }
 }
 
 function resetSidebarToDefault() {
@@ -446,3 +500,4 @@ listItemRowCollapse(".list-item-model-f");
 pagination();
 passwordHandler();
 tabElement();
+toastHandler();
