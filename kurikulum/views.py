@@ -1,6 +1,7 @@
 import json
 from collections import OrderedDict
 from django.conf import settings
+from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
@@ -153,6 +154,7 @@ class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
         kurikulum_detail.pop('prodi')
 
         Kurikulum.objects.get_or_create(prodi=prodi_obj, **kurikulum_detail)
+        return True
     
     def save_mk_kurikulum(self, list_mk_id: list[int]):
         list_kurikulum_id = self.get_cleaned_data_for_step('0').get('kurikulum_from_neosia')
@@ -160,7 +162,14 @@ class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
         prodi_obj = ProgramStudi.objects.get(id_neosia=prodi_id)
 
         for kurikulum_id in list_kurikulum_id:
-            kurikulum_obj = Kurikulum.objects.get(id_neosia=kurikulum_id)
+            try:
+                kurikulum_obj = Kurikulum.objects.get(id_neosia=kurikulum_id)
+            except Kurikulum.DoesNotExist:
+                messages.error(
+                    self.request, 
+                    'Kurikulum dengan ID: {} tidak ditemukan, sehingga gagal menyimpan mata kuliah dari kurikulum tersebut.'.format(kurikulum_id)
+                )
+                continue
 
             list_mk_kurikulum = get_mk_kurikulum(kurikulum_id, prodi_id)
             
@@ -170,12 +179,11 @@ class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
                 deleted_items = ['prodi', 'kurikulum']
                 [mk_kurikulum.pop(item) for item in deleted_items]
 
-                mk_kurikulum_obj: MataKuliahKurikulum = MataKuliahKurikulum.objects.create(
+                MataKuliahKurikulum.objects.create(
                     prodi=prodi_obj, 
                     kurikulum=kurikulum_obj, 
                     **mk_kurikulum
                 )
-                mk_kurikulum_obj.save()
     
     def filter_semester_by_kurikulum(self, kurikulum_id: int):
         semester_by_kurikulum = get_semester_by_kurikulum(kurikulum_id)
@@ -223,16 +231,17 @@ class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
         # If cannot get kurikulum object
         if kurikulum_obj is None:
             # Failed to save semester
-            # TODO: ADD MESSAGE
+            messages.error(self.request, '"{}" tidak bisa disave karena tidak memiliki kurikulum'.format(semester_obj.nama))
             if settings.DEBUG:
                 print('Cannot find Kurikulum object with Semester ID: {}'.format(semester_id))
-            return
+            return False
         
         # Save semester kurikulum object
         SemesterKurikulum.objects.create(
             semester = semester_obj,
             kurikulum = kurikulum_obj
         )
+        return True
 
     def done(self, form_list, **kwargs):
         cleaned_data = self.get_all_cleaned_data()
@@ -250,10 +259,12 @@ class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
             except ValueError:
                 if settings.DEBUG:
                     print('Cannot convert Kurikulum ID ("{}") to integer'.format(kurikulum_id))
-                # TODO: ADD MESSAGE
+                messages.error(self.request, 'Tidak dapat mengonversi Kurikulum ID: {} ke integer'.format(kurikulum_id))
                 return redirect(success_url)
             
-            self.save_kurikulum(kurikulum_id)
+            # If save is failed, add error message
+            if not self.save_kurikulum(kurikulum_id):
+                messages.error(self.request, 'Gagal menyimpan kurikulum dengan ID {}'.format(kurikulum_id))
 
             # Get list semester by kurikulum
             semester_by_kurikulum.update(self.filter_semester_by_kurikulum(kurikulum_id))
@@ -265,14 +276,17 @@ class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
             except ValueError:
                 if settings.DEBUG:
                     print('Cannot convert Semester ID ("{}") to integer'.format(semester_id))
-                # TODO: ADD MESSAGE
+                messages.error(self.request, 'Tidak dapat mengonversi Semester ID: {} ke integer'.format(semester_id))
                 return redirect(success_url)
                 
-            self.save_semester(semester_id, semester_by_kurikulum)
+            if not self.save_semester(semester_id, semester_by_kurikulum):
+                messages.error(self.request, 'Gagal menyimpan semester dengan ID {}'.format(semester_id))
         
         # Save mata kuliah kurikulum
         if len(mk_kurikulum_data) != 0:
             self.save_mk_kurikulum(mk_kurikulum_data)
+
+        messages.success(self.request, 'Sinkronisasi data dari Neosia berhasil')
 
         return redirect(success_url)
 
@@ -291,12 +305,18 @@ class KurikulumBulkUpdateView(FormView):
         form = self.get_form(form_class=self.form_class)
         
         if len(form.fields.get('update_data_kurikulum').choices) == 0:
-            # TODO: ADD MESSAGE
+            messages.info(request, 'Data kurikulum sudah sinkron dengan data di Neosia')
             return redirect(self.success_url)
         return super().get(request, *args, **kwargs)
 
     def update_kurikulum(self, kurikulum_id: int):
-        kurikulum_obj = Kurikulum.objects.filter(id_neosia=kurikulum_id)
+        try:
+            kurikulum_obj = Kurikulum.objects.filter(id_neosia=kurikulum_id)
+        except Kurikulum.DoesNotExist:
+            messages.error(self.request, 
+                'Kurikulum dengan ID: {} tidak ditemukan, sehingga gagal mengupdate kurikulum'.format(kurikulum_id))
+            return
+        
         new_kurikulum_data = get_detail_kurikulum(kurikulum_id)
         kurikulum_obj.update(**new_kurikulum_data)
     
@@ -310,10 +330,12 @@ class KurikulumBulkUpdateView(FormView):
             except ValueError:
                 if settings.DEBUG:
                     print('Cannot convert Kurikulum ID ("{}") to integer'.format(kurikulum_id))
-                # TODO: ADD MESSAGE
+                messages.error(self.request, 'Tidak dapat mengonversi Kurikulum ID: {} ke integer'.format(kurikulum_id))
                 return redirect(self.success_url)
 
             self.update_kurikulum(kurikulum_id)
+        
+        messages.success(self.request, 'Berhasil mengupdate kurikulum')
         return redirect(self.success_url)
 
 
@@ -503,7 +525,8 @@ class KurikulumBulkDeleteView(View):
 
         if len(list_kurikulum) > 0:
             Kurikulum.objects.filter(id_neosia__in=list_kurikulum).delete()
-            
+            messages.success(request, 'Berhasil menghapus kurikulum')
+        
         return redirect(reverse('kurikulum:read-all'))
 
 
@@ -520,7 +543,7 @@ class MataKuliahKurikulumCreateView(FormView):
         
         # If there are no choices, redirect back
         if len(form.fields.get(self.form_field_name).choices) == 0:
-            # TODO: ADD MESSAGE
+            messages.info(request, 'Data mata kuliah kurikulum sudah sinkron dengan data di Neosia')
             return redirect(self.success_url)
         
         return super().get(request, *args, **kwargs)
@@ -561,12 +584,13 @@ class MataKuliahKurikulumCreateView(FormView):
             deleted_items = ['prodi', 'kurikulum']
             [mk_kurikulum.pop(item) for item in deleted_items]
 
-            mk_kurikulum_obj: MataKuliahKurikulum = MataKuliahKurikulum.objects.create(
+            MataKuliahKurikulum.objects.create(
                 prodi=prodi_obj, 
                 kurikulum=kurikulum_obj, 
                 **mk_kurikulum
             )
         
+        messages.success(self.request, 'Berhasil menambahkan mata kuliah kurikulum')
         return redirect(self.success_url)
 
 
@@ -602,7 +626,7 @@ class MataKuliahKurikulumUpdateView(FormView):
         form = self.get_form(form_class=self.form_class)
         
         if len(form.fields.get(self.form_field_name).choices) == 0:
-            # TODO: ADD MESSAGE
+            messages.info(request, 'Data mata kuliah kurikulum sudah sinkron dengan data di Neosia')
             return redirect(self.success_url)
         return super().get(request, *args, **kwargs)
 
@@ -629,7 +653,7 @@ class MataKuliahKurikulumUpdateView(FormView):
         update_mk_kurikulum_data = form.cleaned_data.get(self.form_field_name)
 
         self.update_mk_kurikulum(update_mk_kurikulum_data)
-        
+        messages.success(self.request, 'Berhasil mengupdate mata kuliah kurikulum')
         return super().form_valid(form)
 
 
@@ -643,6 +667,7 @@ class MataKuliahKurikulumBulkDeleteView(DeleteView):
 
         if len(list_mk_kurikulum) > 0:
             MataKuliahKurikulum.objects.filter(id_neosia__in=list_mk_kurikulum).delete()
+            messages.success(request, 'Berhasil menghapus mata kuliah kurikulum')
             
         return redirect(self.get_object().read_detail_url())
 
@@ -659,7 +684,7 @@ class SemesterKurikulumCreateView(FormView):
         
         # If there are no choices, redirect back
         if len(form.fields.get(self.form_field_name).choices) == 0:
-            # TODO: ADD MESSAGE
+            messages.info(request, 'Data semester kurikulum sudah sinkron dengan data di Neosia')
             return redirect(self.success_url)
         
         return super().get(request, *args, **kwargs)
@@ -727,11 +752,12 @@ class SemesterKurikulumCreateView(FormView):
             except ValueError:
                 if settings.DEBUG:
                     print('Cannot convert Semester ID ("{}") to integer'.format(semester_id))
-                # TODO: ADD MESSAGE
+                messages.error(self.request, 'Tidak dapat mengonversi Semester ID: {} ke integer'.format(semester_id))
                 return redirect(self.success_url)
                 
             self.save_semester(semester_id)
         
+        messages.success(self.request, 'Berhasil menambahkan semester kurikulum')
         return super().form_valid(form)
 
 
@@ -758,7 +784,7 @@ class SemesterKurikulumUpdateView(FormView):
         form = self.get_form(form_class=self.form_class)
         
         if len(form.fields.get(self.form_field_name).choices) == 0:
-            # TODO: ADD MESSAGE
+            messages.info(request, 'Data semester kurikulum sudah sinkron dengan data di Neosia')
             return redirect(self.success_url)
         return super().get(request, *args, **kwargs)
 
@@ -796,6 +822,7 @@ class SemesterKurikulumUpdateView(FormView):
         for semester_id in update_semester_data:
             self.update_semester(semester_id)
         
+        messages.success(self.request, 'Berhasil mengupdate semester kurikulum')
         return super().form_valid(form)
 
 
@@ -811,5 +838,6 @@ class SemesterKurikulumBulkDeleteView(DeleteView):
 
         if len(list_semester_kurikulum) > 0:
             SemesterKurikulum.objects.filter(semester__in=list_semester_kurikulum, kurikulum=kurikulum_id).delete()
+            messages.success(self.request, 'Berhasil menghapus semester kurikulum')
             
         return redirect(self.get_object().read_detail_url())

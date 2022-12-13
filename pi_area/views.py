@@ -1,4 +1,5 @@
 from django.http import Http404, HttpRequest, HttpResponse
+from django.contrib import messages
 from django.forms.models import inlineformset_factory
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic.edit import CreateView, DeleteView
@@ -68,6 +69,8 @@ class PIAreaCreateView(CreateView):
             pi_area: PerformanceIndicatorArea = formset_form.save(commit=False)
             pi_area.assessment_area = assessment_area_obj
             pi_area.save()
+
+        messages.success(self.request, 'Berhasil menambahkan assessment area dan PI area')
         
         return redirect(self.success_url)
 
@@ -80,5 +83,6 @@ class AssessmentAreaDeleteView(DeleteView):
         if not request.htmx: raise Http404
         assessment_area_obj: AssessmentArea = self.get_object()
         self.success_url = assessment_area_obj.get_read_pi_url()
-        
+        messages.success(self.request, 'Berhasil menghapus assessment area')
+
         return super().post(request, *args, **kwargs)

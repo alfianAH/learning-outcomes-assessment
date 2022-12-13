@@ -1,4 +1,5 @@
 from django.http import Http404, HttpRequest, HttpResponse
+from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic.base import View
@@ -90,7 +91,7 @@ class SemesterBulkDeleteView(FormView):
         list_semester_kurikulum = [*set(list_semester_kurikulum)]
 
         if len(list_semester_kurikulum) > 0:
-            print(list_semester_kurikulum)
             SemesterKurikulum.objects.filter(id__in=list_semester_kurikulum).delete()
+            messages.success(self.request, 'Berhasil menghapus semester')
         
         return redirect(self.get_success_url())

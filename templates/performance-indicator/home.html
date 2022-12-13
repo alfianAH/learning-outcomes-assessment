@@ -41,7 +41,7 @@ Performance Indicators -
 
     <p>{{ semester_obj.semester.nama }}</p>
 
-    <form action="{{ bulk_delete_url }}" method="post">
+    <form action="{{ bulk_delete_url }}" method="post" class="space-y-3">
         {% csrf_token %}
         {% include 'components/list-table-view/selected-indicator.html' with delete_button=True %}
         

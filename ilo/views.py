@@ -1,4 +1,5 @@
 from django.http import Http404, HttpRequest, HttpResponse
+from django.contrib import messages
 from django.views.generic.base import View
 from django.views.generic.list import ListView
 from django.views.generic.edit import DeleteView, FormView, CreateView
@@ -111,5 +112,5 @@ class IloCreateHxView(CreateView):
         self.object: Ilo = form.save(commit=False)
         self.object.semester = self.semester_obj
         self.object.save()
-
+        messages.success(self.request, 'Berhasil menambahkan ILO')
         return super().form_valid(form)
