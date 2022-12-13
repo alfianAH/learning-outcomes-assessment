@@ -168,6 +168,11 @@ function addToast(toastType, message) {
     }, 150);
 }
 
+function closeToast(buttonElement) {
+    let toast = $(buttonElement).closest('.toast');
+    removeToast(toast);
+}
+
 function removeToast(toastElement) {
     $(toastElement).removeClass('show');
                 
