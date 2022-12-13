@@ -2,7 +2,7 @@ from django.http import Http404, HttpRequest, HttpResponse
 from django.contrib import messages
 from django.forms.models import inlineformset_factory
 from django.shortcuts import get_object_or_404, redirect
-from django.views.generic.edit import CreateView, DeleteView
+from django.views.generic.edit import CreateView, DeleteView, FormView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 
@@ -105,10 +105,33 @@ class PerformanceIndicatorAreaReadAllView(ListView):
         context = super().get_context_data(**kwargs)
 
         context.update({
-            'semester_obj': self.semester_obj
+            'semester_obj': self.semester_obj,
+            'input_name': 'id_pi_area',
+            'prefix_id': 'pi_area-',
+            'bulk_delete_url': self.semester_obj.get_bulk_delete_pi_area_url(),
         })
         return context
 
 
 class PerformanceIndicatorAreaReadView(DetailView):
     pass
+
+
+class PerformanceIndicatorAreaBulkDelete(FormView):
+    model = PerformanceIndicatorArea
+
+    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        semester_id = kwargs.get('semester_kurikulum_id')
+        semester_obj: SemesterKurikulum = get_object_or_404(SemesterKurikulum, id=semester_id)
+
+        self.success_url = semester_obj.read_all_pi_area_url()
+
+        list_pi_area = request.POST.getlist('id_pi_area')
+        list_pi_area = [*set(list_pi_area)]
+
+        if len(list_pi_area) > 0:
+            PerformanceIndicatorArea.objects.filter(id__in=list_pi_area).delete()
+            messages.success(self.request, 'Berhasil menghapus PI Area')
+        
+        return redirect(self.get_success_url())
+

@@ -63,6 +63,11 @@ class SemesterKurikulum(models.Model):
             'semester_kurikulum_id': self.pk
         })
 
+    def get_bulk_delete_pi_area_url(self):
+        return reverse('semester:pi_area:pi-area-bulk-delete', kwargs={
+            'semester_kurikulum_id': self.pk
+        })
+
     # ILO
     def read_all_ilo_url(self):
         return reverse('semester:ilo:read-all', kwargs={
