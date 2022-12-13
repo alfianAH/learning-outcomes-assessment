@@ -3,6 +3,8 @@ from django.contrib import messages
 from django.forms.models import inlineformset_factory
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic.edit import CreateView, DeleteView
+from django.views.generic.list import ListView
+from django.views.generic.detail import DetailView
 
 from semester.models import SemesterKurikulum
 from .forms import (
@@ -27,7 +29,7 @@ class PIAreaCreateView(CreateView):
         semester_kurikulum_id = kwargs.get('semester_kurikulum_id')
         self.semester_obj: SemesterKurikulum = get_object_or_404(SemesterKurikulum, id=semester_kurikulum_id)
 
-        self.success_url = self.semester_obj.read_all_pi_url()
+        self.success_url = self.semester_obj.read_all_pi_area_url()
         return super().setup(request, *args, **kwargs)
     
     def get_form_kwargs(self):
@@ -77,12 +79,36 @@ class PIAreaCreateView(CreateView):
 
 class AssessmentAreaDeleteView(DeleteView):
     model = AssessmentArea
-    pk_url_kwarg = 'area_id'
+    pk_url_kwarg = 'assessment_area_id'
 
     def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         if not request.htmx: raise Http404
         assessment_area_obj: AssessmentArea = self.get_object()
-        self.success_url = assessment_area_obj.get_read_pi_url()
+        self.success_url = assessment_area_obj.get_read_all_pi_area_url()
         messages.success(self.request, 'Berhasil menghapus assessment area')
 
         return super().post(request, *args, **kwargs)
+
+
+class PerformanceIndicatorAreaReadAllView(ListView):
+    model = AssessmentArea
+    template_name: str = 'pi-area/home.html'
+    ordering: str = 'nama'
+    semester_obj: SemesterKurikulum = None
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        semester_id = kwargs.get('semester_kurikulum_id')
+        self.semester_obj = get_object_or_404(SemesterKurikulum, id=semester_id)
+        return super().setup(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context.update({
+            'semester_obj': self.semester_obj
+        })
+        return context
+
+
+class PerformanceIndicatorAreaReadView(DetailView):
+    pass

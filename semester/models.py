@@ -52,18 +52,20 @@ class SemesterKurikulum(models.Model):
             'semester_kurikulum_id': self.pk
         })
 
+    # Performance Indicator Area
+    def read_all_pi_area_url(self):
+        return reverse('semester:pi_area:read-all', kwargs={
+            'semester_kurikulum_id': self.pk
+        })
+
+    def create_pi_area_url(self):
+        return reverse('semester:pi_area:create', kwargs={
+            'semester_kurikulum_id': self.pk
+        })
+
+    # ILO
     def read_all_ilo_url(self):
         return reverse('semester:ilo:read-all', kwargs={
-            'semester_kurikulum_id': self.pk
-        })
-
-    def read_all_pi_url(self):
-        return reverse('semester:performance_indicator:read-all', kwargs={
-            'semester_kurikulum_id': self.pk
-        })
-
-    def create_pi_url(self):
-        return reverse('semester:performance_indicator:pi_area:create', kwargs={
             'semester_kurikulum_id': self.pk
         })
 

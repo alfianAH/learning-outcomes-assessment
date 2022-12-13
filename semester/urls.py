@@ -18,5 +18,5 @@ urlpatterns = [
     # MK Semester
 
     # Performance Indicator
-    path('<int:semester_kurikulum_id>/pi/', include('performance_indicator.urls')),
+    path('<int:semester_kurikulum_id>/pi-area/', include('pi_area.urls')),
 ]
