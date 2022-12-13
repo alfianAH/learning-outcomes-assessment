@@ -518,7 +518,9 @@ class KurikulumReadView(DetailView):
         return context
 
 
-class KurikulumBulkDeleteView(View):
+class KurikulumBulkDeleteView(FormView):
+    success_url = reverse_lazy('kurikulum:read-all')
+
     def post(self, request: HttpRequest, *args, **kwargs):
         list_kurikulum = request.POST.getlist('id_kurikulum')
         list_kurikulum = [*set(list_kurikulum)]
@@ -527,7 +529,7 @@ class KurikulumBulkDeleteView(View):
             Kurikulum.objects.filter(id_neosia__in=list_kurikulum).delete()
             messages.success(request, 'Berhasil menghapus kurikulum')
         
-        return redirect(reverse('kurikulum:read-all'))
+        return redirect(self.get_success_url())
 
 
 # Mata Kuliah Kurikulum
@@ -657,11 +659,11 @@ class MataKuliahKurikulumUpdateView(FormView):
         return super().form_valid(form)
 
 
-class MataKuliahKurikulumBulkDeleteView(DeleteView):
-    model = Kurikulum
-    pk_url_kwarg: str = 'kurikulum_id'
-
+class MataKuliahKurikulumBulkDeleteView(View):
     def post(self, request: HttpRequest, *args, **kwargs):
+        kurikulum_id = kwargs.get('kurikulum_id')
+        kurikulum_obj: Kurikulum = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
+
         list_mk_kurikulum = request.POST.getlist('id_mk_kurikulum')
         list_mk_kurikulum = [*set(list_mk_kurikulum)]
 
@@ -669,7 +671,7 @@ class MataKuliahKurikulumBulkDeleteView(DeleteView):
             MataKuliahKurikulum.objects.filter(id_neosia__in=list_mk_kurikulum).delete()
             messages.success(request, 'Berhasil menghapus mata kuliah kurikulum')
             
-        return redirect(self.get_object().read_detail_url())
+        return redirect(kurikulum_obj.read_detail_url())
 
 
 # Semester Kurikulum
@@ -826,13 +828,11 @@ class SemesterKurikulumUpdateView(FormView):
         return super().form_valid(form)
 
 
-class SemesterKurikulumBulkDeleteView(DeleteView):
-    model = Kurikulum
-    pk_url_kwarg: str = 'kurikulum_id'
-
+class SemesterKurikulumBulkDeleteView(View):
     def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        kurikulum_obj: Kurikulum = self.get_object()
-        kurikulum_id = kurikulum_obj.id_neosia
+        kurikulum_id = kwargs.get('kurikulum_id')
+        kurikulum_obj: Kurikulum = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
+
         list_semester_kurikulum = request.POST.getlist('id_semester')
         list_semester_kurikulum = [*set(list_semester_kurikulum)]
 
@@ -840,4 +840,4 @@ class SemesterKurikulumBulkDeleteView(DeleteView):
             SemesterKurikulum.objects.filter(semester__in=list_semester_kurikulum, kurikulum=kurikulum_id).delete()
             messages.success(self.request, 'Berhasil menghapus semester kurikulum')
             
-        return redirect(self.get_object().read_detail_url())
+        return redirect(kurikulum_obj.read_detail_url())

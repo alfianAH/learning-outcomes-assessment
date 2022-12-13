@@ -2,6 +2,7 @@ from django.http import Http404, HttpRequest, HttpResponse
 from django.contrib import messages
 from django.forms.models import inlineformset_factory
 from django.shortcuts import get_object_or_404, redirect
+from django.views.generic.base import View
 from django.views.generic.edit import CreateView, DeleteView, FormView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
@@ -117,9 +118,7 @@ class PerformanceIndicatorAreaReadView(DetailView):
     pass
 
 
-class PerformanceIndicatorAreaBulkDelete(FormView):
-    model = PerformanceIndicatorArea
-
+class PerformanceIndicatorAreaBulkDelete(View):
     def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         semester_id = kwargs.get('semester_kurikulum_id')
         semester_obj: SemesterKurikulum = get_object_or_404(SemesterKurikulum, id=semester_id)
