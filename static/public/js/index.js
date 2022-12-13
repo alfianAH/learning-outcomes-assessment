@@ -149,7 +149,7 @@ function addToast(toastType, message) {
     let toastContainer = $('.toast-container');
     let toastElement = toastContainer.find(`.toast-example.${toastType}`).clone(true);
 
-    toastElement.find('.toast-body').text = message;
+    toastElement.find('.toast-body').text(message);
     toastContainer.append(toastElement);
 
     // Remove hide from toast
@@ -184,10 +184,8 @@ function toastHandler() {
         if (children.length == 0) return;
 
         let toastChildrenLength = children.length + 1;
-        console.log(children);
 
         if (toastChildrenLength > TOAST_LIMIT) {
-            console.log('remove');
             for (let i = toastChildrenLength - 2; i >= TOAST_LIMIT+1; i--) {
                 if(children[i] !== null){
                     removeToast(children[i]);
