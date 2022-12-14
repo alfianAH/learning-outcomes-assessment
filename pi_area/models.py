@@ -36,7 +36,7 @@ class AssessmentArea(models.Model):
         })
 
     def get_delete_assessment_area_url(self):
-        return reverse('semester:pi_area:delete', kwargs={
+        return reverse('semester:pi_area:assessment-area-delete', kwargs={
             'semester_kurikulum_id': self.semester.pk,
             'assessment_area_id': self.pk
         })
@@ -56,7 +56,7 @@ class PerformanceIndicatorArea(models.Model):
         return self.pi_code
 
     def read_detail_url(self):
-        return reverse('semester:pi_area:read', kwargs={
+        return reverse('semester:pi_area:pi-area-read', kwargs={
             'semester_kurikulum_id': self.assessment_area.semester.pk,
             'pi_area_id': self.pk
         })
