@@ -92,6 +92,7 @@ class AssessmentAreaUpdateHxView(UpdateView):
         self.assessment_area_obj: AssessmentArea = self.get_object()
 
         context.update({
+            'modal_title': 'Update Assessment Area',
             'button_text': 'Update',
             'post_url': self.assessment_area_obj.get_update_assessment_area_url()
         })
@@ -145,7 +146,7 @@ class PIAreaReadAllView(ListView):
 class PerformanceIndicatorAreaCreateHxView(CreateView):
     model = PerformanceIndicatorArea
     form_class = PerformanceIndicatorAreaForm
-    template_name = 'components/form/default-form.html'
+    template_name = 'pi-area/partials/pi-area-create-form.html'
     assessment_area_obj: AssessmentArea = None
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
@@ -162,6 +163,7 @@ class PerformanceIndicatorAreaCreateHxView(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
+            'modal_title': 'Tambah Kode PI',
             'button_text': 'Tambah',
             'post_url': self.assessment_area_obj.get_hx_create_pi_area_url()
         })

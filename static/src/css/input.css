@@ -525,6 +525,18 @@
         @apply flex flex-shrink-0 flex-wrap items-center justify-end p-4 space-x-2.5;
     }
 
+    .modal-dialog-scrollable{
+        @apply h-[calc(100%-1.75rem*2)];
+    }
+
+    .modal-dialog-scrollable .modal-content{
+        @apply max-h-full overflow-hidden;
+    }
+
+    .modal-dialog-scrollable .modal-body{
+        @apply overflow-y-auto;
+    }
+
     /* Navigation Bar */
     .navbar{
         @apply bg-slate-700 dark:bg-zinc-700 sticky top-0 lg:ml-80 py-3 pl-3 pr-8 z-30;
