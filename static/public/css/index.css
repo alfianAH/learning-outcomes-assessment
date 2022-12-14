@@ -2319,6 +2319,19 @@ details.dropdown::marker {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.modal-dialog-scrollable {
+  height: calc(100% - 1.75rem * 2);
+}
+
+.modal-dialog-scrollable .modal-content {
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.modal-dialog-scrollable .modal-body {
+  overflow-y: auto;
+}
+
 .modal-content {
   pointer-events: auto;
   position: relative;

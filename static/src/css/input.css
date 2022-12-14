@@ -458,6 +458,18 @@
         @apply relative m-7 mx-auto pointer-events-auto max-w-lg duration-300 ease-in-out scale-100;
     }
 
+    .modal-dialog-scrollable{
+        @apply h-[calc(100%-1.75rem*2)];
+    }
+
+    .modal-dialog-scrollable .modal-content{
+        @apply max-h-full overflow-hidden;
+    }
+
+    .modal-dialog-scrollable .modal-body{
+        @apply overflow-y-auto;
+    }
+
     .modal-content{
         @apply relative flex flex-col w-full bg-slate-100 dark:bg-neutral-800 pointer-events-auto rounded-md;
     }
