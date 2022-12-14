@@ -55,8 +55,6 @@ class PIAreaCreateView(CreateView):
     def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         form = self.get_form()
         self.formset = self.FormsetClass(request.POST)
-        print('Formset: {}'.format(self.formset.is_valid()))
-        print('Form: {}'.format(form.is_valid()))
 
         if all([self.formset.is_valid(), form.is_valid()]):
             return self.form_valid(form)
@@ -78,12 +76,16 @@ class PIAreaCreateView(CreateView):
         return redirect(self.success_url)
 
 
-class AssessmentAreaUpdateView(UpdateView):
+class AssessmentAreaUpdateHxView(UpdateView):
     model = AssessmentArea
     pk_url_kwarg = 'assessment_area_id'
     form_class = AssessmentAreaForm
     template_name: str = 'pi-area/partials/assessment-area-update-form.html'
     assessment_area_obj: AssessmentArea = None
+
+    def get(self, request: HttpRequest, *args: str, **kwargs) -> HttpResponse:
+        if not request.htmx: raise Http404
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -98,6 +100,7 @@ class AssessmentAreaUpdateView(UpdateView):
     def form_valid(self, form) -> HttpResponse:
         self.assessment_area_obj: AssessmentArea = self.get_object()
         self.success_url = self.assessment_area_obj.get_read_all_pi_area_url()
+        messages.success(self.request, 'Berhasl mengupdate assessment area')
 
         return super().form_valid(form)
 
@@ -139,6 +142,44 @@ class PIAreaReadAllView(ListView):
         return context
 
 
+class PerformanceIndicatorAreaCreateHxView(CreateView):
+    model = PerformanceIndicatorArea
+    form_class = PerformanceIndicatorAreaForm
+    template_name = 'components/form/default-form.html'
+    assessment_area_obj: AssessmentArea = None
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        assessment_area_id = kwargs.get('assessment_area_id')
+        self.assessment_area_obj = get_object_or_404(AssessmentArea, id=assessment_area_id)
+
+        self.success_url = self.assessment_area_obj.get_read_all_pi_area_url()
+        return super().setup(request, *args, **kwargs)
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if not request.htmx: raise Http404
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'button_text': 'Tambah',
+            'post_url': self.assessment_area_obj.get_hx_create_pi_area_url()
+        })
+        return context
+    
+    def form_valid(self, form) -> HttpResponse:
+        pi_area_obj: PerformanceIndicatorArea = form.save(commit=False)
+
+        if self.assessment_area_obj is None:
+            messages.error(self.request, 'Gagal menambahkan kode PI karena assessment area tidak ditemukan')
+        else:
+            pi_area_obj.assessment_area = self.assessment_area_obj
+            pi_area_obj.save()
+            messages.success(self.request, 'Berhasil menambahkan kode PI')
+        
+        return redirect(self.success_url)
+
+
 class PerformanceIndicatorAreaReadView(DetailView):
     pass
 
@@ -155,5 +196,5 @@ class PerformanceIndicatorAreaBulkDeleteView(View):
             PerformanceIndicatorArea.objects.filter(id__in=list_pi_area).delete()
             messages.success(self.request, 'Berhasil menghapus PI Area')
         
-        return redirect(self.get_success_url())
+        return redirect(semester_obj.read_all_pi_area_url())
 

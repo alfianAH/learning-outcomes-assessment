@@ -25,7 +25,7 @@ class AssessmentArea(models.Model):
         return self.performanceindicatorarea_set.all()
 
     def get_update_assessment_area_url(self):
-        return reverse('semester:pi_area:assessment-area-update', kwargs={
+        return reverse('semester:pi_area:hx-assessment-area-update', kwargs={
             'semester_kurikulum_id': self.semester.pk,
             'assessment_area_id': self.pk
         })
@@ -37,6 +37,12 @@ class AssessmentArea(models.Model):
 
     def get_delete_assessment_area_url(self):
         return reverse('semester:pi_area:delete', kwargs={
+            'semester_kurikulum_id': self.semester.pk,
+            'assessment_area_id': self.pk
+        })
+
+    def get_hx_create_pi_area_url(self):
+        return reverse('semester:pi_area:hx-pi-area-create', kwargs={
             'semester_kurikulum_id': self.semester.pk,
             'assessment_area_id': self.pk
         })
