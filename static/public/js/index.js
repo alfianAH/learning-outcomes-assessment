@@ -442,7 +442,6 @@ function searchTextInList(formId) {
 }
 
 function addToast(toastType = 'info', message) {
-    console.log(toastType);
     let toastContainer = $('.toast-container');
     let toastElement = toastContainer.find(`.toast-example.${toastType}`).clone(true);
 
@@ -515,3 +514,4 @@ pagination();
 passwordHandler();
 tabElement();
 toastHandler();
+console.log('test');

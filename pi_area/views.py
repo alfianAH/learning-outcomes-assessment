@@ -91,7 +91,7 @@ class AssessmentAreaDeleteView(DeleteView):
         return super().post(request, *args, **kwargs)
 
 
-class PerformanceIndicatorAreaReadAllView(ListView):
+class PIAreaReadAllView(ListView):
     model = AssessmentArea
     template_name: str = 'pi-area/home.html'
     ordering: str = 'nama'
@@ -118,12 +118,10 @@ class PerformanceIndicatorAreaReadView(DetailView):
     pass
 
 
-class PerformanceIndicatorAreaBulkDelete(View):
+class PerformanceIndicatorAreaBulkDeleteView(View):
     def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         semester_id = kwargs.get('semester_kurikulum_id')
         semester_obj: SemesterKurikulum = get_object_or_404(SemesterKurikulum, id=semester_id)
-
-        self.success_url = semester_obj.read_all_pi_area_url()
 
         list_pi_area = request.POST.getlist('id_pi_area')
         list_pi_area = [*set(list_pi_area)]
@@ -132,5 +130,5 @@ class PerformanceIndicatorAreaBulkDelete(View):
             PerformanceIndicatorArea.objects.filter(id__in=list_pi_area).delete()
             messages.success(self.request, 'Berhasil menghapus PI Area')
         
-        return redirect(self.get_success_url())
+        return redirect(semester_obj.read_all_pi_area_url())
 

@@ -395,6 +395,7 @@ class KurikulumReadView(DetailView):
     model = Kurikulum
     pk_url_kwarg: str = 'kurikulum_id'
     template_name: str = 'kurikulum/detail-view.html'
+    kurikulum_obj: Kurikulum = None
 
     mk_kurikulum_filter: MataKuliahKurikulumFilter = None
     mk_kurikulum_sort: MataKuliahKurikulumSort = None
@@ -405,12 +406,12 @@ class KurikulumReadView(DetailView):
     semester_ordering: str = 'nama'
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        kurikulum_obj: Kurikulum = self.get_object()
-        if kurikulum_obj.prodi.id_neosia != request.user.prodi.id_neosia:
+        self.kurikulum_obj = self.get_object()
+        if self.kurikulum_obj.prodi.id_neosia != request.user.prodi.id_neosia:
             return HttpResponse(status_code=404)
 
-        mk_kurikulum_qs = kurikulum_obj.get_mk_kurikulum()
-        semester_ids = kurikulum_obj.get_semester_ids()
+        mk_kurikulum_qs = self.kurikulum_obj.get_mk_kurikulum()
+        semester_ids = self.kurikulum_obj.get_semester_ids()
         semester_qs = Semester.objects.filter(id_neosia__in=semester_ids)
         
         if mk_kurikulum_qs.exists():
@@ -468,11 +469,11 @@ class KurikulumReadView(DetailView):
         context = super().get_context_data(**kwargs)
         mk_objects = self.get_objects_queryset(
             self.mk_kurikulum_filter,
-            self.get_object().get_mk_kurikulum(),
+            self.kurikulum_obj.get_mk_kurikulum(),
             self.mk_kurikulum_ordering
         )
 
-        semester_ids = self.get_object().get_semester_ids()
+        semester_ids = self.kurikulum_obj.get_semester_ids()
         semester_qs = Semester.objects.filter(id_neosia__in=semester_ids)
         semester_objects = self.get_objects_queryset(
             self.semester_filter,
@@ -488,7 +489,7 @@ class KurikulumReadView(DetailView):
             'mk_table_custom_field_header_template': 'mata-kuliah/partials/table-custom-field-header-mk.html',
             'mk_table_custom_field_template': 'mata-kuliah/partials/table-custom-field-mk.html',
             'mk_prefix_id': 'mk-',
-            'mk_bulk_delete_url': self.get_object().get_mk_bulk_delete(),
+            'mk_bulk_delete_url': self.kurikulum_obj.get_mk_bulk_delete(),
             
             'semester_objects': semester_objects,
             'semester_filter_template': 'semester/partials/semester-filter-form.html',
@@ -498,9 +499,9 @@ class KurikulumReadView(DetailView):
             'semester_table_custom_field_header_template': 'semester/partials/table-custom-field-header-semester.html',
             'semester_table_custom_field_template': 'semester/partials/table-custom-field-semester.html',
             'semester_prefix_id': 'semester-',
-            'semester_bulk_delete_url': self.get_object().get_semester_bulk_delete(),
+            'semester_bulk_delete_url': self.kurikulum_obj.get_semester_bulk_delete(),
             
-            'reset_url': self.get_object().read_detail_url()
+            'reset_url': self.kurikulum_obj.read_detail_url()
         })
 
         if self.mk_kurikulum_filter is not None:

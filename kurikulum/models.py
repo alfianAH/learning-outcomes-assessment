@@ -26,11 +26,6 @@ class Kurikulum(models.Model):
             'kurikulum_id': self.id_neosia
         })
 
-    def delete_kurikulum_url(self):
-        return reverse('kurikulum:delete', kwargs={
-            'kurikulum_id': self.id_neosia
-        })
-
     # Mata Kuliah Kurikulum
     def get_mk_kurikulum(self):
         return self.matakuliahkurikulum_set.all()

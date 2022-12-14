@@ -1,8 +1,8 @@
 from django.urls import path
 from .views import (
-    PerformanceIndicatorAreaReadAllView,
+    PIAreaReadAllView,
     PerformanceIndicatorAreaReadView,
-    PerformanceIndicatorAreaBulkDelete,
+    PerformanceIndicatorAreaBulkDeleteView,
     PIAreaCreateView,
     AssessmentAreaDeleteView,
 )
@@ -11,9 +11,9 @@ from .views import (
 app_name = 'pi_area'
 urlpatterns = [
     # PI Area
-    path('', PerformanceIndicatorAreaReadAllView.as_view(), name='read-all'),
+    path('', PIAreaReadAllView.as_view(), name='read-all'),
     path('<int:pi_area_id>/', PerformanceIndicatorAreaReadView.as_view(), name='read'),
-    path('pi-area-bulk-delete/', PerformanceIndicatorAreaBulkDelete.as_view(), name='pi-area-bulk-delete'),
+    path('pi-area-bulk-delete/', PerformanceIndicatorAreaBulkDeleteView.as_view(), name='pi-area-bulk-delete'),
 
     # Assessment Area
     path('create/', PIAreaCreateView.as_view(), name='create'),
