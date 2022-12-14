@@ -5,6 +5,7 @@ from .views import (
     PerformanceIndicatorAreaBulkDeleteView,
     PIAreaCreateView,
     AssessmentAreaDeleteView,
+    AssessmentAreaUpdateView,
 )
 
 
@@ -17,5 +18,6 @@ urlpatterns = [
 
     # Assessment Area
     path('create/', PIAreaCreateView.as_view(), name='create'),
+    path('<int:assessment_area_id>/update/', AssessmentAreaUpdateView.as_view(), name='assessment-area-update'),
     path('<int:assessment_area_id>/delete/', AssessmentAreaDeleteView.as_view(), name='delete'),
 ]

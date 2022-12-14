@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.forms.models import inlineformset_factory
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic.base import View
-from django.views.generic.edit import CreateView, DeleteView, FormView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 
@@ -78,16 +78,41 @@ class PIAreaCreateView(CreateView):
         return redirect(self.success_url)
 
 
+class AssessmentAreaUpdateView(UpdateView):
+    model = AssessmentArea
+    pk_url_kwarg = 'assessment_area_id'
+    form_class = AssessmentAreaForm
+    template_name: str = 'pi-area/partials/assessment-area-update-form.html'
+    assessment_area_obj: AssessmentArea = None
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        self.assessment_area_obj: AssessmentArea = self.get_object()
+
+        context.update({
+            'button_text': 'Update',
+            'post_url': self.assessment_area_obj.get_update_assessment_area_url()
+        })
+        return context
+
+    def form_valid(self, form) -> HttpResponse:
+        self.assessment_area_obj: AssessmentArea = self.get_object()
+        self.success_url = self.assessment_area_obj.get_read_all_pi_area_url()
+
+        return super().form_valid(form)
+
+
 class AssessmentAreaDeleteView(DeleteView):
     model = AssessmentArea
     pk_url_kwarg = 'assessment_area_id'
-
-    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        if not request.htmx: raise Http404
+    
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         assessment_area_obj: AssessmentArea = self.get_object()
         self.success_url = assessment_area_obj.get_read_all_pi_area_url()
-        messages.success(self.request, 'Berhasil menghapus assessment area')
+        return self.post(request, *args, **kwargs)
 
+    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        messages.success(self.request, 'Berhasil menghapus assessment area')
         return super().post(request, *args, **kwargs)
 
 
@@ -130,5 +155,5 @@ class PerformanceIndicatorAreaBulkDeleteView(View):
             PerformanceIndicatorArea.objects.filter(id__in=list_pi_area).delete()
             messages.success(self.request, 'Berhasil menghapus PI Area')
         
-        return redirect(semester_obj.read_all_pi_area_url())
+        return redirect(self.get_success_url())
 

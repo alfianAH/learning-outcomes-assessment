@@ -514,4 +514,3 @@ pagination();
 passwordHandler();
 tabElement();
 toastHandler();
-console.log('test');
