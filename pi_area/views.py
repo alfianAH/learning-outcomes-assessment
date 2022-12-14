@@ -31,9 +31,7 @@ class PIAreaCreateView(CreateView):
         self.semester_obj: SemesterKurikulum = get_object_or_404(SemesterKurikulum, id=semester_kurikulum_id)
 
         self.success_url = self.semester_obj.read_all_pi_area_url()
-        return super().setup(request, *args, **kwargs)
-    
-    def get_form_kwargs(self):
+
         self.FormsetClass = inlineformset_factory(
             AssessmentArea, 
             PerformanceIndicatorArea, 
@@ -42,11 +40,13 @@ class PIAreaCreateView(CreateView):
             can_delete=False
         )
         self.formset = self.FormsetClass()
-        return super().get_form_kwargs()
+        return super().setup(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
+            'id_total_form': '#id_performanceindicatorarea_set-TOTAL_FORMS',
+            'add_more_btn_text': 'Tambah kode area PI',
             'semester_obj': self.semester_obj,
             'formset': self.formset
         })
@@ -143,17 +143,28 @@ class PIAreaReadAllView(ListView):
         return context
 
 
-class PerformanceIndicatorAreaCreateHxView(CreateView):
+class PerformanceIndicatorAreaCreateHxView(FormView):
     model = PerformanceIndicatorArea
     form_class = PerformanceIndicatorAreaForm
     template_name = 'pi-area/partials/pi-area-create-form.html'
     assessment_area_obj: AssessmentArea = None
+    FormsetClass = None
+    formset = None
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         assessment_area_id = kwargs.get('assessment_area_id')
         self.assessment_area_obj = get_object_or_404(AssessmentArea, id=assessment_area_id)
 
         self.success_url = self.assessment_area_obj.get_read_all_pi_area_url()
+
+        self.FormsetClass = inlineformset_factory(
+            AssessmentArea, 
+            PerformanceIndicatorArea, 
+            form=PerformanceIndicatorAreaForm, 
+            extra=1,
+            can_delete=False
+        )
+        self.formset = self.FormsetClass()
         return super().setup(request, *args, **kwargs)
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
@@ -163,22 +174,34 @@ class PerformanceIndicatorAreaCreateHxView(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
+            'id_total_form': '#id_performanceindicatorarea_set-TOTAL_FORMS',
             'modal_title': 'Tambah Kode PI',
             'button_text': 'Tambah',
+            'formset': self.formset,
             'post_url': self.assessment_area_obj.get_hx_create_pi_area_url()
         })
         return context
+
+    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        self.formset = self.FormsetClass(request.POST)
+        
+        if self.formset.is_valid():
+            return self.form_valid(None)
+        else:
+            return self.form_invalid(None)
     
     def form_valid(self, form) -> HttpResponse:
-        pi_area_obj: PerformanceIndicatorArea = form.save(commit=False)
-
         if self.assessment_area_obj is None:
             messages.error(self.request, 'Gagal menambahkan kode PI karena assessment area tidak ditemukan')
-        else:
+            return redirect(self.success_url)
+
+        for formset_form in self.formset:
+            pi_area_obj: PerformanceIndicatorArea = formset_form.save(commit=False)
+
             pi_area_obj.assessment_area = self.assessment_area_obj
             pi_area_obj.save()
-            messages.success(self.request, 'Berhasil menambahkan kode PI')
-        
+
+        messages.success(self.request, 'Berhasil menambahkan kode PI')
         return redirect(self.success_url)
 
 

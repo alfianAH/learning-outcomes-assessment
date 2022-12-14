@@ -1,1 +1,25 @@
-{% include 'components/form/default-form-in-modal.html' %}
+<form action="{{ post_url|default:'.' }}" method="post" class="modal-content">
+    {% csrf_token %}
+
+    <div class="modal-header">
+        <h3>{{ modal_title }}</h3>
+        <button class="btn border-none" type="button" data-dismiss="modal" onclick="closeModalByButton(this)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+            </svg>
+        </button>
+    </div>
+
+    <div class="modal-body" id="create-modal-form">
+        {% include 'components/form/formset.html' %}
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal" onclick="closeModalByButton(this)">Tutup</button>
+        <button class="btn btn-success" type="submit">{{ button_text|default:'Submit' }}</button>
+    </div>
+</form>
+
+<script>
+    addMoreForm('{{ id_total_form }}');
+</script>

@@ -1,0 +1,24 @@
+{% if formset %}
+    {{ formset.management_form}}
+
+    <div id="form-list" class="ml-4">
+        {% for form in formset %}
+            <div id="form-{{ forloop.counter0 }}" class="mb-3 added-form">
+                {% include 'components/form/formset-fields.html' %}
+            </div>
+        {% endfor %}
+
+        {% include 'components/form/form-errors.html' with errors=formset.non_form_errors %}
+    </div>        
+
+    <div class="hidden mb-3" id="empty-form">
+        {% include 'components/form/formset-fields.html' with data_delete='__prefix__' form=formset.empty_form %}
+    </div>
+
+    <button type="button" class="btn btn-primary btn-icon-start ml-4" id="add-form">
+        <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+        </svg>
+        {{ add_more_btn_text|default:'Tambah lagi' }}
+    </button>
+{% endif %}
