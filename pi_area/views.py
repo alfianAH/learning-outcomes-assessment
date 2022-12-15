@@ -93,6 +93,7 @@ class AssessmentAreaUpdateHxView(UpdateView):
 
         context.update({
             'modal_title': 'Update Assessment Area',
+            'modal_id': 'update-modal-content',
             'button_text': 'Update',
             'post_url': self.assessment_area_obj.get_update_assessment_area_url()
         })
@@ -176,6 +177,7 @@ class PerformanceIndicatorAreaCreateHxView(FormView):
         context.update({
             'id_total_form': '#id_performanceindicatorarea_set-TOTAL_FORMS',
             'modal_title': 'Tambah Kode PI',
+            'modal_id': 'create-modal-content',
             'button_text': 'Tambah',
             'formset': self.formset,
             'post_url': self.assessment_area_obj.get_hx_create_pi_area_url()
@@ -203,6 +205,11 @@ class PerformanceIndicatorAreaCreateHxView(FormView):
 
         messages.success(self.request, 'Berhasil menambahkan kode PI')
         return redirect(self.success_url)
+
+    def form_invalid(self, form) -> HttpResponse:
+        return self.render_to_response(
+            self.get_context_data(formset=self.formset)
+        )
 
 
 class PerformanceIndicatorAreaReadView(DetailView):

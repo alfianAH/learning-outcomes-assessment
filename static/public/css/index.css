@@ -3277,12 +3277,12 @@ details.dropdown::marker {
   margin-bottom: 0.625rem;
 }
 
-.ml-4 {
-  margin-left: 1rem;
-}
-
 .ml-1 {
   margin-left: 0.25rem;
+}
+
+.ml-4 {
+  margin-left: 1rem;
 }
 
 .mt-2\.5 {
