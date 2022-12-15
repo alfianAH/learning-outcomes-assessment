@@ -89,7 +89,7 @@ function showSidebar(button){
         target.removeClass('showing').addClass('show');
     });
     
-    backdrop.on('click', function () {
+    backdrop.one('click', function () {
         closeSidebar(target, backdrop);
     });
 }
@@ -108,12 +108,15 @@ function closeSidebar(sidebar, backdrop) {
 }
 
 function resetSidebarToDefault() {
-    if ($(window).width() >= 1024) {
-        // Remove backdrop
-        $('.backdrop').removeClass('fade show').addClass('hidden');
+    if ($('.sidebar').hasClass('show')) {
+        if ($(window).width() >= 1024) {
+            // Remove backdrop
+            $('.backdrop').removeClass('fade show').addClass('hidden');
 
-        // Remove sidebar's classses
-        $('.sidebar').removeClass('hiding show');
+            // Remove sidebar's classses
+            $('.sidebar').removeClass('hiding show');
+            toggleClass($('body'), 'noscroll');
+        }
     }
 }
 
