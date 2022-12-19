@@ -41,12 +41,6 @@ class AssessmentArea(models.Model):
             'assessment_area_id': self.pk
         })
 
-    def get_hx_create_pi_area_url(self):
-        return reverse('semester:pi_area:hx-pi-area-create', kwargs={
-            'semester_kurikulum_id': self.semester.pk,
-            'assessment_area_id': self.pk
-        })
-
 
 class PerformanceIndicatorArea(models.Model):
     assessment_area = models.ForeignKey(AssessmentArea, on_delete=models.CASCADE)

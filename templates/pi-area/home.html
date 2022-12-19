@@ -51,11 +51,6 @@ Performance Indicators -
                     <div class="flex flex-row items-center space-x-2.5 lg:space-x-3">
                         <span class="list-item-title">{{ object.nama }}</span>
                         
-                        <button class="btn btn-primary" title="Tambah" data-target="#create-modal" onclick="openModal(this)" hx-get="{{ object.get_hx_create_pi_area_url }}" hx-target="#create-modal-content" hx-swap="outerHTML" hx-trigger="click">
-                            <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-                                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-                            </svg>
-                        </button>
                         <button class="btn btn-success" title="Update" data-target="#update-modal" onclick="openModal(this)" hx-get="{{ object.get_update_assessment_area_url }}" hx-target="#update-modal-content" hx-swap="outerHTML" hx-trigger="click">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                 <path d="M0 0h24v24H0V0z" fill="none"/>
@@ -78,7 +73,7 @@ Performance Indicators -
 
     <div>
         <div class="modal" id="update-modal">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-dialog-scrollable">
                 <div id="update-modal-content">
                     
                 </div>

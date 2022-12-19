@@ -1,4 +1,5 @@
 from django import forms
+from django.forms import inlineformset_factory, BaseInlineFormSet
 from learning_outcomes_assessment.widgets import (
     MyTextInput,
     MyColorSelectInput
@@ -37,3 +38,26 @@ class PerformanceIndicatorAreaForm(forms.ModelForm):
                 'placeholder': 'Kode PI: A1, K1, ...'
             })
         }
+
+
+class PerformanceIndicatorInlineFormSet(BaseInlineFormSet):
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     for form in self.forms:
+    #         form.empty_permitted = False
+
+    def clean(self) -> None:
+        super().clean()
+
+        for form in self.forms:
+            print(form.cleaned_data)
+
+
+PerformanceIndicatorAreaFormSet = inlineformset_factory(
+    AssessmentArea, 
+    PerformanceIndicatorArea, 
+    form=PerformanceIndicatorAreaForm, 
+    formset=PerformanceIndicatorInlineFormSet,
+    extra=0,
+    can_delete=False
+)

@@ -1,7 +1,6 @@
 from django.urls import path
 from .views import (
     PIAreaReadAllView,
-    PerformanceIndicatorAreaCreateHxView,
     PerformanceIndicatorAreaReadView,
     PerformanceIndicatorAreaBulkDeleteView,
     PIAreaCreateView,
@@ -18,7 +17,6 @@ urlpatterns = [
 
     # PI Area
     path('<int:pi_area_id>/', PerformanceIndicatorAreaReadView.as_view(), name='pi-area-read'),
-    path('<int:assessment_area_id>/hx-pi-area-create/', PerformanceIndicatorAreaCreateHxView.as_view(), name='hx-pi-area-create'),
     path('pi-area-bulk-delete/', PerformanceIndicatorAreaBulkDeleteView.as_view(), name='pi-area-bulk-delete'),
 
     # Assessment Area

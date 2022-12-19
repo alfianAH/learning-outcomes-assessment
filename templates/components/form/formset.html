@@ -1,10 +1,12 @@
 {% if formset %}
-    {{ formset.management_form}}
+    {{ formset.management_form }}
 
     <div id="form-list" class="ml-4">
         {% for form in formset %}
             <div id="form-{{ forloop.counter0 }}" class="mb-3 added-form">
-                {% include 'components/form/formset-fields.html' %}
+                {% with forloop.counter0 as data_delete %}
+                    {% include 'components/form/formset-fields.html' %}
+                {% endwith %}
             </div>
         {% endfor %}
 
