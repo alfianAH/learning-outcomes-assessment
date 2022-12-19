@@ -3,7 +3,7 @@ function addMoreForm(totalFormId) {
         const currentFormCount = $('.added-form').length; // + 1
         const copyEmptyFormEl = $('#empty-form').clone(true);
 
-        copyEmptyFormEl.removeClass('hidden').addClass('added-form mb-3');
+        copyEmptyFormEl.removeClass('hidden').addClass('added-form mb-3 flex');
         copyEmptyFormEl.attr('id', `form-${currentFormCount}`);
         
         copyEmptyFormEl.find('.form-control').attr('required', 'true');
@@ -25,4 +25,32 @@ function deleteForm(button, totalFormId) {
     // Update total form
     const currentFormCount = $('.added-form').length;
     $(totalFormId).val(currentFormCount);
+}
+
+function changeDeleteFieldValue(deleteFormId) {
+    let canDeleteFieldValue = $(`#${deleteFormId}`).is(':checked');
+    canDeleteFieldValue = !canDeleteFieldValue;
+    return canDeleteFieldValue;
+}
+
+function deleteExistingForm(button, deleteFormId) {
+    const formNumber = $(button).attr('data-delete');
+    let canDeleteFieldValue = changeDeleteFieldValue(deleteFormId);
+    $(`#${deleteFormId}`).attr('checked', canDeleteFieldValue);
+    
+    if (canDeleteFieldValue) {
+        $(`#form-${formNumber}`).addClass('hidden');
+        $(`#deleted-form-${formNumber}`).removeClass('hidden');
+    }
+}
+
+function undoDeleteExistingForm(element, deleteFormId) {
+    const formNumber = $(element).attr('data-delete');
+    let canDeleteFieldValue = changeDeleteFieldValue(deleteFormId);
+    $(`#${deleteFormId}`).attr('checked', canDeleteFieldValue);
+
+    if(!canDeleteFieldValue){
+        $(`#form-${formNumber}`).removeClass('hidden');
+        $(`#deleted-form-${formNumber}`).addClass('hidden');
+    }
 }

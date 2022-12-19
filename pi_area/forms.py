@@ -41,16 +41,22 @@ class PerformanceIndicatorAreaForm(forms.ModelForm):
 
 
 class PerformanceIndicatorInlineFormSet(BaseInlineFormSet):
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-    #     for form in self.forms:
-    #         form.empty_permitted = False
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # for form in self.forms:
+        #     form.empty_permitted = False
+
+    def add_fields(self, form, index) -> None:
+        super().add_fields(form, index)
+        if 'DELETE' in form.fields:
+            form.fields['DELETE'].widget = forms.CheckboxInput(
+                attrs={
+                    'class': 'hidden'
+                }
+            )
 
     def clean(self) -> None:
         super().clean()
-
-        for form in self.forms:
-            print(form.cleaned_data)
 
 
 PerformanceIndicatorAreaFormSet = inlineformset_factory(
@@ -59,5 +65,5 @@ PerformanceIndicatorAreaFormSet = inlineformset_factory(
     form=PerformanceIndicatorAreaForm, 
     formset=PerformanceIndicatorInlineFormSet,
     extra=0,
-    can_delete=False
+    can_delete=True
 )

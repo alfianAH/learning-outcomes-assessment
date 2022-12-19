@@ -120,12 +120,7 @@ class AssessmentAreaUpdateHxView(UpdateView):
 
     def form_valid(self, form) -> HttpResponse:
         assessment_area_obj: AssessmentArea = form.save()
-
-        for formset_form in self.formset:
-            pi_area: PerformanceIndicatorArea = formset_form.save(commit=False)
-            if not hasattr(pi_area, 'assessment_area'):
-                pi_area.assessment_area = assessment_area_obj
-            pi_area.save()
+        self.formset.save(True)
 
         messages.success(self.request, 'Berhasl mengupdate assessment area')
 

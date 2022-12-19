@@ -3293,6 +3293,10 @@ details.dropdown::marker {
   margin-top: 0.5rem;
 }
 
+.mb-1 {
+  margin-bottom: 0.25rem;
+}
+
 .block {
   display: block;
 }
@@ -3421,6 +3425,12 @@ details.dropdown::marker {
   width: 85%;
 }
 
+.w-min {
+  width: -webkit-min-content;
+  width: -moz-min-content;
+  width: min-content;
+}
+
 .min-w-full {
   min-width: 100%;
 }
@@ -3441,6 +3451,10 @@ details.dropdown::marker {
 
 .max-w-sm {
   max-width: 24rem;
+}
+
+.max-w-xl {
+  max-width: 36rem;
 }
 
 @-webkit-keyframes spin {
@@ -3476,12 +3490,20 @@ details.dropdown::marker {
   align-items: center;
 }
 
+.justify-start {
+  justify-content: flex-start;
+}
+
 .justify-center {
   justify-content: center;
 }
 
 .justify-between {
   justify-content: space-between;
+}
+
+.justify-around {
+  justify-content: space-around;
 }
 
 .space-y-5 > :not([hidden]) ~ :not([hidden]) {
