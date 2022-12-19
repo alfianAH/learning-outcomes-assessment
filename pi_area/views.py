@@ -20,10 +20,10 @@ from .models import(
 
 
 # Create your views here.
-class PIAreaCreateView(CreateView):
+class PIAreaCreateHxView(CreateView):
     model = AssessmentArea
     form_class = AssessmentAreaForm
-    template_name: str = 'pi-area/pi-area-create-view.html'
+    template_name: str = 'pi-area/partials/pi-area-create-form.html'
     formset = None
     
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
@@ -35,13 +35,21 @@ class PIAreaCreateView(CreateView):
         self.formset = PerformanceIndicatorAreaFormSet()
         return super().setup(request, *args, **kwargs)
 
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if not request.htmx: raise Http404
+        return super().get(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
+            'modal_title': 'Tambah Assessment Area',
+            'modal_id': 'create-modal-content',
+            'button_text': 'Tambah',
             'id_total_form': '#id_performanceindicatorarea_set-TOTAL_FORMS',
             'add_more_btn_text': 'Tambah kode area PI',
             'semester_obj': self.semester_obj,
-            'formset': self.formset
+            'formset': self.formset,
+            'post_url': self.semester_obj.create_pi_area_url()
         })
         return context
 

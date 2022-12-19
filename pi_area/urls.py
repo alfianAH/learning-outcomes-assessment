@@ -3,7 +3,7 @@ from .views import (
     PIAreaReadAllView,
     PerformanceIndicatorAreaReadView,
     PerformanceIndicatorAreaBulkDeleteView,
-    PIAreaCreateView,
+    PIAreaCreateHxView,
     AssessmentAreaDeleteView,
     AssessmentAreaUpdateHxView,
 )
@@ -13,7 +13,7 @@ app_name = 'pi_area'
 urlpatterns = [
     #  Assessment area and PI Area
     path('', PIAreaReadAllView.as_view(), name='read-all'),
-    path('create/', PIAreaCreateView.as_view(), name='create'),
+    path('hx-create/', PIAreaCreateHxView.as_view(), name='hx-create'),
 
     # PI Area
     path('<int:pi_area_id>/', PerformanceIndicatorAreaReadView.as_view(), name='pi-area-read'),

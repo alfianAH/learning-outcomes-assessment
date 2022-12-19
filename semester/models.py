@@ -59,7 +59,7 @@ class SemesterKurikulum(models.Model):
         })
 
     def create_pi_area_url(self):
-        return reverse('semester:pi_area:create', kwargs={
+        return reverse('semester:pi_area:hx-create', kwargs={
             'semester_kurikulum_id': self.pk
         })
 
