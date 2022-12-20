@@ -120,21 +120,25 @@ function resetSidebarToDefault() {
     }
 }
 
-function openModal(button) {
-    const targetId = $(button).attr('data-target');
-
-    const modal = $(targetId);
+function openModal(modal) {
     // Showing modal
-    modal.addClass('showing');
+    $(modal).addClass('showing');
     toggleClass($('body'), 'noscroll');
     // Show backdrop
     const backdrop = $('.backdrop');
     backdrop.removeClass('hidden').addClass('fade show');
 
     // Show modal
-    modal.one(transitionEvent, function () {
-        modal.removeClass('showing').addClass('show');
+    $(modal).one(transitionEvent, function () {
+        $(modal).removeClass('showing').addClass('show');
     });
+}
+
+function openModalByButton(button) {
+    const targetId = $(button).attr('data-target');
+
+    const modal = $(targetId);
+    openModal(modal);
 }
 
 function closeModal(modal, backdrop) {

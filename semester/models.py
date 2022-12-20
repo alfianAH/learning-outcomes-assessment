@@ -74,8 +74,13 @@ class SemesterKurikulum(models.Model):
             'semester_kurikulum_id': self.pk
         })
 
-    def create_ilo_url(self):
+    def get_hx_create_ilo_url(self):
         return reverse('semester:ilo:hx-create', kwargs={
+            'semester_kurikulum_id': self.pk
+        })
+
+    def get_create_ilo_url(self):
+        return reverse('semester:ilo:create', kwargs={
             'semester_kurikulum_id': self.pk
         })
 

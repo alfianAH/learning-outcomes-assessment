@@ -14,6 +14,9 @@ class IloCreateForm(forms.ModelForm):
     class Meta:
         model = Ilo
         fields = ['nama', 'pi_area', 'satisfactory_level', 'deskripsi']
+        labels = {
+            'pi_area': 'Kode area PI'
+        }
         widgets = {
             'nama': MyTextInput(attrs={
                 'placeholder': 'ILO {}'.format(randint(1, 5)),

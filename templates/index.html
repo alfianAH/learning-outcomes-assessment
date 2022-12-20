@@ -130,9 +130,9 @@
         {% if messages %}
             {% for message in messages %}
                 {% if message.tags %}
-                    addToast('{{ message.tags }}', '{{ message }}');
+                    addToast('{{ message.tags }}', '{{ message|safe }}');
                 {% else %}
-                    addToast(message='{{ message }}');
+                    addToast(message='{{ message|safe }}');
                 {% endif %}
             {% endfor %}
         {% endif %}

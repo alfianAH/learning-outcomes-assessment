@@ -1,0 +1,18 @@
+{% extends 'home-view.html' %}
+
+{% block title %}
+Tambah ILO - 
+{% endblock title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'semester:read-all' %}" role="listitem">Semester</a></li>
+<li class="breadcrumb-item"><a href="{% url 'semester:read' semester_kurikulum_id=semester_obj.id %}" role="listitem">Detail</a></li>
+<li class="breadcrumb-item"><a href="{% url 'semester:ilo:read-all' semester_kurikulum_id=semester_obj.id %}" role="listitem">ILO</a></li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">Tambah ILO</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<h1>{{ modal_title }}</h1>
+
+{% include 'components/form/default-form.html' %}
+{% endblock content %}

@@ -1,9 +1,10 @@
+import json
 from django.http import Http404, HttpRequest, HttpResponse
 from django.contrib import messages
 from django.views.generic.base import View
 from django.views.generic.list import ListView
 from django.views.generic.edit import DeleteView, FormView, CreateView
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from learning_outcomes_assessment.list_view.views import ListViewModelA
 from .models import Ilo
 from .filters import (
@@ -78,15 +79,14 @@ class IloReadAllView(ListViewModelA):
         context = super().get_context_data(**kwargs)
         context.update({
             'semester_obj': self.semester_obj,
-            'create_ilo_url': self.semester_obj.create_ilo_url(),
+            'create_ilo_url': self.semester_obj.get_hx_create_ilo_url(),
         })
         return context
 
 
-class IloCreateHxView(CreateView):
+class IloCreateView(CreateView):
     model = Ilo
     form_class = IloCreateForm
-    template_name: str = 'ilo/partials/ilo-create-form.html'
     semester_obj: SemesterKurikulum = None
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
@@ -104,17 +104,14 @@ class IloCreateHxView(CreateView):
         })
         return kwargs
 
-    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        if not request.htmx: raise Http404
-        return super().get(request, *args, **kwargs)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
             'modal_title': 'Tambah ILO',
             'modal_id': 'create-modal-content',
             'button_text': 'Tambah',
-            'post_url': self.semester_obj.create_ilo_url(),
+            'post_url': self.semester_obj.get_create_ilo_url(),
+            'semester_obj': self.semester_obj,
         })
         return context
 
@@ -125,6 +122,12 @@ class IloCreateHxView(CreateView):
 
         messages.success(self.request, 'Berhasil menambahkan ILO')
         return super().form_valid(form)
+
+    def form_invalid(self, form) -> HttpResponse:
+        form_errors = json.dumps(form.errors.as_json())
+        messages.error(self.request, 'Gagal menambahkan ILO, pastikan data yang anda masukkan valid. Error: {}'.format(form_errors))
+        
+        return self.render_to_response(self.get_context_data(form=form))
 
 
 class IloBulkDeleteView(View):
