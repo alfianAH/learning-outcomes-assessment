@@ -4,7 +4,7 @@
     <div id="form-list" class="ml-4">
         {% for form in formset %}
             <div class="mb-3">
-                <div id="form-{{ forloop.counter0 }}" class="mb-3 added-form flex flex-row justify-between space-x-3">
+                <div id="form-{{ forloop.counter0 }}" class="mb-3 added-form flex flex-row justify-between space-x-3 max-w-xl">
                     <div>
                         {% include 'components/form/formset-fields.html' %}
                     </div>
