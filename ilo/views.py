@@ -87,11 +87,19 @@ class IloCreateHxView(CreateView):
     semester_obj: SemesterKurikulum = None
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+
         semester_kurikulum_id = kwargs.get('semester_kurikulum_id')
         self.semester_obj = get_object_or_404(SemesterKurikulum, id=semester_kurikulum_id)
 
         self.success_url = self.semester_obj.read_all_ilo_url()
-        return super().setup(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'semester_obj': self.semester_obj
+        })
+        return kwargs
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         if not request.htmx: raise Http404
@@ -111,6 +119,6 @@ class IloCreateHxView(CreateView):
         self.object: Ilo = form.save(commit=False)
         self.object.semester = self.semester_obj
         self.object.save()
-        
+
         messages.success(self.request, 'Berhasil menambahkan ILO')
         return super().form_valid(form)

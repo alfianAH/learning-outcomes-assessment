@@ -1,5 +1,6 @@
 from django import forms
 from .models import Ilo
+from pi_area.models import PerformanceIndicatorArea
 from learning_outcomes_assessment.widgets import(
     MyNumberInput,
     MyTextInput,
@@ -29,3 +30,9 @@ class IloCreateForm(forms.ModelForm):
                 'placeholder': 'Masukkan deskripsi',
             }),
         }
+
+    def __init__(self, *args, **kwargs):
+        semester_obj = kwargs.pop('semester_obj')
+        super().__init__(*args, **kwargs)
+
+        self.fields['pi_area'].queryset = PerformanceIndicatorArea.objects.filter(assessment_area__semester=semester_obj)
