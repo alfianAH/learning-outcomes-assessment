@@ -70,22 +70,22 @@ Performance Indicators -
             {% endfor %}
         </ol>
     </form>
-
-    <div>
-        {% include 'components/modal/htmx-modal.html' with modal_id='update-modal' modal_content_id='update-modal-content' is_modal_scrollable=True %}
-        
-        {% include 'components/modal/htmx-modal.html' with modal_id='create-modal' modal_content_id='create-modal-content' is_modal_scrollable=True %}
-    </div>
 {% else %}
 <h1>Performance Indicators</h1>
 <p>{{ semester_obj.semester.nama }}</p>
-<a class="btn btn-success max-w-min" href="{{ semester_obj.create_pi_area_url }}">
+<button class="btn btn-primary" data-target="#create-modal" onclick="openModal(this)" hx-get="{{ semester_obj.create_pi_area_url }}" hx-target="#create-modal-content" hx-swap="outerHTML" hx-trigger="click">
     <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
         <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
     </svg>
     <span class="hidden sm:block sm:ml-2.5">Tambah Performance Indicator</span>
-</a>
+</button>
 {% endif %}
+<div>
+    {% include 'components/modal/htmx-modal.html' with modal_id='update-modal' modal_content_id='update-modal-content' is_modal_scrollable=True %}
+    
+    {% include 'components/modal/htmx-modal.html' with modal_id='create-modal' modal_content_id='create-modal-content' is_modal_scrollable=True %}
+</div>
+
 {% endblock content %}
 
 {% block script %}

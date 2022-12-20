@@ -160,6 +160,12 @@ class PIAreaReadAllView(ListView):
         self.semester_obj = get_object_or_404(SemesterKurikulum, id=semester_id)
         return super().setup(request, *args, **kwargs)
 
+    def get_queryset(self):
+        self.queryset = AssessmentArea.objects.filter(
+            semester=self.semester_obj
+        )
+        return super().get_queryset()
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 

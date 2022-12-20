@@ -18,6 +18,9 @@ class AssessmentArea(models.Model):
     nama = models.CharField(max_length=100, null=False, blank=False)
     color = models.CharField(max_length=7, choices=ColorChoices.choices, null=False, blank=False, default=ColorChoices.DEFAULT)
 
+    class Meta:
+        ordering = ['nama']
+
     def __str__(self) -> str:
         return self.nama
 
@@ -45,6 +48,9 @@ class AssessmentArea(models.Model):
 class PerformanceIndicatorArea(models.Model):
     assessment_area = models.ForeignKey(AssessmentArea, on_delete=models.CASCADE)
     pi_code = models.CharField(max_length=20, null=False, blank=False)
+
+    class Meta:
+        ordering = ['pi_code']
 
     def __str__(self) -> str:
         return self.pi_code
