@@ -72,21 +72,9 @@ Performance Indicators -
     </form>
 
     <div>
-        <div class="modal" id="update-modal">
-            <div class="modal-dialog modal-dialog-scrollable">
-                <div id="update-modal-content">
-                    
-                </div>
-            </div>
-        </div>
-
-        <div class="modal" id="create-modal">
-            <div class="modal-dialog modal-dialog-scrollable">
-                <div id="create-modal-content">
-                    
-                </div>
-            </div>
-        </div>
+        {% include 'components/modal/htmx-modal.html' with modal_id='update-modal' modal_content_id='update-modal-content' is_modal_scrollable=True %}
+        
+        {% include 'components/modal/htmx-modal.html' with modal_id='create-modal' modal_content_id='create-modal-content' is_modal_scrollable=True %}
     </div>
 {% else %}
 <h1>Performance Indicators</h1>

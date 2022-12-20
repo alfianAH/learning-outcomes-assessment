@@ -83,7 +83,7 @@ class IloReadAllView(ListViewModelA):
 class IloCreateHxView(CreateView):
     model = Ilo
     form_class = IloCreateForm
-    template_name: str = 'ilo/partials/ilo-create-view.html'
+    template_name: str = 'ilo/partials/ilo-create-form.html'
     semester_obj: SemesterKurikulum = None
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
@@ -97,14 +97,13 @@ class IloCreateHxView(CreateView):
         if not request.htmx: raise Http404
         return super().get(request, *args, **kwargs)
 
-    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        if not request.htmx: raise Http404
-        return super().post(request, *args, **kwargs)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'create_ilo_url': self.semester_obj.create_ilo_url()
+            'modal_title': 'Tambah ILO',
+            'modal_id': 'create-modal-content',
+            'button_text': 'Tambah',
+            'post_url': self.semester_obj.create_ilo_url(),
         })
         return context
 
@@ -112,5 +111,6 @@ class IloCreateHxView(CreateView):
         self.object: Ilo = form.save(commit=False)
         self.object.semester = self.semester_obj
         self.object.save()
+        
         messages.success(self.request, 'Berhasil menambahkan ILO')
         return super().form_valid(form)

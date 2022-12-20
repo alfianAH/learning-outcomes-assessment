@@ -8,5 +8,5 @@ from .views import(
 app_name = 'ilo'
 urlpatterns = [
     path('', IloReadAllView.as_view(), name='read-all'),
-    path('hx/create/', IloCreateHxView.as_view(), name='hx-create'),
+    path('hx-create/', IloCreateHxView.as_view(), name='hx-create'),
 ]
