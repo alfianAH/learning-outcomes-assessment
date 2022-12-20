@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.views.generic.base import View
 from django.views.generic.list import ListView
 from django.views.generic.edit import DeleteView, FormView, CreateView
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from learning_outcomes_assessment.list_view.views import ListViewModelA
 from .models import Ilo
 from .filters import (
@@ -40,6 +40,9 @@ class IloReadAllView(ListViewModelA):
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         semester_kurikulum_id = kwargs.get('semester_kurikulum_id')
         self.semester_obj: SemesterKurikulum = get_object_or_404(SemesterKurikulum, id=semester_kurikulum_id)
+
+        self.bulk_delete_url = self.semester_obj.get_ilo_bulk_delete_url()
+        self.reset_url = self.semester_obj.read_all_ilo_url()
 
         self.reset_url = self.semester_obj.read_all_ilo_url()
         return super().setup(request, *args, **kwargs)
@@ -122,3 +125,18 @@ class IloCreateHxView(CreateView):
 
         messages.success(self.request, 'Berhasil menambahkan ILO')
         return super().form_valid(form)
+
+
+class IloBulkDeleteView(View):
+    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        semester_id = kwargs.get('semester_kurikulum_id')
+        semester_obj: SemesterKurikulum = get_object_or_404(SemesterKurikulum, id=semester_id)
+
+        list_ilo = request.POST.getlist('id_ilo')
+        list_ilo = [*set(list_ilo)]
+
+        if len(list_ilo) > 0:
+            Ilo.objects.filter(id__in=list_ilo).delete()
+            messages.success(self.request, 'Berhasil menghapus ILO')
+        
+        return redirect(semester_obj.read_all_ilo_url())

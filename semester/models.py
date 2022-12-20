@@ -78,3 +78,8 @@ class SemesterKurikulum(models.Model):
         return reverse('semester:ilo:hx-create', kwargs={
             'semester_kurikulum_id': self.pk
         })
+
+    def get_ilo_bulk_delete_url(self):
+        return reverse('semester:ilo:bulk-delete', kwargs={
+            'semester_kurikulum_id': self.pk
+        })
