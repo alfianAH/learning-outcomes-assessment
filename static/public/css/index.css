@@ -3281,6 +3281,10 @@ details.dropdown::marker {
   margin-left: 0.25rem;
 }
 
+.mb-1 {
+  margin-bottom: 0.25rem;
+}
+
 .ml-4 {
   margin-left: 1rem;
 }
@@ -3291,10 +3295,6 @@ details.dropdown::marker {
 
 .mt-2 {
   margin-top: 0.5rem;
-}
-
-.mb-1 {
-  margin-bottom: 0.25rem;
 }
 
 .block {
@@ -3393,6 +3393,10 @@ details.dropdown::marker {
   width: 5rem;
 }
 
+.w-24 {
+  width: 6rem;
+}
+
 .w-48 {
   width: 12rem;
 }
@@ -3425,12 +3429,6 @@ details.dropdown::marker {
   width: 85%;
 }
 
-.w-min {
-  width: -webkit-min-content;
-  width: -moz-min-content;
-  width: min-content;
-}
-
 .min-w-full {
   min-width: 100%;
 }
@@ -3439,6 +3437,10 @@ details.dropdown::marker {
   max-width: -webkit-min-content;
   max-width: -moz-min-content;
   max-width: min-content;
+}
+
+.max-w-xl {
+  max-width: 36rem;
 }
 
 .max-w-none {
@@ -3451,10 +3453,6 @@ details.dropdown::marker {
 
 .max-w-sm {
   max-width: 24rem;
-}
-
-.max-w-xl {
-  max-width: 36rem;
 }
 
 @-webkit-keyframes spin {
@@ -3490,20 +3488,12 @@ details.dropdown::marker {
   align-items: center;
 }
 
-.justify-start {
-  justify-content: flex-start;
-}
-
 .justify-center {
   justify-content: center;
 }
 
 .justify-between {
   justify-content: space-between;
-}
-
-.justify-around {
-  justify-content: space-around;
 }
 
 .space-y-5 > :not([hidden]) ~ :not([hidden]) {
@@ -4510,16 +4500,16 @@ details.dropdown::marker {
     margin-left: calc(0.75rem * calc(1 - var(--tw-space-x-reverse)));
   }
 
-  .xl\:space-y-3 > :not([hidden]) ~ :not([hidden]) {
-    --tw-space-y-reverse: 0;
-    margin-top: calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));
-    margin-bottom: calc(0.75rem * var(--tw-space-y-reverse));
-  }
-
   .xl\:space-x-10 > :not([hidden]) ~ :not([hidden]) {
     --tw-space-x-reverse: 0;
     margin-right: calc(2.5rem * var(--tw-space-x-reverse));
     margin-left: calc(2.5rem * calc(1 - var(--tw-space-x-reverse)));
+  }
+
+  .xl\:space-y-3 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-y-reverse: 0;
+    margin-top: calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));
+    margin-bottom: calc(0.75rem * var(--tw-space-y-reverse));
   }
 
   .xl\:text-xl {

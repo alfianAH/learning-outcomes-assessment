@@ -20,6 +20,6 @@ urlpatterns = [
     path('pi-area-bulk-delete/', PerformanceIndicatorAreaBulkDeleteView.as_view(), name='pi-area-bulk-delete'),
 
     # Assessment Area
-    path('<int:assessment_area_id>/hx-update/', AssessmentAreaUpdateHxView.as_view(), name='hx-assessment-area-update'),
-    path('<int:assessment_area_id>/delete/', AssessmentAreaDeleteView.as_view(), name='assessment-area-delete'),
+    path('assessment-area/<int:assessment_area_id>/hx-update/', AssessmentAreaUpdateHxView.as_view(), name='hx-assessment-area-update'),
+    path('assessment-area/<int:assessment_area_id>/delete/', AssessmentAreaDeleteView.as_view(), name='assessment-area-delete'),
 ]

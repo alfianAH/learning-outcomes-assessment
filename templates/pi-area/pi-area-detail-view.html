@@ -1,0 +1,55 @@
+{% extends 'home-view.html' %}
+
+{% block title %}
+Tambah Performance Indicators - 
+{% endblock title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'semester:read-all' %}" role="listitem">Semester</a></li>
+<li class="breadcrumb-item"><a href="{{ object.assessment_area.semester.read_detail_url }}" role="listitem">Detail</a></li>
+<li class="breadcrumb-item"><a href="{{ object.assessment_area.semester.read_all_pi_area_url }}" role="listitem">PI</a></li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">Detail</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<h1>Detail Performance Indicator</h1>
+
+<div class="table-div">
+    <div class="tr-div">
+        <div class="w-24 sm:w-32 md:w-40 xl:w-48">Semester</div>
+        <div>:</div>
+        <div>{{ object.assessment_area.semester.semester.nama }}</div>
+    </div>
+    <div class="tr-div">
+        <div class="w-24 sm:w-32 md:w-40 xl:w-48">Area</div>
+        <div>:</div>
+        <div class="badge {{ object.assessment_area.get_color_display }}">{{ object.assessment_area.nama }}</div>
+    </div>
+    <div class="tr-div">
+        <div class="w-24 sm:w-32 md:w-40 xl:w-48">Kode area PI</div>
+        <div>:</div>
+        <div>{{ object.pi_code }}</div>
+    </div>
+    <div class="tr-div">
+        <div class="w-24 sm:w-32 md:w-40 xl:w-48">Kode ILO</div>
+        <div>:</div>
+        <div>{{ object.ilo|default:'-' }}</div>
+    </div>
+    {% if object.ilo %}
+    <div class="tr-div">
+        <div class="w-24 sm:w-32 md:w-40 xl:w-48">Deskripsi ILO</div>
+        <div>:</div>
+        <div></div>
+    </div>
+
+    <div class="tr-div">
+        <div>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid quasi fugit quos sint nam totam assumenda iste cumque reprehenderit voluptatum?</div>
+    </div>
+    {% endif %}
+</div>
+
+{% if object.ilo %}
+<h2>Performance Indicator</h2>
+{% endif %}
+
+{% endblock content %}

@@ -50,7 +50,6 @@ def oauth_callback(request: HttpRequest):
     login(request, user=user)
 
     return redirect('/')
-    # return JsonResponse(user)
 
 def logout_view(request: HttpRequest):
     logout(request)

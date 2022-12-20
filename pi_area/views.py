@@ -173,7 +173,9 @@ class PIAreaReadAllView(ListView):
 
 
 class PerformanceIndicatorAreaReadView(DetailView):
-    pass
+    model = PerformanceIndicatorArea
+    pk_url_kwarg = 'pi_area_id'
+    template_name = 'pi-area/pi-area-detail-view.html'
 
 
 class PerformanceIndicatorAreaBulkDeleteView(View):
