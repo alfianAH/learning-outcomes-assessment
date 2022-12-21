@@ -1,0 +1,25 @@
+{% extends 'home-view.html' %}
+
+{% block title %}
+Update Area PI - 
+{% endblock title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'semester:read-all' %}" role="listitem">Semester</a></li>
+<li class="breadcrumb-item"><a href="{{ object.assessment_area.semester.read_detail_url }}" role="listitem">Detail</a></li>
+<li class="breadcrumb-item"><a href="{{ object.assessment_area.semester.read_all_pi_area_url }}" role="listitem">PI</a></li>
+<li class="breadcrumb-item"><a href="{{ object.read_detail_url }}" role="listitem">Detail</a></li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">Update Area PI</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<h1>Update Area Performance Indicator</h1>
+
+{% include 'components/form/default-form.html' with form_fields='pi-area/partials/performance-indicator-area-form.html' %}
+{% endblock content %}
+
+{% block script %}
+<script>
+    addMoreForm('{{ id_total_form }}');
+</script>
+{% endblock script %}

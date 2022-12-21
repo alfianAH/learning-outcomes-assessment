@@ -60,9 +60,18 @@ class PerformanceIndicatorArea(models.Model):
 
     def __str__(self) -> str:
         return self.pi_code
+    
+    def get_performance_indicator(self):
+        return self.performanceindicator_set.all()
 
     def read_detail_url(self):
         return reverse('semester:pi_area:pi-area-read', kwargs={
+            'semester_kurikulum_id': self.assessment_area.semester.pk,
+            'pi_area_id': self.pk
+        })
+    
+    def get_pi_area_update_url(self):
+        return reverse('semester:pi_area:pi-area-update', kwargs={
             'semester_kurikulum_id': self.assessment_area.semester.pk,
             'pi_area_id': self.pk
         })

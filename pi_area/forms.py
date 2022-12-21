@@ -46,9 +46,11 @@ class PerformanceIndicatorForm(forms.ModelForm):
     class Meta:
         model = PerformanceIndicator
         fields = ['deskripsi']
-        widget = {
+        widgets = {
             'deskripsi': MyTextareaInput(
                 attrs={
+                    'cols': 30,
+                    'rows': 3,
                     'placeholder': 'Masukkan deskripsi performance indicator',
                 }
             )

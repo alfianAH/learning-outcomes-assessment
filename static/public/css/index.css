@@ -3466,6 +3466,10 @@ details.dropdown::marker {
   cursor: pointer;
 }
 
+.list-disc {
+  list-style-type: disc;
+}
+
 .flex-row {
   flex-direction: row;
 }

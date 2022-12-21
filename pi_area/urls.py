@@ -9,7 +9,7 @@ from .views import (
     PerformanceIndicatorAreaReadView,
     PerformanceIndicatorAreaBulkDeleteView,
 
-    PerformanceIndicatorCreateView,
+    PerformanceIndicatorAreaUpdateView,
 )
 
 
@@ -25,11 +25,10 @@ urlpatterns = [
 
     # PI Area
     path('<int:pi_area_id>/', PerformanceIndicatorAreaReadView.as_view(), name='pi-area-read'),
+    # PI Area and Performance Indicator
+    path('<int:pi_area_id>/update/', PerformanceIndicatorAreaUpdateView.as_view(), name='pi-area-update'),
     path('pi-area-bulk-delete/', PerformanceIndicatorAreaBulkDeleteView.as_view(), name='pi-area-bulk-delete'),
 
     # Assessment Area
     path('assessment-area/<int:assessment_area_id>/delete/', AssessmentAreaDeleteView.as_view(), name='assessment-area-delete'),
-
-    # Performance Indicator
-    path('<int:pi_area_id>/pi/create/', PerformanceIndicatorCreateView.as_view(), name='pi-create'),
 ]
