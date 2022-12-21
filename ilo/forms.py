@@ -10,7 +10,7 @@ from learning_outcomes_assessment.widgets import(
 from random import randint
 
 
-class IloCreateForm(forms.ModelForm):
+class IloForm(forms.ModelForm):
     class Meta:
         model = Ilo
         fields = ['nama', 'pi_area', 'satisfactory_level', 'deskripsi']

@@ -2,6 +2,7 @@
     <td class="text-left max-w-xs flex field-nama">
         <span class="one-line" title="{{ option.label.nama }}">{{ option.label.nama }}</span>
     </td>
+    <td class="text-left">{{ option.label.pi_area.pi_code }}</td>
     <td class="text-left">{{ option.label.satisfactory_level }}</td>
     <td class="text-left">{{ option.label.persentase_capaian_ilo }}</td>
 {% else %}
@@ -11,6 +12,7 @@
             {% include 'components/button/open-list-item-button.html' %}
         {% endif %}
     </td>
+    <td class="text-left">{{ option.pi_area.pi_code }}</td>
     <td class="text-left">{{ option.satisfactory_level }}</td>
     <td class="text-left">{{ option.persentase_capaian_ilo|default:0 }}</td>
 {% endif %}

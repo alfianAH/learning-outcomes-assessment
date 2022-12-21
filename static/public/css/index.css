@@ -4193,6 +4193,10 @@ details.dropdown::marker {
     width: 20rem;
   }
 
+  .sm\:w-44 {
+    width: 11rem;
+  }
+
   .sm\:w-32 {
     width: 8rem;
   }
@@ -4397,6 +4401,10 @@ details.dropdown::marker {
 
   .lg\:w-\[480px\] {
     width: 480px;
+  }
+
+  .lg\:w-64 {
+    width: 16rem;
   }
 
   .lg\:w-44 {

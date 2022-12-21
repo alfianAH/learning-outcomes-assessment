@@ -1,0 +1,54 @@
+{% extends 'home-view.html' %}
+
+{% block title %}
+{{ object.nama }} - 
+{% endblock title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'semester:read-all' %}" role="listitem">Semester</a></li>
+<li class="breadcrumb-item"><a href="{{ object.get_semester.read_detail_url }}" role="listitem">Detail</a></li>
+<li class="breadcrumb-item"><a href="{{ object.get_semester.read_all_ilo_url }}" role="listitem">ILO</a></li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">Detail</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="h-icon">
+    <h1>{{ object.nama }}</h1>
+    <button class="btn btn-success" title="Update" data-target="#update-modal" onclick="openModalByButton(this)" hx-get="{{ object.get_hx_ilo_update_url }}" hx-target="#update-modal-content" hx-swap="outerHTML" hx-trigger="click">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M0 0h24v24H0V0z" fill="none"/>
+            <path d="M3 17.46v3.04c0 .28.22.5.5.5h3.04c.13 0 .26-.05.35-.15L17.81 9.94l-3.75-3.75L3.15 17.1c-.1.1-.15.22-.15.36zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+        </svg>
+    </button>
+</div>
+
+<div class="table-div">
+    <div class="tr-div">
+        <div class="w-40 sm:w-44 lg:w-64">Kode area PI</div>
+        <div>:</div>
+        <div>{{ object.pi_area.pi_code }}</div>
+    </div>
+    <div class="tr-div">
+        <div class="w-40 sm:w-44 lg:w-64">Satisfactory level</div>
+        <div>:</div>
+        <div>{{ object.satisfactory_level }}</div>
+    </div>
+    <div class="tr-div">
+        <div class="w-40 sm:w-44 lg:w-64">Persentasi capaian ILO</div>
+        <div>:</div>
+        <div>{{ object.persentase_capaian_ilo|default:'-' }}</div>
+    </div>
+    <div class="tr-div">
+        <div>Deskripsi</div>
+        <div>:</div>
+        <div></div>
+    </div>
+    <div class="tr-div">
+        <div>{{ object.deskripsi }}</div>
+    </div>
+</div>
+
+<div>
+    {% include 'components/modal/htmx-modal.html' with modal_id='update-modal' modal_content_id='update-modal-content' is_modal_scrollable=True %}
+</div>
+{% endblock content %}

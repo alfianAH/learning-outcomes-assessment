@@ -8,7 +8,7 @@ from django.views.generic.detail import SingleObjectTemplateResponseMixin
 
 class BaseHtmxFormView(ModelFormMixin, ProcessFormView):
     modal_title: str = 'Modal Title'
-    modal_id: str = 'modal-id'
+    modal_content_id: str = 'modal-content'
     button_text: str = 'Submit'
     post_url: str = ''
     success_msg: str = 'Berhasil menambahkan'
@@ -24,7 +24,7 @@ class BaseHtmxFormView(ModelFormMixin, ProcessFormView):
         context = super().get_context_data(**kwargs)
         context.update({
             'modal_title': self.modal_title,
-            'modal_id': self.modal_id,
+            'modal_content_id': self.modal_content_id,
             'button_text': self.button_text,
             'post_url': self.post_url,
         })

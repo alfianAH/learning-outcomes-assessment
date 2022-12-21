@@ -1,18 +1,20 @@
 import json
-from django.http import Http404, HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse
 from django.contrib import messages
 from django.views.generic.base import View
-from django.views.generic.list import ListView
-from django.views.generic.edit import DeleteView, FormView, CreateView
+from django.views.generic.detail import DetailView
 from django.shortcuts import get_object_or_404, redirect
-from learning_outcomes_assessment.forms.views import HtmxCreateFormView
+from learning_outcomes_assessment.forms.views import (
+    HtmxCreateFormView,
+    HtmxUpdateFormView,
+)
 from learning_outcomes_assessment.list_view.views import ListViewModelA
 from .models import Ilo
 from .filters import (
     IloFilter,
     IloSort,
 )
-from .forms import IloCreateForm
+from .forms import IloForm
 from semester.models import SemesterKurikulum
 
 
@@ -85,9 +87,15 @@ class IloReadAllView(ListViewModelA):
         return context
 
 
+class IloReadView(DetailView):
+    model = Ilo
+    pk_url_kwarg: str = 'ilo_id'
+    template_name: str = 'ilo/ilo-detail-view.html'
+
+
 class IloCreateView(HtmxCreateFormView):
     model = Ilo
-    form_class = IloCreateForm
+    form_class = IloForm
     semester_obj: SemesterKurikulum = None
 
     modal_title: str = 'Tambah ILO'
@@ -124,6 +132,37 @@ class IloCreateView(HtmxCreateFormView):
         self.object.save()
 
         return super().form_valid(form)
+
+
+class IloUpdateView(HtmxUpdateFormView):
+    model = Ilo
+    form_class = IloForm
+    pk_url_kwarg = 'ilo_id'
+    object: Ilo = None
+
+    modal_title: str = 'Update ILO'
+    modal_content_id: str = 'update-modal-content'
+    button_text: str = 'Update'
+    post_url: str = ''
+    success_msg: str = 'Berhasil mengupdate ILO'
+    error_msg: str = 'Gagal mengupdate ILO. Pastikan data yang anda masukkan valid.'
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+
+        semester_kurikulum_id = kwargs.get('semester_kurikulum_id')
+        self.semester_obj = get_object_or_404(SemesterKurikulum, id=semester_kurikulum_id)
+        
+        self.object: Ilo = self.get_object()
+        self.post_url = self.object.get_ilo_update_url()
+        self.success_url = self.object.read_detail_url()
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'semester_obj': self.semester_obj
+        })
+        return kwargs
 
 
 class IloBulkDeleteView(View):
