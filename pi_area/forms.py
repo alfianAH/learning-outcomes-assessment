@@ -2,11 +2,13 @@ from django import forms
 from django.forms import inlineformset_factory, BaseInlineFormSet
 from learning_outcomes_assessment.widgets import (
     MyTextInput,
-    MyColorSelectInput
+    MyColorSelectInput,
+    MyTextareaInput
 )
 from .models import(
     AssessmentArea,
     PerformanceIndicatorArea,
+    PerformanceIndicator
 )
 
 
@@ -40,12 +42,20 @@ class PerformanceIndicatorAreaForm(forms.ModelForm):
         }
 
 
-class PerformanceIndicatorInlineFormSet(BaseInlineFormSet):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # for form in self.forms:
-        #     form.empty_permitted = False
+class PerformanceIndicatorForm(forms.ModelForm):
+    class Meta:
+        model = PerformanceIndicator
+        fields = ['deskripsi']
+        widget = {
+            'deskripsi': MyTextareaInput(
+                attrs={
+                    'placeholder': 'Masukkan deskripsi performance indicator',
+                }
+            )
+        }
 
+
+class PerformanceIndicatorAreaInlineFormSet(BaseInlineFormSet):
     def add_fields(self, form, index) -> None:
         super().add_fields(form, index)
         if 'DELETE' in form.fields:
@@ -55,15 +65,21 @@ class PerformanceIndicatorInlineFormSet(BaseInlineFormSet):
                 }
             )
 
-    def clean(self) -> None:
-        super().clean()
-
 
 PerformanceIndicatorAreaFormSet = inlineformset_factory(
     AssessmentArea, 
     PerformanceIndicatorArea, 
     form=PerformanceIndicatorAreaForm, 
-    formset=PerformanceIndicatorInlineFormSet,
+    formset=PerformanceIndicatorAreaInlineFormSet,
     extra=0,
     can_delete=True
+)
+
+PerformanceIndicatorFormSet = inlineformset_factory(
+    PerformanceIndicatorArea,
+    PerformanceIndicator,
+    form=PerformanceIndicatorForm,
+    formset=PerformanceIndicatorAreaInlineFormSet,
+    extra=0,
+    can_delete=True,
 )

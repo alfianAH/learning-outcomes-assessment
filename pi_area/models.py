@@ -66,3 +66,8 @@ class PerformanceIndicatorArea(models.Model):
             'semester_kurikulum_id': self.assessment_area.semester.pk,
             'pi_area_id': self.pk
         })
+
+
+class PerformanceIndicator(models.Model):
+    pi_area = models.ForeignKey(PerformanceIndicatorArea, on_delete=models.CASCADE)
+    deskripsi = models.TextField()

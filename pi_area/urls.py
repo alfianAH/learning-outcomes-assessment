@@ -1,11 +1,15 @@
-from django.urls import path
+from django.urls import include, path
 from .views import (
+    PIAreaCreateView,
     PIAreaReadAllView,
+    PIAreaUpdateView,
+
+    AssessmentAreaDeleteView,
+
     PerformanceIndicatorAreaReadView,
     PerformanceIndicatorAreaBulkDeleteView,
-    PIAreaCreateView,
-    AssessmentAreaDeleteView,
-    PIAreaUpdateView,
+
+    PerformanceIndicatorCreateView,
 )
 
 
@@ -25,4 +29,7 @@ urlpatterns = [
 
     # Assessment Area
     path('assessment-area/<int:assessment_area_id>/delete/', AssessmentAreaDeleteView.as_view(), name='assessment-area-delete'),
+
+    # Performance Indicator
+    path('<int:pi_area_id>/pi/create/', PerformanceIndicatorCreateView.as_view(), name='pi-create'),
 ]
