@@ -33,7 +33,7 @@ Tambah Performance Indicators -
     <div class="tr-div">
         <div class="w-24 sm:w-32 md:w-40 xl:w-48">Kode ILO</div>
         <div>:</div>
-        <div>{{ object.ilo|default:'-' }}</div>
+        <div>{{ object.ilo.nama|default:'-' }}</div>
     </div>
     {% if object.ilo %}
     <div class="tr-div">
@@ -43,7 +43,7 @@ Tambah Performance Indicators -
     </div>
 
     <div class="tr-div">
-        <div>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid quasi fugit quos sint nam totam assumenda iste cumque reprehenderit voluptatum?</div>
+        <div>{{ object.ilo.deskripsi }}</div>
     </div>
     {% endif %}
 </div>
