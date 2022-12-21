@@ -11,6 +11,7 @@ from django.views.generic.detail import DetailView
 from learning_outcomes_assessment.forms.views import (
     HtmxCreateInlineFormsetView, 
     HtmxUpdateInlineFormsetView,
+    UpdateInlineFormsetView,
 )
 from semester.models import SemesterKurikulum
 from .forms import (
@@ -42,13 +43,13 @@ class PIAreaCreateView(HtmxCreateInlineFormsetView):
     formset_class = PerformanceIndicatorAreaFormSet
     
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        
         semester_kurikulum_id = kwargs.get('semester_kurikulum_id')
         self.semester_obj: SemesterKurikulum = get_object_or_404(SemesterKurikulum, id=semester_kurikulum_id)
 
         self.post_url = self.semester_obj.get_create_pi_area_url()
         self.success_url = self.semester_obj.read_all_pi_area_url()
-
-        return super().setup(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -163,7 +164,7 @@ class PerformanceIndicatorAreaBulkDeleteView(View):
 
 
 # PI Area and Performance Indicator
-class PerformanceIndicatorAreaUpdateView(UpdateView):
+class PerformanceIndicatorAreaUpdateView(UpdateInlineFormsetView):
     model = PerformanceIndicatorArea
     pk_url_kwarg: str = 'pi_area_id'
     template_name = 'pi-area/peformance-indicator-area-update-view.html'
@@ -183,46 +184,4 @@ class PerformanceIndicatorAreaUpdateView(UpdateView):
     def setup(self, request: HttpRequest, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         
-        self.object: PerformanceIndicatorArea = self.get_object()
-        self.success_url = self.object.read_detail_url()
-        self.formset = self.formset_class(
-            instance=self.object
-        )
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({
-            'button_text': self.button_text,
-            'post_url': self.post_url,
-
-            'id_total_form': self.id_total_form,
-            'add_more_btn_text': self.add_more_btn_text,
-            'formset': self.formset,
-        })  
-        return context
-
-    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        form = self.get_form()
-        self.formset = self.formset_class(
-            request.POST,
-            instance=self.object
-        )
-
-        if all([self.formset.is_valid(), form.is_valid()]):
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
-
-    def form_valid(self, form) -> HttpResponse:
-        form.save()
-        self.formset.save(True)
-        
-        messages.success(self.request, self.success_msg)
-        return super().form_valid(form)
-    
-    def form_invalid(self, form) -> HttpResponse:
-        form_errors = json.dumps(form.errors.as_json())
-        error_message = '{}. Error: {}'.format(self.error_msg, form_errors)
-
-        messages.error(self.request, error_message)
-        return super().form_invalid(form)
+        self.success_url = self.object.read_detail_url()\
