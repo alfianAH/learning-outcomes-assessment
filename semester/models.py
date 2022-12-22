@@ -73,6 +73,11 @@ class SemesterKurikulum(models.Model):
             'semester_kurikulum_id': self.pk
         })
 
+    def get_duplicate_pi_area_url(self):
+        return reverse('semester:pi_area:duplicate', kwargs={
+            'semester_kurikulum_id': self.pk
+        })
+
     # ILO
     def read_all_ilo_url(self):
         return reverse('semester:ilo:read-all', kwargs={

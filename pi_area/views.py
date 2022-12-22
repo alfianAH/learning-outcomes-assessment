@@ -1,10 +1,9 @@
-import json
 from django.forms import BaseInlineFormSet
 from django.http import HttpRequest, HttpResponse
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic.base import View
-from django.views.generic.edit import DeleteView, UpdateView
+from django.views.generic.edit import DeleteView, FormView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 
@@ -17,12 +16,17 @@ from semester.models import SemesterKurikulum
 from .forms import (
     AssessmentAreaForm,
     PerformanceIndicatorAreaForm,
+    PIAreaDuplicateForm,
     PerformanceIndicatorAreaFormSet,
     PerformanceIndicatorFormSet
 )
 from .models import(
     AssessmentArea,
     PerformanceIndicatorArea
+)
+from .utils import(
+    get_semester_with_pi_area_by_kurikulum,
+    duplicate_pi_area_from_semester_id
 )
 
 
@@ -55,6 +59,8 @@ class PIAreaCreateView(HtmxCreateInlineFormsetView):
         context = super().get_context_data(**kwargs)
         context.update({
             'semester_obj': self.semester_obj,
+            'can_duplicate': True,
+            'duplicate_url': self.semester_obj.get_duplicate_pi_area_url()
         })
         return context
 
@@ -185,3 +191,40 @@ class PerformanceIndicatorAreaUpdateView(UpdateInlineFormsetView):
         super().setup(request, *args, **kwargs)
         
         self.success_url = self.object.read_detail_url()\
+
+
+# Assessment area, PI Area, Performance Indicator
+class PIAreaDuplicateFormView(FormView):
+    model = AssessmentArea
+    form_class = PIAreaDuplicateForm
+    semester_obj: SemesterKurikulum = None
+    template_name = 'pi-area/pi-area-duplicate-view.html'
+
+    def setup(self, request: HttpRequest, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        semester_kurikulum_id = kwargs.get('semester_kurikulum_id')
+        self.semester_obj = get_object_or_404(SemesterKurikulum, id=semester_kurikulum_id)
+        self.success_url = self.semester_obj.read_all_pi_area_url()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'semester_obj': self.semester_obj,
+            'back_url': self.success_url,
+        })
+        return context
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        semester_choices = get_semester_with_pi_area_by_kurikulum(self.semester_obj)
+        kwargs.update({
+            'semester_name': self.semester_obj.semester.nama,
+            'semester_choices': semester_choices,
+        })
+        return kwargs
+
+    def form_valid(self, form) -> HttpResponse:
+        semester_id = form.cleaned_data.get('semester')
+        duplicate_pi_area_from_semester_id(semester_id, self.semester_obj)
+        return super().form_valid(form)

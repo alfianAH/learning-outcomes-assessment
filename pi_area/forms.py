@@ -3,7 +3,8 @@ from django.forms import inlineformset_factory, BaseInlineFormSet
 from learning_outcomes_assessment.widgets import (
     MyTextInput,
     MyColorSelectInput,
-    MyTextareaInput
+    MyRadioInput,
+    MyTextareaInput,
 )
 from .models import(
     AssessmentArea,
@@ -55,6 +56,37 @@ class PerformanceIndicatorForm(forms.ModelForm):
                 }
             )
         }
+
+
+class PIAreaDuplicateForm(forms.Form):
+    semester = forms.ChoiceField(
+        widget=MyRadioInput(),
+        label='Duplikasi Performance Indicators'
+    )
+
+    def __init__(self, *args, **kwargs):
+        semester_name = kwargs.pop('semester_name')
+        semester_choices = kwargs.pop('semester_choices')
+        super().__init__(*args, **kwargs)
+
+        self.fields['semester'].choices = semester_choices
+        self.fields['semester'].help_text = 'Berikut adalah pilihan semester yang sudah memiliki performance indicator. Pilih salah satu semester untuk menduplikasi performance indicator dari semester tersebut ke {}.'.format(
+            semester_name
+        )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        semester_id = cleaned_data.get('semester')
+        try: 
+            semester_id = int(semester_id)
+        except ValueError:
+            semester_id = 0
+
+        cleaned_data['semester'] = semester_id
+        
+        return cleaned_data
+
+    
 
 
 class PerformanceIndicatorAreaInlineFormSet(BaseInlineFormSet):

@@ -3,6 +3,7 @@ from .views import (
     PIAreaCreateView,
     PIAreaReadAllView,
     PIAreaUpdateView,
+    PIAreaDuplicateFormView,
 
     AssessmentAreaDeleteView,
 
@@ -19,6 +20,7 @@ urlpatterns = [
     path('', PIAreaReadAllView.as_view(), name='read-all'),
     path('hx-create/', PIAreaCreateView.as_view(template_name='pi-area/partials/pi-area-form.html'), name='hx-create'),
     path('create/', PIAreaCreateView.as_view(template_name='pi-area/pi-area-create-view.html'), name='create'),
+    path('duplicate/', PIAreaDuplicateFormView.as_view(), name='duplicate'),
 
     path('assessment-area/<int:assessment_area_id>/hx-update/', PIAreaUpdateView.as_view(template_name='pi-area/partials/pi-area-form.html'), name='hx-update'),
     path('assessment-area/<int:assessment_area_id>/update/', PIAreaUpdateView.as_view(template_name='pi-area/pi-area-update-view.html'), name='update'),

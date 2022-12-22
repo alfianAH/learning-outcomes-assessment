@@ -1,3 +1,7 @@
+{% if can_duplicate %}
+<p class="mb-2">Untuk menduplikasi PI dari semester lain, klik <a href="{{ duplicate_url }}">di sini</a></p>
+{% endif %}
+
 {% include 'components/form/form-fields.html' %}
 
 {% include 'components/form/formset.html' %}

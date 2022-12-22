@@ -1,0 +1,36 @@
+{% extends 'home-view.html' %}
+
+{% block title %}
+Performance Indicators - 
+{% endblock title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'semester:read-all' %}" role="listitem">Semester</a></li>
+<li class="breadcrumb-item"><a href="{% url 'semester:read' semester_kurikulum_id=semester_obj.id %}" role="listitem">Detail</a></li>
+<li class="breadcrumb-item"><a href="{% url 'semester:pi_area:read-all' semester_kurikulum_id=semester_obj.id %}" role="listitem">PI</a></li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">Duplikasi</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<form action="." method="post" class="space-y-2 md:space-y-3">
+    {% csrf_token %}
+
+    {% for field in form %}
+        <h1>{{ field.label }}</h1>
+
+        {% if field.help_text %}
+            <p>{{ field.help_text|safe }}</p>
+        {% endif %}
+
+        <h2>List Semester</h2>
+        {{ field }}
+
+        {% include 'components/form/form-errors.html' with errors=field.errors %}
+    {% endfor %}
+
+    <div class="form-buttons">
+        <a href="{{ back_url }}" class="btn btn-secondary">Kembali</a>
+        <button type="submit" class="btn btn-success">{{ submit_text|default:'Submit' }}</button>
+    </div>
+</form>
+{% endblock content %}
