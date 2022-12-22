@@ -1,4 +1,5 @@
 from semester.models import SemesterKurikulum
+from ilo.models import Ilo
 from .models import (
     AssessmentArea,
     PerformanceIndicatorArea,
@@ -43,7 +44,6 @@ def duplicate_pi_area_from_semester_id(semester_id: int, new_semester: SemesterK
 
     # Duplicate assessment area
     for assessment_area_obj in assessment_area_qs:
-        # Duplicate PI Area 
         pi_area_qs = PerformanceIndicatorArea.objects.filter(
             assessment_area=assessment_area_obj,
             assessment_area__semester=semester_id,
@@ -54,10 +54,14 @@ def duplicate_pi_area_from_semester_id(semester_id: int, new_semester: SemesterK
         new_assessment_area_obj.pk = None
         new_assessment_area_obj.semester = new_semester
         new_assessment_area_obj.save()
-
+        
+        # Duplicate PI Area 
         for pi_area_obj in pi_area_qs:
-            # Duplicate Performance Indicator
             pi_qs = PerformanceIndicator.objects.filter(
+                pi_area=pi_area_obj,
+                pi_area__assessment_area__semester=semester_id,
+            )
+            ilo_qs = Ilo.objects.filter(
                 pi_area=pi_area_obj,
                 pi_area__assessment_area__semester=semester_id,
             )
@@ -68,9 +72,19 @@ def duplicate_pi_area_from_semester_id(semester_id: int, new_semester: SemesterK
             new_pi_area_obj.assessment_area = new_assessment_area_obj
             new_pi_area_obj.save()
 
+            # Duplicate Performance Indicator
             for pi_obj in pi_qs:
                 new_pi_obj = pi_obj
                 new_pi_obj._state.adding = True
                 new_pi_obj.pk = None
                 new_pi_obj.pi_area = new_pi_area_obj
                 new_pi_obj.save()
+
+            # Duplicate ILO
+            for ilo_obj in ilo_qs:
+                new_ilo_obj = ilo_obj
+                new_ilo_obj._state.adding = True
+                new_ilo_obj.pk = None
+                new_ilo_obj.pi_area = new_pi_area_obj
+                new_ilo_obj.persentase_capaian_ilo = 0
+                new_ilo_obj.save()

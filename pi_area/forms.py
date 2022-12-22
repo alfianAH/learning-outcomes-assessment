@@ -83,10 +83,8 @@ class PIAreaDuplicateForm(forms.Form):
             semester_id = 0
 
         cleaned_data['semester'] = semester_id
-        
-        return cleaned_data
 
-    
+        return cleaned_data
 
 
 class PerformanceIndicatorAreaInlineFormSet(BaseInlineFormSet):

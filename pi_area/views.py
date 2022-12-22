@@ -199,6 +199,7 @@ class PIAreaDuplicateFormView(FormView):
     form_class = PIAreaDuplicateForm
     semester_obj: SemesterKurikulum = None
     template_name = 'pi-area/pi-area-duplicate-view.html'
+    choices = None
 
     def setup(self, request: HttpRequest, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -206,6 +207,15 @@ class PIAreaDuplicateFormView(FormView):
         semester_kurikulum_id = kwargs.get('semester_kurikulum_id')
         self.semester_obj = get_object_or_404(SemesterKurikulum, id=semester_kurikulum_id)
         self.success_url = self.semester_obj.read_all_pi_area_url()
+        self.choices = get_semester_with_pi_area_by_kurikulum(self.semester_obj)
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        print(len(self.choices))
+        if len(self.choices) == 0:
+            messages.info('Semester lain dalam {} belum mempunyai performance indicator.'.format(self.semester_obj.kurikulum.nama))
+            return redirect(self.success_url)
+
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -217,14 +227,14 @@ class PIAreaDuplicateFormView(FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        semester_choices = get_semester_with_pi_area_by_kurikulum(self.semester_obj)
         kwargs.update({
             'semester_name': self.semester_obj.semester.nama,
-            'semester_choices': semester_choices,
+            'semester_choices': self.choices,
         })
         return kwargs
 
     def form_valid(self, form) -> HttpResponse:
         semester_id = form.cleaned_data.get('semester')
         duplicate_pi_area_from_semester_id(semester_id, self.semester_obj)
+        messages.success(self.request, 'Berhasil menduplikasi performance indicator ke semester ini.')
         return super().form_valid(form)
