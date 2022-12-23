@@ -37,7 +37,7 @@ class SemesterReadAllView(ListViewModelA):
     list_prefix_id: str = 'semester-'
     list_item_name: str = 'semester/partials/list-item-name-semester-kurikulum.html'
     badge_template: str = 'semester/partials/badge-list-semester-kurikulum.html'
-    list_custom_field_template: str = 'semester/partials/list-custom-field-semester.html'
+    list_custom_field_template: str = 'semester/partials/list-custom-field-semester-kurikulum.html'
     table_custom_field_header_template: str = 'semester/partials/table-custom-field-header-semester.html'
     table_custom_field_template: str = 'semester/partials/table-custom-field-semester-kurikulum.html'
     filter_template: str = 'semester/partials/semester-kurikulum-filter-form.html'

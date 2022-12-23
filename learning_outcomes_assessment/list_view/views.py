@@ -1,8 +1,8 @@
 from django.forms import BaseForm
-from django.views.generic.list import ListView
+from .list import MyListView
 
 
-class ListViewModelA(ListView):
+class ListViewModelA(MyListView):
     filter_form = None
     sort_form: BaseForm = None
     sort_form_ordering_by_key: str = ''

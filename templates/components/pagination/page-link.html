@@ -1,0 +1,4 @@
+<a href="?{% for key, value in request.GET.items %}{{ key }}={{ value }}&{% endfor %}page={{ forloop.counter }}" 
+    class="page-link {% if forloop.counter == page_obj.number %}active{% endif %}">
+    {{ forloop.counter }}
+</a>

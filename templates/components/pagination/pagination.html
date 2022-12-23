@@ -1,0 +1,66 @@
+{% if page_obj.paginator.num_pages > 0 %}
+    <div class="md:px-3">
+        {% if page_obj.paginator.count > 10 %}
+        <div class="mb-2 sm:mb-2.5 md:mb-3">
+            <span class="text-xs md:text-sm lg:text-base">Tampilkan </span>
+            <select name="data_per_page" id="data-per-page" role="option" aria-label="data_per_page" onchange="this.form.submit();" form="get-form"
+                class="rounded-md bg-slate-50 dark:bg-zinc-700 border border-slate-300 dark:border-zinc-600 cursor-pointer px-2 py-1 lg:py-2 text-xs md:text-sm lg:text-base">
+                <option value="10" {% if request.GET.data_per_page == "10" %}selected{% endif %}>10</option>
+                <option value="15" {% if request.GET.data_per_page == "15" %}selected{% endif %}>15</option>
+                <option value="20" {% if request.GET.data_per_page == "20" %}selected{% endif %}>20</option>
+                <option value="25" {% if request.GET.data_per_page == "25" %}selected{% endif %}>25</option>
+            </select>
+            <span class="text-xs md:text-sm lg:text-base"> dari {{ page_obj.paginator.count }} data</span>
+        </div>
+        {% endif %}
+        
+        <div class="flex flex-row items-center">
+            <nav role="navigation" aria-label="page-navigation">
+                <ul class="pagination">
+                    <li>
+                        <a {% if page_obj.has_previous %}href="?{% for key, value in request.GET.items %}{{ key }}={{ value }}&{% endfor %}page={{ page_obj.previous_page_number }}"{% endif %} 
+                            class="page-link {% if not page_obj.has_previous %}disabled{% endif %} lg:py-4" aria-label="previous">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-chevron-left w-4 h-4 md:w-5 md:h-5" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+                            </svg>
+                        </a>
+                    </li>
+                    
+                    {% for page in page_obj.paginator.page_range %}
+                        {% if forloop.first %}
+                        <li>
+                            {% include 'components/pagination/page-link.html' %}
+                        </li>
+                        <li><a href="?page={{ forloop.counter }}" class="page-link collapse hidden">...</a></li>
+                        {% elif forloop.last %}
+                        <li>
+                            {% include 'components/pagination/page-link.html' %}
+                        </li>
+                        {% else %}
+                        <li><a href="?page={{ forloop.counter }}" class="page-link collapse hidden">...</a></li>
+                        <li>
+                            {% include 'components/pagination/page-link.html' %}
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    <li>
+                        <a {% if page_obj.has_next %}href="?{% for key, value in request.GET.items %}{{ key }}={{ value }}&{% endfor %}page={{ page_obj.next_page_number }}"{% endif %}
+                            class="page-link lg:py-4 {% if not page_obj.has_next %}disabled{% endif %}" aria-label="next">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-chevron-right w-4 h-4 md:w-5 md:h-5" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+                            </svg>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            {% if page_obj.paginator.num_pages > 5 %}
+            <div class="ml-3 hidden sm:block">
+                <span class="text-xs md:text-sm lg:text-base">Ke halaman</span>
+                <input type="number" class="rounded-md bg-slate-50 dark:bg-zinc-700 border border-slate-300 dark:border-zinc-600 p-2 text-xs md:text-sm lg:text-base w-16 focus:outline-none" name="page" id="target-page" min="1" max="{{ page_obj.paginator.num_pages }}" placeholder="{{ page_obj.paginator.num_pages }}" onchange="targetPageOnChange(this);" form="get-form">
+            </div>
+            {% endif %}
+        </div>
+    </div>
+{% endif %}
