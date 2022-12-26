@@ -104,3 +104,13 @@ class SemesterKurikulum(models.Model):
         return reverse('semester:mata_kuliah:read-all', kwargs={
             'semester_kurikulum_id': self.pk
         })
+
+    def get_create_mk_semester_url(self):
+        return reverse('semester:mata_kuliah:create', kwargs={
+            'semester_kurikulum_id': self.pk
+        })
+
+    def get_update_mk_semester_url(self):
+        return reverse('semester:mata_kuliah:update', kwargs={
+            'semester_kurikulum_id': self.pk
+        })

@@ -1,5 +1,7 @@
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
+from django.views.generic.edit import FormView
+from django.views.generic.detail import DetailView
 from learning_outcomes_assessment.list_view.views import ListViewModelA
 from semester.models import SemesterKurikulum
 from .filters import (
@@ -74,5 +76,19 @@ class MataKuliahSemesterReadAllView(ListViewModelA):
         context = super().get_context_data(**kwargs)
         context.update({
             'semester_obj': self.semester_obj,
+            'mk_semester_create_url': self.semester_obj.get_create_mk_semester_url(),
+            'mk_semester_update_url': self.semester_obj.get_update_mk_semester_url(),
         })
         return context
+
+
+class MataKuliahSemesterCreateView(FormView):
+    pass
+
+
+class MataKuliahSemesterUpdateView(FormView):
+    pass
+
+
+class MataKuliahSemesterReadView(DetailView):
+    pass
