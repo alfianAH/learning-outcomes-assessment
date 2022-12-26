@@ -1,4 +1,10 @@
-<a href="?{% for key, value in request.GET.items %}{{ key }}={{ value }}&{% endfor %}page={{ forloop.counter }}" 
-    class="page-link {% if forloop.counter == page_obj.number %}active{% endif %}">
-    {{ forloop.counter }}
-</a>
+{% if forloop.counter == page_obj.number %}
+    <span class="page-link active">
+        {{ forloop.counter }}
+    </span>
+{% else %}
+    <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ forloop.counter }}" 
+        class="page-link">
+        {{ forloop.counter }}
+    </a>
+{% endif %}

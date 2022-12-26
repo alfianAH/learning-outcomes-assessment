@@ -204,7 +204,7 @@ function breadcrumb() {
 }
 
 function pagination() {
-    let pages = $('.pagination > li').children('.page-link:not(.collapse)');
+    let pages = $('.pagination > li').children('.page-link:not(.page-link-collapse)');
     let pagesLength = pages.length - 2;
 
     if (pagesLength <= 6) return;

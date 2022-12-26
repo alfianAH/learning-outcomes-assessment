@@ -1,4 +1,4 @@
-<ol class="flex flex-col sm:grid sm:grid-cols-2 list-numbered md:hidden {% if classes %}{{ classes }}{% endif %}" 
+<ol class="flex flex-col sm:grid sm:grid-cols-2 md:hidden {% if not page_obj.start_index %}list-numbered{% endif %} {% if classes %}{{ classes }}{% endif %}" 
     {% if id %}id="{{ id }}"{% endif %}
     role="list">
 
@@ -26,8 +26,10 @@
                     <label class="w-full flex space-x-2.5 items-center">
                         <input type="checkbox" name="{{ input_name }}" {% if option.id_neosia %}value="{{ option.id_neosia }}" id="{{ prefix_id }}{{ option.id_neosia }}" {% else %}value="{{ option.id }}" id="{{ prefix_id }}{{ option.id }}" {% endif %}>
                         
-                        {% include list_item_name|default:'components/list-table-view/model-a/list-item-name.html' %}
-
+                        {% with page_obj.start_index|add:forloop.counter|add:-1 as number %}
+                            {% include list_item_name|default:'components/list-table-view/model-a/list-item-name.html' %}
+                        {% endwith %}
+                        
                         {% if badge_template %}
                             {% include badge_template %}
                         {% endif %}
@@ -46,7 +48,7 @@
     {% endif %}
 </ol>
 
-<table class="table-css table-hover table-checkbox table-numbered hidden md:table {% if classes %}{{ classes }}{% endif %}" 
+<table class="table-css table-hover table-checkbox hidden md:table {% if not page_obj.start_index %}table-numbered{% endif %} {% if classes %}{{ classes }}{% endif %}" 
     {% if id %}id="{{ id }}"{% endif %}
     role="list">
     <thead>
@@ -96,7 +98,7 @@
                     <th class="text-center checkbox">
                         <input type="checkbox" name="{{ input_name }}" {% if option.id_neosia %}value="{{ option.id_neosia }}" id="{{ prefix_id }}{{ option.id_neosia }}" {% else %}value="{{ option.id }}" id="{{ prefix_id }}{{ option.id }}" {% endif %}>
                     </th>
-                    <th class="text-center number"></th>
+                    <th class="text-center {% if not page_obj.start_index %}number{% endif %}">{{ page_obj.start_index|add:forloop.counter|add:-1 }}.</th>
                     
                     {% if table_custom_field_template %}
                         {% include table_custom_field_template %}

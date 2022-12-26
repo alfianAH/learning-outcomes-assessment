@@ -18,7 +18,7 @@
             <nav role="navigation" aria-label="page-navigation">
                 <ul class="pagination">
                     <li>
-                        <a {% if page_obj.has_previous %}href="?{% for key, value in request.GET.items %}{{ key }}={{ value }}&{% endfor %}page={{ page_obj.previous_page_number }}"{% endif %} 
+                        <a {% if page_obj.has_previous %}href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}"{% endif %} 
                             class="page-link {% if not page_obj.has_previous %}disabled{% endif %} lg:py-4" aria-label="previous">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-chevron-left w-4 h-4 md:w-5 md:h-5" viewBox="0 0 16 16">
                                 <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
@@ -29,23 +29,23 @@
                     {% for page in page_obj.paginator.page_range %}
                         {% if forloop.first %}
                         <li>
-                            {% include 'components/pagination/page-link.html' %}
-                        </li>
-                        <li><a href="?page={{ forloop.counter }}" class="page-link collapse hidden">...</a></li>
+                                {% include 'components/pagination/page-link.html' %}
+                            </li>
+                            <li><span class="page-link page-link-collapse hidden">...</span></li>
                         {% elif forloop.last %}
-                        <li>
-                            {% include 'components/pagination/page-link.html' %}
-                        </li>
+                            <li><span class="page-link page-link-collapse hidden">...</span></li>
+                            <li>
+                                {% include 'components/pagination/page-link.html' %}
+                            </li>
                         {% else %}
-                        <li><a href="?page={{ forloop.counter }}" class="page-link collapse hidden">...</a></li>
-                        <li>
-                            {% include 'components/pagination/page-link.html' %}
-                        </li>
+                            <li>
+                                {% include 'components/pagination/page-link.html' %}
+                            </li>
                         {% endif %}
                     {% endfor %}
 
                     <li>
-                        <a {% if page_obj.has_next %}href="?{% for key, value in request.GET.items %}{{ key }}={{ value }}&{% endfor %}page={{ page_obj.next_page_number }}"{% endif %}
+                        <a {% if page_obj.has_next %}href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}"{% endif %}
                             class="page-link lg:py-4 {% if not page_obj.has_next %}disabled{% endif %}" aria-label="next">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-chevron-right w-4 h-4 md:w-5 md:h-5" viewBox="0 0 16 16">
                                 <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
