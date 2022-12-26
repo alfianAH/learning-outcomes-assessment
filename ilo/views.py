@@ -48,7 +48,6 @@ class IloReadAllView(ListViewModelA):
         self.bulk_delete_url = self.semester_obj.get_ilo_bulk_delete_url()
         self.reset_url = self.semester_obj.read_all_ilo_url()
 
-        self.reset_url = self.semester_obj.read_all_ilo_url()
         return super().setup(request, *args, **kwargs)
     
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:

@@ -16,6 +16,7 @@ urlpatterns = [
     path('<int:semester_kurikulum_id>/ilo/', include('ilo.urls')),
 
     # MK Semester
+    path('<int:semester_kurikulum_id>/mk/', include('mata_kuliah.urls')),
 
     # Performance Indicator
     path('<int:semester_kurikulum_id>/pi-area/', include('pi_area.urls')),

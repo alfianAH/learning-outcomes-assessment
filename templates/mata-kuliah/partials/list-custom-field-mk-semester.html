@@ -10,6 +10,16 @@
                 <td class="w-full">SKS</td>
                 <td>{{ option.label.sks }}</td>
             </tr>
+
+            <tr class="flex px-3 py-1 space-x-2.5">
+                <td class="w-full">Status Nilai</td>
+                <td>{{ option.label.status_nilai }}</td>
+            </tr>
+
+            <tr class="flex px-3 py-1 space-x-2.5">
+                <td class="w-full">Status Pedoman</td>
+                <td>{{ option.label.status_pedoman }}</td>
+            </tr>
         {% else %}
             <tr class="flex px-3 py-1 space-x-2.5">
                 <td class="w-full">Kode</td>
@@ -19,6 +29,16 @@
             <tr class="flex px-3 py-1 space-x-2.5">
                 <td class="w-full">SKS</td>
                 <td>{{ option.sks }}</td>
+            </tr>
+
+            <tr class="flex px-3 py-1 space-x-2.5">
+                <td class="w-full">Status Nilai</td>
+                <td>{{ option.status_nilai }}</td>
+            </tr>
+
+            <tr class="flex px-3 py-1 space-x-2.5">
+                <td class="w-full">Status Pedoman</td>
+                <td>{{ option.status_pedoman }}</td>
             </tr>
         {% endif %}
     </tbody>

@@ -1,0 +1,20 @@
+{% if option.wrap_label %}
+    <td class="text-left">{{ option.label.kode }}</td>   
+    <td class="text-left max-w-sm flex field-nama">
+        <span class="one-line" title="{{ option.label.nama }}">{{ option.label.nama }}</span>
+    </td>
+    <td class="text-left">{{ option.label.sks }}</td>
+    <td class="text-left hidden lg:table-cell">{{ option.label.status_nilai }}</td>
+    <td class="text-left hidden lg:table-cell">{{ option.label.status_pedoman }}</td>
+{% else %}
+    <td class="text-left">{{ option.mk_kurikulum.kode }}</td>
+    <td scope="col" class="text-left field-nama {% if open_button and option.read_detail_url %} flex max-w-sm flex-row items-center relative {% endif %}">
+        <span class="one-line" title="{{ option.mk_kurikulum.nama }}">{{ option.mk_kurikulum.nama }}</span>
+        {% if open_button and option.read_detail_url %}
+            {% include 'components/button/open-list-item-button.html' %}
+        {% endif %}
+    </td>
+    <td class="text-left">{{ option.mk_kurikulum.sks }}</td>
+    <td class="text-left hidden lg:table-cell"></td>
+    <td class="text-left hidden lg:table-cell"></td>
+{% endif %}

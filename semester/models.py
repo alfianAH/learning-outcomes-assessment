@@ -98,3 +98,9 @@ class SemesterKurikulum(models.Model):
         return reverse('semester:ilo:bulk-delete', kwargs={
             'semester_kurikulum_id': self.pk
         })
+
+    # Mata kuliah semester
+    def read_all_mk_semester_url(self):
+        return reverse('semester:mata_kuliah:read-all', kwargs={
+            'semester_kurikulum_id': self.pk
+        })

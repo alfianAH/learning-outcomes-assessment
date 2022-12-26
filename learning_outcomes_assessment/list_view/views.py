@@ -1,4 +1,5 @@
 from django.forms import BaseForm
+from django.http import HttpRequest
 from .list import MyListView
 
 
@@ -19,6 +20,9 @@ class ListViewModelA(MyListView):
     table_custom_field_template: str = ''
     filter_template: str = ''
     sort_template: str = ''
+
+    def setup(self, request: HttpRequest, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
 
     def get_ordering(self):
         if self.sort_form is None:

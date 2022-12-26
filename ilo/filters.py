@@ -1,7 +1,6 @@
 import django_filters as filter
 from django import forms
 from learning_outcomes_assessment.widgets import (
-    MyNumberInput,
     MyRadioInput,
     MyRangeInput,
     MySearchInput,
