@@ -98,7 +98,11 @@
                     <th class="text-center checkbox">
                         <input type="checkbox" name="{{ input_name }}" {% if option.id_neosia %}value="{{ option.id_neosia }}" id="{{ prefix_id }}{{ option.id_neosia }}" {% else %}value="{{ option.id }}" id="{{ prefix_id }}{{ option.id }}" {% endif %}>
                     </th>
-                    <th class="text-center {% if not page_obj.start_index %}number{% endif %}">{{ page_obj.start_index|add:forloop.counter|add:-1 }}.</th>
+                    <th class="text-center {% if not page_obj.start_index %}number{% endif %}">
+                        {% if page_obj.start_index %}
+                            {{ page_obj.start_index|add:forloop.counter|add:-1 }}.
+                        {% endif %}
+                    </th>
                     
                     {% if table_custom_field_template %}
                         {% include table_custom_field_template %}
