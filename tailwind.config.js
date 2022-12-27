@@ -5,7 +5,8 @@ module.exports = {
   content: [
     "./templates/**/*.html",
     "./static/**/*.js",
-    "./pi_area/models.py"
+    "./pi_area/models.py",
+    './mata_kuliah/forms.py'
   ],
   darkMode: 'class',
   theme: {

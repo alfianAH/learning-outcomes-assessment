@@ -1,5 +1,6 @@
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import get_object_or_404
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect
 from django.views.generic.edit import FormView
 from django.views.generic.detail import DetailView
 from learning_outcomes_assessment.list_view.views import ListViewModelA
@@ -8,8 +9,14 @@ from .filters import (
     MataKuliahSemesterFilter,
     MataKuliahSemesterSort,
 )
+from .forms import (
+    MataKuliahSemesterCreateForm,
+)
 from .models import (
     MataKuliahSemester,
+)
+from .utils import(
+    get_mk_semester_choices
 )
 
 
@@ -83,7 +90,46 @@ class MataKuliahSemesterReadAllView(ListViewModelA):
 
 
 class MataKuliahSemesterCreateView(FormView):
-    pass
+    form_class = MataKuliahSemesterCreateForm
+    template_name: str = 'mata-kuliah/mk-semester-create-view.html'
+    semester_obj: SemesterKurikulum = None
+    mk_semester_choices = []
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+
+        semester_kurikulum_id = kwargs.get('semester_kurikulum_id')
+        self.semester_obj: SemesterKurikulum = get_object_or_404(SemesterKurikulum, id=semester_kurikulum_id)
+
+        prodi_id: int = request.user.prodi.id_neosia
+        self.mk_semester_choices = get_mk_semester_choices(prodi_id, self.semester_obj.semester.id_neosia)
+
+        self.success_url = self.semester_obj.read_all_mk_semester_url()
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if len(self.mk_semester_choices) == 0:
+            messages.info(request, 'Pilihan mata kuliah semester kosong. Ada kemungkinan data sudah disinkronisasi atau mata kuliah pada kurikulum belum ditambahkan.')
+            return redirect(self.success_url)
+        return super().get(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context.update({
+            'semester_obj': self.semester_obj,
+            'back_url': self.success_url,
+            'submit_text': 'Tambahkan'
+        })
+        return context
+
+    def get_form(self, form_class = None):
+        form = super().get_form(form_class)
+        form.fields['mk_from_neosia'].choices = self.mk_semester_choices
+        return form
+
+    def form_valid(self, form) -> HttpResponse:
+        #TODO: NOT YET IMPLEMENTED
+        return super().form_valid(form)
 
 
 class MataKuliahSemesterUpdateView(FormView):

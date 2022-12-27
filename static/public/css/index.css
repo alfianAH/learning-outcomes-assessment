@@ -3085,8 +3085,6 @@ details.dropdown::marker {
 
 /* Toast */
 
-/* Toast */
-
 .toast-container {
   pointer-events: none;
   position: fixed;
@@ -3261,6 +3259,13 @@ details.dropdown::marker {
     font-size: 1rem;
     line-height: 1.5rem;
   }
+}
+
+/* Text */
+
+.text-danger {
+  --tw-text-opacity: 1;
+  color: rgb(239 68 68 / var(--tw-text-opacity));
 }
 
 .invisible {
@@ -4506,6 +4511,10 @@ details.dropdown::marker {
 
   .lg\:inline-block {
     display: inline-block;
+  }
+
+  .lg\:table-cell {
+    display: table-cell;
   }
 
   .lg\:hidden {

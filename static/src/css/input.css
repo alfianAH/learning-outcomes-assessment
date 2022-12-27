@@ -758,7 +758,6 @@
     }
 
     /* Toast */
-    /* Toast */
     .toast-container{
         @apply fixed w-max max-w-full pointer-events-none bottom-0 right-0 p-3 z-40 space-y-2;
     }
@@ -801,6 +800,11 @@
 
     .toast-body{
         @apply pb-2 px-3 break-words text-sm md:text-base;
+    }
+
+    /* Text */
+    .text-danger{
+        @apply text-red-500;
     }
 }
 

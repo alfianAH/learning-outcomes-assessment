@@ -57,14 +57,21 @@ class MataKuliahSemester(models.Model):
         })
 
 
-class PesertaMataKuliah(models.Model):
+class KelasMataKuliahSemester(models.Model):
+    id_neosia = models.BigIntegerField(primary_key=True, null=False, unique=True)
     mk_semester = models.ForeignKey(MataKuliahSemester, on_delete=models.CASCADE)
+
+    nama = models.CharField(max_length=255)
+    kelas = models.CharField(max_length=255)
+
+
+class PesertaMataKuliah(models.Model):
+    kelas_mk_semester = models.ForeignKey(KelasMataKuliahSemester, on_delete=models.CASCADE)
     mahasiswa = models.ForeignKey(User, on_delete=models.CASCADE)
-    kelas = models.CharField(max_length=20)
 
 
 class DosenMataKuliah(models.Model):
-    mk_semester = models.ForeignKey(MataKuliahSemester, on_delete=models.CASCADE)
+    kelas_mk_semester = models.ForeignKey(KelasMataKuliahSemester, on_delete=models.CASCADE)
     mahasiswa = models.ForeignKey(User, on_delete=models.CASCADE)
 
 

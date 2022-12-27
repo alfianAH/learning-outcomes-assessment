@@ -1,10 +1,15 @@
 from django.conf import settings
 from learning_outcomes_assessment.utils import request_data_to_neosia
-from .models import MataKuliahKurikulum
+from .models import MataKuliahKurikulum, KelasMataKuliahSemester
 
 
 DETAIL_MATA_KULIAH_URL = 'https://customapi.neosia.unhas.ac.id/getMKDetail'
 MATA_KULIAH_KURIKULUM_URL = 'https://customapi.neosia.unhas.ac.id/getMKbyKurikulumAndProdi'
+
+PRODI_SEMESTER_URL = 'https://customapi.neosia.unhas.ac.id/getProdiSemester'
+MATA_KULIAH_SEMESTER_URL = 'https://customapi.neosia.unhas.ac.id/getKelasBySemester'
+PESERTA_MATA_KULIAH_URL = 'https://customapi.neosia.unhas.ac.id/getMahasiswaByKelas'
+DOSEN_MATA_KULIAH_URL = 'https://customapi.neosia.unhas.ac.id/getDosenByKelas'
 
 
 def get_mk_kurikulum(kurikulum_id: int, prodi_id: int):
@@ -108,3 +113,91 @@ def get_update_mk_kurikulum_choices(kurikulum_id: int, prodi_id: int):
         update_mk_kurikulum_choices.append(update_mk_kurikulum_choice)
 
     return update_mk_kurikulum_choices
+
+
+def get_mk_semester(prodi_id: int, semester_id: int):
+    parameters = {
+        'prodi_kode': prodi_id
+    }
+
+    # Get prodi semester
+    prodi_semester_json_response = request_data_to_neosia(PRODI_SEMESTER_URL, params=parameters)
+    list_mata_kuliah_semester = []
+
+    if prodi_semester_json_response is None: return list_mata_kuliah_semester
+
+    prodi_semester_id: int = None
+    for prodi_semester in prodi_semester_json_response:
+        if prodi_semester['id_semester'] == semester_id and prodi_semester['id_prodi'] == prodi_id:
+            prodi_semester_id = prodi_semester['id']
+            break
+    
+    if prodi_semester_id is None: return list_mata_kuliah_semester
+
+    # Get MK semester
+    parameters = {
+        'id_prodi_semester': prodi_semester_id
+    }
+    mk_semester_json_response = request_data_to_neosia(MATA_KULIAH_SEMESTER_URL, parameters)
+    if mk_semester_json_response is None: return list_mata_kuliah_semester
+
+    for mk_semester_per_kelas in mk_semester_json_response:
+        mata_kuliah = {
+            'id': mk_semester_per_kelas['id'],
+            'id_mata_kuliah': mk_semester_per_kelas['id_mata_kuliah'],
+            'nama': mk_semester_per_kelas['nama']
+        }
+
+        list_mata_kuliah_semester.append(mata_kuliah)
+
+    return list_mata_kuliah_semester
+
+
+def get_mk_semester_choices(prodi_id: int, semester_id: int):
+    """Get mata kuliah semester choices for choice field
+    Returns only mata kuliah kurikulum because all classess in mata kuliah
+    semester will be synchronized
+
+    Args:
+        prodi_id (int): Program Studi ID
+        semester_id (int): Semester ID
+
+    Returns:
+        list: List mata kuliah kurikulum
+    """
+    list_mk_semester = get_mk_semester(prodi_id, semester_id)
+    list_id_mk_kurikulum = []
+    mk_semester_choices = []
+
+    for mk_semester_per_kelas in list_mk_semester:
+        id_mk_kurikulum = mk_semester_per_kelas['id_mata_kuliah']
+        id_kelas_mk_semester = mk_semester_per_kelas['id']
+
+        print('Semester: {}'.format(mk_semester_per_kelas['nama']))
+        kelas_mk_semester_qs = KelasMataKuliahSemester.objects.filter(id_neosia=id_kelas_mk_semester)
+
+        # If kelas MK semester is already in database, skip 
+        if kelas_mk_semester_qs.exists(): continue
+
+        if id_mk_kurikulum in list_id_mk_kurikulum: continue
+
+        # Check whether mata kuliah kurikulum exist in database
+        try:
+            mk_kurikulum_obj = MataKuliahKurikulum.objects.get(id_neosia=id_mk_kurikulum)
+        except MataKuliahKurikulum.DoesNotExist or MataKuliahKurikulum.MultipleObjectsReturned:
+            continue
+
+        print('Kurikulum: {} - {}'.format(mk_kurikulum_obj.nama, mk_kurikulum_obj.kode))
+
+        mata_kuliah = {
+            'id_neosia': mk_kurikulum_obj.id_neosia,
+            'kode': mk_kurikulum_obj.kode,
+            'nama': mk_kurikulum_obj.nama,
+            'sks': mk_kurikulum_obj.sks,
+        }
+        list_id_mk_kurikulum.append(id_mk_kurikulum)
+
+        mk_semester_choice = mata_kuliah['id_neosia'], mata_kuliah
+        mk_semester_choices.append(mk_semester_choice)
+
+    return mk_semester_choices
