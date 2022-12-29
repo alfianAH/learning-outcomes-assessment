@@ -34,7 +34,7 @@ class KurikulumCreateForm(forms.Form):
         prodi_id = self.user.prodi.id_neosia
         kurikulum_choices = get_kurikulum_by_prodi_choices(prodi_id)
         
-        for i, (kurikulum_id, _) in enumerate(kurikulum_choices):
+        for kurikulum_id, _ in kurikulum_choices:
             mk_kurikulum = get_mk_kurikulum(kurikulum_id, prodi_id)
 
             if len(mk_kurikulum) > 0: 
@@ -49,8 +49,7 @@ class KurikulumCreateForm(forms.Form):
                     break
                 
                 # If all semester is already synchronized, remove kurikulum choices
-                if is_all_mk_sync: 
-                    print('Kurikulum: {}'.format(kurikulum_id))
+                if is_all_mk_sync:
                     # Set input with kurikulum that has no semester to false
                     self.fields.get('kurikulum_from_neosia').widget.condition_dict.update({
                         kurikulum_id: False
