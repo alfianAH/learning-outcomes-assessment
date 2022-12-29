@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+from accounts.models import ProgramStudi
 from kurikulum.models import Kurikulum
 from learning_outcomes_assessment.utils import extract_tahun_ajaran
 
@@ -31,6 +32,11 @@ class TahunAjaran(models.Model):
         return '{}/{}'.format(self.tahun_ajaran_awal, self.tahun_ajaran_akhir)
 
 
+class TahunAjaranProdi(models.Model):
+    tahun_ajaran = models.ForeignKey(TahunAjaran, on_delete=models.CASCADE)
+    prodi = models.ForeignKey(ProgramStudi, on_delete=models.CASCADE)
+
+
 class Semester(models.Model):
     id_neosia = models.BigIntegerField(primary_key=True, null=False, unique=True)
     
@@ -41,6 +47,12 @@ class Semester(models.Model):
 
     def __str__(self) -> str:
         return self.nama
+
+
+class SemesterProdi(models.Model):
+    id_neosia = models.BigIntegerField(primary_key=True, null=False, unique=True)
+    tahun_ajaran_prodi = models.ForeignKey(TahunAjaranProdi, on_delete=models.CASCADE)
+    semester = models.ForeignKey(Semester, on_delete=models.CASCADE)
 
 
 class SemesterKurikulum(models.Model):

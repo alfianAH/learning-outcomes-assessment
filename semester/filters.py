@@ -25,7 +25,7 @@ SEMESTER_KURIKULUM_ORDERING_BY = (
 )
 
 class SemesterFilter(filter.FilterSet):
-    semester_nama = filter.CharFilter(
+    nama = filter.CharFilter(
         field_name='nama', 
         lookup_expr='icontains', 
         label='Nama Semester',
@@ -36,7 +36,7 @@ class SemesterFilter(filter.FilterSet):
             }
         ),
     )
-    semester_tipe_semester = filter.ChoiceFilter(
+    tipe_semester = filter.ChoiceFilter(
         field_name='tipe_semester',
         label='Tipe Semester',
         choices=TipeSemester.choices,
@@ -48,7 +48,7 @@ class SemesterFilter(filter.FilterSet):
         fields = ('nama', 'tipe_semester')
 
 
-class SemesterKurikulumFilter(filter.FilterSet):
+class SemesterProdiFilter(filter.FilterSet):
     nama = filter.CharFilter(
         field_name='semester__nama', 
         lookup_expr='icontains', 
@@ -80,7 +80,7 @@ class SemesterSort(forms.Form):
         initial='nama',
     )
 
-class SemesterKurikulumSort(forms.Form):
+class SemesterProdiSort(forms.Form):
     ordering_by = forms.ChoiceField(
         choices=SEMESTER_KURIKULUM_ORDERING_BY,
         widget=MyRadioInput,
