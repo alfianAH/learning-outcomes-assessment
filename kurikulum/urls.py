@@ -10,10 +10,6 @@ from .views import (
     MataKuliahKurikulumReadView,
     MataKuliahKurikulumUpdateView,
     MataKuliahKurikulumBulkDeleteView,
-
-    SemesterKurikulumCreateView,
-    SemesterKurikulumUpdateView,
-    SemesterKurikulumBulkDeleteView,
 )
 
 
@@ -30,9 +26,4 @@ urlpatterns = [
     path('<int:kurikulum_id>/mk/<int:mk_id>/', MataKuliahKurikulumReadView.as_view(), name='mk-read'),
     path('<int:kurikulum_id>/mk/update/', MataKuliahKurikulumUpdateView.as_view(), name='mk-update'),
     path('<int:kurikulum_id>/mk/delete/', MataKuliahKurikulumBulkDeleteView.as_view(), name='mk-bulk-delete'),
-
-    # Semester Kurikulum
-    path('<int:kurikulum_id>/semester/create/', SemesterKurikulumCreateView.as_view(), name='semester-create'),
-    path('<int:kurikulum_id>/semester/update/', SemesterKurikulumUpdateView.as_view(), name='semester-update'),
-    path('<int:kurikulum_id>/semester/delete/', SemesterKurikulumBulkDeleteView.as_view(), name='semester-bulk-delete'),
 ]
