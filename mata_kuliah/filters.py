@@ -25,7 +25,7 @@ MK_SEMESTER_ORDERING_BY = (
 )
 
 class MataKuliahKurikulumFilter(filter.FilterSet):
-    mk_nama = filter.CharFilter(
+    nama = filter.CharFilter(
         field_name='nama', 
         lookup_expr='icontains', 
         label='Nama Mata Kuliah',
@@ -36,10 +36,14 @@ class MataKuliahKurikulumFilter(filter.FilterSet):
             }
         ),
     )
-    mk_sks = filter.NumberFilter(
+    sks = filter.NumberFilter(
         field_name='sks',
         label='SKS',
-        widget=MyNumberInput,
+        widget=MyNumberInput(
+            attrs={
+                'placeholder': 'Masukkan SKS mata kuliah'
+            }
+        ),
     )
 
     class Meta:
@@ -48,7 +52,7 @@ class MataKuliahKurikulumFilter(filter.FilterSet):
 
 
 class MataKuliahKurikulumSort(forms.Form):
-    mk_ordering_by = forms.ChoiceField(
+    ordering_by = forms.ChoiceField(
         choices=MK_KURIKULUM_ORDERING_BY,
         widget=MyRadioInput,
         label='Urutkan berdasarkan',
@@ -71,7 +75,11 @@ class MataKuliahSemesterFilter(filter.FilterSet):
     sks = filter.NumberFilter(
         field_name='mk_kurikulum__sks',
         label='SKS',
-        widget=MyNumberInput,
+        widget=MyNumberInput(
+            attrs={
+                'placeholder': 'Masukkan SKS mata kuliah'
+            }
+        ),
     )
 
     class Meta:
