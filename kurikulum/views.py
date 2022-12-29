@@ -1,5 +1,4 @@
 import json
-from collections import OrderedDict
 from django.conf import settings
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
@@ -7,8 +6,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic.base import View
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import DeleteView, FormView
-from django.views.generic.list import ListView
+from django.views.generic.edit import FormView
 from learning_outcomes_assessment.wizard.views import MySessionWizardView
 from learning_outcomes_assessment.list_view.views import ListViewModelA
 
@@ -54,7 +52,6 @@ from semester.forms import(
 )
 from semester.utils import(
     get_detail_semester,
-    get_semester_by_kurikulum,
     get_semester_by_kurikulum_choices,
 )
 
@@ -62,7 +59,7 @@ from semester.utils import(
 # Create your views here.
 class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
     template_name: str = 'kurikulum/read-all-sync-form.html'
-    form_list: list = [KurikulumCreateForm, SemesterKurikulumCreateForm, MataKuliahKurikulumCreateForm]
+    form_list: list = [KurikulumCreateForm, MataKuliahKurikulumCreateForm]
 
     def get_form_kwargs(self, step=None):
         form_kwargs = super().get_form_kwargs(step)
@@ -82,10 +79,6 @@ class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
                 })
             case '1':
                 context.update({
-                    'search_placeholder': 'Cari nama semester...'
-                })
-            case '2':
-                context.update({
                     'search_placeholder': 'Cari nama mata kuliah...'
                 })
         return context
@@ -95,17 +88,6 @@ class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
         
         match(next_step): 
             case '1':
-                kurikulum_cleaned_data = self.get_cleaned_data_for_step('0').get('kurikulum_from_neosia')
-                semester_choices = []
-
-                for kurikulum_id in kurikulum_cleaned_data:
-                    list_semester_by_kurikulum = get_semester_by_kurikulum_choices(kurikulum_id)
-                    for semester_choice in list_semester_by_kurikulum:
-                        semester_choices.append(semester_choice)
-
-                # Set extra data for semester choices
-                self.storage.extra_data.update({'semester_choices': json.dumps(semester_choices)})
-            case '2':
                 kurikulum_cleaned_data = self.get_cleaned_data_for_step('0').get('kurikulum_from_neosia')
                 prodi_id = self.request.user.prodi.id_neosia
                 mk_kurikulum_choices = []
@@ -141,8 +123,6 @@ class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
         
         match(step):
             case '1':
-                self.set_form_choices(form, 'semester_choices', 'semester_from_neosia')
-            case '2':
                 self.set_form_choices(form, 'mk_kurikulum_choices', 'mk_from_neosia')
         return form
 
@@ -184,71 +164,11 @@ class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
                     kurikulum=kurikulum_obj, 
                     **mk_kurikulum
                 )
-    
-    def filter_semester_by_kurikulum(self, kurikulum_id: int):
-        semester_by_kurikulum = get_semester_by_kurikulum(kurikulum_id)
-        result = {
-            kurikulum_id: semester_by_kurikulum
-        }
-
-        sorted_result_by_kurikulum_id = OrderedDict(sorted(result.items()))
-
-        return sorted_result_by_kurikulum_id
-
-    def save_semester(self, semester_id: int, semester_by_kurikulum: dict):
-        try:
-            semester_obj = Semester.objects.get(id_neosia=semester_id)
-        except Semester.DoesNotExist:
-            semester_detail = get_detail_semester(semester_id)
-            
-            # Extract tahun ajaran
-            tahun_ajaran = semester_detail.get('tahun_ajaran')
-            tahun_ajaran_obj = TahunAjaran.objects.get_or_create_tahun_ajaran(tahun_ajaran)
-            
-            # Get tipe semester
-            tipe_semester_str: str = semester_detail.get('tipe_semester')
-            match(tipe_semester_str.lower()):
-                case 'ganjil':
-                    tipe_semester = TipeSemester.GANJIL
-                case 'genap':
-                    tipe_semester = TipeSemester.GENAP
-            
-            semester_obj = Semester.objects.create(
-                id_neosia = semester_detail.get('id_neosia'),
-                tahun_ajaran = tahun_ajaran_obj[0],
-                nama = semester_detail.get('nama'),
-                tipe_semester = tipe_semester,
-            )
-
-        # Get kurikulum
-        kurikulum_obj: Kurikulum = None
-        for kurikulum_id, list_semester_data in semester_by_kurikulum.items():
-            list_semester_id = [semester_data['id_neosia'] for semester_data in list_semester_data]
-            if semester_id not in list_semester_id: continue
-            kurikulum_obj = Kurikulum.objects.get(id_neosia=kurikulum_id)
-            break
-        
-        # If cannot get kurikulum object
-        if kurikulum_obj is None:
-            # Failed to save semester
-            messages.error(self.request, '"{}" tidak bisa disave karena tidak memiliki kurikulum'.format(semester_obj.nama))
-            if settings.DEBUG:
-                print('Cannot find Kurikulum object with Semester ID: {}'.format(semester_id))
-            return False
-        
-        # Save semester kurikulum object
-        SemesterKurikulum.objects.create(
-            semester = semester_obj,
-            kurikulum = kurikulum_obj
-        )
-        return True
 
     def done(self, form_list, **kwargs):
         cleaned_data = self.get_all_cleaned_data()
         
         kurikulum_data = cleaned_data.get('kurikulum_from_neosia')
-        semester_by_kurikulum = {}
-        semester_data = cleaned_data.get('semester_from_neosia')
         mk_kurikulum_data = cleaned_data.get('mk_from_neosia')
         success_url = reverse('kurikulum:read-all')
         
@@ -265,22 +185,6 @@ class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
             # If save is failed, add error message
             if not self.save_kurikulum(kurikulum_id):
                 messages.error(self.request, 'Gagal menyimpan kurikulum dengan ID {}'.format(kurikulum_id))
-
-            # Get list semester by kurikulum
-            semester_by_kurikulum.update(self.filter_semester_by_kurikulum(kurikulum_id))
-
-        # Save list semester by kurikulum
-        for semester_id in semester_data:
-            try:
-                semester_id = int(semester_id)
-            except ValueError:
-                if settings.DEBUG:
-                    print('Cannot convert Semester ID ("{}") to integer'.format(semester_id))
-                messages.error(self.request, 'Tidak dapat mengonversi Semester ID: {} ke integer'.format(semester_id))
-                return redirect(success_url)
-                
-            if not self.save_semester(semester_id, semester_by_kurikulum):
-                messages.error(self.request, 'Gagal menyimpan semester dengan ID {}'.format(semester_id))
         
         # Save mata kuliah kurikulum
         if len(mk_kurikulum_data) != 0:
