@@ -44,11 +44,11 @@ class KurikulumCreateForm(forms.Form):
                     mk_id = mk_data['id_neosia']
                     mk_in_db = MataKuliahKurikulum.objects.filter(id_neosia=int(mk_id), kurikulum=kurikulum_id)
                     if mk_in_db.exists(): continue
-                    # Break and set to False if kurikulum has one or more semester to sync
+                    # Break and set to False if kurikulum has one or more MK Kurikulum to sync
                     is_all_mk_sync = False
                     break
                 
-                # If all semester is already synchronized, remove kurikulum choices
+                # If all MK Kurikulum is already synchronized, remove kurikulum choices
                 if is_all_mk_sync:
                     # Set input with kurikulum that has no semester to false
                     self.fields.get('kurikulum_from_neosia').widget.condition_dict.update({
@@ -56,7 +56,7 @@ class KurikulumCreateForm(forms.Form):
                     })
                 continue
             
-            # Set input with kurikulum that has no semester to false
+            # Set input with kurikulum that has no MK Kurikulum to false
             self.fields.get('kurikulum_from_neosia').widget.condition_dict.update({
                 kurikulum_id: False
             })

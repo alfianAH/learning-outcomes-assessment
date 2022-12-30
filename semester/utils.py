@@ -1,43 +1,10 @@
 from django.conf import settings
 from learning_outcomes_assessment.utils import request_data_to_neosia
-from .models import Semester, SemesterKurikulum
+from .models import Semester, SemesterKurikulum, SemesterProdi
 
 
-SEMESTER_BY_KURIKULUM_URL = 'https://customapi.neosia.unhas.ac.id/getSemesterByKurikulum'
+SEMESTER_PRODI_URL = 'https://customapi.neosia.unhas.ac.id/getProdiSemester'
 DETAIL_SEMESTER_URL = 'https://customapi.neosia.unhas.ac.id/getSemesterDetail'
-
-
-def get_semester_by_kurikulum(kurikulum_id: int):
-    """Get semesters by kurikulum
-
-    Args:
-        kurikulum_id (int): Kurikulum ID
-
-    Returns:
-        list: All semesters by kurikulum
-    """
-
-    # Request semester by kurikulum
-    parameters = {
-        'id_kurikulum': kurikulum_id
-    }
-    json_response = request_data_to_neosia(SEMESTER_BY_KURIKULUM_URL, params=parameters)
-    list_semester = []
-    if json_response is None: return list_semester
-    
-    # Get all semester
-    for semester_data in json_response:
-        semester = {
-            'id_neosia': semester_data['id_semester'],
-            'tahun_ajaran': semester_data['tahun_ajaran'],
-            'tipe_semester': semester_data['jenis'],
-            'nama': 'Semester {} {}'.format(
-                semester_data['tahun_ajaran'],
-                semester_data['jenis'].capitalize()
-            ),
-        }
-        list_semester.append(semester)
-    return list_semester
 
 
 def get_detail_semester(semester_id: int):
@@ -71,69 +38,101 @@ def get_detail_semester(semester_id: int):
     return semester_detail
 
 
-def get_semester_by_kurikulum_choices(kurikulum_id: int):
-    """Get semester by kurikulum choices
+def get_semester_prodi(prodi_id: int):
+    """Get semesters by prodi
 
     Args:
-        kurikulum_id (int): Kurikulum ID
+        prodi_id (int): Program Studi ID
 
     Returns:
-        list: All semester by kurikulum ID with detail semester
+        list: All semester prodi
     """
 
     # Request semester by kurikulum
-    list_semester = get_semester_by_kurikulum(kurikulum_id)
+    parameters = {
+        'prodi_kode': prodi_id
+    }
+    json_response = request_data_to_neosia(SEMESTER_PRODI_URL, params=parameters)
+    list_semester_prodi = []
+    if json_response is None: return list_semester_prodi
+    
+    # Get all semester
+    for semester_prodi_data in json_response:
+        id_semester = semester_prodi_data['id_semester']
+        detail_semester = get_detail_semester(id_semester)
+        if detail_semester is None: continue
+
+        semester_prodi = {
+            'id_neosia': semester_prodi_data['id'],
+            'tahun_ajaran': detail_semester['tahun_ajaran'],
+            'tipe_semester': detail_semester['tipe_semester'],
+            'nama': 'Semester {} {}'.format(
+                detail_semester['tahun_ajaran'],
+                detail_semester['tipe_semester'].capitalize()
+            ),
+        }
+        list_semester_prodi.append(semester_prodi)
+    return list_semester_prodi
+
+
+def get_semester_prodi_choices(prodi_id: int):
+    """Get semester by prodi choices
+
+    Args:
+        prodi_id (int): Program Studi ID
+
+    Returns:
+        list: All semester by prodi ID with detail semester
+    """
+
+    # Request semester by kurikulum
+    list_semester = get_semester_prodi(prodi_id)
     semester_choices = []
 
     # Get all detail semester by semester ID
     for semester_data in list_semester:
         semester_id = semester_data['id_neosia']
         # Search in database
-        object_in_db = SemesterKurikulum.objects.filter(kurikulum=kurikulum_id, semester=int(semester_id))
+        object_in_db = SemesterProdi.objects.filter(
+            tahun_ajaran_prodi__prodi__id_neosia=prodi_id, 
+            semester=int(semester_id)
+        )
         if object_in_db.exists(): continue
 
         # Convert it to input value, options
         semester_choice = semester_data['id_neosia'], semester_data
         semester_choices.append(semester_choice)
     
+    semester_choices.sort(reverse=True)
     return semester_choices
 
 
-def get_update_semester_choices(kurikulum_id: int):
+def get_update_semester_prodi_choices(prodi_id: int):
     # Request semester by kurikulum
-    json_response = get_semester_by_kurikulum(kurikulum_id)
+    json_response = get_semester_prodi(prodi_id)
     update_semester_choices = []
 
-    for semester_data in json_response:
-        id_semester = semester_data['id_neosia']
+    for semester_prodi_data in json_response:
+        id_semester_prodi = semester_prodi_data['id_neosia']
 
         try:
-            semester_obj = Semester.objects.get(id_neosia=id_semester)
+            semester_prodi_obj = SemesterProdi.objects.get(id_neosia=id_semester_prodi)
         except Semester.DoesNotExist:
             continue
         except Semester.MultipleObjectsReturned:
-            if settings.DEBUG: print('Semester object returns multiple objects. ID: {}'.format(id_semester))
-            continue
-        
-        # Filter if semester is in semester kurikulum
-        try:
-            SemesterKurikulum.objects.get(semester=id_semester, kurikulum=kurikulum_id)
-        except SemesterKurikulum.DoesNotExist:
-            continue
-        except SemesterKurikulum.MultipleObjectsReturned:
-            if settings.DEBUG: print('Semester Kurikulum object returns multiple objects. Kurikulum ID: {}, Semester Id: {}'.format(kurikulum_id, id_semester))
+            if settings.DEBUG: print('Semester Prodi object returns multiple objects. ID: {}'.format(id_semester_prodi))
             continue
 
-        isDataOkay = semester_obj.nama == semester_data['nama'] and str(semester_obj.tahun_ajaran) == semester_data['tahun_ajaran'] and semester_obj.get_tipe_semester_display().lower() == semester_data['tipe_semester'].lower()
+        isDataOkay = semester_prodi_obj.semester.nama == semester_prodi_data['nama'] and str(semester_prodi_obj.semester.tahun_ajaran) == semester_prodi_data['tahun_ajaran'] and semester_prodi_obj.semester.get_tipe_semester_display().lower() == semester_prodi_data['tipe_semester'].lower()
 
         if isDataOkay: continue
 
         update_semester_data = {
-            'new': semester_data,
-            'old': semester_obj,
+            'new': semester_prodi_data,
+            'old': semester_prodi_obj,
         }
 
-        update_semester_choice = id_semester, update_semester_data
+        update_semester_choice = id_semester_prodi, update_semester_data
         update_semester_choices.append(update_semester_choice)
 
     return update_semester_choices

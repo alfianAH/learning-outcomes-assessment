@@ -221,7 +221,7 @@ class KurikulumBulkUpdateView(FormView):
 
             self.update_kurikulum(kurikulum_id)
         
-        messages.success(self.request, 'Berhasil mengupdate kurikulum')
+        messages.success(self.request, 'Proses mengupdate kurikulum telah selesai.')
         return redirect(self.success_url)
 
 

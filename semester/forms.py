@@ -2,15 +2,20 @@ from django import forms
 from django.conf import settings
 
 from .utils import (
-    get_update_semester_choices,
+    get_semester_prodi_choices,
+    get_update_semester_prodi_choices,
 )
+from mata_kuliah.utils import(
+    get_mk_semester,
+)
+from mata_kuliah.models import MataKuliahSemester
 from learning_outcomes_assessment.widgets import (
     ChoiceListInteractiveModelA, 
     UpdateChoiceList,
 )
 
 
-class SemesterKurikulumCreateForm(forms.Form):
+class SemesterProdiCreateForm(forms.Form):
     semester_from_neosia = forms.MultipleChoiceField(
         widget=ChoiceListInteractiveModelA(
             badge_template='semester/partials/badge-list-semester.html',
@@ -19,13 +24,28 @@ class SemesterKurikulumCreateForm(forms.Form):
             table_custom_field_header_template='semester/partials/table-custom-field-header-semester.html',
         ),
         label = 'Tambahkan Semester dari Neosia',
-        help_text = 'Data di bawah ini merupakan data semester, dari Neosia, berdasarkan kurikulum yang dipilih pada langkah 1. Beri centang pada item yang ingin anda tambahkan.',
+        help_text = 'Data di bawah ini merupakan data baru dari Neosia dan belum ditemukan dalam database. Beri centang pada item yang ingin anda tambahkan.<br>Note: Data semester yang tidak bisa dicentang berarti semester tidak memiliki data mata kuliah di Neosia atau mata kuliah semester sudah disinkronisasi semuanya.',
         required = False,
     )
 
     def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user')
         super().__init__(*args, **kwargs)
         self.label_suffix = ""
+
+        prodi_id: int = self.user.prodi.id_neosia
+        semester_prodi_choices = get_semester_prodi_choices(prodi_id)
+
+        for semester_prodi_id, _ in semester_prodi_choices:
+            mk_semester = get_mk_semester(semester_prodi_id)
+
+            if len(mk_semester) == 0: 
+                # Set input with semester that has no MK Semester to false
+                self.fields.get('semester_from_neosia').widget.condition_dict.update({
+                    semester_prodi_id: False
+                })
+
+        self.fields['semester_from_neosia'].choices = semester_prodi_choices
 
     def clean(self):
         cleaned_data = super().clean()
@@ -34,15 +54,19 @@ class SemesterKurikulumCreateForm(forms.Form):
         # Clean kurikulum IDs
         semester_from_neosia = cleaned_data.get('semester_from_neosia')
         semester_from_neosia = [*set(semester_from_neosia)]
-        
         cleaned_data['semester_from_neosia'] = semester_from_neosia
+
+        is_semester_valid = len(semester_from_neosia) > 0
+
+        if not is_semester_valid:
+            self.add_error('semester_from_neosia', 'Pilih minimal 1 (satu) semester')
 
         if settings.DEBUG: print("Clean data: {}".format(cleaned_data))
         
         return cleaned_data
 
 
-class SemesterKurikulumBulkUpdateForm(forms.Form):
+class SemesterProdiBulkUpdateForm(forms.Form):
     update_data_semester = forms.MultipleChoiceField(
         widget=UpdateChoiceList(
             badge_template='semester/partials/badge-list-semester.html',
@@ -54,9 +78,9 @@ class SemesterKurikulumBulkUpdateForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
-        kurikulum_id = kwargs.pop('kurikulum_id')
+        user = kwargs.pop('user')
         super().__init__(*args, **kwargs)
 
-        update_semester_choices = get_update_semester_choices(kurikulum_id)
+        update_semester_choices = get_update_semester_prodi_choices(user.prodi.id_neosia)
 
         self.fields['update_data_semester'].choices = update_semester_choices

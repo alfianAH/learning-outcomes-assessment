@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.http import Http404, HttpRequest, HttpResponse
 from django.contrib import messages
 from django.shortcuts import redirect
@@ -8,6 +9,10 @@ from learning_outcomes_assessment.list_view.views import ListViewModelA
 from .filters import(
     SemesterProdiFilter,
     SemesterProdiSort
+)
+from .forms import(
+    SemesterProdiCreateForm,
+    SemesterProdiBulkUpdateForm,
 )
 from .models import(
     Semester, 
@@ -71,6 +76,106 @@ class SemesterReadAllView(ListViewModelA):
             tahun_ajaran_prodi__prodi__id_neosia=prodi_id
         )
         return super().get_queryset()
+
+
+class SemesterCreateView(FormView):
+    form_class = SemesterProdiCreateForm
+    template_name = 'semester/create-view.html'
+    success_url = reverse_lazy('semester:read-all')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'search_placeholder': 'Cari nama semester...',
+            'back_url': self.success_url,
+            'submit_text': 'Tambahkan',
+        })
+        return context
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'user': self.request.user
+        })
+        return kwargs
+
+    def form_valid(self, form) -> HttpResponse:
+        print(form.cleaned_data)
+        # Get detail semester prodi from Neosia
+
+        # Get or create tahun ajaran
+
+        # Get prodi object
+
+        # Get or create tahun ajaran prodi
+
+        # Get or create semester
+
+        # Create semester prodi
+
+        return super().form_valid(form)
+
+
+class SemesterBulkUpdateView(FormView):
+    form_class = SemesterProdiBulkUpdateForm
+    template_name = 'semester/bulk-update-view.html'
+    success_url = reverse_lazy('semester:read-all')
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        form = self.get_form(form_class=self.form_class)
+        
+        if len(form.fields.get('update_data_semester').choices) == 0:
+            messages.info(request, 'Data semester sudah sinkron dengan data di Neosia')
+            return redirect(self.success_url)
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'search_placeholder': 'Cari nama semester...',
+            'back_url': self.success_url,
+            'submit_text': 'Update',
+        })
+        return context
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'user': self.request.user
+        })
+        return kwargs
+
+    def update_semester_prodi(self, semester_prodi_id: int):
+        try:
+            semester_prodi_obj = SemesterProdi.objects.filter(id_neosia=semester_prodi_id)
+        except SemesterProdi.DoesNotExist:
+            messages.error(self.request, 
+                'Semester Prodi dengan ID: {} tidak ditemukan, sehingga gagal mengupdate semester'.format(semester_prodi_id))
+            return
+        
+        # new_semester_data = get_detail_semester_prodi(semester_prodi_id)
+        # semester_prodi_obj.update(**new_semester_data)
+
+    def form_valid(self, form) -> HttpResponse:
+        print(form.cleaned_data)
+        # Get semester prodi ids
+        update_semester_data = form.cleaned_data.get('update_data_semester', [])
+
+        # Update semester
+        for semester_prodi_id in update_semester_data:
+            try:
+                semester_prodi_id = int(semester_prodi_id)
+            except ValueError:
+                if settings.DEBUG:
+                    print('Cannot convert Semester Prodi ID ("{}") to integer'.format(semester_prodi_id))
+                messages.error(self.request, 'Tidak dapat mengonversi Semester Prodi ID: {} ke integer'.format(semester_prodi_id))
+                return redirect(self.success_url)
+
+            self.update_semester_prodi(semester_prodi_id)
+        
+        messages.success(self.request, 'Proses mengupdate semester telah selesai.')
+
+        return super().form_valid(form)
 
 
 class SemesterReadView(DetailView):

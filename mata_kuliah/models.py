@@ -6,7 +6,7 @@ from django.conf import settings
 from accounts.models import ProgramStudi
 from ilo.models import Ilo
 from kurikulum.models import Kurikulum
-from semester.models import SemesterKurikulum
+from semester.models import SemesterProdi
 
 User = settings.AUTH_USER_MODEL
 
@@ -37,7 +37,7 @@ class MataKuliahKurikulum(models.Model):
 
 class MataKuliahSemester(models.Model):
     mk_kurikulum = models.ForeignKey(MataKuliahKurikulum, on_delete=models.CASCADE)
-    semester = models.ForeignKey(SemesterKurikulum, on_delete=models.CASCADE)
+    semester = models.ForeignKey(SemesterProdi, on_delete=models.CASCADE)
 
     average_clo_achievement = models.FloatField(null=True, 
         validators=[MinValueValidator(0.0), MaxValueValidator(100.0)])
