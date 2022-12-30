@@ -77,13 +77,3 @@ class SemesterProdi(models.Model):
         return reverse('semester:mata_kuliah:update', kwargs={
             'semester_prodi_id': self.id_neosia
         })
-
-
-class SemesterKurikulum(models.Model):
-    semester = models.ForeignKey(Semester, on_delete=models.CASCADE)
-    kurikulum = models.ForeignKey(Kurikulum, on_delete=models.CASCADE)
-
-    def read_detail_url(self):
-        return reverse('semester:read', kwargs={
-            'semester_kurikulum_id': self.pk
-        })

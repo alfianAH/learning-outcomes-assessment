@@ -6,8 +6,8 @@ from learning_outcomes_assessment.widgets import (
     MySelectInput
 )
 from .models import (
-    Semester, 
-    SemesterKurikulum,
+    Semester,
+    SemesterProdi,
     TipeSemester,
 )
 
@@ -18,7 +18,7 @@ SEMESTER_ORDERING_BY = (
     ('tipe_semester', 'Tipe Semester'),
 )
 
-SEMESTER_KURIKULUM_ORDERING_BY = (
+SEMESTER_PRODI_ORDERING_BY = (
     ('semester__nama', 'Nama'),
     ('semester__tahun_ajaran', 'Tahun Ajaran'),
     ('semester__tipe_semester', 'Tipe Semester'),
@@ -68,7 +68,7 @@ class SemesterProdiFilter(filter.FilterSet):
     )
 
     class Meta:
-        model = SemesterKurikulum
+        model = SemesterProdi
         fields = ('semester__nama', 'semester__tipe_semester')
 
 
@@ -82,7 +82,7 @@ class SemesterSort(forms.Form):
 
 class SemesterProdiSort(forms.Form):
     ordering_by = forms.ChoiceField(
-        choices=SEMESTER_KURIKULUM_ORDERING_BY,
+        choices=SEMESTER_PRODI_ORDERING_BY,
         widget=MyRadioInput,
         label='Urutkan berdasarkan',
         initial='semester__nama',

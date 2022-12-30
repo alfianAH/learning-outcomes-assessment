@@ -8,7 +8,7 @@ from .views import (
 
     MataKuliahKurikulumCreateView,
     MataKuliahKurikulumReadView,
-    MataKuliahKurikulumUpdateView,
+    MataKuliahKurikulumBulkUpdateView,
     MataKuliahKurikulumBulkDeleteView,
 )
 
@@ -24,7 +24,7 @@ urlpatterns = [
     # Mata Kuliah Kurikulum
     path('<int:kurikulum_id>/mk/create/', MataKuliahKurikulumCreateView.as_view(), name='mk-create'),
     path('<int:kurikulum_id>/mk/<int:mk_id>/', MataKuliahKurikulumReadView.as_view(), name='mk-read'),
-    path('<int:kurikulum_id>/mk/update/', MataKuliahKurikulumUpdateView.as_view(), name='mk-update'),
+    path('<int:kurikulum_id>/mk/bulk-update/', MataKuliahKurikulumBulkUpdateView.as_view(), name='mk-bulk-update'),
     path('<int:kurikulum_id>/mk/delete/', MataKuliahKurikulumBulkDeleteView.as_view(), name='mk-bulk-delete'),
 
     # ILO

@@ -23,7 +23,7 @@ class MataKuliahKurikulum(models.Model):
     def __str__(self) -> str:
         return self.nama
 
-    def read_kurikulum(self):
+    def read_kurikulum_url(self):
         return reverse('kurikulum:read', kwargs={
             'kurikulum_id': self.kurikulum.id_neosia
         })

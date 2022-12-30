@@ -1,4 +1,3 @@
-from semester.models import SemesterKurikulum
 from kurikulum.models import Kurikulum
 from ilo.models import Ilo
 from .models import (

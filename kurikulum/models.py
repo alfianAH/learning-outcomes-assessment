@@ -40,8 +40,8 @@ class Kurikulum(models.Model):
             'kurikulum_id': self.id_neosia
         })
 
-    def get_mk_update(self):
-        return reverse('kurikulum:mk-update', kwargs={
+    def get_mk_bulk_update(self):
+        return reverse('kurikulum:mk-bulk-update', kwargs={
             'kurikulum_id': self.id_neosia
         })
 

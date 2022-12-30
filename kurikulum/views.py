@@ -375,9 +375,16 @@ class KurikulumBulkDeleteView(FormView):
 class MataKuliahKurikulumCreateView(FormView):
     form_class = MataKuliahKurikulumCreateForm
     template_name: str = 'mata-kuliah/mk-kurikulum-create-view.html'
-    kurikulum_id: int = None
+    kurikulum_obj: Kurikulum = None
     prodi_id: int = None
     form_field_name: str = 'mk_from_neosia'
+
+    def setup(self, request: HttpRequest, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        kurikulum_id = kwargs.get('kurikulum_id')
+        self.kurikulum_obj = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
+        self.success_url = self.kurikulum_obj.read_detail_url()
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         form = self.get_form(form_class=self.form_class)
@@ -391,15 +398,9 @@ class MataKuliahKurikulumCreateView(FormView):
 
     def get_form(self, form_class = None):
         form = super().get_form(form_class)
-        
-        self.kurikulum_id = self.kwargs.get('kurikulum_id')
-        self.success_url = reverse('kurikulum:read', kwargs={
-            'kurikulum_id': self.kurikulum_id
-        })
 
         self.prodi_id = self.request.user.prodi.id_neosia
-
-        mk_kurikulum_choices = get_mk_kurikulum_choices(self.kurikulum_id, self.prodi_id)
+        mk_kurikulum_choices = get_mk_kurikulum_choices(self.kurikulum_obj.id_neosia, self.prodi_id)
 
         form.fields.get(self.form_field_name).choices = mk_kurikulum_choices
         
@@ -408,16 +409,16 @@ class MataKuliahKurikulumCreateView(FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'kurikulum_id': self.kurikulum_id
+            'kurikulum_obj': self.kurikulum_obj,
+            'back_url': self.success_url
         })
         return context
 
     def form_valid(self, form) -> HttpResponse:
         list_mk_id = form.cleaned_data.get(self.form_field_name)
-        kurikulum_obj = Kurikulum.objects.get(id_neosia=self.kurikulum_id)
         prodi_obj = ProgramStudi.objects.get(id_neosia=self.prodi_id)
         
-        list_mk_kurikulum = get_mk_kurikulum(self.kurikulum_id, self.prodi_id)
+        list_mk_kurikulum = get_mk_kurikulum(self.kurikulum_obj.id_neosia, self.prodi_id)
         
         for mk_kurikulum in list_mk_kurikulum:
             if str(mk_kurikulum['id_neosia']) not in list_mk_id: continue
@@ -427,7 +428,7 @@ class MataKuliahKurikulumCreateView(FormView):
 
             MataKuliahKurikulum.objects.create(
                 prodi=prodi_obj, 
-                kurikulum=kurikulum_obj, 
+                kurikulum=self.kurikulum_obj, 
                 **mk_kurikulum
             )
         
@@ -441,25 +442,24 @@ class MataKuliahKurikulumReadView(DetailView):
     template_name: str = 'mata-kuliah/mk-kurikulum-detail-view.html'
 
 
-class MataKuliahKurikulumUpdateView(FormView):
+class MataKuliahKurikulumBulkUpdateView(FormView):
     form_class = MataKuliahKurikulumBulkUpdateForm
     template_name: str = 'mata-kuliah/mk-kurikulum-update-view.html'
-    kurikulum_id: int = None
+    kurikulum_obj: Kurikulum = None
     prodi_id: int = None
     form_field_name: str = 'update_data_mk_kurikulum'
 
-    def get_form(self, form_class = None):
-        self.kurikulum_id = self.kwargs.get('kurikulum_id')
-        self.prodi_id = self.request.user.prodi.id_neosia
-        self.success_url = reverse('kurikulum:read', kwargs={
-            'kurikulum_id': self.kurikulum_id
-        })
-        
-        return super().get_form(form_class)
+    def setup(self, request: HttpRequest, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        kurikulum_id = kwargs.get('kurikulum_id')
+        self.kurikulum_obj = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
+        self.prodi_id = request.user.prodi.id_neosia
+        self.success_url = self.kurikulum_obj.read_detail_url()
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()        
-        kwargs['kurikulum_id'] = self.kurikulum_id
+        kwargs['kurikulum_id'] = self.kurikulum_obj.id_neosia
         kwargs['prodi_id'] = self.prodi_id
         return kwargs
 
@@ -474,12 +474,13 @@ class MataKuliahKurikulumUpdateView(FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'kurikulum_id': self.kurikulum_id
+            'kurikulum_obj': self.kurikulum_obj,
+            'back_url': self.success_url,
         })
         return context
 
     def update_mk_kurikulum(self, list_mk_kurikulum_id: int):
-        list_mk_kurikulum = get_mk_kurikulum(self.kurikulum_id, self.prodi_id)
+        list_mk_kurikulum = get_mk_kurikulum(self.kurikulum_obj.id_neosia, self.prodi_id)
         
         for mk_kurikulum in list_mk_kurikulum:
             if str(mk_kurikulum['id_neosia']) not in list_mk_kurikulum_id: continue

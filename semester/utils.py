@@ -1,6 +1,6 @@
 from django.conf import settings
 from learning_outcomes_assessment.utils import request_data_to_neosia
-from .models import Semester, SemesterKurikulum, SemesterProdi
+from .models import Semester, SemesterProdi
 
 
 SEMESTER_PRODI_URL = 'https://customapi.neosia.unhas.ac.id/getProdiSemester'

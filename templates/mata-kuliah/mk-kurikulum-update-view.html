@@ -6,11 +6,10 @@ Update Mata Kuliah -
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{% url 'kurikulum:read-all' %}" role="listitem">Kurikulum</a></li>
-<li class="breadcrumb-item"><a href="{% url 'kurikulum:read' kurikulum_id=kurikulum_id %}" role="listitem">Detail</a></li>
+<li class="breadcrumb-item"><a href="{{ kurikulum_obj.read_detail_url }}" role="listitem">Detail</a></li>
 <li class="breadcrumb-item active" aria-current="page" role="listitem">Update mata kuliah</li>
 {% endblock breadcrumb %}
 
 {% block content %}
-{% url 'kurikulum:read' kurikulum_id=kurikulum_id as back_url %}
 {% include 'components/form/single-form.html' with search_placeholder='Cari nama kurikulum...' submit_text='Update' %}
 {% endblock %}
