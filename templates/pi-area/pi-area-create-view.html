@@ -5,9 +5,9 @@ Tambah PI Area -
 {% endblock title %}
 
 {% block breadcrumb %}
-<li class="breadcrumb-item"><a href="{% url 'semester:read-all' %}" role="listitem">Semester</a></li>
-<li class="breadcrumb-item"><a href="{{ semester_obj.read_detail_url }}" role="listitem">Detail</a></li>
-<li class="breadcrumb-item"><a href="{{ semester_obj.read_all_pi_area_url }}" role="listitem">PI</a></li>
+<li class="breadcrumb-item"><a href="{% url 'kurikulum:read-all' %}" role="listitem">Kurikulum</a></li>
+<li class="breadcrumb-item"><a href="{{ kurikulum_obj.read_detail_url }}" role="listitem">Detail</a></li>
+<li class="breadcrumb-item"><a href="{{ kurikulum_obj.read_all_pi_area_url }}" role="listitem">PI</a></li>
 <li class="breadcrumb-item active" aria-current="page" role="listitem">Tambah PI Area</li>
 {% endblock breadcrumb %}
 

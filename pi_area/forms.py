@@ -59,30 +59,30 @@ class PerformanceIndicatorForm(forms.ModelForm):
 
 
 class PIAreaDuplicateForm(forms.Form):
-    semester = forms.ChoiceField(
+    kurikulum = forms.ChoiceField(
         widget=MyRadioInput(),
         label='Duplikasi Performance Indicators'
     )
 
     def __init__(self, *args, **kwargs):
-        semester_name = kwargs.pop('semester_name')
-        semester_choices = kwargs.pop('semester_choices')
+        kurikulum_name = kwargs.pop('kurikulum_name')
+        kurikulum_choices = kwargs.pop('kurikulum_choices')
         super().__init__(*args, **kwargs)
 
-        self.fields['semester'].choices = semester_choices
-        self.fields['semester'].help_text = 'Berikut adalah pilihan semester yang sudah memiliki performance indicator. Pilih salah satu semester untuk menduplikasi performance indicator dari semester tersebut ke {}.'.format(
-            semester_name
+        self.fields['kurikulum'].choices = kurikulum_choices
+        self.fields['kurikulum'].help_text = 'Berikut adalah pilihan kurikulum yang sudah memiliki performance indicator. Pilih salah satu kurikulum untuk menduplikasi performance indicator dari kurikulum tersebut ke {}.'.format(
+            kurikulum_name
         )
 
     def clean(self):
         cleaned_data = super().clean()
-        semester_id = cleaned_data.get('semester')
+        kurikulum_id = cleaned_data.get('kurikulum')
         try: 
-            semester_id = int(semester_id)
+            kurikulum_id = int(kurikulum_id)
         except ValueError:
-            semester_id = 0
+            kurikulum_id = 0
 
-        cleaned_data['semester'] = semester_id
+        cleaned_data['kurikulum'] = kurikulum_id
 
         return cleaned_data
 

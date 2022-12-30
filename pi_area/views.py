@@ -12,7 +12,7 @@ from learning_outcomes_assessment.forms.views import (
     HtmxUpdateInlineFormsetView,
     UpdateInlineFormsetView,
 )
-from semester.models import SemesterKurikulum
+from kurikulum.models import Kurikulum
 from .forms import (
     AssessmentAreaForm,
     PerformanceIndicatorAreaForm,
@@ -25,8 +25,8 @@ from .models import(
     PerformanceIndicatorArea
 )
 from .utils import(
-    get_semester_with_pi_area_by_kurikulum,
-    duplicate_pi_area_from_semester_id
+    get_kurikulum_with_pi_area,
+    duplicate_pi_area_from_kurikulum_id
 )
 
 
@@ -49,24 +49,24 @@ class PIAreaCreateView(HtmxCreateInlineFormsetView):
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
         
-        semester_kurikulum_id = kwargs.get('semester_kurikulum_id')
-        self.semester_obj: SemesterKurikulum = get_object_or_404(SemesterKurikulum, id=semester_kurikulum_id)
+        kurikulum_id = kwargs.get('kurikulum_id')
+        self.kurikulum_obj: Kurikulum = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
 
-        self.post_url = self.semester_obj.get_create_pi_area_url()
-        self.success_url = self.semester_obj.read_all_pi_area_url()
+        self.post_url = self.kurikulum_obj.get_create_pi_area_url()
+        self.success_url = self.kurikulum_obj.read_all_pi_area_url()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'semester_obj': self.semester_obj,
+            'kurikulum_obj': self.kurikulum_obj,
             'can_duplicate': True,
-            'duplicate_url': self.semester_obj.get_duplicate_pi_area_url()
+            'duplicate_url': self.kurikulum_obj.get_duplicate_pi_area_url()
         })
         return context
 
     def form_valid(self, form) -> HttpResponse:
         assessment_area_obj: AssessmentArea = form.save(commit=False)
-        assessment_area_obj.semester = self.semester_obj
+        assessment_area_obj.kurikulum = self.kurikulum_obj
         assessment_area_obj.save()
 
         for formset_form in self.formset:
@@ -96,8 +96,8 @@ class PIAreaUpdateView(HtmxUpdateInlineFormsetView):
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
 
-        semester_kurikulum_id = kwargs.get('semester_kurikulum_id')
-        self.semester_obj: SemesterKurikulum = get_object_or_404(SemesterKurikulum, id=semester_kurikulum_id)
+        kurikulum_id = kwargs.get('kurikulum_id')
+        self.kurikulum_obj: Kurikulum = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
 
         self.post_url = self.object.get_update_pi_area_url()
         self.success_url = self.object.get_read_all_pi_area_url()
@@ -107,16 +107,16 @@ class PIAreaReadAllView(ListView):
     model = AssessmentArea
     template_name: str = 'pi-area/home.html'
     ordering: str = 'nama'
-    semester_obj: SemesterKurikulum = None
+    kurikulum_obj: Kurikulum = None
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
-        semester_id = kwargs.get('semester_kurikulum_id')
-        self.semester_obj = get_object_or_404(SemesterKurikulum, id=semester_id)
+        kurikulum_id = kwargs.get('kurikulum_id')
+        self.kurikulum_obj = get_object_or_404(Kurikulum, id=kurikulum_id)
         return super().setup(request, *args, **kwargs)
 
     def get_queryset(self):
         self.queryset = AssessmentArea.objects.filter(
-            semester=self.semester_obj
+            kurikulum=self.kurikulum_obj
         )
         return super().get_queryset()
 
@@ -124,10 +124,10 @@ class PIAreaReadAllView(ListView):
         context = super().get_context_data(**kwargs)
 
         context.update({
-            'semester_obj': self.semester_obj,
+            'kurikulum_obj': self.kurikulum_obj,
             'input_name': 'id_pi_area',
             'prefix_id': 'pi_area-',
-            'bulk_delete_url': self.semester_obj.get_bulk_delete_pi_area_url(),
+            'bulk_delete_url': self.kurikulum_obj.get_bulk_delete_pi_area_url(),
         })
         return context
 
@@ -156,8 +156,8 @@ class PerformanceIndicatorAreaReadView(DetailView):
 
 class PerformanceIndicatorAreaBulkDeleteView(View):
     def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        semester_id = kwargs.get('semester_kurikulum_id')
-        semester_obj: SemesterKurikulum = get_object_or_404(SemesterKurikulum, id=semester_id)
+        kurikulum_id = kwargs.get('kurikulum_id')
+        kurikulum_obj: Kurikulum = get_object_or_404(Kurikulum, id=kurikulum_id)
 
         list_pi_area = request.POST.getlist('id_pi_area')
         list_pi_area = [*set(list_pi_area)]
@@ -166,7 +166,7 @@ class PerformanceIndicatorAreaBulkDeleteView(View):
             PerformanceIndicatorArea.objects.filter(id__in=list_pi_area).delete()
             messages.success(self.request, 'Berhasil menghapus PI Area')
         
-        return redirect(semester_obj.read_all_pi_area_url())
+        return redirect(kurikulum_obj.read_all_pi_area_url())
 
 
 # PI Area and Performance Indicator
@@ -190,29 +190,29 @@ class PerformanceIndicatorAreaUpdateView(UpdateInlineFormsetView):
     def setup(self, request: HttpRequest, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         
-        self.success_url = self.object.read_detail_url()\
+        self.success_url = self.object.read_detail_url()
 
 
 # Assessment area, PI Area, Performance Indicator
 class PIAreaDuplicateFormView(FormView):
     model = AssessmentArea
     form_class = PIAreaDuplicateForm
-    semester_obj: SemesterKurikulum = None
+    kurikulum_obj: Kurikulum = None
     template_name = 'pi-area/pi-area-duplicate-view.html'
     choices = None
 
     def setup(self, request: HttpRequest, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        semester_kurikulum_id = kwargs.get('semester_kurikulum_id')
-        self.semester_obj = get_object_or_404(SemesterKurikulum, id=semester_kurikulum_id)
-        self.success_url = self.semester_obj.read_all_pi_area_url()
-        self.choices = get_semester_with_pi_area_by_kurikulum(self.semester_obj)
+        kurikulum_id = kwargs.get('kurikulum_id')
+        self.kurikulum_obj = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
+        self.success_url = self.kurikulum_obj.read_all_pi_area_url()
+        self.choices = get_kurikulum_with_pi_area(self.kurikulum_obj)
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         print(len(self.choices))
         if len(self.choices) == 0:
-            messages.info('Semester lain dalam {} belum mempunyai performance indicator.'.format(self.semester_obj.kurikulum.nama))
+            messages.info('Kurikulum lain belum mempunyai performance indicator.')
             return redirect(self.success_url)
 
         return super().get(request, *args, **kwargs)
@@ -220,7 +220,7 @@ class PIAreaDuplicateFormView(FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'semester_obj': self.semester_obj,
+            'kurikulum_obj': self.kurikulum_obj,
             'back_url': self.success_url,
         })
         return context
@@ -228,13 +228,13 @@ class PIAreaDuplicateFormView(FormView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs.update({
-            'semester_name': self.semester_obj.semester.nama,
-            'semester_choices': self.choices,
+            'kurikulum_name': self.kurikulum_obj.nama,
+            'kurikulum_choices': self.choices,
         })
         return kwargs
 
     def form_valid(self, form) -> HttpResponse:
-        semester_id = form.cleaned_data.get('semester')
-        duplicate_pi_area_from_semester_id(semester_id, self.semester_obj)
-        messages.success(self.request, 'Berhasil menduplikasi performance indicator ke semester ini.')
+        kurikulum_id = form.cleaned_data.get('kurikulum')
+        duplicate_pi_area_from_kurikulum_id(kurikulum_id, self.kurikulum_obj)
+        messages.success(self.request, 'Berhasil menduplikasi performance indicator ke kurikulum ini.')
         return super().form_valid(form)

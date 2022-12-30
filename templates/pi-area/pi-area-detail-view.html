@@ -5,9 +5,9 @@ Tambah Performance Indicators -
 {% endblock title %}
 
 {% block breadcrumb %}
-<li class="breadcrumb-item"><a href="{% url 'semester:read-all' %}" role="listitem">Semester</a></li>
-<li class="breadcrumb-item"><a href="{{ object.assessment_area.semester.read_detail_url }}" role="listitem">Detail</a></li>
-<li class="breadcrumb-item"><a href="{{ object.assessment_area.semester.read_all_pi_area_url }}" role="listitem">PI</a></li>
+<li class="breadcrumb-item"><a href="{% url 'kurikulum:read-all' %}" role="listitem">Kurikulum</a></li>
+<li class="breadcrumb-item"><a href="{{ object.assessment_area.kurikulum.read_detail_url }}" role="listitem">Detail</a></li>
+<li class="breadcrumb-item"><a href="{{ object.assessment_area.kurikulum.read_all_pi_area_url }}" role="listitem">PI</a></li>
 <li class="breadcrumb-item active" aria-current="page" role="listitem">Detail</li>
 {% endblock breadcrumb %}
 
@@ -24,9 +24,9 @@ Tambah Performance Indicators -
 
 <div class="table-div">
     <div class="tr-div">
-        <div class="w-24 sm:w-32 md:w-40 xl:w-48">Semester</div>
+        <div class="w-24 sm:w-32 md:w-40 xl:w-48">Kurikulum</div>
         <div>:</div>
-        <div>{{ object.assessment_area.semester.semester.nama }}</div>
+        <div>{{ object.assessment_area.kurikulum.nama }}</div>
     </div>
     <div class="tr-div">
         <div class="w-24 sm:w-32 md:w-40 xl:w-48">Area</div>

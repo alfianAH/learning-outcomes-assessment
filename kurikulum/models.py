@@ -44,3 +44,29 @@ class Kurikulum(models.Model):
         return reverse('kurikulum:mk-update', kwargs={
             'kurikulum_id': self.id_neosia
         })
+
+    # Performance Indicator Area
+    def read_all_pi_area_url(self):
+        return reverse('kurikulum:pi_area:read-all', kwargs={
+            'kurikulum_id': self.id_neosia
+        })
+
+    def get_hx_create_pi_area_url(self):
+        return reverse('kurikulum:pi_area:hx-create', kwargs={
+            'kurikulum_id': self.id_neosia
+        })
+
+    def get_create_pi_area_url(self):
+        return reverse('kurikulum:pi_area:create', kwargs={
+            'kurikulum_id': self.id_neosia
+        })
+
+    def get_bulk_delete_pi_area_url(self):
+        return reverse('kurikulum:pi_area:pi-area-bulk-delete', kwargs={
+            'kurikulum_id': self.id_neosia
+        })
+
+    def get_duplicate_pi_area_url(self):
+        return reverse('kurikulum:pi_area:duplicate', kwargs={
+            'kurikulum_id': self.id_neosia
+        })

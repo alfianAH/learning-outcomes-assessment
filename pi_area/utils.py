@@ -1,4 +1,5 @@
 from semester.models import SemesterKurikulum
+from kurikulum.models import Kurikulum
 from ilo.models import Ilo
 from .models import (
     AssessmentArea,
@@ -7,63 +8,63 @@ from .models import (
 )
 
 
-def get_semester_with_pi_area_by_kurikulum(semester_obj: SemesterKurikulum):
-    semester_choices = []
+def get_kurikulum_with_pi_area(kurikulum_obj: Kurikulum):
+    kurikulum_choices = []
 
-    # Get list semester by kurikulum
-    semester_kurikulum_qs = SemesterKurikulum.objects.filter(
-        kurikulum=semester_obj.kurikulum.id_neosia).exclude(id=semester_obj.pk)
+    # Get list kurikulum and exclude obj itself
+    kurikulum_qs = Kurikulum.objects.filter(
+        prodi=kurikulum_obj.prodi.id_neosia).exclude(id_neosia=kurikulum_obj.id_neosia)
 
     # Filter Assessment Area and PI Area in the semester
-    for semester_kurikulum_obj in semester_kurikulum_qs:
+    for kurikulum_obj in kurikulum_qs:
         # Check assessment area
         assessment_area_qs = AssessmentArea.objects.filter(
-            semester=semester_kurikulum_obj
+            kurikulum=kurikulum_obj
         )
 
         if not assessment_area_qs.exists(): continue
 
         # Check PI Area
         pi_area_qs = PerformanceIndicatorArea.objects.filter(
-            assessment_area__semester=semester_kurikulum_obj
+            assessment_area__kurikulum=kurikulum_obj
         )
 
         if not pi_area_qs.exists(): continue
 
-        semester_choices.append(
-            (semester_kurikulum_obj.pk, semester_kurikulum_obj.semester.nama)
+        kurikulum_choices.append(
+            (kurikulum_obj.id_neosia, kurikulum_obj.nama)
         )
 
-    return semester_choices
+    return kurikulum_choices
 
 
-def duplicate_pi_area_from_semester_id(semester_id: int, new_semester: SemesterKurikulum):
+def duplicate_pi_area_from_kurikulum_id(kurikulum_id: int, new_kurikulum: Kurikulum):
     assessment_area_qs = AssessmentArea.objects.filter(
-        semester=semester_id
+        kurikulum=kurikulum_id
     )
 
     # Duplicate assessment area
     for assessment_area_obj in assessment_area_qs:
         pi_area_qs = PerformanceIndicatorArea.objects.filter(
             assessment_area=assessment_area_obj,
-            assessment_area__semester=semester_id,
+            assessment_area__kurikulum=kurikulum_id,
         )
 
         new_assessment_area_obj = assessment_area_obj
         new_assessment_area_obj._state.adding = True
         new_assessment_area_obj.pk = None
-        new_assessment_area_obj.semester = new_semester
+        new_assessment_area_obj.kurikulum = new_kurikulum
         new_assessment_area_obj.save()
         
         # Duplicate PI Area 
         for pi_area_obj in pi_area_qs:
             pi_qs = PerformanceIndicator.objects.filter(
                 pi_area=pi_area_obj,
-                pi_area__assessment_area__semester=semester_id,
+                pi_area__assessment_area__kurikulum=kurikulum_id,
             )
             ilo_qs = Ilo.objects.filter(
                 pi_area=pi_area_obj,
-                pi_area__assessment_area__semester=semester_id,
+                pi_area__assessment_area__kurikulum=kurikulum_id,
             )
 
             new_pi_area_obj = pi_area_obj

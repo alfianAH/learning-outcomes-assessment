@@ -1,13 +1,13 @@
 {% extends 'home-view.html' %}
 
 {% block title %}
-Performance Indicators - 
+Duplikasi Performance Indicators - 
 {% endblock title %}
 
 {% block breadcrumb %}
-<li class="breadcrumb-item"><a href="{% url 'semester:read-all' %}" role="listitem">Semester</a></li>
-<li class="breadcrumb-item"><a href="{% url 'semester:read' semester_kurikulum_id=semester_obj.id %}" role="listitem">Detail</a></li>
-<li class="breadcrumb-item"><a href="{% url 'semester:pi_area:read-all' semester_kurikulum_id=semester_obj.id %}" role="listitem">PI</a></li>
+<li class="breadcrumb-item"><a href="{% url 'kurikulum:read-all' %}" role="listitem">Kurikulum</a></li>
+<li class="breadcrumb-item"><a href="{{ kurikulum_obj.read_detail_url }}" role="listitem">Detail</a></li>
+<li class="breadcrumb-item"><a href="{{ kurikulum_obj.read_all_pi_area_url }}" role="listitem">PI</a></li>
 <li class="breadcrumb-item active" aria-current="page" role="listitem">Duplikasi</li>
 {% endblock breadcrumb %}
 
@@ -22,7 +22,7 @@ Performance Indicators -
             <p>{{ field.help_text|safe }}</p>
         {% endif %}
 
-        <h2>List Semester</h2>
+        <h2>List kurikulum</h2>
         {{ field }}
 
         {% include 'components/form/form-errors.html' with errors=field.errors %}
