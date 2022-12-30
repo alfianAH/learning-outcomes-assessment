@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views.generic.edit import FormView
 from django.views.generic.detail import DetailView
 from learning_outcomes_assessment.list_view.views import ListViewModelA
-from semester.models import SemesterKurikulum
+from semester.models import SemesterProdi
 from .filters import (
     MataKuliahSemesterFilter,
     MataKuliahSemesterSort,
@@ -21,13 +21,13 @@ from .utils import(
 
 
 # Create your views here.
-class MataKuliahSemesterReadAllView(ListViewModelA):
+class MataKuliahSemesterReadAllHxView(ListViewModelA):
     model = MataKuliahSemester
     paginate_by: int = 10
-    template_name: str = 'mata-kuliah/mk-semester-home.html'
+    template_name: str = 'mata-kuliah/partials/mk-semester-home.html'
     ordering: str = 'mk_kurikulum__nama'
     sort_form_ordering_by_key: str = 'ordering_by'
-    semester_obj: SemesterKurikulum = None
+    semester_obj: SemesterProdi = None
 
     filter_form: MataKuliahSemesterFilter = None
     sort_form: MataKuliahSemesterSort = None
@@ -46,8 +46,8 @@ class MataKuliahSemesterReadAllView(ListViewModelA):
     def setup(self, request: HttpRequest, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        semester_kurikulum_id = kwargs.get('semester_kurikulum_id')
-        self.semester_obj: SemesterKurikulum = get_object_or_404(SemesterKurikulum, id=semester_kurikulum_id)
+        semester_prodi_id = kwargs.get('semester_prodi_id')
+        self.semester_obj: SemesterProdi = get_object_or_404(SemesterProdi, id_neosia=semester_prodi_id)
 
         # self.bulk_delete_url = self.semester_obj.get_mk_semester_bulk_delete_url()
         self.reset_url = self.semester_obj.read_all_mk_semester_url()
@@ -92,14 +92,14 @@ class MataKuliahSemesterReadAllView(ListViewModelA):
 class MataKuliahSemesterCreateView(FormView):
     form_class = MataKuliahSemesterCreateForm
     template_name: str = 'mata-kuliah/mk-semester-create-view.html'
-    semester_obj: SemesterKurikulum = None
+    semester_obj: SemesterProdi = None
     mk_semester_choices = []
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
 
-        semester_kurikulum_id = kwargs.get('semester_kurikulum_id')
-        self.semester_obj: SemesterKurikulum = get_object_or_404(SemesterKurikulum, id=semester_kurikulum_id)
+        semester_prodi_id = kwargs.get('semester_prodi_id')
+        self.semester_obj: SemesterProdi = get_object_or_404(SemesterProdi, id_neosia=semester_prodi_id)
 
         prodi_id: int = request.user.prodi.id_neosia
         self.mk_semester_choices = get_mk_semester_choices(prodi_id, self.semester_obj.semester.id_neosia)

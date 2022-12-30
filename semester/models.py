@@ -54,6 +54,30 @@ class SemesterProdi(models.Model):
     tahun_ajaran_prodi = models.ForeignKey(TahunAjaranProdi, on_delete=models.CASCADE)
     semester = models.ForeignKey(Semester, on_delete=models.CASCADE)
 
+    def get_mk_semester(self):
+        return self.matakuliahsemester_set.all()
+
+    def read_detail_url(self):
+        return reverse('semester:read', kwargs={
+            'semester_prodi_id': self.id_neosia
+        })
+
+    # Mata kuliah semester
+    def hx_read_all_mk_semester_url(self):
+        return reverse('semester:mata_kuliah:hx-read-all', kwargs={
+            'semester_prodi_id': self.id_neosia
+        })
+
+    def get_create_mk_semester_url(self):
+        return reverse('semester:mata_kuliah:create', kwargs={
+            'semester_prodi_id': self.id_neosia
+        })
+
+    def get_update_mk_semester_url(self):
+        return reverse('semester:mata_kuliah:update', kwargs={
+            'semester_prodi_id': self.id_neosia
+        })
+
 
 class SemesterKurikulum(models.Model):
     semester = models.ForeignKey(Semester, on_delete=models.CASCADE)
@@ -108,21 +132,5 @@ class SemesterKurikulum(models.Model):
 
     def get_ilo_bulk_delete_url(self):
         return reverse('semester:ilo:bulk-delete', kwargs={
-            'semester_kurikulum_id': self.pk
-        })
-
-    # Mata kuliah semester
-    def read_all_mk_semester_url(self):
-        return reverse('semester:mata_kuliah:read-all', kwargs={
-            'semester_kurikulum_id': self.pk
-        })
-
-    def get_create_mk_semester_url(self):
-        return reverse('semester:mata_kuliah:create', kwargs={
-            'semester_kurikulum_id': self.pk
-        })
-
-    def get_update_mk_semester_url(self):
-        return reverse('semester:mata_kuliah:update', kwargs={
             'semester_kurikulum_id': self.pk
         })
