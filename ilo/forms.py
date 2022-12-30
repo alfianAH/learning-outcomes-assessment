@@ -35,7 +35,7 @@ class IloForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        semester_obj = kwargs.pop('semester_obj')
+        kurikulum_obj = kwargs.pop('kurikulum_obj')
         super().__init__(*args, **kwargs)
 
-        self.fields['pi_area'].queryset = PerformanceIndicatorArea.objects.filter(assessment_area__semester=semester_obj)
+        self.fields['pi_area'].queryset = PerformanceIndicatorArea.objects.filter(assessment_area__kurikulum=kurikulum_obj)

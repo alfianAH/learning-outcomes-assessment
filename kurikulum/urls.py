@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from .views import (
     KurikulumReadAllSyncFormWizardView,
     KurikulumReadAllView,
@@ -26,4 +26,10 @@ urlpatterns = [
     path('<int:kurikulum_id>/mk/<int:mk_id>/', MataKuliahKurikulumReadView.as_view(), name='mk-read'),
     path('<int:kurikulum_id>/mk/update/', MataKuliahKurikulumUpdateView.as_view(), name='mk-update'),
     path('<int:kurikulum_id>/mk/delete/', MataKuliahKurikulumBulkDeleteView.as_view(), name='mk-bulk-delete'),
+
+    # ILO
+    path('<int:kurikulum_id>/ilo/', include('ilo.urls')),
+
+    # Performance Indicator
+    path('<int:kurikulum_id>/pi-area/', include('pi_area.urls')),
 ]

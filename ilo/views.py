@@ -1,4 +1,3 @@
-import json
 from django.http import HttpRequest, HttpResponse
 from django.contrib import messages
 from django.views.generic.base import View
@@ -15,7 +14,7 @@ from .filters import (
     IloSort,
 )
 from .forms import IloForm
-from semester.models import SemesterKurikulum
+from kurikulum.models import Kurikulum
 
 
 # Create your views here.
@@ -25,7 +24,7 @@ class IloReadAllView(ListViewModelA):
     template_name: str = 'ilo/home.html'
     ordering: str = 'nama'
     sort_form_ordering_by_key: str = 'ordering_by'
-    semester_obj: SemesterKurikulum = None
+    kurikulum_obj: Kurikulum = None
 
     filter_form: IloFilter = None
     sort_form: IloSort = None
@@ -42,16 +41,16 @@ class IloReadAllView(ListViewModelA):
     sort_template: str = 'ilo/partials/ilo-sort-form.html'
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
-        semester_kurikulum_id = kwargs.get('semester_kurikulum_id')
-        self.semester_obj: SemesterKurikulum = get_object_or_404(SemesterKurikulum, id=semester_kurikulum_id)
+        kurikulum_id = kwargs.get('kurikulum_id')
+        self.kurikulum_obj: Kurikulum = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
 
-        self.bulk_delete_url = self.semester_obj.get_ilo_bulk_delete_url()
-        self.reset_url = self.semester_obj.read_all_ilo_url()
+        self.bulk_delete_url = self.kurikulum_obj.get_ilo_bulk_delete_url()
+        self.reset_url = self.kurikulum_obj.read_all_ilo_url()
 
         return super().setup(request, *args, **kwargs)
     
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        ilo_qs = self.model.objects.filter(pi_area__assessment_area__semester=self.semester_obj.pk)
+        ilo_qs = self.get_queryset()
 
         if ilo_qs.exists():
             filter_data = {
@@ -74,14 +73,15 @@ class IloReadAllView(ListViewModelA):
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        self.queryset = self.model.objects.filter(pi_area__assessment_area__semester=self.semester_obj.pk)
+        self.queryset = self.model.objects.filter(
+            pi_area__assessment_area__kurikulum=self.kurikulum_obj.id_neosia)
         return super().get_queryset()
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'semester_obj': self.semester_obj,
-            'create_ilo_url': self.semester_obj.get_hx_create_ilo_url(),
+            'kurikulum_obj': self.kurikulum_obj,
+            'create_ilo_url': self.kurikulum_obj.get_hx_create_ilo_url(),
         })
         return context
 
@@ -95,7 +95,7 @@ class IloReadView(DetailView):
 class IloCreateView(HtmxCreateFormView):
     model = Ilo
     form_class = IloForm
-    semester_obj: SemesterKurikulum = None
+    kurikulum_obj: Kurikulum = None
 
     modal_title: str = 'Tambah ILO'
     modal_id: str = 'create-modal-content'
@@ -106,28 +106,27 @@ class IloCreateView(HtmxCreateFormView):
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
 
-        semester_kurikulum_id = kwargs.get('semester_kurikulum_id')
-        self.semester_obj = get_object_or_404(SemesterKurikulum, id=semester_kurikulum_id)
-        self.post_url = self.semester_obj.get_create_ilo_url()
-        self.success_url = self.semester_obj.read_all_ilo_url()
+        kurikulum_id = kwargs.get('kurikulum_id')
+        self.kurikulum_obj = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
+        self.post_url = self.kurikulum_obj.get_create_ilo_url()
+        self.success_url = self.kurikulum_obj.read_all_ilo_url()
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs.update({
-            'semester_obj': self.semester_obj
+            'kurikulum_obj': self.kurikulum_obj
         })
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'semester_obj': self.semester_obj,
+            'kurikulum_obj': self.kurikulum_obj,
         })
         return context
 
     def form_valid(self, form) -> HttpResponse:
         self.object: Ilo = form.save(commit=False)
-        self.object.semester = self.semester_obj
         self.object.save()
 
         return super().form_valid(form)
@@ -149,8 +148,8 @@ class IloUpdateView(HtmxUpdateFormView):
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
 
-        semester_kurikulum_id = kwargs.get('semester_kurikulum_id')
-        self.semester_obj = get_object_or_404(SemesterKurikulum, id=semester_kurikulum_id)
+        kurikulum_id = kwargs.get('kurikulum_id')
+        self.kurikulum_obj = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
         
         self.object: Ilo = self.get_object()
         self.post_url = self.object.get_ilo_update_url()
@@ -159,15 +158,15 @@ class IloUpdateView(HtmxUpdateFormView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs.update({
-            'semester_obj': self.semester_obj
+            'kurikulum_obj': self.kurikulum_obj
         })
         return kwargs
 
 
 class IloBulkDeleteView(View):
     def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        semester_id = kwargs.get('semester_kurikulum_id')
-        semester_obj: SemesterKurikulum = get_object_or_404(SemesterKurikulum, id=semester_id)
+        kurikulum_id = kwargs.get('kurikulum_id')
+        kurikulum_obj: Kurikulum = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
 
         list_ilo = request.POST.getlist('id_ilo')
         list_ilo = [*set(list_ilo)]
@@ -176,4 +175,4 @@ class IloBulkDeleteView(View):
             Ilo.objects.filter(id__in=list_ilo).delete()
             messages.success(self.request, 'Berhasil menghapus ILO')
         
-        return redirect(semester_obj.read_all_ilo_url())
+        return redirect(kurikulum_obj.read_all_ilo_url())

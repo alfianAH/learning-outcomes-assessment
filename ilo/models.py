@@ -27,23 +27,23 @@ class Ilo(models.Model):
             ),
         )
 
-    def get_semester(self):
-        return self.pi_area.assessment_area.semester
+    def get_kurikulum(self):
+        return self.pi_area.assessment_area.kurikulum
 
     def read_detail_url(self):
-        return reverse('semester:ilo:read', kwargs={
-            'semester_kurikulum_id': self.get_semester().pk,
+        return reverse('kurikulum:ilo:read', kwargs={
+            'kurikulum_id': self.get_kurikulum().pk,
             'ilo_id': self.pk
         })
 
     def get_hx_ilo_update_url(self):
-        return reverse('semester:ilo:hx-update', kwargs={
-            'semester_kurikulum_id': self.get_semester().pk,
+        return reverse('kurikulum:ilo:hx-update', kwargs={
+            'kurikulum_id': self.get_kurikulum().pk,
             'ilo_id': self.pk
         })
 
     def get_ilo_update_url(self):
-        return reverse('semester:ilo:update', kwargs={
-            'semester_kurikulum_id': self.get_semester().pk,
+        return reverse('kurikulum:ilo:update', kwargs={
+            'kurikulum_id': self.get_kurikulum().pk,
             'ilo_id': self.pk
         })

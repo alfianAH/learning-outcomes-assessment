@@ -70,3 +70,24 @@ class Kurikulum(models.Model):
         return reverse('kurikulum:pi_area:duplicate', kwargs={
             'kurikulum_id': self.id_neosia
         })
+
+    # ILO
+    def read_all_ilo_url(self):
+        return reverse('kurikulum:ilo:read-all', kwargs={
+            'kurikulum_id': self.id_neosia
+        })
+
+    def get_hx_create_ilo_url(self):
+        return reverse('kurikulum:ilo:hx-create', kwargs={
+            'kurikulum_id': self.id_neosia
+        })
+
+    def get_create_ilo_url(self):
+        return reverse('kurikulum:ilo:create', kwargs={
+            'kurikulum_id': self.id_neosia
+        })
+
+    def get_ilo_bulk_delete_url(self):
+        return reverse('kurikulum:ilo:bulk-delete', kwargs={
+            'kurikulum_id': self.id_neosia
+        })

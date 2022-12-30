@@ -5,9 +5,9 @@
 {% endblock title %}
 
 {% block breadcrumb %}
-<li class="breadcrumb-item"><a href="{% url 'semester:read-all' %}" role="listitem">Semester</a></li>
-<li class="breadcrumb-item"><a href="{{ object.get_semester.read_detail_url }}" role="listitem">Detail</a></li>
-<li class="breadcrumb-item"><a href="{{ object.get_semester.read_all_ilo_url }}" role="listitem">ILO</a></li>
+<li class="breadcrumb-item"><a href="{% url 'kurikulum:read-all' %}" role="listitem">Kurikulum</a></li>
+<li class="breadcrumb-item"><a href="{{ object.get_kurikulum.read_detail_url }}" role="listitem">Detail</a></li>
+<li class="breadcrumb-item"><a href="{{ object.get_kurikulum.read_all_ilo_url }}" role="listitem">ILO</a></li>
 <li class="breadcrumb-item active" aria-current="page" role="listitem">Detail</li>
 {% endblock breadcrumb %}
 

@@ -16,12 +16,6 @@ urlpatterns = [
     path('bulk-update/', SemesterBulkUpdateView.as_view(), name='bulk-update'),
     path('<int:semester_prodi_id>/', SemesterReadView.as_view(), name='read'),
 
-    # ILO
-    # path('<int:semester_prodi_id>/ilo/', include('ilo.urls')),
-
     # MK Semester
     path('<int:semester_prodi_id>/mk/', include('mata_kuliah.urls')),
-
-    # Performance Indicator
-    # path('<int:semester_prodi_id>/pi-area/', include('pi_area.urls')),
 ]
