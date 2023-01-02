@@ -28,24 +28,24 @@ class AssessmentArea(models.Model):
         return self.performanceindicatorarea_set.all()
 
     def get_hx_update_pi_area_url(self):
-        return reverse('semester:pi_area:hx-update', kwargs={
+        return reverse('kurikulum:pi_area:hx-update', kwargs={
             'kurikulum_id': self.kurikulum.id_neosia,
             'assessment_area_id': self.pk
         })
 
     def get_update_pi_area_url(self):
-        return reverse('semester:pi_area:update', kwargs={
+        return reverse('kurikulum:pi_area:update', kwargs={
             'kurikulum_id': self.kurikulum.id_neosia,
             'assessment_area_id': self.pk
         })
     
     def get_read_all_pi_area_url(self):
-        return reverse('semester:pi_area:read-all', kwargs={
+        return reverse('kurikulum:pi_area:read-all', kwargs={
             'kurikulum_id': self.kurikulum.id_neosia
         })
 
     def get_delete_assessment_area_url(self):
-        return reverse('semester:pi_area:assessment-area-delete', kwargs={
+        return reverse('kurikulum:pi_area:assessment-area-delete', kwargs={
             'kurikulum_id': self.kurikulum.id_neosia,
             'assessment_area_id': self.pk
         })
@@ -65,13 +65,13 @@ class PerformanceIndicatorArea(models.Model):
         return self.performanceindicator_set.all()
 
     def read_detail_url(self):
-        return reverse('semester:pi_area:pi-area-read', kwargs={
+        return reverse('kurikulum:pi_area:pi-area-read', kwargs={
             'kurikulum_id': self.assessment_area.kurikulum.id_neosia,
             'pi_area_id': self.pk
         })
     
     def get_pi_area_update_url(self):
-        return reverse('semester:pi_area:pi-area-update', kwargs={
+        return reverse('kurikulum:pi_area:pi-area-update', kwargs={
             'kurikulum_id': self.assessment_area.kurikulum.id_neosia,
             'pi_area_id': self.pk
         })
