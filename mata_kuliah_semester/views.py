@@ -24,7 +24,7 @@ from .utils import(
 class MataKuliahSemesterReadAllHxView(ListViewModelA):
     model = MataKuliahSemester
     paginate_by: int = 10
-    template_name: str = 'mata-kuliah/partials/mk-semester-home.html'
+    template_name: str = 'mata-kuliah-semester/partials/mk-semester-home.html'
     ordering: str = 'mk_kurikulum__nama'
     sort_form_ordering_by_key: str = 'ordering_by'
     semester_obj: SemesterProdi = None
@@ -37,11 +37,11 @@ class MataKuliahSemesterReadAllHxView(ListViewModelA):
     list_prefix_id: str = 'mk-semester-'
     input_name: str = 'id_mk_semester'
     list_id: str = 'mk-semester-list-content'
-    list_custom_field_template: str = 'mata-kuliah/partials/list-custom-field-mk-semester.html'
-    table_custom_field_header_template: str = 'mata-kuliah/partals/table-custom-field-header-mk-semester.html'
-    table_custom_field_template: str = 'mata-kuliah/partials/table-custom-field-mk-semester.html'
-    filter_template: str = 'mata-kuliah/partials/mk-semester-filter-form.html'
-    sort_template: str = 'mata-kuliah/partials/mk-semester-sort-form.html'
+    list_custom_field_template: str = 'mata-kuliah-semester/partials/list-custom-field-mk-semester.html'
+    table_custom_field_header_template: str = 'mata-kuliah-semester/partals/table-custom-field-header-mk-semester.html'
+    table_custom_field_template: str = 'mata-kuliah-semester/partials/table-custom-field-mk-semester.html'
+    filter_template: str = 'mata-kuliah-semester/partials/mk-semester-filter-form.html'
+    sort_template: str = 'mata-kuliah-semester/partials/mk-semester-sort-form.html'
 
     def setup(self, request: HttpRequest, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -91,7 +91,7 @@ class MataKuliahSemesterReadAllHxView(ListViewModelA):
 
 class MataKuliahSemesterCreateView(FormView):
     form_class = MataKuliahSemesterCreateForm
-    template_name: str = 'mata-kuliah/create-view.html'
+    template_name: str = 'mata-kuliah-semester/create-view.html'
     semester_obj: SemesterProdi = None
     mk_semester_choices = []
 
