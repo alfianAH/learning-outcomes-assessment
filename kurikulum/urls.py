@@ -5,11 +5,6 @@ from .views import (
     KurikulumReadView,
     KurikulumBulkUpdateView,
     KurikulumBulkDeleteView,
-
-    MataKuliahKurikulumCreateView,
-    MataKuliahKurikulumReadView,
-    MataKuliahKurikulumBulkUpdateView,
-    MataKuliahKurikulumBulkDeleteView,
 )
 
 
@@ -22,14 +17,9 @@ urlpatterns = [
     path('<int:kurikulum_id>/', KurikulumReadView.as_view(), name='read'),
 
     # Mata Kuliah Kurikulum
-    path('<int:kurikulum_id>/mk/create/', MataKuliahKurikulumCreateView.as_view(), name='mk-create'),
-    path('<int:kurikulum_id>/mk/<int:mk_id>/', MataKuliahKurikulumReadView.as_view(), name='mk-read'),
-    path('<int:kurikulum_id>/mk/bulk-update/', MataKuliahKurikulumBulkUpdateView.as_view(), name='mk-bulk-update'),
-    path('<int:kurikulum_id>/mk/delete/', MataKuliahKurikulumBulkDeleteView.as_view(), name='mk-bulk-delete'),
-
+    path('<int:kurikulum_id>/mk/', include('mata_kuliah_kurikulum.urls')),
     # ILO
     path('<int:kurikulum_id>/ilo/', include('ilo.urls')),
-
     # Performance Indicator
     path('<int:kurikulum_id>/pi-area/', include('pi_area.urls')),
 ]

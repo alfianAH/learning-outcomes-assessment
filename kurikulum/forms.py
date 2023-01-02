@@ -4,8 +4,8 @@ from learning_outcomes_assessment.widgets import (
     ChoiceListInteractiveModelA,
     UpdateChoiceList,
 )
-from mata_kuliah.models import MataKuliahKurikulum
-from mata_kuliah.utils import(
+from mata_kuliah_kurikulum.models import MataKuliahKurikulum
+from mata_kuliah_kurikulum.utils import(
     get_mk_kurikulum,
 )
 from .utils import (

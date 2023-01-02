@@ -29,19 +29,24 @@ class Kurikulum(models.Model):
     # Mata Kuliah Kurikulum
     def get_mk_kurikulum(self):
         return self.matakuliahkurikulum_set.all()
+    
+    def read_all_mk_kurikulum_url(self):
+        return reverse('kurikulum:mata_kuliah_kurikulum:read-all', kwargs={
+            'kurikulum_id': self.id_neosia
+        })
 
     def get_mk_bulk_delete(self):
-        return reverse('kurikulum:mk-bulk-delete', kwargs={
+        return reverse('kurikulum:mata_kuliah_kurikulum:bulk-delete', kwargs={
             'kurikulum_id': self.id_neosia
         })
     
     def get_mk_create(self):
-        return reverse('kurikulum:mk-create', kwargs={
+        return reverse('kurikulum:mata_kuliah_kurikulum:create', kwargs={
             'kurikulum_id': self.id_neosia
         })
 
     def get_mk_bulk_update(self):
-        return reverse('kurikulum:mk-bulk-update', kwargs={
+        return reverse('kurikulum:mata_kuliah_kurikulum:bulk-update', kwargs={
             'kurikulum_id': self.id_neosia
         })
 

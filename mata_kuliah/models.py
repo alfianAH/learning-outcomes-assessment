@@ -3,38 +3,13 @@ from django.db.models import CheckConstraint, Q
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.urls import reverse
 from django.conf import settings
-from accounts.models import ProgramStudi
 from ilo.models import Ilo
-from kurikulum.models import Kurikulum
+from mata_kuliah_kurikulum.models import MataKuliahKurikulum
 from semester.models import SemesterProdi
 
 User = settings.AUTH_USER_MODEL
 
 # Create your models here.
-class MataKuliahKurikulum(models.Model):
-    id_neosia = models.BigIntegerField(primary_key=True, null=False, unique=True)
-    prodi = models.ForeignKey(ProgramStudi, on_delete=models.CASCADE)
-    kurikulum = models.ForeignKey(Kurikulum, on_delete=models.CASCADE)
-    
-    kode = models.CharField(max_length=100, null=False)
-    nama = models.CharField(max_length=255, null=False)
-    sks = models.PositiveSmallIntegerField(null=False)
-
-    def __str__(self) -> str:
-        return self.nama
-
-    def read_kurikulum_url(self):
-        return reverse('kurikulum:read', kwargs={
-            'kurikulum_id': self.kurikulum.id_neosia
-        })
-
-    def read_detail_url(self):
-        return reverse('kurikulum:mk-read', kwargs={
-            'kurikulum_id': self.kurikulum.id_neosia,
-            'mk_id': self.id_neosia
-        })
-
-
 class MataKuliahSemester(models.Model):
     mk_kurikulum = models.ForeignKey(MataKuliahKurikulum, on_delete=models.CASCADE)
     semester = models.ForeignKey(SemesterProdi, on_delete=models.CASCADE)

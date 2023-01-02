@@ -19,69 +19,9 @@
         <div>{{ object.tahun_mulai }}</div>
     </div>
     <div class="tr-div">
-        <div class="w-40 md:w-52 xl:w-64">Minimal SKS kelulusan</div>
-        <div>:</div>
-        <div>{{ object.min_sks }}</div>
-    </div>
-    <div class="tr-div">
         <div class="w-40 md:w-52 xl:w-64">Keaktifan</div>
         <div>:</div>
         <div>{% include 'kurikulum/partials/badge-list-kurikulum.html' with option=object %}</div>
     </div>
 </div>
-
-{% with request.GET as GET %}
-<ul class="tab" role="tablist">
-    <li class="tab-item w-40 lg:w-44" id="tab-2" data-target="#tab-mk-pane" role="presentation">
-        <div class="tab-title">
-            <span class="one-line">Mata Kuliah</span>
-        </div>
-
-        <div class="tab-item-line"></div>
-    </li>
-</ul>
-
-<div class="tab-content">
-    <div class="tab-pane fade show active" role="tabpanel" id="tab-mk-pane" aria-labelledby="tab-mata-kuliah">
-
-        {% if mk_objects or mk_data_exist %}
-            <div class="h-icon">
-                <h2>List Mata Kuliah</h2>
-                <a href="{{ object.get_mk_create }}" title="Tambah data mata kuliah" type="button" class="btn btn-success">
-                    <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-                    </svg>
-                    <span class="hidden sm:block">Tambah</span>
-                </a>
-                <a href="{{ object.get_mk_bulk_update }}" title="Update data mata kuliah" type="button" class="btn btn-primary">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" focusable="False" aria-label="sync">
-                        <path d="M.01 0h24v24h-24V0z" fill="none"/>
-                        <path d="M12 4V2.21c0-.45-.54-.67-.85-.35l-2.8 2.79c-.2.2-.2.51 0 .71l2.79 2.79c.32.31.86.09.86-.36V6c3.31 0 6 2.69 6 6 0 .79-.15 1.56-.44 2.25-.15.36-.04.77.23 1.04.51.51 1.37.33 1.64-.34.37-.91.57-1.91.57-2.95 0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-.79.15-1.56.44-2.25.15-.36.04-.77-.23-1.04-.51-.51-1.37-.33-1.64.34C4.2 9.96 4 10.96 4 12c0 4.42 3.58 8 8 8v1.79c0 .45.54.67.85.35l2.79-2.79c.2-.2.2-.51 0-.71l-2.79-2.79c-.31-.31-.85-.09-.85.36V18z"/>
-                    </svg>
-                    <span class="hidden sm:block">Update</span>
-                </a>
-            </div>
-            {% include 'components/list-table-view/list-tools.html' with search_field=mk_filter_form.nama prefix_id=mk_prefix_id filter_template=mk_filter_template sort_template=mk_sort_template filter_form=mk_filter_form sort_form=mk_sort_form ordering_by_field=mk_sort_form.ordering_by %}
-
-            {% if mk_objects %}
-                <form action="{{ mk_bulk_delete_url }}" method="post" class="space-y-2.5 py-2.5 md:p-3">
-                    {% csrf_token %}
-
-                    {% include 'components/list-table-view/selected-indicator.html' with delete_button=True %}
-                    {% include 'components/list-table-view/model-a/list-view-model-a.html' with use_widget=False open_button=True id='mk-list-content' prefix_id=mk_prefix_id input_name='id_mk_kurikulum' options=mk_objects list_custom_field_template=mk_list_custom_field_template table_custom_field_header_template=mk_table_custom_field_header_template table_custom_field_template=mk_table_custom_field_template %}
-                </form>
-            {% else %}
-                <p>Tidak ditemukan data dengan filter yang diberikan.</p>
-            {% endif %}
-        {% else %}
-            <a href="{{ object.get_mk_create }}" title="Tambah data mata kuliah" type="button" class="btn btn-success btn-icon-start max-w-min">
-                <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-                </svg>
-                Tambah data dari Neosia
-            </a>
-        {% endif %}
-    </div>
-</div>
-{% endwith %}
 {% endblock content %}

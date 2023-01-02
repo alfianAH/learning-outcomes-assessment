@@ -6,19 +6,19 @@ from learning_outcomes_assessment.widgets import (
     MySearchInput,
 )
 from .models import (
-    MataKuliahSemester,
+    MataKuliahKurikulum,
 )
 
 
-MK_SEMESTER_ORDERING_BY = (
-    ('mk_kurikulum__kode', 'Kode MK'),
-    ('mk_kurikulum__nama', 'Nama'),
-    ('mk_kurikulum__sks', 'SKS'),
+MK_KURIKULUM_ORDERING_BY = (
+    ('kode', 'Kode MK'),
+    ('nama', 'Nama'),
+    ('sks', 'SKS'),
 )
 
-class MataKuliahSemesterFilter(filter.FilterSet):
+class MataKuliahKurikulumFilter(filter.FilterSet):
     nama = filter.CharFilter(
-        field_name='mk_kurikulum__nama', 
+        field_name='nama', 
         lookup_expr='icontains', 
         label='Nama Mata Kuliah',
         widget=MySearchInput(
@@ -29,7 +29,7 @@ class MataKuliahSemesterFilter(filter.FilterSet):
         ),
     )
     sks = filter.NumberFilter(
-        field_name='mk_kurikulum__sks',
+        field_name='sks',
         label='SKS',
         widget=MyNumberInput(
             attrs={
@@ -39,14 +39,14 @@ class MataKuliahSemesterFilter(filter.FilterSet):
     )
 
     class Meta:
-        model = MataKuliahSemester
-        fields = ('mk_kurikulum__nama', 'mk_kurikulum__sks')
+        model = MataKuliahKurikulum
+        fields = ('nama', 'sks')
 
 
-class MataKuliahSemesterSort(forms.Form):
+class MataKuliahKurikulumSort(forms.Form):
     ordering_by = forms.ChoiceField(
-        choices=MK_SEMESTER_ORDERING_BY,
+        choices=MK_KURIKULUM_ORDERING_BY,
         widget=MyRadioInput,
         label='Urutkan berdasarkan',
-        initial='mk_kurikulum__nama',
+        initial='nama',
     )
