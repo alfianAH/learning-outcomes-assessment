@@ -29,19 +29,19 @@ class Migration(migrations.Migration):
                 ('id_neosia', models.BigIntegerField(primary_key=True, serialize=False, unique=True)),
                 ('nama', models.CharField(max_length=255)),
                 ('kelas', models.CharField(max_length=255)),
-                ('mk_semester', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='mata_kuliah.matakuliahsemester')),
+                ('mk_semester', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='mata_kuliah_semester.matakuliahsemester')),
             ],
         ),
         migrations.AddField(
             model_name='dosenmatakuliah',
             name='kelas_mk_semester',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='mata_kuliah.kelasmatakuliahsemester'),
+            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='mata_kuliah_semester.kelasmatakuliahsemester'),
             preserve_default=False,
         ),
         migrations.AddField(
             model_name='pesertamatakuliah',
             name='kelas_mk_semester',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='mata_kuliah.kelasmatakuliahsemester'),
+            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='mata_kuliah_semester.kelasmatakuliahsemester'),
             preserve_default=False,
         ),
     ]

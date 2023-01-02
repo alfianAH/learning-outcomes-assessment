@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('average_clo_achievement', models.FloatField(null=True, validators=[django.core.validators.MinValueValidator(0.0), django.core.validators.MaxValueValidator(100.0)])),
-                ('mk_kurikulum', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='mata_kuliah.matakuliahkurikulum')),
+                ('mk_kurikulum', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='mata_kuliah_semester.matakuliahkurikulum')),
                 ('semester', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='semester.semesterkurikulum')),
             ],
         ),
@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('kelas', models.CharField(max_length=20)),
                 ('mahasiswa', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('mk_semester', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='mata_kuliah.matakuliahsemester')),
+                ('mk_semester', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='mata_kuliah_semester.matakuliahsemester')),
             ],
         ),
         migrations.CreateModel(
@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('nilai_akhir', models.FloatField(null=True, validators=[django.core.validators.MinValueValidator(0.0), django.core.validators.MaxValueValidator(100.0)])),
-                ('peserta', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='mata_kuliah.pesertamatakuliah')),
+                ('peserta', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='mata_kuliah_semester.pesertamatakuliah')),
             ],
         ),
         migrations.CreateModel(
@@ -48,7 +48,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('nilai_ilo', models.FloatField(validators=[django.core.validators.MinValueValidator(0.0), django.core.validators.MaxValueValidator(100.0)])),
                 ('ilo', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='ilo.ilo')),
-                ('peserta', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='mata_kuliah.pesertamatakuliah')),
+                ('peserta', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='mata_kuliah_semester.pesertamatakuliah')),
             ],
         ),
         migrations.CreateModel(
@@ -56,7 +56,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('mahasiswa', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('mk_semester', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='mata_kuliah.matakuliahsemester')),
+                ('mk_semester', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='mata_kuliah_semester.matakuliahsemester')),
             ],
         ),
         migrations.AddConstraint(
