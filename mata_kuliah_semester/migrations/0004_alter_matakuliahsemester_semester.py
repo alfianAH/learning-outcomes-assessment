@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('semester', '0005_semesterprodi_tahunajaranprodi'),
-        ('mata_kuliah', '0003_auto_20221227_1536'),
+        ('mata_kuliah_semester', '0003_auto_20221227_1536'),
     ]
 
     operations = [

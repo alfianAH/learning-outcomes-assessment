@@ -17,5 +17,5 @@ urlpatterns = [
     path('<int:semester_prodi_id>/', SemesterReadView.as_view(), name='read'),
 
     # MK Semester
-    path('<int:semester_prodi_id>/mk/', include('mata_kuliah.urls')),
+    path('<int:semester_prodi_id>/mk/', include('mata_kuliah_semester.urls')),
 ]

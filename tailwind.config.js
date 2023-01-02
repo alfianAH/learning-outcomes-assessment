@@ -6,7 +6,7 @@ module.exports = {
     "./templates/**/*.html",
     "./static/**/*.js",
     "./pi_area/models.py",
-    './mata_kuliah/forms.py'
+    './mata_kuliah_semester/forms.py'
   ],
   darkMode: 'class',
   theme: {

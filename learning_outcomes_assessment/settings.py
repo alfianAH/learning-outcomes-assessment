@@ -57,7 +57,7 @@ INSTALLED_APPS = [
     'accounts',
     'kurikulum',
     'mata_kuliah_kurikulum',
-    'mata_kuliah',
+    'mata_kuliah_semester',
     'pi_area',
     'semester',
     'ilo',

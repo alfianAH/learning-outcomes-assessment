@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
         ('semester', '0004_alter_tahunajaran_options'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('ilo', '0005_auto_20221223_1116'),
-        ('mata_kuliah', '0001_initial'),
+        ('mata_kuliah_semester', '0001_initial'),
     ]
 
     operations = [

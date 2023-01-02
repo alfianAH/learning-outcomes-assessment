@@ -5,10 +5,10 @@ from .utils import (
     get_semester_prodi_choices,
     get_update_semester_prodi_choices,
 )
-from mata_kuliah.utils import(
+from mata_kuliah_semester.utils import(
     get_mk_semester,
 )
-from mata_kuliah.models import MataKuliahSemester
+from mata_kuliah_semester.models import MataKuliahSemester
 from learning_outcomes_assessment.widgets import (
     ChoiceListInteractiveModelA, 
     UpdateChoiceList,

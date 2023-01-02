@@ -7,7 +7,7 @@ from .views import (
 )
 
 
-app_name = 'mata_kuliah'
+app_name = 'mata_kuliah_semester'
 urlpatterns = [
     path('hx/', MataKuliahSemesterReadAllHxView.as_view(), name='hx-read-all'),
     path('<int:mk_semester_id>/', MataKuliahSemesterReadView.as_view(), name='read'),

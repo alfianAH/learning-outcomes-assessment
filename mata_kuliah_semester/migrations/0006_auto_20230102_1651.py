@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('mata_kuliah_kurikulum', '0001_initial'),
-        ('mata_kuliah', '0005_auto_20230102_1651'),
+        ('mata_kuliah_semester', '0005_auto_20230102_1651'),
     ]
 
     operations = [
