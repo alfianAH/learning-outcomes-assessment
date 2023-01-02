@@ -30,7 +30,7 @@ Semester -
     {% include 'components/list-table-view/list-tools.html' with search_field=filter_form.nama ordering_by_field=sort_form.ordering_by %}
 
     {% if object_list %}
-        {% include 'semester/partials/semester-read-all-view.html' %}
+        {% include 'components/list-table-view/model-a/read-all-view.html' %}
     {% else %}
         <p>Tidak ditemukan data dengan filter yang diberikan</p>
     {% endif %}

@@ -6,5 +6,8 @@
         
         {% include 'components/list-table-view/model-a/list-view-model-a.html' with use_widget=False open_button=True prefix_id=list_prefix_id options=object_list %}
     </form>
-    {% include 'components/pagination/pagination.html' %}
+
+    {% if page_obj %}
+        {% include 'components/pagination/pagination.html' %}
+    {% endif %}
 </div>

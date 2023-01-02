@@ -40,12 +40,12 @@ class Kurikulum(models.Model):
             'kurikulum_id': self.id_neosia
         })
     
-    def get_mk_create(self):
+    def get_create_mk_kurikulum_url(self):
         return reverse('kurikulum:mata_kuliah_kurikulum:create', kwargs={
             'kurikulum_id': self.id_neosia
         })
 
-    def get_mk_bulk_update(self):
+    def get_bulk_update_mk_kurikulum_url(self):
         return reverse('kurikulum:mata_kuliah_kurikulum:bulk-update', kwargs={
             'kurikulum_id': self.id_neosia
         })

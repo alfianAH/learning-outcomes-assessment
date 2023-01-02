@@ -53,7 +53,7 @@ class MataKuliahSemesterReadAllHxView(ListViewModelA):
         self.reset_url = self.semester_obj.read_all_mk_semester_url()
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        mk_semester_qs = self.model.objects.filter(semester=self.semester_obj.pk)
+        mk_semester_qs = self.get_queryset()
 
         if mk_semester_qs.exists():
             filter_data = {

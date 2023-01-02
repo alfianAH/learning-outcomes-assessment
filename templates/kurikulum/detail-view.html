@@ -10,18 +10,38 @@
 {% endblock title %}
 
 {% block content %}
-<h1>{{ object.nama }}</h1>
-
-<div class="table-div">
-    <div class="tr-div">
-        <div class="w-40 md:w-52 xl:w-64">Tahun mulai</div>
-        <div>:</div>
-        <div>{{ object.tahun_mulai }}</div>
-    </div>
-    <div class="tr-div">
-        <div class="w-40 md:w-52 xl:w-64">Keaktifan</div>
-        <div>:</div>
-        <div>{% include 'kurikulum/partials/badge-list-kurikulum.html' with option=object %}</div>
-    </div>
+<div class="h-icon">
+    <h1>{{ object.nama }}</h1>
+    
+    {% include 'kurikulum/partials/badge-list-kurikulum.html' with option=object %}
 </div>
+
+<ul class="w-full text-center sm:text-start space-y-2 sm:space-y-0 sm:space-x-2 xl:space-x-10">
+    <li class="link-item-icon">
+        <a href="{{ object.read_all_mk_kurikulum_url }}">
+            <div class="rounded-full bg-slate-500 w-48 h-48"></div>
+            <span>
+                Mata Kuliah Kurikulum
+            </span>
+        </a>
+    </li>
+
+    <li class="link-item-icon">
+        <a href="{{ object.read_all_pi_area_url }}" class="link-with-icon">
+            <div class="rounded-full bg-slate-500 w-48 h-48"></div>
+            <span>
+                Performance Indicators
+            </span>
+        </a>
+    </li>
+
+    <li class="link-item-icon">
+        <a href="{{ object.read_all_ilo_url }}" class="link-with-icon">
+            <div class="rounded-full bg-slate-500 w-48 h-48"></div>
+            <span>
+                Intended Learning Outcomes
+            </span>
+        </a>
+    </li>
+</ul>
 {% endblock content %}

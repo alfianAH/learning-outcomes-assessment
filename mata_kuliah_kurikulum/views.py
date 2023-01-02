@@ -13,6 +13,10 @@ from mata_kuliah_kurikulum.forms import (
     MataKuliahKurikulumCreateForm,
     MataKuliahKurikulumBulkUpdateForm
 )
+from .filters import(
+    MataKuliahKurikulumFilter,
+    MataKuliahKurikulumSort
+)
 from mata_kuliah_kurikulum.utils import(
     get_mk_kurikulum,
     get_mk_kurikulum_choices,
@@ -21,7 +25,71 @@ from mata_kuliah_kurikulum.utils import(
 
 # Create your views here.
 class MataKuliahKurikulumReadAllView(ListViewModelA):
-    pass
+    model = MataKuliahKurikulum
+    paginate_by: int = 10
+    template_name: str = 'mata-kuliah-kurikulum/home.html'
+    ordering: str = 'nama'
+    sort_form_ordering_by_key: str = 'ordering_by'
+    kurikulum_obj: Kurikulum = None
+
+    filter_form: MataKuliahKurikulumFilter = None
+    sort_form: MataKuliahKurikulumSort = None
+
+    bulk_delete_url: str = ''
+    reset_url: str = ''
+    list_prefix_id: str = 'mk-kurikulum-'
+    input_name: str = 'id_mk_kurikulum'
+    list_id: str = 'mk-kurikulum-list-content'
+    list_custom_field_template: str = 'mata-kuliah-kurikulum/partials/list-custom-field-mk-kurikulum.html'
+    table_custom_field_header_template: str = 'mata-kuliah-kurikulum/partials/table-custom-field-header-mk-kurikulum.html'
+    table_custom_field_template: str = 'mata-kuliah-kurikulum/partials/table-custom-field-mk-kurikulum.html'
+    filter_template: str = 'mata-kuliah-kurikulum/partials/mk-kurikulum-filter-form.html'
+    sort_template: str = 'mata-kuliah-kurikulum/partials/mk-kurikulum-sort-form.html'
+
+    def setup(self, request: HttpRequest, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        kurikulum_id = kwargs.get('kurikulum_id')
+        self.kurikulum_obj: Kurikulum = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
+
+        # self.bulk_delete_url = self.kurikulum_obj.get_mk_kurikulum_bulk_delete_url()
+        self.reset_url = self.kurikulum_obj.read_all_mk_kurikulum_url()
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        mk_kurikulum_qs = self.get_queryset()
+
+        if mk_kurikulum_qs.exists():
+            filter_data = {
+                'nama': request.GET.get('nama', ''),
+                'sks': request.GET.get('sks', ''),
+            }
+
+            sort_data = {
+                self.sort_form_ordering_by_key: request.GET.get(self.sort_form_ordering_by_key, self.ordering)
+            }
+
+            self.filter_form = MataKuliahKurikulumFilter(
+                data=filter_data or None,
+                queryset=mk_kurikulum_qs
+            )
+            self.sort_form = MataKuliahKurikulumSort(data=sort_data)
+
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        self.queryset = self.model.objects.filter(
+            kurikulum=self.kurikulum_obj.id_neosia
+        )
+        return super().get_queryset()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'kurikulum_obj': self.kurikulum_obj,
+            'mk_kurikulum_create_url': self.kurikulum_obj.get_create_mk_kurikulum_url(),
+            'mk_kurikulum_bulk_update_url': self.kurikulum_obj.get_bulk_update_mk_kurikulum_url(),
+        })
+        return context
 
 
 class MataKuliahKurikulumCreateView(FormView):
@@ -36,7 +104,7 @@ class MataKuliahKurikulumCreateView(FormView):
 
         kurikulum_id = kwargs.get('kurikulum_id')
         self.kurikulum_obj = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
-        self.success_url = self.kurikulum_obj.read_detail_url()
+        self.success_url = self.kurikulum_obj.read_all_mk_kurikulum_url()
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         form = self.get_form(form_class=self.form_class)
@@ -107,7 +175,7 @@ class MataKuliahKurikulumBulkUpdateView(FormView):
         kurikulum_id = kwargs.get('kurikulum_id')
         self.kurikulum_obj = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
         self.prodi_id = request.user.prodi.id_neosia
-        self.success_url = self.kurikulum_obj.read_detail_url()
+        self.success_url = self.kurikulum_obj.read_all_mk_kurikulum_url()
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()        
