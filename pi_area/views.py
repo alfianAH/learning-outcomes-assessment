@@ -111,7 +111,7 @@ class PIAreaReadAllView(ListView):
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         kurikulum_id = kwargs.get('kurikulum_id')
-        self.kurikulum_obj = get_object_or_404(Kurikulum, id=kurikulum_id)
+        self.kurikulum_obj = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
         return super().setup(request, *args, **kwargs)
 
     def get_queryset(self):
@@ -157,7 +157,7 @@ class PerformanceIndicatorAreaReadView(DetailView):
 class PerformanceIndicatorAreaBulkDeleteView(View):
     def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         kurikulum_id = kwargs.get('kurikulum_id')
-        kurikulum_obj: Kurikulum = get_object_or_404(Kurikulum, id=kurikulum_id)
+        kurikulum_obj: Kurikulum = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
 
         list_pi_area = request.POST.getlist('id_pi_area')
         list_pi_area = [*set(list_pi_area)]

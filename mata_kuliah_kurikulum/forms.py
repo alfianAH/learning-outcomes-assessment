@@ -28,7 +28,11 @@ class MataKuliahKurikulumCreateForm(forms.Form):
         mk_from_neosia = [*set(mk_from_neosia)]
         
         cleaned_data['mk_from_neosia'] = mk_from_neosia
-
+        is_mk_kurikulum_valid = len(mk_from_neosia) > 0
+        
+        if not is_mk_kurikulum_valid:
+            self.add_error('mk_from_neosia', 'Pilih minimal 1 (satu) mata kuliah kurikulum')
+        
         if settings.DEBUG: print("Clean data: {}".format(cleaned_data))
         
         return cleaned_data

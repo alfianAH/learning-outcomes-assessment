@@ -11,7 +11,7 @@
 
 {% block content %}
 <div class="h-icon">
-    <h1>{{ object.nama }}</h1>
+    <h1>{{ object.nama }} - {{ object.tahun_mulai }}</h1>
     
     {% include 'kurikulum/partials/badge-list-kurikulum.html' with option=object %}
 </div>

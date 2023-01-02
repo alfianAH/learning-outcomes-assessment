@@ -14,5 +14,5 @@ urlpatterns = [
     path('create/', MataKuliahKurikulumCreateView.as_view(), name='create'),
     path('<int:mk_id>/', MataKuliahKurikulumReadView.as_view(), name='read'),
     path('bulk-update/', MataKuliahKurikulumBulkUpdateView.as_view(), name='bulk-update'),
-    path('delete/', MataKuliahKurikulumBulkDeleteView.as_view(), name='bulk-delete'),
+    path('bulk-delete/', MataKuliahKurikulumBulkDeleteView.as_view(), name='bulk-delete'),
 ]

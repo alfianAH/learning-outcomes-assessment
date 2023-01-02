@@ -52,7 +52,7 @@ class MataKuliahKurikulumReadAllView(ListViewModelA):
         kurikulum_id = kwargs.get('kurikulum_id')
         self.kurikulum_obj: Kurikulum = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
 
-        # self.bulk_delete_url = self.kurikulum_obj.get_mk_kurikulum_bulk_delete_url()
+        self.bulk_delete_url = self.kurikulum_obj.get_bulk_delete_mk_kurikulum_url()
         self.reset_url = self.kurikulum_obj.read_all_mk_kurikulum_url()
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
@@ -231,4 +231,4 @@ class MataKuliahKurikulumBulkDeleteView(View):
             MataKuliahKurikulum.objects.filter(id_neosia__in=list_mk_kurikulum).delete()
             messages.success(request, 'Berhasil menghapus mata kuliah kurikulum')
             
-        return redirect(kurikulum_obj.read_detail_url())
+        return redirect(kurikulum_obj.read_all_mk_kurikulum_url())

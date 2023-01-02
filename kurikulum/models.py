@@ -35,7 +35,7 @@ class Kurikulum(models.Model):
             'kurikulum_id': self.id_neosia
         })
 
-    def get_mk_bulk_delete(self):
+    def get_bulk_delete_mk_kurikulum_url(self):
         return reverse('kurikulum:mata_kuliah_kurikulum:bulk-delete', kwargs={
             'kurikulum_id': self.id_neosia
         })
