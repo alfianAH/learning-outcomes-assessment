@@ -26,7 +26,7 @@ class MataKuliahKurikulumReadAllView(ListViewModelA):
 
 class MataKuliahKurikulumCreateView(FormView):
     form_class = MataKuliahKurikulumCreateForm
-    template_name: str = 'mata-kuliah/mk-kurikulum-create-view.html'
+    template_name: str = 'mata-kuliah-kurikulum/create-view.html'
     kurikulum_obj: Kurikulum = None
     prodi_id: int = None
     form_field_name: str = 'mk_from_neosia'
@@ -91,12 +91,12 @@ class MataKuliahKurikulumCreateView(FormView):
 class MataKuliahKurikulumReadView(DetailView):
     model = MataKuliahKurikulum
     pk_url_kwarg: str = 'mk_id'
-    template_name: str = 'mata-kuliah/mk-kurikulum-detail-view.html'
+    template_name: str = 'mata-kuliah-kurikulum/detail-view.html'
 
 
 class MataKuliahKurikulumBulkUpdateView(FormView):
     form_class = MataKuliahKurikulumBulkUpdateForm
-    template_name: str = 'mata-kuliah/mk-kurikulum-update-view.html'
+    template_name: str = 'mata-kuliah-kurikulum/update-view.html'
     kurikulum_obj: Kurikulum = None
     prodi_id: int = None
     form_field_name: str = 'update_data_mk_kurikulum'

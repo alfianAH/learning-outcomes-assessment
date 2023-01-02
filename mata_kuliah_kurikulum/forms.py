@@ -10,9 +10,9 @@ from .utils import get_update_mk_kurikulum_choices
 class MataKuliahKurikulumCreateForm(forms.Form):
     mk_from_neosia = forms.MultipleChoiceField(
         widget=ChoiceListInteractiveModelA(
-            list_custom_field_template='mata-kuliah/partials/list-custom-field-mk.html',
-            table_custom_field_template='mata-kuliah/partials/table-custom-field-mk.html',
-            table_custom_field_header_template='mata-kuliah/partials/table-custom-field-header-mk.html',
+            list_custom_field_template='mata-kuliah-kurikulum/partials/list-custom-field-mk-kurikulum.html',
+            table_custom_field_template='mata-kuliah-kurikulum/partials/table-custom-field-mk-kurikulum.html',
+            table_custom_field_header_template='mata-kuliah-kurikulum/partials/table-custom-field-header-mk-kurikulum.html',
         ),
         label = 'Tambahkan Mata Kuliah Kurikulum dari Neosia',
         help_text = 'Data di bawah ini merupakan data baru dari Neosia dan belum ditemukan dalam database. Beri centang pada item yang ingin anda tambahkan.',
@@ -37,7 +37,7 @@ class MataKuliahKurikulumCreateForm(forms.Form):
 class MataKuliahKurikulumBulkUpdateForm(forms.Form):
     update_data_mk_kurikulum = forms.MultipleChoiceField(
         widget=UpdateChoiceList(
-            list_custom_field_template='mata-kuliah/partials/list-custom-field-mk.html',
+            list_custom_field_template='mata-kuliah-kurikulum/partials/list-custom-field-mk-kurikulum.html',
         ),
         label = 'Update Data Mata Kuliah Kurikulum',
         help_text = 'Data yang berwarna hijau merupakan data terbaru dari Neosia.<br>Data yang berwarna merah merupakan data lama pada sistem ini.<br>Beri centang pada item yang ingin anda update.',

@@ -91,7 +91,7 @@ class MataKuliahSemesterReadAllHxView(ListViewModelA):
 
 class MataKuliahSemesterCreateView(FormView):
     form_class = MataKuliahSemesterCreateForm
-    template_name: str = 'mata-kuliah/mk-semester-create-view.html'
+    template_name: str = 'mata-kuliah/create-view.html'
     semester_obj: SemesterProdi = None
     mk_semester_choices = []
 
