@@ -438,6 +438,22 @@
         @apply -rotate-180;
     }
 
+    /* Loading */
+    .loading-card{
+        @apply fixed top-0 left-0 z-50 w-full h-full transition-transform duration-500 ease-in-out -translate-y-full;
+    }
+
+    .loading-card.show:not(.hiding),
+    .loading-card.showing {
+        @apply transform-none;
+    }
+
+    .loading-card.hiding,
+    .loading-card.showing,
+    .loading-card.show {
+        @apply visible;
+    }
+
     /* Modal */
     .modal{
         @apply fixed top-0 left-0 z-50 w-full h-full overflow-x-hidden overflow-y-hidden outline-0 invisible transition-transform duration-500 ease-in-out -translate-y-full;
