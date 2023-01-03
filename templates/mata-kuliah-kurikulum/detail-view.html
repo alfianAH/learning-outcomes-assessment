@@ -6,8 +6,8 @@
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{% url 'kurikulum:read-all' %}" role="listitem">Kurikulum</a></li>
-<li class="breadcrumb-item"><a href="{{ object.read_kurikulum_url }}" role="listitem">Detail</a></li>
-<li class="breadcrumb-item"><a href="{{ kurikulum_obj.read_all_mk_kurikulum_url }}" role="listitem">Mata Kuliah Kurikulum</a></li>
+<li class="breadcrumb-item"><a href="{{ object.kurikulum.read_detail_url }}" role="listitem">Detail</a></li>
+<li class="breadcrumb-item"><a href="{{ object.kurikulum.read_all_mk_kurikulum_url }}" role="listitem">Mata Kuliah Kurikulum</a></li>
 <li class="breadcrumb-item active" aria-current="page" role="listitem">Detail MK Kurikulum</li>
 {% endblock breadcrumb %}
 

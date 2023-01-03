@@ -156,6 +156,8 @@
         </ol>
     </nav>
 
+    {% include 'components/loading-card.html' %}
+
     <div id="content">
         {% block content %}
             <h2>Selamat Datang, {{ request.user.name }}</h2>

@@ -58,7 +58,7 @@
 
     <div class="form-buttons">
         {% if wizard.steps.prev %}
-            <button class="btn btn-secondary btn-icon-start" name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}" role="button" id="prev-btn">
+            <button class="btn btn-secondary btn-icon-start loading-trigger" name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}" role="button" id="prev-btn">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-chevron-left" focusable="False" role="img" aria-label="previous" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
                 </svg>
@@ -66,6 +66,6 @@
             </button>
         {% endif %}
         
-        <input class="btn btn-success btn-icon-end" type="submit" value="{% if wizard.steps.next %}Selanjutnya{% else %}Sinkronisasi{% endif %}"/>
+        <input class="btn btn-success btn-icon-end loading-trigger" type="submit" value="{% if wizard.steps.next %}Selanjutnya{% else %}Sinkronisasi{% endif %}"/>
     </div>
 </form>
