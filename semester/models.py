@@ -16,7 +16,7 @@ class TahunAjaranManager(models.Manager):
     def get_or_create_tahun_ajaran(self, tahun_ajaran: str):
         extracted_tahun_ajaran = extract_tahun_ajaran(tahun_ajaran)
         filter_obj = self.get_or_create(**extracted_tahun_ajaran)
-        return filter_obj
+        return filter_obj[0]
 
 
 class TahunAjaran(models.Model):

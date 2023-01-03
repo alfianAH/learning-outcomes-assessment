@@ -64,6 +64,7 @@ def get_semester_prodi(prodi_id: int):
 
         semester_prodi = {
             'id_neosia': semester_prodi_data['id'],
+            'id_semester': id_semester,
             'tahun_ajaran': detail_semester['tahun_ajaran'],
             'tipe_semester': detail_semester['tipe_semester'],
             'nama': 'Semester {} {}'.format(
@@ -86,12 +87,12 @@ def get_semester_prodi_choices(prodi_id: int):
     """
 
     # Request semester by kurikulum
-    list_semester = get_semester_prodi(prodi_id)
+    list_semester_prodi = get_semester_prodi(prodi_id)
     semester_choices = []
 
     # Get all detail semester by semester ID
-    for semester_data in list_semester:
-        semester_id = semester_data['id_neosia']
+    for semester_prodi_data in list_semester_prodi:
+        semester_id = semester_prodi_data['id_neosia']
         # Search in database
         object_in_db = SemesterProdi.objects.filter(
             tahun_ajaran_prodi__prodi__id_neosia=prodi_id, 
@@ -100,7 +101,7 @@ def get_semester_prodi_choices(prodi_id: int):
         if object_in_db.exists(): continue
 
         # Convert it to input value, options
-        semester_choice = semester_data['id_neosia'], semester_data
+        semester_choice = semester_prodi_data['id_neosia'], semester_prodi_data
         semester_choices.append(semester_choice)
     
     semester_choices.sort(reverse=True)

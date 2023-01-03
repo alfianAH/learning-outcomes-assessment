@@ -14,9 +14,16 @@ from .forms import(
     SemesterProdiCreateForm,
     SemesterProdiBulkUpdateForm,
 )
+from accounts.models import ProgramStudi
 from .models import(
+    TahunAjaran,
+    TahunAjaranProdi,
+    TipeSemester,
     Semester, 
     SemesterProdi,
+)
+from .utils import(
+    get_semester_prodi
 )
 
 
@@ -100,18 +107,48 @@ class SemesterCreateView(FormView):
         return kwargs
 
     def form_valid(self, form) -> HttpResponse:
-        print(form.cleaned_data)
-        # Get detail semester prodi from Neosia
-
-        # Get or create tahun ajaran
-
         # Get prodi object
+        prodi_obj: ProgramStudi = self.request.user.prodi
 
-        # Get or create tahun ajaran prodi
+        list_semester_prodi_id = form.cleaned_data.get('semester_from_neosia')
+        list_semester_prodi = get_semester_prodi(prodi_obj.id_neosia)
+        
+        # Get detail semester prodi from Neosia
+        for semester_prodi in list_semester_prodi:
+            if str(semester_prodi['id_neosia']) not in list_semester_prodi_id: continue
 
-        # Get or create semester
+            # Get or create tahun ajaran
+            tahun_ajaran_obj = TahunAjaran.objects.get_or_create_tahun_ajaran(semester_prodi['tahun_ajaran'])
 
-        # Create semester prodi
+            # Get or create tahun ajaran prodi
+            tahun_ajaran_prodi_obj = TahunAjaranProdi.objects.get_or_create(
+                tahun_ajaran=tahun_ajaran_obj,
+                prodi=prodi_obj
+            )
+
+            # Get tipe semester
+            match(semester_prodi['tipe_semester']): 
+                case 'ganjil':
+                    tipe_semester = TipeSemester.GANJIL
+                case 'genap':
+                    tipe_semester = TipeSemester.GENAP
+
+            # Get or create semester
+            semester_obj = Semester.objects.get_or_create(
+                id_neosia=semester_prodi['id_semester'],
+                tahun_ajaran=tahun_ajaran_obj,
+                nama=semester_prodi['nama'],
+                tipe_semester=tipe_semester
+            )
+
+            # Create semester prodi
+            SemesterProdi.objects.create(
+                id_neosia=semester_prodi['id_neosia'],
+                tahun_ajaran_prodi=tahun_ajaran_prodi_obj[0],
+                semester=semester_obj[0]
+            )
+
+        messages.success(self.request, 'Berhasil menambahkan semester')
 
         return super().form_valid(form)
 
