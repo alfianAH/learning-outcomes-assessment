@@ -12,7 +12,7 @@
 {% block content %}
 <div class="h-icon">
     <h1>{{ object.semester.nama }}</h1>
-    <a href="{{ osject.get_create_mk_semester_url }}" class="btn btn-primary">
+    <a href="{{ object.get_create_mk_semester_url }}" class="btn btn-success">
         <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
             <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
         </svg>
@@ -27,7 +27,7 @@
     </a>
 </div>
 
-<div hx-get="{{ object.hx_read_all_mk_semester_url }}" hx-trigger="revealed">
+<div hx-get="{{ object.hx_read_all_mk_semester_url }}" hx-trigger="revealed" hx-target="this">
 </div>
 
 {% endblock content %}

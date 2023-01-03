@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
@@ -11,6 +12,9 @@ from .filters import (
 )
 from .forms import (
     MataKuliahSemesterCreateForm,
+)
+from mata_kuliah_kurikulum.models import(
+    MataKuliahKurikulum
 )
 from .models import (
     MataKuliahSemester,
@@ -38,7 +42,7 @@ class MataKuliahSemesterReadAllHxView(ListViewModelA):
     input_name: str = 'id_mk_semester'
     list_id: str = 'mk-semester-list-content'
     list_custom_field_template: str = 'mata-kuliah-semester/partials/list-custom-field-mk-semester.html'
-    table_custom_field_header_template: str = 'mata-kuliah-semester/partals/table-custom-field-header-mk-semester.html'
+    table_custom_field_header_template: str = 'mata-kuliah-semester/partials/table-custom-field-header-mk-semester.html'
     table_custom_field_template: str = 'mata-kuliah-semester/partials/table-custom-field-mk-semester.html'
     filter_template: str = 'mata-kuliah-semester/partials/mk-semester-filter-form.html'
     sort_template: str = 'mata-kuliah-semester/partials/mk-semester-sort-form.html'
@@ -49,8 +53,8 @@ class MataKuliahSemesterReadAllHxView(ListViewModelA):
         semester_prodi_id = kwargs.get('semester_prodi_id')
         self.semester_obj: SemesterProdi = get_object_or_404(SemesterProdi, id_neosia=semester_prodi_id)
 
-        # self.bulk_delete_url = self.semester_obj.get_mk_semester_bulk_delete_url()
-        self.reset_url = self.semester_obj.read_all_mk_semester_url()
+        self.bulk_delete_url = self.semester_obj.get_bulk_delete_mk_semester_url()
+        self.reset_url = self.semester_obj.read_detail_url()
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         mk_semester_qs = self.get_queryset()
@@ -101,10 +105,9 @@ class MataKuliahSemesterCreateView(FormView):
         semester_prodi_id = kwargs.get('semester_prodi_id')
         self.semester_obj: SemesterProdi = get_object_or_404(SemesterProdi, id_neosia=semester_prodi_id)
 
-        prodi_id: int = request.user.prodi.id_neosia
-        self.mk_semester_choices = get_mk_semester_choices(prodi_id, self.semester_obj.semester.id_neosia)
+        self.mk_semester_choices = get_mk_semester_choices(self.semester_obj.id_neosia)
 
-        self.success_url = self.semester_obj.read_all_mk_semester_url()
+        self.success_url = self.semester_obj.read_detail_url()
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         if len(self.mk_semester_choices) == 0:
@@ -128,7 +131,39 @@ class MataKuliahSemesterCreateView(FormView):
         return form
 
     def form_valid(self, form) -> HttpResponse:
-        #TODO: NOT YET IMPLEMENTED
+        list_mk_kurikulum_id = form.cleaned_data.get('mk_from_neosia')
+
+        for mk_kurikulum_id in list_mk_kurikulum_id:
+            # Convert mk kurikulum to integer
+            try:
+                mk_kurikulum_id = int(mk_kurikulum_id)
+            except ValueError:
+                if settings.DEBUG:
+                    print('Cannot convert MK Kurikulum ID: "{}" to integer'.format(mk_kurikulum_id))
+                messages.error(self.request, 'Tidak bisa mengonversi MK Kurikulum ID: {} ke integer'.format(mk_kurikulum_id))
+                continue
+            
+            # Get MK Kurikulum object
+            try:
+                mk_kurikulum_obj = MataKuliahKurikulum.objects.get(id_neosia=mk_kurikulum_id)
+            except MataKuliahKurikulum.DoesNotExist:
+                if settings.DEBUG:
+                    print('MK Kurikulum object not found. ID: {}'.format(mk_kurikulum_id))
+                messages.error(self.request, 'Tidak dapat menemukan mata kuliah kurikulum dengan ID: {}'.format(mk_kurikulum_id))
+                continue
+            except MataKuliahKurikulum.MultipleObjectsReturned:
+                if settings.DEBUG:
+                    print('MK Kurikulum with ID({}) returns multiple objects.'.format(mk_kurikulum_id))
+                continue
+            
+            # Create MK Semester
+            MataKuliahSemester.objects.create(
+                mk_kurikulum=mk_kurikulum_obj,
+                semester=self.semester_obj
+            )
+        
+        messages.success(self.request, 'Proses menambahkan mata kuliah semester sudah selesai')
+
         return super().form_valid(form)
 
 
@@ -137,4 +172,8 @@ class MataKuliahSemesterUpdateView(FormView):
 
 
 class MataKuliahSemesterReadView(DetailView):
+    pass
+
+
+class MataKuliahSemesterBulkDeleteView(FormView):
     pass

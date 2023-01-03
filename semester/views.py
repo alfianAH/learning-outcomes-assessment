@@ -118,10 +118,10 @@ class SemesterCreateView(FormView):
             if str(semester_prodi['id_neosia']) not in list_semester_prodi_id: continue
 
             # Get or create tahun ajaran
-            tahun_ajaran_obj = TahunAjaran.objects.get_or_create_tahun_ajaran(semester_prodi['tahun_ajaran'])
+            tahun_ajaran_obj, _ = TahunAjaran.objects.get_or_create_tahun_ajaran(semester_prodi['tahun_ajaran'])
 
             # Get or create tahun ajaran prodi
-            tahun_ajaran_prodi_obj = TahunAjaranProdi.objects.get_or_create(
+            tahun_ajaran_prodi_obj, _ = TahunAjaranProdi.objects.get_or_create(
                 tahun_ajaran=tahun_ajaran_obj,
                 prodi=prodi_obj
             )
@@ -134,7 +134,7 @@ class SemesterCreateView(FormView):
                     tipe_semester = TipeSemester.GENAP
 
             # Get or create semester
-            semester_obj = Semester.objects.get_or_create(
+            semester_obj, _ = Semester.objects.get_or_create(
                 id_neosia=semester_prodi['id_semester'],
                 tahun_ajaran=tahun_ajaran_obj,
                 nama=semester_prodi['nama'],
@@ -144,8 +144,8 @@ class SemesterCreateView(FormView):
             # Create semester prodi
             SemesterProdi.objects.create(
                 id_neosia=semester_prodi['id_neosia'],
-                tahun_ajaran_prodi=tahun_ajaran_prodi_obj[0],
-                semester=semester_obj[0]
+                tahun_ajaran_prodi=tahun_ajaran_prodi_obj,
+                semester=semester_obj
             )
 
         messages.success(self.request, 'Berhasil menambahkan semester')

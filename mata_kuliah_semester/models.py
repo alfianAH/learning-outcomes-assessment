@@ -26,7 +26,7 @@ class MataKuliahSemester(models.Model):
         )
 
     def read_detail_url(self):
-        return reverse('semester:mata_kuliah_semester.read', kwargs={
+        return reverse('semester:mata_kuliah_semester:read', kwargs={
             'semester_prodi_id': self.semester.pk,
             'mk_semester_id': self.pk
         })

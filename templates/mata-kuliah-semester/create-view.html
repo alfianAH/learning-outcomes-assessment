@@ -6,8 +6,7 @@ Tambah MK Semester -
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{% url 'semester:read-all' %}" role="listitem">Semester</a></li>
-<li class="breadcrumb-item"><a href="{{ semester.obj.read_detail_url }}" role="listitem">Detail</a></li>
-<li class="breadcrumb-item"><a href="{{ semester_obj.read_all_mk_semester_url }}" role="listitem">MK Semester</a></li>
+<li class="breadcrumb-item"><a href="{{ semester_obj.read_detail_url }}" role="listitem">Detail</a></li>
 <li class="breadcrumb-item active" aria-current="page" role="listitem">Tambah MK Semester</li>
 {% endblock breadcrumb %}
 

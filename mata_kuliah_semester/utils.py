@@ -32,24 +32,24 @@ def get_mk_semester(semester_prodi_id: int):
     return list_mata_kuliah_semester
 
 
-def get_mk_semester_choices(semester_id: int):
+def get_mk_semester_choices(semester_prodi_id: int):
     """Get mata kuliah semester choices for choice field
     Returns only mata kuliah kurikulum because all classess in mata kuliah
     semester will be synchronized
 
     Args:
-        semester_id (int): Semester ID
+        semester_prodi_id (int): Semester Prodi ID
 
     Returns:
         list: List mata kuliah semester
     """
-    list_mk_semester = get_mk_semester(semester_id)
+    list_mk_semester = get_mk_semester(semester_prodi_id)
     list_id_mk_kurikulum = []
     mk_semester_choices = []
 
     for mk_semester_per_kelas in list_mk_semester:
         id_mk_kurikulum = mk_semester_per_kelas['id_mata_kuliah']
-        id_kelas_mk_semester = mk_semester_per_kelas['id_neosia']
+        id_kelas_mk_semester = mk_semester_per_kelas['id']
 
         if settings.DEBUG: 
             print('Semester: {}'.format(mk_semester_per_kelas['nama']))
