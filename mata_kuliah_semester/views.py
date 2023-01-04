@@ -87,8 +87,6 @@ class MataKuliahSemesterReadAllHxView(ListViewModelA):
         context = super().get_context_data(**kwargs)
         context.update({
             'semester_obj': self.semester_obj,
-            'mk_semester_create_url': self.semester_obj.get_create_mk_semester_url(),
-            'mk_semester_update_url': self.semester_obj.get_update_mk_semester_url(),
         })
         return context
 

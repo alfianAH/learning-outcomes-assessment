@@ -9,6 +9,7 @@ from accounts.models import ProgramStudi
 from .models import MataKuliahKurikulum
 from kurikulum.models import Kurikulum
 from learning_outcomes_assessment.list_view.views import ListViewModelA
+from learning_outcomes_assessment.forms.edit import ModelBulkDeleteView
 from mata_kuliah_kurikulum.forms import (
     MataKuliahKurikulumCreateForm,
     MataKuliahKurikulumBulkUpdateForm
@@ -219,16 +220,17 @@ class MataKuliahKurikulumBulkUpdateView(FormView):
         return super().form_valid(form)
 
 
-class MataKuliahKurikulumBulkDeleteView(View):
-    def post(self, request: HttpRequest, *args, **kwargs):
+class MataKuliahKurikulumBulkDeleteView(ModelBulkDeleteView):
+    model = MataKuliahKurikulum
+    success_msg = 'Berhasil menghapus mata kuliah kurikulum'
+    id_list_obj = 'id_mk_kurikulum'
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
         kurikulum_id = kwargs.get('kurikulum_id')
         kurikulum_obj: Kurikulum = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
+        self.success_url = kurikulum_obj.read_all_mk_kurikulum_url()
 
-        list_mk_kurikulum = request.POST.getlist('id_mk_kurikulum')
-        list_mk_kurikulum = [*set(list_mk_kurikulum)]
-
-        if len(list_mk_kurikulum) > 0:
-            MataKuliahKurikulum.objects.filter(id_neosia__in=list_mk_kurikulum).delete()
-            messages.success(request, 'Berhasil menghapus mata kuliah kurikulum')
-            
-        return redirect(kurikulum_obj.read_all_mk_kurikulum_url())
+    def get_queryset(self):
+        self.queryset = self.model.objects.filter(id_neosia__in=self.get_list_selected_obj())
+        return super().get_queryset()

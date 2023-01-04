@@ -6,7 +6,7 @@ from django.views.generic.base import View
 from django.views.generic.edit import DeleteView, FormView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-
+from learning_outcomes_assessment.forms.edit import ModelBulkDeleteView
 from learning_outcomes_assessment.forms.views import (
     HtmxCreateInlineFormsetView, 
     HtmxUpdateInlineFormsetView,
@@ -154,19 +154,20 @@ class PerformanceIndicatorAreaReadView(DetailView):
     template_name = 'pi-area/pi-area-detail-view.html'
 
 
-class PerformanceIndicatorAreaBulkDeleteView(View):
-    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+class PerformanceIndicatorAreaBulkDeleteView(ModelBulkDeleteView):
+    model = PerformanceIndicatorArea
+    success_msg = 'Berhasil menghapus PI Area'
+    id_list_obj = 'id_pi_area'
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
         kurikulum_id = kwargs.get('kurikulum_id')
         kurikulum_obj: Kurikulum = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
+        self.success_url = kurikulum_obj.read_all_pi_area_url()
 
-        list_pi_area = request.POST.getlist('id_pi_area')
-        list_pi_area = [*set(list_pi_area)]
-
-        if len(list_pi_area) > 0:
-            PerformanceIndicatorArea.objects.filter(id__in=list_pi_area).delete()
-            messages.success(self.request, 'Berhasil menghapus PI Area')
-        
-        return redirect(kurikulum_obj.read_all_pi_area_url())
+    def get_queryset(self):
+        self.queryset = self.model.objects.filter(id__in=self.get_list_selected_obj())
+        return super().get_queryset()
 
 
 # PI Area and Performance Indicator

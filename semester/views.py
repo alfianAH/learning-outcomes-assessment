@@ -5,6 +5,7 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
+from learning_outcomes_assessment.forms.edit import ModelBulkDeleteView
 from learning_outcomes_assessment.list_view.views import ListViewModelA
 from .filters import(
     SemesterProdiFilter,
@@ -221,15 +222,12 @@ class SemesterReadView(DetailView):
     template_name: str = 'semester/detail-view.html'
 
 
-class SemesterBulkDeleteView(FormView):
+class SemesterBulkDeleteView(ModelBulkDeleteView):
     success_url = reverse_lazy('semester:read-all')
+    model = SemesterProdi
+    id_list_obj: str = 'id_semester'
+    success_msg = 'Berhasil menghapus semester'
 
-    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        list_semester_prodi = request.POST.getlist('id_semester')
-        list_semester_prodi = [*set(list_semester_prodi)]
-
-        if len(list_semester_prodi) > 0:
-            SemesterProdi.objects.filter(id__in=list_semester_prodi).delete()
-            messages.success(self.request, 'Berhasil menghapus semester')
-        
-        return redirect(self.get_success_url())
+    def get_queryset(self):
+        self.queryset = self.model.objects.filter(id_neosia__in=self.get_list_selected_obj())
+        return super().get_queryset()

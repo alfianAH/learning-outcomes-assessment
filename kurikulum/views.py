@@ -9,7 +9,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from learning_outcomes_assessment.wizard.views import MySessionWizardView
 from learning_outcomes_assessment.list_view.views import ListViewModelA
-
+from learning_outcomes_assessment.forms.edit import ModelBulkDeleteView
 from accounts.models import ProgramStudi
 from .models import Kurikulum
 from .filters import (
@@ -278,15 +278,12 @@ class KurikulumReadView(DetailView):
     template_name: str = 'kurikulum/detail-view.html'
 
 
-class KurikulumBulkDeleteView(FormView):
+class KurikulumBulkDeleteView(ModelBulkDeleteView):
     success_url = reverse_lazy('kurikulum:read-all')
+    model = Kurikulum
+    id_list_obj = 'id_kurikulum'
+    success_msg = 'Berhasil menghapus kurikulum'
 
-    def post(self, request: HttpRequest, *args, **kwargs):
-        list_kurikulum = request.POST.getlist('id_kurikulum')
-        list_kurikulum = [*set(list_kurikulum)]
-
-        if len(list_kurikulum) > 0:
-            Kurikulum.objects.filter(id_neosia__in=list_kurikulum).delete()
-            messages.success(request, 'Berhasil menghapus kurikulum')
-        
-        return redirect(self.get_success_url())
+    def get_queryset(self):
+        self.queryset = self.model.objects.filter(id_neosia__in=self.get_list_selected_obj())
+        return super().get_queryset()

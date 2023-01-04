@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.views.generic.base import View
 from django.views.generic.detail import DetailView
 from django.shortcuts import get_object_or_404, redirect
+from learning_outcomes_assessment.forms.edit import ModelBulkDeleteView
 from learning_outcomes_assessment.forms.views import (
     HtmxCreateFormView,
     HtmxUpdateFormView,
@@ -163,16 +164,17 @@ class IloUpdateView(HtmxUpdateFormView):
         return kwargs
 
 
-class IloBulkDeleteView(View):
-    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+class IloBulkDeleteView(ModelBulkDeleteView):
+    model = Ilo
+    id_list_obj: str = 'id_ilo'
+    success_msg = 'Berhasil menghapus ILO'
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
         kurikulum_id = kwargs.get('kurikulum_id')
         kurikulum_obj: Kurikulum = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
+        self.success_url = kurikulum_obj.read_all_ilo_url()
 
-        list_ilo = request.POST.getlist('id_ilo')
-        list_ilo = [*set(list_ilo)]
-
-        if len(list_ilo) > 0:
-            Ilo.objects.filter(id__in=list_ilo).delete()
-            messages.success(self.request, 'Berhasil menghapus ILO')
-        
-        return redirect(kurikulum_obj.read_all_ilo_url())
+    def get_queryset(self):
+        self.queryset = self.model.objects.filter(id__in=self.get_list_selected_obj())
+        return super().get_queryset()
