@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic.edit import FormView
 from django.views.generic.detail import DetailView
+from learning_outcomes_assessment.forms.edit import ModelBulkDeleteView
 from learning_outcomes_assessment.list_view.views import ListViewModelA
 from semester.models import SemesterProdi
 from .filters import (
@@ -173,5 +174,17 @@ class MataKuliahSemesterReadView(DetailView):
     pass
 
 
-class MataKuliahSemesterBulkDeleteView(FormView):
-    pass
+class MataKuliahSemesterBulkDeleteView(ModelBulkDeleteView):
+    model = MataKuliahSemester
+    id_list_obj = 'id_mk_semester'
+    success_msg = 'Berhasil mmenghapus mata kuliah semester'
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        semester_prodi_id = kwargs.get('semester_prodi_id')
+        semester_prodi_obj = get_object_or_404(SemesterProdi, id_neosia=semester_prodi_id)
+        self.success_url = semester_prodi_obj.read_detail_url()
+
+    def get_queryset(self):
+        self.queryset = self.model.objects.filter(id__in=self.get_list_selected_obj())
+        return super().get_queryset()
