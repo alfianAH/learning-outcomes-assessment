@@ -63,8 +63,8 @@ class SemesterProdi(models.Model):
         })
 
     # Mata kuliah semester
-    def hx_read_all_mk_semester_url(self):
-        return reverse('semester:mata_kuliah_semester:hx-read-all', kwargs={
+    def read_all_mk_semester_url(self):
+        return reverse('semester:mata_kuliah_semester:read-all', kwargs={
             'semester_prodi_id': self.id_neosia
         })
 

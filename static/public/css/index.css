@@ -3473,6 +3473,10 @@ details.dropdown::marker {
   width: 20rem;
 }
 
+.w-28 {
+  width: 7rem;
+}
+
 .w-5 {
   width: 1.25rem;
 }
@@ -3513,6 +3517,10 @@ details.dropdown::marker {
 
 .max-w-sm {
   max-width: 24rem;
+}
+
+.max-w-\[7rem\] {
+  max-width: 7rem;
 }
 
 .-translate-x-1\/2 {
@@ -4519,10 +4527,6 @@ details.dropdown::marker {
     display: inline-block;
   }
 
-  .lg\:table-cell {
-    display: table-cell;
-  }
-
   .lg\:hidden {
     display: none;
   }
@@ -4537,6 +4541,10 @@ details.dropdown::marker {
 
   .lg\:w-\[90\%\] {
     width: 90%;
+  }
+
+  .lg\:max-w-xs {
+    max-width: 20rem;
   }
 
   .lg\:translate-x-0 {
@@ -4605,6 +4613,10 @@ details.dropdown::marker {
 @media (min-width: 1280px) {
   .xl\:mr-3 {
     margin-right: 0.75rem;
+  }
+
+  .xl\:table-cell {
+    display: table-cell;
   }
 
   .xl\:h-6 {

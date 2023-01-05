@@ -6,13 +6,17 @@
     <td class="text-left">{{ option.label.sks }}</td>
 {% else %}
     <td class="text-left">{{ option.mk_kurikulum.kode }}</td>
-    <td scope="col" class="text-left field-nama {% if open_button and option.read_detail_url %} flex max-w-sm flex-row items-center relative {% endif %}">
+    <td scope="col" class="text-left field-nama {% if open_button and option.read_detail_url %} flex max-w-sm lg:max-w-xs flex-row items-center relative {% endif %}">
         <span class="one-line" title="{{ option.mk_kurikulum.nama }}">{{ option.mk_kurikulum.nama }}</span>
         {% if open_button and option.read_detail_url %}
             {% include 'components/button/open-list-item-button.html' %}
         {% endif %}
     </td>
     <td class="text-left">{{ option.mk_kurikulum.sks }}</td>
-    <td class="text-left hidden lg:table-cell"></td>
-    <td class="text-left hidden lg:table-cell"></td>
+    <td class="text-left hidden xl:table-cell !align-middle">
+        <div class="w-5 h-5 rounded-full badge-success" title="Sudah lengkap"></div>
+    </td>
+    <td class="text-left hidden xl:table-cell !align-middle">
+        <div class="w-5 h-5 rounded-full badge-success" title="Sudah lengkap"></div>
+    </td>
 {% endif %}

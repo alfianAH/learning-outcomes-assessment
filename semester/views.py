@@ -6,7 +6,12 @@ from django.urls import reverse_lazy
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from learning_outcomes_assessment.forms.edit import ModelBulkDeleteView
-from learning_outcomes_assessment.list_view.views import ListViewModelA
+from learning_outcomes_assessment.list_view.views import (
+    ListViewModelA,
+    DetailWithListViewModelA,
+)
+from mata_kuliah_semester.filters import MataKuliahSemesterFilter, MataKuliahSemesterSort
+from mata_kuliah_semester.models import MataKuliahSemester
 from .filters import(
     SemesterProdiFilter,
     SemesterProdiSort
@@ -216,10 +221,64 @@ class SemesterBulkUpdateView(FormView):
         return super().form_valid(form)
 
 
-class SemesterReadView(DetailView):
-    model = SemesterProdi
-    pk_url_kwarg: str = 'semester_prodi_id'
+class SemesterReadView(DetailWithListViewModelA):
+    single_model = SemesterProdi
+    single_pk_url_kwarg = 'semester_prodi_id'
+    single_object: SemesterProdi = None
+    
+    model = MataKuliahSemester
+    paginate_by: int = 10
     template_name: str = 'semester/detail-view.html'
+    ordering: str = 'mk_kurikulum__nama'
+    sort_form_ordering_by_key: str = 'ordering_by'
+
+    filter_form: MataKuliahSemesterFilter = None
+    sort_form: MataKuliahSemesterSort = None
+
+    bulk_delete_url: str = ''
+    reset_url: str = ''
+    list_prefix_id: str = 'mk-semester-'
+    input_name: str = 'id_mk_semester'
+    list_id: str = 'mk-semester-list-content'
+    list_item_name: str = 'mata-kuliah-semester/partials/list-item-name-mk-semester.html'
+    list_custom_field_template: str = 'mata-kuliah-semester/partials/list-custom-field-mk-semester.html'
+    table_custom_field_header_template: str = 'mata-kuliah-semester/partials/table-custom-field-header-mk-semester.html'
+    table_custom_field_template: str = 'mata-kuliah-semester/partials/table-custom-field-mk-semester.html'
+    filter_template: str = 'mata-kuliah-semester/partials/mk-semester-filter-form.html'
+    sort_template: str = 'mata-kuliah-semester/partials/mk-semester-sort-form.html'
+
+    def setup(self, request: HttpRequest, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        self.bulk_delete_url = self.single_object.get_bulk_delete_mk_semester_url()
+        self.reset_url = self.single_object.read_detail_url()
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        mk_semester_qs = self.get_queryset()
+
+        if mk_semester_qs.exists():
+            filter_data = {
+                'nama': request.GET.get('nama', ''),
+                'sks': request.GET.get('sks', ''),
+            }
+
+            sort_data = {
+                self.sort_form_ordering_by_key: request.GET.get(self.sort_form_ordering_by_key, self.ordering)
+            }
+
+            self.filter_form = MataKuliahSemesterFilter(
+                data=filter_data or None,
+                queryset=mk_semester_qs
+            )
+            self.sort_form = MataKuliahSemesterSort(data=sort_data)
+
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        self.queryset = self.model.objects.filter(
+            semester=self.single_object.pk
+        )
+        return super().get_queryset()
 
 
 class SemesterBulkDeleteView(ModelBulkDeleteView):
