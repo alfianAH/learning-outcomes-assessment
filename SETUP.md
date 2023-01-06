@@ -54,8 +54,9 @@
     ALTER ROLE <POSTGRES_USER> SET client_encoding TO 'utf8';
     ALTER ROLE <POSTGRES_USER> SET default_transaction_isolation TO 'read committed';
     ALTER ROLE <POSTGRES_USER> SET timezone TO 'UTC';
+    ALTER USER <POSTGRES_USER> CREATEDB;
     ```
 
 1. Grant permission to the user
 
-    `GRANT ALL PRIVILEGES ON DATABASE learning_outcomes_assessment TO admin_loa;`
+    `GRANT ALL PRIVILEGES ON DATABASE learning_outcomes_assessment TO <POSTGRES_USER>;`

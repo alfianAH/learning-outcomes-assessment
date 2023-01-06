@@ -41,6 +41,25 @@ class MyBackend(BaseBackend):
                 }
 
                 user_profile = get_user_profile(user, role)
+                
+                # Return None if user profile is None
+                if user_profile is None:
+                    if settings.DEBUG: print("Failed to get user profile: {}".format(user['username']))
+                    return None
+
+                # Get Fakultas and Program Studi from user profile
+                fakultas = self.get_or_create_fakultas(
+                    user_profile['id_fakultas'], 
+                    user_profile['nama_resmi']
+                )
+                prodi = self.get_or_create_prodi(
+                    user_profile['id_prodi'], 
+                    user_profile['nama_prodi'], 
+                    fakultas
+                )
+                
+                if fakultas is None or prodi is None: 
+                    return None
             case RoleChoices.MAHASISWA:
                 user_data = validate_mahasiswa(user, password)
 

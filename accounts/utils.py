@@ -15,7 +15,7 @@ MBERKAS_OAUTH_BEARER = 'https://mberkas.unhas.ac.id/api/checkStatus'
 MHS_AUTH_URL = 'https://customapi.neosia.unhas.ac.id/checkMahasiswa2'
 
 MHS_PROFILE_URL = 'https://customapi.neosia.unhas.ac.id/GetProfilMhs'
-DOSEN_PROFILE_URL = 'http://apps.unhas.ac.id/nusoap/serviceApps.php'
+DOSEN_PROFILE_URL = 'https://customapi.neosia.unhas.ac.id/getDetilDosen'
 
 
 def get_user_profile(user: dict, role: str):
@@ -31,16 +31,29 @@ def get_user_profile(user: dict, role: str):
 
     # Request authenticated user's profile
     match(role):
-        # case RoleChoices.DOSEN:
-        #     response = request_data_to_neosia(DOSEN_PROFILE_URL, parameters, headers)
+        case RoleChoices.DOSEN:
+            parameters = {
+                'nip': user
+            }
+            response = request_data_to_neosia(DOSEN_PROFILE_URL, parameters)
+            if response is None: return None
+
+            if response.status_code == 200:
+                json_response = response.json()
+
+                # Return None if the request has no data
+                if len(json_response) == 0: return None
+                
+                user_profile = json_response[0]
+                return user_profile
+            else:
+                if settings.DEBUG: print(response.reason)
+                return None
         case RoleChoices.MAHASISWA:
             parameters = {
                 'nim': user
             }
-            headers = {
-                'token': os.environ.get('NEOSIA_API_TOKEN')
-            }
-            response = request_data_to_neosia(MHS_PROFILE_URL, parameters, headers)
+            response = request_data_to_neosia(MHS_PROFILE_URL, parameters)
     
             if response is None: return None
 
@@ -56,7 +69,7 @@ def get_user_profile(user: dict, role: str):
                 if settings.DEBUG: print(response.reason)
                 return None
 
-def request_data_to_neosia(auth_url: str, parameters: dict, headers: dict):
+def request_data_to_neosia(auth_url: str, parameters: dict, headers: dict = {}):
     """Request data to Neosia API
 
     Args:
@@ -67,7 +80,9 @@ def request_data_to_neosia(auth_url: str, parameters: dict, headers: dict):
     Returns:
         Response: Response from Neosia API
     """
-
+    headers.update({
+        'token': os.environ.get('NEOSIA_API_TOKEN')
+    })
     try:
         response = requests.post(auth_url, params=parameters, headers=headers)
     except MissingSchema:
