@@ -10,15 +10,15 @@ PESERTA_MATA_KULIAH_URL = 'https://customapi.neosia.unhas.ac.id/getMahasiswaByKe
 DOSEN_MATA_KULIAH_URL = 'https://customapi.neosia.unhas.ac.id/getDosenByKelas'
 
 
-def get_mk_semester(semester_prodi_id: int):
-    list_mata_kuliah_semester = []
+def get_kelas_mk_semester(semester_prodi_id: int):
+    list_kelas_mk_semester = []
 
     # Get MK semester
     parameters = {
         'id_prodi_semester': semester_prodi_id
     }
     json_response = request_data_to_neosia(MATA_KULIAH_SEMESTER_URL, parameters)
-    if json_response is None: return list_mata_kuliah_semester
+    if json_response is None: return list_kelas_mk_semester
 
     for mk_semester_per_kelas in json_response:
         mata_kuliah = {
@@ -27,12 +27,12 @@ def get_mk_semester(semester_prodi_id: int):
             'nama': mk_semester_per_kelas['nama']
         }
 
-        list_mata_kuliah_semester.append(mata_kuliah)
+        list_kelas_mk_semester.append(mata_kuliah)
 
-    return list_mata_kuliah_semester
+    return list_kelas_mk_semester
 
 
-def get_mk_semester_choices(semester_prodi_id: int):
+def get_kelas_mk_semester_choices(semester_prodi_id: int):
     """Get mata kuliah semester choices for choice field
     Returns only mata kuliah kurikulum because all classess in mata kuliah
     semester will be synchronized
@@ -43,41 +43,32 @@ def get_mk_semester_choices(semester_prodi_id: int):
     Returns:
         list: List mata kuliah semester
     """
-    list_mk_semester = get_mk_semester(semester_prodi_id)
-    list_id_mk_kurikulum = []
-    mk_semester_choices = []
+    list_kelas_mk_semester = get_kelas_mk_semester(semester_prodi_id)
+    kelas_mk_semester_choices = []
 
-    for mk_semester_per_kelas in list_mk_semester:
+    for mk_semester_per_kelas in list_kelas_mk_semester:
         id_mk_kurikulum = mk_semester_per_kelas['id_mata_kuliah']
         id_kelas_mk_semester = mk_semester_per_kelas['id']
 
-        if settings.DEBUG: 
-            print('Semester: {}'.format(mk_semester_per_kelas['nama']))
         kelas_mk_semester_qs = KelasMataKuliahSemester.objects.filter(id_neosia=id_kelas_mk_semester)
 
         # If kelas MK semester is already in database, skip 
         if kelas_mk_semester_qs.exists(): continue
-
-        if id_mk_kurikulum in list_id_mk_kurikulum: continue
 
         # Check whether mata kuliah kurikulum exist in database
         try:
             mk_kurikulum_obj = MataKuliahKurikulum.objects.get(id_neosia=id_mk_kurikulum)
         except MataKuliahKurikulum.DoesNotExist or MataKuliahKurikulum.MultipleObjectsReturned:
             continue
-        
-        if settings.DEBUG:
-            print('Kurikulum: {} - {}'.format(mk_kurikulum_obj.nama, mk_kurikulum_obj.kode))
 
-        mata_kuliah = {
-            'id_neosia': mk_kurikulum_obj.id_neosia,
+        kelas_mk_semester = {
+            'id_neosia': id_kelas_mk_semester,
             'kode': mk_kurikulum_obj.kode,
-            'nama': mk_kurikulum_obj.nama,
+            'nama': mk_semester_per_kelas['nama'],
             'sks': mk_kurikulum_obj.sks,
         }
-        list_id_mk_kurikulum.append(id_mk_kurikulum)
 
-        mk_semester_choice = mata_kuliah['id_neosia'], mata_kuliah
-        mk_semester_choices.append(mk_semester_choice)
+        kelas_mk_semester_choice = kelas_mk_semester['id_neosia'], kelas_mk_semester
+        kelas_mk_semester_choices.append(kelas_mk_semester_choice)
 
-    return mk_semester_choices
+    return kelas_mk_semester_choices

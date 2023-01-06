@@ -3473,10 +3473,6 @@ details.dropdown::marker {
   width: 20rem;
 }
 
-.w-28 {
-  width: 7rem;
-}
-
 .w-5 {
   width: 1.25rem;
 }
@@ -3519,8 +3515,8 @@ details.dropdown::marker {
   max-width: 24rem;
 }
 
-.max-w-\[7rem\] {
-  max-width: 7rem;
+.max-w-md {
+  max-width: 28rem;
 }
 
 .-translate-x-1\/2 {

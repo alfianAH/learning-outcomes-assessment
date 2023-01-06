@@ -6,7 +6,7 @@ from .utils import (
     get_update_semester_prodi_choices,
 )
 from mata_kuliah_semester.utils import(
-    get_mk_semester,
+    get_kelas_mk_semester,
 )
 from mata_kuliah_semester.models import MataKuliahSemester
 from learning_outcomes_assessment.widgets import (
@@ -37,9 +37,9 @@ class SemesterProdiCreateForm(forms.Form):
         semester_prodi_choices = get_semester_prodi_choices(prodi_id)
 
         for semester_prodi_id, _ in semester_prodi_choices:
-            mk_semester = get_mk_semester(semester_prodi_id)
+            kelas_mk_semester = get_kelas_mk_semester(semester_prodi_id)
 
-            if len(mk_semester) == 0: 
+            if len(kelas_mk_semester) == 0: 
                 # Set input with semester that has no MK Semester to false
                 self.fields.get('semester_from_neosia').widget.condition_dict.update({
                     semester_prodi_id: False

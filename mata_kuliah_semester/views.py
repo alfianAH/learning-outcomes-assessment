@@ -15,9 +15,11 @@ from mata_kuliah_kurikulum.models import(
 )
 from .models import (
     MataKuliahSemester,
+    KelasMataKuliahSemester,
 )
 from .utils import(
-    get_mk_semester_choices
+    get_kelas_mk_semester,
+    get_kelas_mk_semester_choices
 )
 
 
@@ -34,7 +36,7 @@ class MataKuliahSemesterCreateView(FormView):
         semester_prodi_id = kwargs.get('semester_prodi_id')
         self.semester_obj: SemesterProdi = get_object_or_404(SemesterProdi, id_neosia=semester_prodi_id)
 
-        self.mk_semester_choices = get_mk_semester_choices(self.semester_obj.id_neosia)
+        self.mk_semester_choices = get_kelas_mk_semester_choices(self.semester_obj.id_neosia)
 
         self.success_url = self.semester_obj.read_detail_url()
 
@@ -60,19 +62,14 @@ class MataKuliahSemesterCreateView(FormView):
         return form
 
     def form_valid(self, form) -> HttpResponse:
-        list_mk_kurikulum_id = form.cleaned_data.get('mk_from_neosia')
+        list_kelas_mk_semester_id = form.cleaned_data.get('mk_from_neosia')
+        list_kelas_mk_semester = get_kelas_mk_semester(self.semester_obj.id_neosia)
 
-        for mk_kurikulum_id in list_mk_kurikulum_id:
-            # Convert mk kurikulum to integer
-            try:
-                mk_kurikulum_id = int(mk_kurikulum_id)
-            except ValueError:
-                if settings.DEBUG:
-                    print('Cannot convert MK Kurikulum ID: "{}" to integer'.format(mk_kurikulum_id))
-                messages.error(self.request, 'Tidak bisa mengonversi MK Kurikulum ID: {} ke integer'.format(mk_kurikulum_id))
-                continue
-            
+        for kelas_mk_semester in list_kelas_mk_semester:
+            if str(kelas_mk_semester['id']) not in list_kelas_mk_semester_id: continue
+
             # Get MK Kurikulum object
+            mk_kurikulum_id = kelas_mk_semester['id_mata_kuliah']
             try:
                 mk_kurikulum_obj = MataKuliahKurikulum.objects.get(id_neosia=mk_kurikulum_id)
             except MataKuliahKurikulum.DoesNotExist:
@@ -86,9 +83,16 @@ class MataKuliahSemesterCreateView(FormView):
                 continue
             
             # Create MK Semester
-            MataKuliahSemester.objects.create(
+            mk_semester_obj, _ = MataKuliahSemester.objects.get_or_create(
                 mk_kurikulum=mk_kurikulum_obj,
                 semester=self.semester_obj
+            )
+
+            # Create Kelas MK Semester
+            KelasMataKuliahSemester.objects.create(
+                id_neosia=kelas_mk_semester['id'],
+                mk_semester=mk_semester_obj,
+                nama=kelas_mk_semester['nama']
             )
         
         messages.success(self.request, 'Proses menambahkan mata kuliah semester sudah selesai')

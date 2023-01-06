@@ -25,6 +25,9 @@ class MataKuliahSemester(models.Model):
             ),
         )
 
+    def get_kelas_mk_semester(self):
+        return self.kelasmatakuliahsemester_set.all()
+
     def read_detail_url(self):
         return reverse('semester:mata_kuliah_semester:read', kwargs={
             'semester_prodi_id': self.semester.pk,
@@ -37,7 +40,7 @@ class KelasMataKuliahSemester(models.Model):
     mk_semester = models.ForeignKey(MataKuliahSemester, on_delete=models.CASCADE)
 
     nama = models.CharField(max_length=255)
-    kelas = models.CharField(max_length=255)
+    kelas = models.CharField(max_length=255, null=True)
 
 
 class PesertaMataKuliah(models.Model):

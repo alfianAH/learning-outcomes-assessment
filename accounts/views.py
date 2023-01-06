@@ -41,6 +41,7 @@ def oauth_callback(request: HttpRequest):
     code = request.GET['code']
     access_token = get_oauth_access_token(code)
     user = validate_user(access_token)
+    print(user)
     is_admin = user.get('administrator') == 1
     if is_admin:
         user = authenticate(request, user=user, role=RoleChoices.ADMIN_PRODI)
