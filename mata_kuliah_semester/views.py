@@ -105,7 +105,9 @@ class MataKuliahSemesterUpdateView(FormView):
 
 
 class MataKuliahSemesterReadView(DetailView):
-    pass
+    model = MataKuliahSemester
+    pk_url_kwarg = 'mk_semester_id'
+    template_name = 'mata-kuliah-semester/detail-view.html'
 
 
 class MataKuliahSemesterBulkDeleteView(ModelBulkDeleteView):

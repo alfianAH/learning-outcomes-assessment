@@ -50,7 +50,7 @@ class PesertaMataKuliah(models.Model):
 
 class DosenMataKuliah(models.Model):
     kelas_mk_semester = models.ForeignKey(KelasMataKuliahSemester, on_delete=models.CASCADE)
-    mahasiswa = models.ForeignKey(User, on_delete=models.CASCADE)
+    dosen = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
 class NilaiMataKuliahMahasiswa(models.Model):

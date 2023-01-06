@@ -48,7 +48,7 @@ def get_semester_prodi(prodi_id: int):
         list: All semester prodi
     """
 
-    # Request semester by kurikulum
+    # Request semester prodi
     parameters = {
         'prodi_kode': prodi_id
     }
