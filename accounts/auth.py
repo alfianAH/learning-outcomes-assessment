@@ -1,11 +1,15 @@
 from django.conf import settings
 from django.contrib.auth.backends import BaseBackend
+from learning_outcomes_assessment.utils import request_data_to_neosia
 from .models import Fakultas, MyUser, ProgramStudi
 from .enums import RoleChoices
 from .utils import (
     get_user_profile,
     validate_mahasiswa,
 )
+
+
+DETAIL_FAKULTAS_URL = 'https://customapi.neosia.unhas.ac.id/getDetilFakultas'
 
 class MyBackend(BaseBackend):
     def authenticate(self, request, user=None, password: str = None, role: RoleChoices = None):
@@ -20,6 +24,8 @@ class MyBackend(BaseBackend):
         Returns:
             MyUser: User object if succesfully gotten or created else None
         """
+        fakultas = None
+        prodi = None
         match(role):
             case RoleChoices.ADMIN_PRODI:
                 user_data = {
@@ -27,13 +33,25 @@ class MyBackend(BaseBackend):
                     'nama': user['nama'],
                     'id_prodi': user['prodi']['id'],
                     'nama_prodi': user['prodi']['nama_resmi'],
+                    'id_fakultas': user['prodi']['id_fakultas']
                 }
 
-                # Get Program Studi
-                prodi = self.get_or_create_prodi(
-                    user_data['id_prodi'], 
-                    user_data['nama_prodi']
-                )
+                params = {
+                    'id': user_data['id_fakultas']
+                }
+                detail_fakultas = request_data_to_neosia(DETAIL_FAKULTAS_URL, params=params)
+                
+                if detail_fakultas is not None or len(detail_fakultas) > 0:
+                    fakultas = self.get_or_create_fakultas(
+                        user_data['id_fakultas'],
+                        detail_fakultas[0]['nama_resmi']
+                    )
+                    # Get Program Studi
+                    prodi = self.get_or_create_prodi(
+                        user_data['id_prodi'], 
+                        user_data['nama_prodi'],
+                        fakultas
+                    )
             case RoleChoices.DOSEN:
                 user_data = {
                     'username': user['nip'],
@@ -44,22 +62,21 @@ class MyBackend(BaseBackend):
                 
                 # Return None if user profile is None
                 if user_profile is None:
-                    if settings.DEBUG: print("Failed to get user profile: {}".format(user['username']))
-                    return None
-
-                # Get Fakultas and Program Studi from user profile
-                fakultas = self.get_or_create_fakultas(
-                    user_profile['id_fakultas'], 
-                    user_profile['nama_resmi']
-                )
-                prodi = self.get_or_create_prodi(
-                    user_profile['id_prodi'], 
-                    user_profile['nama_prodi'], 
-                    fakultas
-                )
-                
-                if fakultas is None or prodi is None: 
-                    return None
+                    if settings.DEBUG: print("Failed to get user profile: {}".format(user_data['username']))
+                else:
+                    # Get Fakultas and Program Studi from user profile
+                    fakultas = self.get_or_create_fakultas(
+                        user_profile['id_fakultas'], 
+                        user_profile['nama_resmi']
+                    )
+                    prodi = self.get_or_create_prodi(
+                        user_profile['id_prodi'], 
+                        user_profile['nama_prodi'], 
+                        fakultas
+                    )
+                    
+                    if fakultas is None or prodi is None: 
+                        return None
             case RoleChoices.MAHASISWA:
                 user_data = validate_mahasiswa(user, password)
 
