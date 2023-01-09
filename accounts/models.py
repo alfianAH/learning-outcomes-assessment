@@ -1,11 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, UserManager
+from django.urls import reverse
 from .enums import RoleChoices
 
 
 # Create your models here.
 class Fakultas(models.Model):
-    id_neosia = models.IntegerField(unique=True, null=False, primary_key=True)
+    id_neosia = models.BigIntegerField(unique=True, null=False, primary_key=True)
     nama = models.CharField(max_length=100, null=False)
 
     def __str__(self) -> str:
@@ -14,11 +15,43 @@ class Fakultas(models.Model):
 
 class ProgramStudi(models.Model):
     fakultas = models.ForeignKey(Fakultas, on_delete=models.CASCADE, null=True)
-    id_neosia = models.IntegerField(unique=True, null=False, primary_key=True)
+    id_neosia = models.BigIntegerField(unique=True, null=False, primary_key=True)
     nama = models.CharField(max_length=100, null=False)
 
     def __str__(self) -> str:
         return self.nama
+
+    def get_prodi_bulk_update_url(self):
+        return reverse('accounts:prodi-bulk-update', kwargs={
+            'prodi_id': self.id_neosia
+        })
+
+    def get_prodi_create_url(self):
+        return reverse('accounts:prodi-create', kwargs={
+            'prodi_id': self.id_neosia
+        })
+
+    def get_bulk_delete_prodi_jenjang_url(self):
+        return reverse('accounts:prodi-jenjang-bulk-delete', kwargs={
+            'prodi_id': self.id_neosia
+        })
+
+
+class JenjangStudi(models.Model):
+    id_neosia = models.BigIntegerField(unique=True, null=False, primary_key=True)
+    nama = models.CharField(max_length=255)
+    kode = models.CharField(max_length=20)
+
+    def __str__(self) -> str:
+        return self.nama
+
+
+class ProgramStudiJenjang(models.Model):
+    id_neosia = models.BigIntegerField(unique=True, null=False, primary_key=True)
+    program_studi = models.ForeignKey(ProgramStudi, on_delete=models.CASCADE)
+    jenjang_studi = models.ForeignKey(JenjangStudi, on_delete=models.CASCADE)
+    
+    total_sks_lulus = models.PositiveSmallIntegerField(null=True)
 
 
 class UserOAuthManager(UserManager):

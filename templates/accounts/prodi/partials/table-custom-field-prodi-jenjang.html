@@ -1,0 +1,8 @@
+{% if option.wrap_label %}
+    <td class="text-left">{{ option.label.jenjang_studi.nama }}</td>
+    <td class="text-left">{{ option.label.jenjang_studi.kode }}</td>
+{% else %}
+    <td class="text-left">{{ option.jenjang_studi.nama }}</td>
+    <td class="text-left">{{ option.jenjang_studi.kode }}</td>
+    <td class="text-left">{{ option.total_sks_lulus }}</td>
+{% endif %}

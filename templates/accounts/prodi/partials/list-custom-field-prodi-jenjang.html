@@ -1,0 +1,28 @@
+<table class="w-full table-strip">
+    <tbody class="space-y-1">
+        <tr class="flex px-3 py-1 space-x-2.5">
+            {% if option.wrap_label %}
+                <td class="w-full">Jenjang Studi</td>
+                <td>{{ option.label.jenjang_studi.nama }}</td>
+            {% else %}
+                <td class="w-full">Jenjang Studi</td>
+                <td>{{ option.jenjang_studi.nama }}</td>
+            {% endif %}
+        </tr>
+        <tr class="flex px-3 py-1 space-x-2.5">
+            {% if option.wrap_label %}
+                <td class="w-full">Kode</td>
+                <td>{{ option.label.jenjang_studi.kode }}</td>
+            {% else %}
+                <td class="w-full">Kode</td>
+                <td>{{ option.jenjang_studi.kode }}</td>
+            {% endif %}
+        </tr>
+    </tbody>
+    {% if not option.wrap_label %}
+    <tr class="flex px-3 py-1 space-x-2.5">
+        <td class="w-full">Min. SKS Kelulusan</td>
+        <td>{{ option.total_sks_lulus }}</td>
+    </tr>
+    {% endif %}
+</table>

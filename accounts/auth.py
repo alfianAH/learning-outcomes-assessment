@@ -1,7 +1,9 @@
 from django.conf import settings
 from django.contrib.auth.backends import BaseBackend
 from learning_outcomes_assessment.utils import request_data_to_neosia
-from .models import Fakultas, MyUser, ProgramStudi
+from .models import (
+    Fakultas, MyUser, ProgramStudi,
+)
 from .enums import RoleChoices
 from .utils import (
     get_user_profile,
@@ -36,12 +38,12 @@ class MyBackend(BaseBackend):
                     'id_fakultas': user['prodi']['id_fakultas']
                 }
 
-                params = {
+                detail_fakultas = request_data_to_neosia(DETAIL_FAKULTAS_URL, params={
                     'id': user_data['id_fakultas']
-                }
-                detail_fakultas = request_data_to_neosia(DETAIL_FAKULTAS_URL, params=params)
+                })
                 
                 if detail_fakultas is not None or len(detail_fakultas) > 0:
+                    # Get Fakultas
                     fakultas = self.get_or_create_fakultas(
                         user_data['id_fakultas'],
                         detail_fakultas[0]['nama_resmi']
@@ -149,17 +151,10 @@ class MyBackend(BaseBackend):
             Fakultas: existing or new Fakultas object
         """
 
-        try:
-            fakultas = Fakultas.objects.get(id_neosia=id_fakultas)
-        except Fakultas.DoesNotExist:
-            if settings.DEBUG: print("Create new fakultas")
-            fakultas = Fakultas.objects.create(
-                id_neosia = id_fakultas,
-                nama = nama_fakultas
-            )
-        except Fakultas.MultipleObjectsReturned:
-            if settings.DEBUG: print("Fakultas returns multiple objects.")
-            return None
+        fakultas, _ = Fakultas.objects.get_or_create(
+            id_neosia=id_fakultas,
+            nama=nama_fakultas
+        )
         
         return fakultas
     

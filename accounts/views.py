@@ -1,12 +1,23 @@
-from django.http import HttpRequest, JsonResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.contrib.auth import login, logout, authenticate
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from urllib.parse import urlencode
 import os
-
+from django.views.generic.detail import DetailView
+from learning_outcomes_assessment.wizard.views import MySessionWizardView
+from learning_outcomes_assessment.list_view.views import DetailWithListViewModelA
+from learning_outcomes_assessment.forms.edit import ModelBulkDeleteView
 from accounts.enums import RoleChoices
-from .forms import MahasiswaAuthForm
+from .forms import (
+    MahasiswaAuthForm,
+    ProgramStudiJenjangForm
+)
+from .models import (
+    ProgramStudi,
+    ProgramStudiJenjang,
+    JenjangStudi
+)
 from .utils import get_oauth_access_token, validate_user
 
 
@@ -55,3 +66,45 @@ def oauth_callback(request: HttpRequest):
 def logout_view(request: HttpRequest):
     logout(request)
     return redirect('/')
+
+
+class ProgramStudiReadView(DetailWithListViewModelA):
+    single_model = ProgramStudi
+    single_pk_url_kwarg = 'prodi_id'
+    single_object: ProgramStudi = None
+
+    template_name = 'accounts/prodi/home.html'
+    model = ProgramStudiJenjang
+
+    bulk_delete_url: str = ''
+    reset_url: str = ''
+    list_prefix_id: str = 'prodi-jenjang-'
+    input_name: str = 'id_prodi_jenjang'
+    list_id: str = 'prodi-jenjang-list-content'
+    # list_item_name: str = 'accounts/prodi/partials/list-item-name-prodi-jenjang.html'
+    list_custom_field_template: str = 'accounts/prodi/partials/list-custom-field-prodi-jenjang.html'
+    table_custom_field_header_template: str = 'accounts/prodi/partials/table-custom-field-header-prodi-jenjang.html'
+    table_custom_field_template: str = 'accounts/prodi/partials/table-custom-field-prodi-jenjang.html'
+
+    def setup(self, request: HttpRequest, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        self.bulk_delete_url = self.single_object.get_bulk_delete_prodi_jenjang_url()
+
+    def get_queryset(self):
+        self.queryset = self.model.objects.filter(
+            program_studi=self.single_object.pk
+        )
+        return super().get_queryset()
+
+
+class ProgramStudiCreateWizardFormView(MySessionWizardView):
+    form_list = [ProgramStudiJenjangForm,]
+
+
+class ProgramStudiBulkUpdateView(MySessionWizardView):
+    form_list = [ProgramStudiJenjangForm, ]
+
+
+class ProgramStudiJenjangBulkDeleteView(ModelBulkDeleteView):
+    pass
