@@ -8,14 +8,17 @@ from django.urls import reverse
 from urllib.parse import urlencode
 import os
 from learning_outcomes_assessment.auth.mixins import ProgramStudiMixin
-from learning_outcomes_assessment.wizard.views import MySessionWizardView
 from learning_outcomes_assessment.list_view.views import DetailWithListViewModelA
-from learning_outcomes_assessment.forms.edit import ModelBulkDeleteView
+from learning_outcomes_assessment.forms.edit import (
+    ModelBulkDeleteView,
+    ModelBulkUpdateView
+)
 from learning_outcomes_assessment.forms.views import UpdateInlineFormsetView
 from accounts.enums import RoleChoices
 from .forms import (
     MahasiswaAuthForm,
-    ProgramStudiJenjangForm,
+    ProgramStudiJenjangCreateForm,
+    ProgramStudiJenjangUpdateForm,
     ProgramStudiJenjangModelForm,
     ProgramStudiJenjangModelFormset
 )
@@ -28,6 +31,7 @@ from .models import (
 from .utils import (
     get_oauth_access_token,
     get_all_prodi, 
+    get_update_prodi_jenjang_choices,
     validate_user
 )
 
@@ -110,7 +114,7 @@ class ProgramStudiReadView(ProgramStudiMixin, DetailWithListViewModelA):
 
 
 class ProgramStudiCreateFormView(ProgramStudiMixin, FormView):
-    form_class = ProgramStudiJenjangForm    
+    form_class = ProgramStudiJenjangCreateForm    
     template_name: str = 'accounts/prodi/create-view.html'
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
@@ -164,10 +168,10 @@ class ProgramStudiCreateFormView(ProgramStudiMixin, FormView):
         return super().form_valid(form)
 
 
-class ProgramStudiBulkUpdateView(ProgramStudiMixin, UpdateInlineFormsetView):
+class ProgramStudiJenjangSKSBulkUpdateView(ProgramStudiMixin, UpdateInlineFormsetView):
     model = ProgramStudi
     pk_url_kwarg: str = 'prodi_id'
-    template_name = 'accounts/prodi/update-view.html'
+    template_name = 'accounts/prodi/bulk-update-sks-view.html'
     form_class = ProgramStudiJenjangModelForm
     object: ProgramStudiJenjang = None
 
@@ -210,6 +214,55 @@ class ProgramStudiBulkUpdateView(ProgramStudiMixin, UpdateInlineFormsetView):
         self.formset.save(commit=True)
         messages.success(self.request, self.success_msg)
         return redirect(self.success_url)
+
+
+class ProgramStudiJenjangBulkUpdateView(ProgramStudiMixin, ModelBulkUpdateView):
+    form_class = ProgramStudiJenjangUpdateForm
+    template_name = 'accounts/prodi/bulk-update-view.html'
+
+    back_url: str = ''
+    form_field_name: str = 'update_data_prodi_jenjang'
+    search_placeholder: str = 'Cari nama jenjang prodi ...'
+    submit_text: str = 'Update'
+    no_choices_msg: str = 'Data jenjang prodi sudah sinkron dengan data di Neosia'
+
+    def setup(self, request: HttpRequest, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        prodi_id = kwargs.get('prodi_id')
+        self.program_studi_obj = get_object_or_404(ProgramStudi, id_neosia=prodi_id)
+        self.success_url = self.program_studi_obj.get_prodi_read_url()
+        self.back_url = self.success_url
+
+        self.list_prodi_jenjang_id = [prodi_jenjang['id_neosia'] for prodi_jenjang in list(self.program_studi_obj.get_prodi_jenjang().values())]
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        
+        kwargs.update({
+            'list_prodi_jenjang_id': self.list_prodi_jenjang_id 
+        })
+        return kwargs
+
+    def update_prodi_jenjang(self, list_prodi_jenjang_id):
+        update_prodi_jenjang_data = get_update_prodi_jenjang_choices(self.list_prodi_jenjang_id)
+
+        for prodi_jenjang_id, update_data in update_prodi_jenjang_data:
+            print(prodi_jenjang_id, update_data)
+            if str(prodi_jenjang_id) not in list_prodi_jenjang_id: continue
+            
+            jenjang_studi_qs = JenjangStudi.objects.filter(id_neosia=update_data['new']['jenjang_studi']['id_neosia'])
+            jenjang_studi_qs.update(**update_data['new']['jenjang_studi'])
+
+            prodi_jenjang_qs = ProgramStudiJenjang.objects.filter(id_neosia=prodi_jenjang_id)
+            prodi_jenjang_qs.update(nama=update_data['new']['nama'])
+
+    def form_valid(self, form) -> HttpResponse:
+        list_update_prodi_jenjang_id = form.cleaned_data.get(self.form_field_name)
+
+        self.update_prodi_jenjang(list_update_prodi_jenjang_id)
+        messages.success(self.request, 'Proses mengupdate prodi jenjang sudah selesai.')
+        return super().form_valid(form)
 
 
 class ProgramStudiJenjangBulkDeleteView(ProgramStudiMixin, ModelBulkDeleteView):

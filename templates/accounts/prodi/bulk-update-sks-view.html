@@ -1,0 +1,16 @@
+{% extends 'home-view.html' %}
+
+{% block title %}
+Update SKS Jenjang Prodi - 
+{% endblock title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'accounts:prodi-read' prodi_id=request.user.prodi.id_neosia %}" role="listitem">Program Studi</a></li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">Update SKS Jenjang Prodi</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<h1>Update SKS Jenjang Program Studi</h1>
+
+{% include 'components/form/default-form.html' with form_fields='components/form/formset.html' %}
+{% endblock content %}

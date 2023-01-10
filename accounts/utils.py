@@ -227,3 +227,32 @@ def get_all_prodi_choices():
         list_prodi_choices.append(prodi_choice)
 
     return list_prodi_choices
+
+
+def get_update_prodi_jenjang_choices(list_prodi_id: list[int]):
+    list_prodi = get_all_prodi()
+    update_prodi_jenjang_choices = []
+
+    for prodi in list_prodi:
+        if prodi['id_neosia'] not in list_prodi_id: continue
+
+        try:
+            prodi_jenjang_obj = ProgramStudiJenjang.objects.get(id_neosia=prodi['id_neosia'])
+        except ProgramStudiJenjang.DoesNotExist:
+            continue
+        except ProgramStudiJenjang.MultipleObjectsReturned:
+            if settings.DEBUG: print('Program Studi Jenjang object returns multiple objects. ID: {}'.format(prodi['id_neosia']))
+            continue
+        
+        isDataOkay = prodi_jenjang_obj.nama == prodi['nama'] and prodi_jenjang_obj.jenjang_studi.nama == prodi['jenjang_studi']['nama'] and prodi_jenjang_obj.jenjang_studi.kode == prodi['jenjang_studi']['kode']
+
+        if isDataOkay: continue
+
+        update_prodi_jenjang_data = {
+            'new': prodi,
+            'old': prodi_jenjang_obj,
+        }
+        update_prodi_jenjang_choice = prodi['id_neosia'], update_prodi_jenjang_data
+        update_prodi_jenjang_choices.append(update_prodi_jenjang_choice)
+
+    return update_prodi_jenjang_choices

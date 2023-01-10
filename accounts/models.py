@@ -21,6 +21,9 @@ class ProgramStudi(models.Model):
     def __str__(self) -> str:
         return self.nama
 
+    def get_prodi_jenjang(self):
+        return self.programstudijenjang_set.all()
+
     def get_prodi_read_url(self):
         return reverse('accounts:prodi-read', kwargs={
             'prodi_id': self.id_neosia
@@ -28,6 +31,11 @@ class ProgramStudi(models.Model):
 
     def get_prodi_bulk_update_url(self):
         return reverse('accounts:prodi-bulk-update', kwargs={
+            'prodi_id': self.id_neosia
+        })
+
+    def get_prodi_bulk_update_sks_url(self):
+        return reverse('accounts:prodi-bulk-update-sks', kwargs={
             'prodi_id': self.id_neosia
         })
 

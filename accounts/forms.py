@@ -5,13 +5,14 @@ from django.contrib.auth import authenticate
 from django import forms
 from learning_outcomes_assessment import settings
 from learning_outcomes_assessment.widgets import (
+    UpdateChoiceList,
     ChoiceListInteractiveModelA,
     MyNumberInput,
 )
 from .models import ProgramStudi, ProgramStudiJenjang
 from .enums import RoleChoices
 from .widgets import LoginTextInput, LoginPasswordInput
-from .utils import get_all_prodi_choices
+from .utils import get_all_prodi_choices, get_update_prodi_jenjang_choices
 
 
 class MahasiswaAuthForm(AuthenticationForm):
@@ -50,7 +51,8 @@ class MahasiswaAuthForm(AuthenticationForm):
 
         return self.cleaned_data
 
-class ProgramStudiJenjangForm(forms.Form):
+
+class ProgramStudiJenjangCreateForm(forms.Form):
     prodi_jenjang_from_neosia = forms.MultipleChoiceField(
         widget=ChoiceListInteractiveModelA(
             list_custom_field_template='accounts/prodi/partials/list-custom-field-prodi-jenjang.html',
@@ -84,6 +86,25 @@ class ProgramStudiJenjangForm(forms.Form):
         return cleaned_data
 
 
+class ProgramStudiJenjangUpdateForm(forms.Form):
+    update_data_prodi_jenjang = forms.MultipleChoiceField(
+        widget=UpdateChoiceList(
+            list_custom_field_template='accounts/prodi/partials/list-custom-field-prodi-jenjang-wo-sks.html',
+        ),
+        label = 'Update Data Jenjang Program Studi',
+        help_text = 'Data yang berwarna hijau merupakan data terbaru dari Neosia.<br>Data yang berwarna merah merupakan data lama pada sistem ini.<br>Beri centang pada item yang ingin anda update.',
+        required = False,
+    )
+
+    def __init__(self, *args, **kwargs):
+        self.list_prodi_jenjang_id = kwargs.pop('list_prodi_jenjang_id')
+        super().__init__(*args, **kwargs)
+
+        update_kurikulum_choices = get_update_prodi_jenjang_choices(self.list_prodi_jenjang_id)
+
+        self.fields['update_data_prodi_jenjang'].choices = update_kurikulum_choices
+
+
 class ProgramStudiJenjangModelForm(forms.ModelForm):
     class Meta:
         model = ProgramStudiJenjang
@@ -99,7 +120,7 @@ class ProgramStudiJenjangModelForm(forms.ModelForm):
 class ProgramStudiJenjangInlineFormset(forms.BaseInlineFormSet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
+
         for form in self.forms:
             form['total_sks_lulus'].label = 'Minimal SKS Kelulusan ({})'.format(form.instance.nama)
 

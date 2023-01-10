@@ -18,11 +18,5 @@
                 <td>{{ option.jenjang_studi.kode }}</td>
             {% endif %}
         </tr>
-        {% if not option.wrap_label %}
-        <tr class="flex px-3 py-1 space-x-2.5">
-            <td class="w-full">Min. SKS Kelulusan</td>
-            <td>{{ option.total_sks_lulus|default:0 }}</td>
-        </tr>
-        {% endif %}
     </tbody>
 </table>

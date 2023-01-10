@@ -38,3 +38,28 @@ class ModelBulkDeleteView(FormView):
             messages.success(self.request, self.success_msg)
         
         return redirect(self.success_url)
+
+
+class ModelBulkUpdateView(FormView):
+    back_url: str = ''
+    form_field_name: str = 'update_data'
+    search_placeholder: str = 'Cari ...'
+    submit_text: str = 'Update'
+    no_choices_msg: str = 'Data sudah sinkron dengan data di Neosia'
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        form = self.get_form(form_class=self.form_class)
+        
+        if len(form.fields.get(self.form_field_name).choices) == 0:
+            messages.info(request, self.no_choices_msg)
+            return redirect(self.success_url)
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'search_placeholder': self.search_placeholder,
+            'back_url': self.back_url,
+            'submit_text': self.submit_text,
+        })
+        return context
