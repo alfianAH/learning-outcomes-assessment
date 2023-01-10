@@ -10,7 +10,10 @@ from django.views.generic.edit import FormView
 from learning_outcomes_assessment.auth.mixins import ProgramStudiMixin
 from learning_outcomes_assessment.wizard.views import MySessionWizardView
 from learning_outcomes_assessment.list_view.views import ListViewModelA
-from learning_outcomes_assessment.forms.edit import ModelBulkDeleteView
+from learning_outcomes_assessment.forms.edit import (
+    ModelBulkDeleteView,
+    ModelBulkUpdateView
+)
 from accounts.models import ProgramStudi
 from .models import Kurikulum
 from .filters import (
@@ -178,23 +181,20 @@ class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
         return redirect(success_url)
 
 
-class KurikulumBulkUpdateView(FormView):
+class KurikulumBulkUpdateView(ModelBulkUpdateView):
     form_class = KurikulumBulkUpdateForm
     template_name: str = 'kurikulum/kurikulum-update-view.html'
     success_url = reverse_lazy('kurikulum:read-all')
+
+    back_url: str = reverse_lazy('kurikulum:read-all')
+    form_field_name: str = 'update_data_kurikulum'
+    search_placeholder: str = 'Cari nama Kurikulum...'
+    no_choices_msg: str = 'Data kurikulum sudah sinkron dengan data di Neosia'
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
-    
-    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        form = self.get_form(form_class=self.form_class)
-        
-        if len(form.fields.get('update_data_kurikulum').choices) == 0:
-            messages.info(request, 'Data kurikulum sudah sinkron dengan data di Neosia')
-            return redirect(self.success_url)
-        return super().get(request, *args, **kwargs)
 
     def update_kurikulum(self, kurikulum_id: int):
         try:
@@ -208,7 +208,7 @@ class KurikulumBulkUpdateView(FormView):
         kurikulum_obj.update(**new_kurikulum_data)
     
     def form_valid(self, form) -> HttpResponse:
-        update_kurikulum_data = form.cleaned_data.get('update_data_kurikulum', [])
+        update_kurikulum_data = form.cleaned_data.get(self.form_field_name, [])
 
         # Update kurikulum
         for kurikulum_id in update_kurikulum_data:

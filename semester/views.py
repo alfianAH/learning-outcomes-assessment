@@ -4,9 +4,11 @@ from django.core.exceptions import PermissionDenied
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
-from learning_outcomes_assessment.forms.edit import ModelBulkDeleteView
+from learning_outcomes_assessment.forms.edit import (
+    ModelBulkDeleteView,
+    ModelBulkUpdateView
+)
 from learning_outcomes_assessment.list_view.views import (
     ListViewModelA,
     DetailWithListViewModelA,
@@ -160,27 +162,15 @@ class SemesterCreateView(FormView):
         return super().form_valid(form)
 
 
-class SemesterBulkUpdateView(FormView):
+class SemesterBulkUpdateView(ModelBulkUpdateView):
     form_class = SemesterProdiBulkUpdateForm
     template_name = 'semester/bulk-update-view.html'
     success_url = reverse_lazy('semester:read-all')
 
-    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        form = self.get_form(form_class=self.form_class)
-        
-        if len(form.fields.get('update_data_semester').choices) == 0:
-            messages.info(request, 'Data semester sudah sinkron dengan data di Neosia')
-            return redirect(self.success_url)
-        return super().get(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({
-            'search_placeholder': 'Cari nama semester...',
-            'back_url': self.success_url,
-            'submit_text': 'Update',
-        })
-        return context
+    back_url: str = reverse_lazy('semester:read-all')
+    form_field_name: str = 'update_data_semester'
+    search_placeholder: str = 'Cari nama semester...'
+    no_choices_msg: str = 'Data semester sudah sinkron dengan data di Neosia'
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -196,14 +186,13 @@ class SemesterBulkUpdateView(FormView):
             messages.error(self.request, 
                 'Semester Prodi dengan ID: {} tidak ditemukan, sehingga gagal mengupdate semester'.format(semester_prodi_id))
             return
-        
+        # TODO: not yet implemented
         # new_semester_data = get_detail_semester_prodi(semester_prodi_id)
         # semester_prodi_obj.update(**new_semester_data)
 
     def form_valid(self, form) -> HttpResponse:
-        print(form.cleaned_data)
         # Get semester prodi ids
-        update_semester_data = form.cleaned_data.get('update_data_semester', [])
+        update_semester_data = form.cleaned_data.get(self.form_field_name, [])
 
         # Update semester
         for semester_prodi_id in update_semester_data:

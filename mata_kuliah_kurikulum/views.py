@@ -1,15 +1,16 @@
-import json
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
-from django.views.generic.base import View
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from accounts.models import ProgramStudi
 from .models import MataKuliahKurikulum
 from kurikulum.models import Kurikulum
 from learning_outcomes_assessment.list_view.views import ListViewModelA
-from learning_outcomes_assessment.forms.edit import ModelBulkDeleteView
+from learning_outcomes_assessment.forms.edit import (
+    ModelBulkDeleteView,
+    ModelBulkUpdateView,
+)
 from mata_kuliah_kurikulum.forms import (
     MataKuliahKurikulumCreateForm,
     MataKuliahKurikulumBulkUpdateForm
@@ -163,12 +164,17 @@ class MataKuliahKurikulumReadView(DetailView):
     template_name: str = 'mata-kuliah-kurikulum/detail-view.html'
 
 
-class MataKuliahKurikulumBulkUpdateView(FormView):
+class MataKuliahKurikulumBulkUpdateView(ModelBulkUpdateView):
     form_class = MataKuliahKurikulumBulkUpdateForm
     template_name: str = 'mata-kuliah-kurikulum/update-view.html'
     kurikulum_obj: Kurikulum = None
     prodi_id: int = None
     form_field_name: str = 'update_data_mk_kurikulum'
+
+    back_url: str = ''
+    form_field_name: str = 'update_data_mk_kurikulum'
+    search_placeholder: str = 'Cari nama mata kuliah...'
+    no_choices_msg: str = 'Data mata kuliah kurikulum sudah sinkron dengan data di Neosia'
 
     def setup(self, request: HttpRequest, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -177,6 +183,7 @@ class MataKuliahKurikulumBulkUpdateView(FormView):
         self.kurikulum_obj = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
         self.prodi_id = request.user.prodi.id_neosia
         self.success_url = self.kurikulum_obj.read_all_mk_kurikulum_url()
+        self.back_url = self.success_url
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()        
@@ -184,23 +191,14 @@ class MataKuliahKurikulumBulkUpdateView(FormView):
         kwargs['prodi_id'] = self.prodi_id
         return kwargs
 
-    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        form = self.get_form(form_class=self.form_class)
-        
-        if len(form.fields.get(self.form_field_name).choices) == 0:
-            messages.info(request, 'Data mata kuliah kurikulum sudah sinkron dengan data di Neosia')
-            return redirect(self.success_url)
-        return super().get(request, *args, **kwargs)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
             'kurikulum_obj': self.kurikulum_obj,
-            'back_url': self.success_url,
         })
         return context
 
-    def update_mk_kurikulum(self, list_mk_kurikulum_id: int):
+    def update_mk_kurikulum(self, list_mk_kurikulum_id):
         list_mk_kurikulum = get_mk_kurikulum(self.kurikulum_obj.id_neosia, self.prodi_id)
         
         for mk_kurikulum in list_mk_kurikulum:
