@@ -1,6 +1,8 @@
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from django.contrib.auth import login, logout, authenticate
-from django.shortcuts import redirect, render
+from django.contrib import messages
+from django.shortcuts import redirect, render, get_object_or_404
+from django.views.generic.edit import FormView
 from django.urls import reverse
 from urllib.parse import urlencode
 import os
@@ -11,14 +13,19 @@ from learning_outcomes_assessment.forms.edit import ModelBulkDeleteView
 from accounts.enums import RoleChoices
 from .forms import (
     MahasiswaAuthForm,
-    ProgramStudiJenjangForm
+    ProgramStudiJenjangForm,
 )
 from .models import (
+    Fakultas,
     ProgramStudi,
     ProgramStudiJenjang,
     JenjangStudi
 )
-from .utils import get_oauth_access_token, validate_user
+from .utils import (
+    get_oauth_access_token,
+    get_all_prodi, 
+    validate_user
+)
 
 
 # Create your views here.
@@ -98,13 +105,69 @@ class ProgramStudiReadView(ProgramStudiMixin, DetailWithListViewModelA):
         return super().get_queryset()
 
 
-class ProgramStudiCreateWizardFormView(MySessionWizardView):
-    form_list = [ProgramStudiJenjangForm,]
+class ProgramStudiCreateFormView(ProgramStudiMixin, FormView):
+    form_class = ProgramStudiJenjangForm    
+    template_name: str = 'accounts/prodi/create-view.html'
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+
+        prodi_id = kwargs.get('prodi_id')
+        self.program_studi_obj = get_object_or_404(ProgramStudi, id_neosia=prodi_id)
+        self.success_url = self.program_studi_obj.get_prodi_read_url()
+
+    def form_valid(self, form) -> HttpResponse:
+        list_prodi_jenjang_id = form.cleaned_data.get('prodi_jenjang_from_neosia')
+        list_prodi_jenjang = get_all_prodi()
+        
+        for prodi_jenjang in list_prodi_jenjang:
+            if str(prodi_jenjang['id_neosia']) not in list_prodi_jenjang_id: continue
+
+            jenjang_studi_obj, _ = JenjangStudi.objects.get_or_create(
+                **prodi_jenjang['jenjang_studi']
+            )
+
+            ProgramStudiJenjang.objects.create(
+                id_neosia=prodi_jenjang['id_neosia'],
+                program_studi=self.program_studi_obj,
+                jenjang_studi=jenjang_studi_obj,
+                nama=prodi_jenjang['nama'],
+            )
+
+            if self.program_studi_obj.fakultas is not None:
+                if self.program_studi_obj.fakultas.id_neosia != prodi_jenjang['fakultas']['id_neosia']:
+                    messages.warning(self.request, '{} tidak dapat ditambahkan karena merupakan bagian dari Fakultas {}. Fakultas anda: {}'.format(
+                        prodi_jenjang['nama'], 
+                        prodi_jenjang['fakultas']['nama'],
+                        self.program_studi_obj.fakultas.nama
+                    ))
+                continue
+
+            fakultas_obj, _ = Fakultas.objects.get_or_create(
+                **prodi_jenjang['fakultas']
+            )
+            self.program_studi_obj.fakultas = fakultas_obj
+
+        messages.success(self.request, 'Proses menambahkan jenjang program studi sudah selesai')
+        
+        return super().form_valid(form)
 
 
-class ProgramStudiBulkUpdateView(MySessionWizardView):
+class ProgramStudiBulkUpdateView(FormView):
     form_list = [ProgramStudiJenjangForm, ]
 
 
-class ProgramStudiJenjangBulkDeleteView(ModelBulkDeleteView):
-    pass
+class ProgramStudiJenjangBulkDeleteView(ProgramStudiMixin, ModelBulkDeleteView):
+    model = ProgramStudiJenjang
+    id_list_obj = 'id_prodi_jenjang'
+    success_msg = 'Berhasil menghapus jenjang program studi.'
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        prodi_id = kwargs.get('prodi_id')
+        self.program_studi_obj = get_object_or_404(ProgramStudi, id_neosia=prodi_id)
+        self.success_url = self.program_studi_obj.get_prodi_read_url()
+
+    def get_queryset(self):
+        self.queryset = self.model.objects.filter(id_neosia__in=self.get_list_selected_obj())
+        return super().get_queryset()

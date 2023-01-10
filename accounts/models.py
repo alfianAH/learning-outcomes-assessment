@@ -21,6 +21,11 @@ class ProgramStudi(models.Model):
     def __str__(self) -> str:
         return self.nama
 
+    def get_prodi_read_url(self):
+        return reverse('accounts:prodi-read', kwargs={
+            'prodi_id': self.id_neosia
+        })
+
     def get_prodi_bulk_update_url(self):
         return reverse('accounts:prodi-bulk-update', kwargs={
             'prodi_id': self.id_neosia
@@ -51,6 +56,7 @@ class ProgramStudiJenjang(models.Model):
     program_studi = models.ForeignKey(ProgramStudi, on_delete=models.CASCADE)
     jenjang_studi = models.ForeignKey(JenjangStudi, on_delete=models.CASCADE)
     
+    nama = models.CharField(max_length=255)
     total_sks_lulus = models.PositiveSmallIntegerField(null=True)
 
 

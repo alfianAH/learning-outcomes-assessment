@@ -6,6 +6,7 @@ from .views import (
     logout_view,
     oauth_callback,
     ProgramStudiReadView,
+    ProgramStudiCreateFormView,
     ProgramStudiBulkUpdateView,
     ProgramStudiJenjangBulkDeleteView,
 )
@@ -18,7 +19,7 @@ urlpatterns = [
     path('logout/', logout_view, name='logout'),
 
     path('prodi/<int:prodi_id>/', ProgramStudiReadView.as_view(), name='prodi-read'),
-    path('prodi/<int:prodi_id>/create', ProgramStudiReadView.as_view(), name='prodi-create'),
+    path('prodi/<int:prodi_id>/create/', ProgramStudiCreateFormView.as_view(), name='prodi-create'),
     path('prodi/<int:prodi_id>/update/', ProgramStudiBulkUpdateView.as_view(), name='prodi-bulk-update'),
-    path('prodi/<int:prodi_id>/bulk-delete', ProgramStudiJenjangBulkDeleteView.as_view(), name='prodi-jenjang-bulk-delete'),
+    path('prodi/<int:prodi_id>/bulk-delete/', ProgramStudiJenjangBulkDeleteView.as_view(), name='prodi-jenjang-bulk-delete'),
 ]

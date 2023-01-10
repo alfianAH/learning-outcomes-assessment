@@ -1,0 +1,14 @@
+{% extends 'home-view.html' %}
+
+{% block title %}
+Tambah Jenjang Prodi - 
+{% endblock title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'accounts:prodi-read' prodi_id=request.user.prodi.id_neosia %}" role="listitem">Program Studi</a></li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">Tambah Jenjang Prodi</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+{% include 'components/form/single-form.html' with search_placeholder='Cari nama program studi...' submit_text='Tambahkan' %}
+{% endblock content %}

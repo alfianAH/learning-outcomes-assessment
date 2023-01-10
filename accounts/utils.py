@@ -5,9 +5,13 @@ import requests
 from learning_outcomes_assessment.utils import request_data_to_neosia
 from requests import Request, Session
 from requests.exceptions import MissingSchema, SSLError
-
+from .models import ProgramStudiJenjang
 from .enums import RoleChoices
 
+
+ALL_PRODI_URL = 'https://customapi.neosia.unhas.ac.id/getAllProdi'
+DETAIL_JENJANG_STUDI_URL = 'https://customapi.neosia.unhas.ac.id/getDetilProdiJenjang'
+DETAIL_FAKULTAS_URL = 'https://customapi.neosia.unhas.ac.id/getDetilFakultas'
 
 MBERKAS_OAUTH_TOKEN_URL = 'https://mberkas.unhas.ac.id/oauth/token'
 MBERKAS_OAUTH_BEARER = 'https://mberkas.unhas.ac.id/api/checkStatus'
@@ -91,6 +95,7 @@ def get_oauth_access_token(code: str):
     
     return access_token
 
+
 def validate_user(access_token: str):
     """Validate user from MBerkas OAuth Bearer with given access token
 
@@ -120,6 +125,7 @@ def validate_user(access_token: str):
         if settings.DEBUG: print(response.raw)
         return None
 
+
 def validate_mahasiswa(username: str, password: str):
     parameters = {
         'username': username,
@@ -138,3 +144,86 @@ def validate_mahasiswa(username: str, password: str):
     
     user = json_response['data']
     return user
+
+
+def get_detail_jenjang_studi(jenjang_studi_id: int):
+    parameters = {
+        'id': jenjang_studi_id
+    }
+    json_response = request_data_to_neosia(DETAIL_JENJANG_STUDI_URL, params=parameters)
+    if json_response is None: return None
+    detail_jenjang_studi = json_response[0]
+
+    jenjang_studi_data = {
+        'id_neosia': detail_jenjang_studi['id'],
+        'nama': detail_jenjang_studi['nama'],
+        'kode': detail_jenjang_studi['kode']
+    }
+
+    return jenjang_studi_data
+
+
+def get_detail_fakultas(fakultas_id: int):
+    parameters = {
+        'id': fakultas_id
+    }
+    json_response = request_data_to_neosia(DETAIL_FAKULTAS_URL, params=parameters)
+    if json_response is None: return None
+    detail_fakultas = json_response[0]
+
+    fakultas_data = {
+        'id_neosia': detail_fakultas['id'],
+        'nama': detail_fakultas['nama_resmi']
+    }
+    return fakultas_data
+
+
+def get_all_prodi():
+    json_response = request_data_to_neosia(ALL_PRODI_URL)
+    list_prodi = []
+    list_jenjang_studi = {}
+    list_fakultas = {}
+    if json_response is None: return list_prodi
+
+    for data_prodi in json_response:
+        if data_prodi['is_active'] == 0: continue
+
+        # Get jenjang studi
+        jenjang_studi_id = data_prodi['id_prodi_jenjang']
+
+        if jenjang_studi_id not in list_jenjang_studi.keys():
+            jenjang_studi = get_detail_jenjang_studi(jenjang_studi_id)
+            list_jenjang_studi[jenjang_studi_id] = jenjang_studi
+
+        # Get fakultas
+        fakultas_id = data_prodi['id_fakultas']
+        if fakultas_id not in list_fakultas.keys():
+            fakultas = get_detail_fakultas(fakultas_id)
+            list_fakultas[fakultas_id] = fakultas
+
+        prodi = {
+            'id_neosia': data_prodi['id'],
+            'nama': data_prodi['nama_resmi'],
+            'jenjang_studi': list_jenjang_studi[jenjang_studi_id],
+            'fakultas': list_fakultas[fakultas_id],
+        }
+
+        list_prodi.append(prodi)
+
+    return list_prodi
+
+def get_all_prodi_choices():
+    list_prodi = get_all_prodi()
+    list_prodi_choices = []
+
+    for prodi in list_prodi:
+        prodi_jenjang_qs = ProgramStudiJenjang.objects.filter(
+            id_neosia=prodi['id_neosia']
+        )
+        if prodi_jenjang_qs.exists(): continue
+
+        prodi_choice = prodi['id_neosia'], prodi
+
+        list_prodi_choices.append(prodi_choice)
+
+    return list_prodi_choices
