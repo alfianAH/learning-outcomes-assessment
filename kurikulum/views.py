@@ -4,9 +4,9 @@ from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
-from django.views.generic.base import View
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
+from learning_outcomes_assessment.auth.mixins import ProgramStudiMixin
 from learning_outcomes_assessment.wizard.views import MySessionWizardView
 from learning_outcomes_assessment.list_view.views import ListViewModelA
 from learning_outcomes_assessment.forms.edit import ModelBulkDeleteView
@@ -272,10 +272,15 @@ class KurikulumReadAllView(ListViewModelA):
         return super().get_queryset()
 
 
-class KurikulumReadView(DetailView):
+class KurikulumReadView(ProgramStudiMixin, DetailView):
     model = Kurikulum
     pk_url_kwarg: str = 'kurikulum_id'
     template_name: str = 'kurikulum/detail-view.html'
+
+    def setup(self, request: HttpRequest, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.object: Kurikulum = self.get_object()
+        self.program_studi_obj = self.object.prodi
 
 
 class KurikulumBulkDeleteView(ModelBulkDeleteView):

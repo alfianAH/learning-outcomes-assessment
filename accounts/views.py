@@ -1,10 +1,10 @@
-from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.http import HttpRequest
 from django.contrib.auth import login, logout, authenticate
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from urllib.parse import urlencode
 import os
-from django.views.generic.detail import DetailView
+from learning_outcomes_assessment.auth.mixins import ProgramStudiMixin
 from learning_outcomes_assessment.wizard.views import MySessionWizardView
 from learning_outcomes_assessment.list_view.views import DetailWithListViewModelA
 from learning_outcomes_assessment.forms.edit import ModelBulkDeleteView
@@ -68,7 +68,7 @@ def logout_view(request: HttpRequest):
     return redirect('/')
 
 
-class ProgramStudiReadView(DetailWithListViewModelA):
+class ProgramStudiReadView(ProgramStudiMixin, DetailWithListViewModelA):
     single_model = ProgramStudi
     single_pk_url_kwarg = 'prodi_id'
     single_object: ProgramStudi = None
@@ -81,13 +81,13 @@ class ProgramStudiReadView(DetailWithListViewModelA):
     list_prefix_id: str = 'prodi-jenjang-'
     input_name: str = 'id_prodi_jenjang'
     list_id: str = 'prodi-jenjang-list-content'
-    # list_item_name: str = 'accounts/prodi/partials/list-item-name-prodi-jenjang.html'
     list_custom_field_template: str = 'accounts/prodi/partials/list-custom-field-prodi-jenjang.html'
     table_custom_field_header_template: str = 'accounts/prodi/partials/table-custom-field-header-prodi-jenjang.html'
     table_custom_field_template: str = 'accounts/prodi/partials/table-custom-field-prodi-jenjang.html'
 
     def setup(self, request: HttpRequest, *args, **kwargs):
         super().setup(request, *args, **kwargs)
+        self.program_studi_obj = self.single_object
 
         self.bulk_delete_url = self.single_object.get_bulk_delete_prodi_jenjang_url()
 

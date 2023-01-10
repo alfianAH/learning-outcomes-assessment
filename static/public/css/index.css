@@ -3361,10 +3361,6 @@ details.dropdown::marker {
   display: inline-block;
 }
 
-.inline {
-  display: inline;
-}
-
 .flex {
   display: flex;
 }
@@ -3568,10 +3564,6 @@ details.dropdown::marker {
 
 .flex-col {
   flex-direction: column;
-}
-
-.items-start {
-  align-items: flex-start;
 }
 
 .items-center {
@@ -3790,10 +3782,6 @@ details.dropdown::marker {
 
 .text-center {
   text-align: center;
-}
-
-.align-top {
-  vertical-align: top;
 }
 
 .\!align-middle {
