@@ -57,7 +57,10 @@ class ProgramStudiJenjang(models.Model):
     jenjang_studi = models.ForeignKey(JenjangStudi, on_delete=models.CASCADE)
     
     nama = models.CharField(max_length=255)
-    total_sks_lulus = models.PositiveSmallIntegerField(null=True)
+    total_sks_lulus = models.PositiveSmallIntegerField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['jenjang_studi__id_neosia']
 
 
 class UserOAuthManager(UserManager):

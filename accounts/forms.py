@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import formset_factory
+from django.forms import inlineformset_factory
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate
 from django import forms
@@ -8,6 +8,7 @@ from learning_outcomes_assessment.widgets import (
     ChoiceListInteractiveModelA,
     MyNumberInput,
 )
+from .models import ProgramStudi, ProgramStudiJenjang
 from .enums import RoleChoices
 from .widgets import LoginTextInput, LoginPasswordInput
 from .utils import get_all_prodi_choices
@@ -81,3 +82,33 @@ class ProgramStudiJenjangForm(forms.Form):
         if settings.DEBUG: print("Clean data: {}".format(cleaned_data))
         
         return cleaned_data
+
+
+class ProgramStudiJenjangModelForm(forms.ModelForm):
+    class Meta:
+        model = ProgramStudiJenjang
+        fields = ['total_sks_lulus']
+        labels = {
+            'total_sks_lulus': 'Minimal SKS Kelulusan'
+        }
+        widgets = {
+            'total_sks_lulus': MyNumberInput()
+        }
+
+
+class ProgramStudiJenjangInlineFormset(forms.BaseInlineFormSet):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        for form in self.forms:
+            form['total_sks_lulus'].label = 'Minimal SKS Kelulusan ({})'.format(form.instance.nama)
+
+
+ProgramStudiJenjangModelFormset = inlineformset_factory(
+    ProgramStudi,
+    ProgramStudiJenjang,
+    form=ProgramStudiJenjangModelForm,
+    formset=ProgramStudiJenjangInlineFormset,
+    can_delete=False,
+    extra=0,
+)

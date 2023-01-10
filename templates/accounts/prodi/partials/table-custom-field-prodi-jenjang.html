@@ -6,5 +6,5 @@
     <td class="text-left field-nama">{{ option.nama }}</td>
     <td class="text-left">{{ option.jenjang_studi.nama }}</td>
     <td class="text-left">{{ option.jenjang_studi.kode }}</td>
-    <td class="text-left">{{ option.total_sks_lulus }}</td>
+    <td class="text-left">{{ option.total_sks_lulus|default:0 }}</td>
 {% endif %}

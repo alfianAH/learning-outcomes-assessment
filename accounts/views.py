@@ -1,6 +1,7 @@
 from django.http import HttpRequest, HttpResponse
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
+from django.forms import BaseInlineFormSet
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views.generic.edit import FormView
 from django.urls import reverse
@@ -10,10 +11,13 @@ from learning_outcomes_assessment.auth.mixins import ProgramStudiMixin
 from learning_outcomes_assessment.wizard.views import MySessionWizardView
 from learning_outcomes_assessment.list_view.views import DetailWithListViewModelA
 from learning_outcomes_assessment.forms.edit import ModelBulkDeleteView
+from learning_outcomes_assessment.forms.views import UpdateInlineFormsetView
 from accounts.enums import RoleChoices
 from .forms import (
     MahasiswaAuthForm,
     ProgramStudiJenjangForm,
+    ProgramStudiJenjangModelForm,
+    ProgramStudiJenjangModelFormset
 )
 from .models import (
     Fakultas,
@@ -116,6 +120,13 @@ class ProgramStudiCreateFormView(ProgramStudiMixin, FormView):
         self.program_studi_obj = get_object_or_404(ProgramStudi, id_neosia=prodi_id)
         self.success_url = self.program_studi_obj.get_prodi_read_url()
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'back_url': self.success_url
+        })
+        return context
+
     def form_valid(self, form) -> HttpResponse:
         list_prodi_jenjang_id = form.cleaned_data.get('prodi_jenjang_from_neosia')
         list_prodi_jenjang = get_all_prodi()
@@ -153,8 +164,52 @@ class ProgramStudiCreateFormView(ProgramStudiMixin, FormView):
         return super().form_valid(form)
 
 
-class ProgramStudiBulkUpdateView(FormView):
-    form_list = [ProgramStudiJenjangForm, ]
+class ProgramStudiBulkUpdateView(ProgramStudiMixin, UpdateInlineFormsetView):
+    model = ProgramStudi
+    pk_url_kwarg: str = 'prodi_id'
+    template_name = 'accounts/prodi/update-view.html'
+    form_class = ProgramStudiJenjangModelForm
+    object: ProgramStudiJenjang = None
+
+    post_url: str = '.'
+    button_text: str = 'Update'
+    success_msg: str = 'Berhasil mengupdate jenjang program studi'
+    error_msg: str = 'Gagal mengupdate jenjang program studi. Pastikan data yang anda masukkan valid.'
+
+    id_total_form: str = '#id_programstudijenjang_set-TOTAL_FORMS'
+    add_more_btn_text: str = 'Tambah Jenjang Program Studi'
+    formset: BaseInlineFormSet = None
+    formset_class: type[BaseInlineFormSet] = ProgramStudiJenjangModelFormset
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+
+        self.program_studi_obj = self.object
+        self.success_url = self.object.get_prodi_read_url()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["can_add_form"] = False
+        return context
+    
+    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        self.object = self.get_object()
+
+        form = self.get_form()
+        self.formset = self.formset_class(
+            request.POST,
+            instance=self.object
+        )
+        
+        if self.formset.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form) -> HttpResponse:
+        self.formset.save(commit=True)
+        messages.success(self.request, self.success_msg)
+        return redirect(self.success_url)
 
 
 class ProgramStudiJenjangBulkDeleteView(ProgramStudiMixin, ModelBulkDeleteView):
