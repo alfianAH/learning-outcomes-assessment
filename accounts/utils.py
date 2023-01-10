@@ -1,8 +1,8 @@
-from django.conf import settings
 import os
 from django.conf import settings
 from django.urls import reverse
 import requests
+from learning_outcomes_assessment.utils import request_data_to_neosia
 from requests import Request, Session
 from requests.exceptions import MissingSchema, SSLError
 
@@ -35,59 +35,25 @@ def get_user_profile(user: dict, role: str):
             parameters = {
                 'nip': user
             }
-            response = request_data_to_neosia(DOSEN_PROFILE_URL, parameters)
-            if response is None: return None
+            json_response = request_data_to_neosia(DOSEN_PROFILE_URL, params=parameters)
+            if json_response is None: return None
 
-            if response.status_code == 200:
-                json_response = response.json()
-
-                # Return None if the request has no data
-                if len(json_response) == 0: return None
-                
-                user_profile = json_response[0]
-                return user_profile
-            else:
-                if settings.DEBUG: print(response.reason)
-                return None
+            user_profile = json_response[0]
+            return user_profile
         case RoleChoices.MAHASISWA:
             parameters = {
                 'nim': user
             }
-            response = request_data_to_neosia(MHS_PROFILE_URL, parameters)
+            json_response = request_data_to_neosia(MHS_PROFILE_URL, parameters)
     
-            if response is None: return None
+            if json_response is None: return None
 
-            if response.status_code == 200:
-                json_response = response.json()
+            # Return None if the request has no data
+            if len(json_response['data']) == 0: return None
+            
+            user_profile = json_response['data'][0]
+            return user_profile
 
-                # Return None if the request has no data
-                if len(json_response['data']) == 0: return None
-                
-                user_profile = json_response['data'][0]
-                return user_profile
-            else:
-                if settings.DEBUG: print(response.reason)
-                return None
-
-def request_data_to_neosia(auth_url: str, parameters: dict, headers: dict = {}):
-    """Request data to Neosia API
-
-    Args:
-        auth_url (str): Target URL
-        parameters (dict): Requested parameters
-        headers (dict): Requested headers
-
-    Returns:
-        Response: Response from Neosia API
-    """
-    headers.update({
-        'token': os.environ.get('NEOSIA_API_TOKEN')
-    })
-    try:
-        response = requests.post(auth_url, params=parameters, headers=headers)
-    except MissingSchema:
-        return None
-    return response
 
 def get_oauth_access_token(code: str):
     """Get OAuth Access Token from MBerkas OAuth
@@ -163,18 +129,12 @@ def validate_mahasiswa(username: str, password: str):
         'token': os.environ.get('NEOSIA_API_TOKEN')
     }
 
-    response = request_data_to_neosia(MHS_AUTH_URL, parameters, headers)
+    json_response = request_data_to_neosia(MHS_AUTH_URL, parameters, headers)
 
-    if response is None: return None
+    if json_response is None: return None
 
-    if response.status_code == 200:
-        json_response = response.json()
-
-        # Return None if the request is not success
-        if json_response['success'] == '0': return None
-        
-        user = json_response['data']
-        return user
-    else:
-        print(response)
-        return None
+    # Return None if the request is not success
+    if json_response['success'] == '0': return None
+    
+    user = json_response['data']
+    return user

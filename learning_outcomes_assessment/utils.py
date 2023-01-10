@@ -68,11 +68,15 @@ def request_data_to_neosia(auth_url: str, params: dict = {}, headers: dict = {})
     except requests.exceptions.SSLError:
         if settings.DEBUG: print("SSL Error")
         response = requests.post(auth_url, params=params, headers=headers, verify=False)
+    except requests.exceptions.MissingSchema:
+        if settings.DEBUG:
+            print('URL POST has not been set')
+        return None
     except requests.exceptions.ConnectTimeout:
         # TODO: ACTIONS ON CONNECT TIMEOUT
         if settings.DEBUG:
             print('Timeout')
-            return None
+        return None
 
     if response.status_code == 200:
         json_response = response.json()
