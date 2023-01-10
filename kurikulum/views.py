@@ -1,5 +1,6 @@
 import json
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
@@ -37,6 +38,11 @@ from mata_kuliah_kurikulum.utils import(
 class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
     template_name: str = 'kurikulum/read-all-sync-form.html'
     form_list: list = [KurikulumCreateForm, MataKuliahKurikulumCreateForm]
+
+    def get(self, request, *args, **kwargs):
+        if request.user.prodi is None:
+            raise PermissionDenied
+        return super().get(request, *args, **kwargs)
 
     def get_form_kwargs(self, step=None):
         form_kwargs = super().get_form_kwargs(step)

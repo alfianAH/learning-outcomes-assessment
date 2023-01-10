@@ -95,6 +95,7 @@
                 <span class="ml-5 text-slate-50">Beranda</span>
             </a>
             
+            {% if request.user.prodi %}
             <a href="{% url 'accounts:prodi-read' prodi_id=request.user.prodi.id_neosia %}" class="sidebar-item" role="menuitem link">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" role="img" aria-label="home" focusable="False" 
                     class="bi bi-house
@@ -105,6 +106,7 @@
                 </svg>
                 <span class="ml-5 text-slate-50">Program Studi</span>
             </a>
+            {% endif %}
 
             <a href="{% url 'kurikulum:read-all' %}" class="sidebar-item" role="menuitem link">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" role="img" aria-label="curriculum" focusable="False" 
@@ -172,6 +174,26 @@
     <div id="content">
         {% block content %}
             <h2>Selamat Datang, {{ request.user.name }}</h2>
+            {% if not request.user.prodi %}
+                <p class="text-danger">Saat akun anda tidak memiliki program studi. Hal ini dikarenakan akun anda di{% if request.user.role == 'd' or request.user.role == 'a' %} MBerkas {% else %} Neosia {% endif %}tidak memiliki program studi{% if request.user.role == 'd' %} atau data anda tidak tercatat di Neosia{% endif %}. Hubungi admin untuk memperbaiki hal ini.</p>
+                {% if request.user.role == 'a' %}
+                    <p>Cara memperbaiki:</p>
+                    <ul class="list-decimal ml-5">
+                        <li>Tambahkan data program studi di MBerkas</li>
+                    </ul>
+                {% elif request.user.role == 'd' %}
+                    <p>Cara memperbaiki: (pilih salah satu)</p>
+                    <ul class="list-decimal ml-5">
+                        <li>Tambahkan data program studi di MBerkas</li>
+                        <li>Tambahkan data dosen di Neosia</li>
+                    </ul>
+                {% elif request.user.role == 'm' %}
+                    <p>Cara memperbaiki:</p>
+                    <ul class="list-decimal ml-5">
+                        <li>Tambahkan data mahasiswa di Neosia</li>
+                    </ul>
+                {% endif %}
+            {% endif %}
         {% endblock content %}
     </div>
 </main>

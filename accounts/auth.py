@@ -26,8 +26,8 @@ class MyBackend(BaseBackend):
         Returns:
             MyUser: User object if succesfully gotten or created else None
         """
-        fakultas = None
         prodi = None
+
         match(role):
             case RoleChoices.ADMIN_PRODI:
                 user_data = {
@@ -38,47 +38,31 @@ class MyBackend(BaseBackend):
                     'id_fakultas': user['prodi']['id_fakultas']
                 }
 
-                detail_fakultas = request_data_to_neosia(DETAIL_FAKULTAS_URL, params={
-                    'id': user_data['id_fakultas']
-                })
-                
-                if detail_fakultas is not None or len(detail_fakultas) > 0:
-                    # Get Fakultas
-                    fakultas = self.get_or_create_fakultas(
-                        user_data['id_fakultas'],
-                        detail_fakultas[0]['nama_resmi']
-                    )
-                    # Get Program Studi
-                    prodi = self.get_or_create_prodi(
-                        user_data['id_prodi'], 
-                        user_data['nama_prodi'],
-                        fakultas
-                    )
+                _, prodi = self.get_or_create_fakultas_and_prodi_from_mberkas(user_data)
             case RoleChoices.DOSEN:
                 user_data = {
                     'username': user['nip'],
                     'nama': user['nama'],
                 }
 
-                user_profile = get_user_profile(user, role)
-                
-                # Return None if user profile is None
-                if user_profile is None:
-                    if settings.DEBUG: print("Failed to get user profile: {}".format(user_data['username']))
-                else:
-                    # Get Fakultas and Program Studi from user profile
-                    fakultas = self.get_or_create_fakultas(
-                        user_profile['id_fakultas'], 
-                        user_profile['nama_resmi']
-                    )
-                    prodi = self.get_or_create_prodi(
-                        user_profile['id_prodi'], 
-                        user_profile['nama_prodi'], 
-                        fakultas
-                    )
+                # Get prodi from Neosia
+                if user['prodi'] is None:
+                    user_profile = get_user_profile(user, role)
                     
-                    if fakultas is None or prodi is None: 
-                        return None
+                    # Return None if user profile is None
+                    if user_profile is None:
+                        if settings.DEBUG: print("Failed to get user profile: {}".format(user_data['username']))
+                    else:
+                        _, prodi = self.get_or_create_fakultas_and_prodi_from_neosia(user_profile)
+                # Get Prodi from MBerkas
+                else:
+                    user_data.update({
+                        'id_prodi': user['prodi']['id'],
+                        'nama_prodi': user['prodi']['nama_resmi'],
+                        'id_fakultas': user['prodi']['id_fakultas']
+                    })
+
+                    _, prodi = self.get_or_create_fakultas_and_prodi_from_mberkas(user_data)
             case RoleChoices.MAHASISWA:
                 user_data = validate_mahasiswa(user, password)
 
@@ -88,25 +72,11 @@ class MyBackend(BaseBackend):
                     return None
                 
                 user_profile = get_user_profile(user, role)
-
-                # Return None if user profile is None
+                
                 if user_profile is None:
                     if settings.DEBUG: print("Failed to get user profile: {}".format(user['username']))
-                    return None
-
-                # Get Fakultas and Program Studi from user profile
-                fakultas = self.get_or_create_fakultas(
-                    user_profile['id_fakultas'], 
-                    user_profile['nama_fakultas']
-                )
-                prodi = self.get_or_create_prodi(
-                    user_profile['id_prodi'], 
-                    user_profile['nama_prodi'], 
-                    fakultas
-                )
-                
-                if fakultas is None or prodi is None: 
-                    return None
+                else:
+                    _, prodi = self.get_or_create_fakultas_and_prodi_from_neosia(user_profile)
         
         # Get user
         try:
@@ -139,6 +109,60 @@ class MyBackend(BaseBackend):
             return None
         if settings.DEBUG: print(user)
         return user
+
+    def get_or_create_fakultas_and_prodi_from_mberkas(self, user_data: dict):
+        """Get or create fakultas and prodi from MBerkas user data
+
+        Args:
+            user_data (dict): User data from MBerkas
+
+        Returns:
+            tuple: Fakultas and Program Studi
+        """
+        
+        detail_fakultas = request_data_to_neosia(DETAIL_FAKULTAS_URL, params={
+            'id': user_data['id_fakultas']
+        })
+        fakultas = None
+        
+        if detail_fakultas is not None or len(detail_fakultas) > 0:
+            # Get Fakultas
+            fakultas = self.get_or_create_fakultas(
+                user_data['id_fakultas'],
+                detail_fakultas[0]['nama_resmi']
+            )
+        
+        # Get Program Studi
+        prodi = self.get_or_create_prodi(
+            user_data['id_prodi'], 
+            user_data['nama_prodi'],
+            fakultas
+        )
+
+        return fakultas, prodi
+
+    def get_or_create_fakultas_and_prodi_from_neosia(self, user_profile: dict):
+        """Get or create fakultas and prodi from Neosia user profile
+
+        Args:
+            user_profile (dict): User profile from Neosia
+
+        Returns:
+            tuple: Fakultas and Program Studi
+        """
+        
+        # Get Fakultas and Program Studi from user profile
+        fakultas = self.get_or_create_fakultas(
+            user_profile['id_fakultas'], 
+            user_profile['nama_fakultas']
+        )
+        prodi = self.get_or_create_prodi(
+            user_profile['id_prodi'], 
+            user_profile['nama_prodi'], 
+            fakultas
+        )
+
+        return fakultas, prodi
     
     def get_or_create_fakultas(self, id_fakultas: int, nama_fakultas: str) -> Fakultas:
         """Get or create fakultas object

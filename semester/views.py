@@ -1,5 +1,6 @@
 from django.conf import settings
-from django.http import Http404, HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse
+from django.core.exceptions import PermissionDenied
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -58,7 +59,7 @@ class SemesterReadAllView(ListViewModelA):
     sort_template: str = 'semester/partials/semester-sort-form.html'
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        if request.user.prodi is None: raise Http404()
+        if request.user.prodi is None: raise PermissionDenied()
 
         semester_qs = self.get_queryset()
 

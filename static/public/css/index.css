@@ -3554,6 +3554,10 @@ details.dropdown::marker {
   cursor: pointer;
 }
 
+.list-decimal {
+  list-style-type: decimal;
+}
+
 .list-disc {
   list-style-type: disc;
 }
