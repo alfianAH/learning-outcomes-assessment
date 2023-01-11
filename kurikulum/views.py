@@ -137,8 +137,6 @@ class KurikulumCreateFormWizardView(MySessionWizardView):
     def save_mk_kurikulum(self, list_mk_id: list[int]):
         prodi_jenjang_id = self.get_cleaned_data_for_step('0')['prodi_jenjang']
         list_kurikulum_id = self.get_cleaned_data_for_step('1')['kurikulum_from_neosia']
-        
-        prodi_jenjang_obj = ProgramStudiJenjang.objects.get(id_neosia=prodi_jenjang_id)
 
         for kurikulum_id in list_kurikulum_id:
             try:
@@ -155,11 +153,10 @@ class KurikulumCreateFormWizardView(MySessionWizardView):
             for mk_kurikulum in list_mk_kurikulum:
                 if str(mk_kurikulum['id_neosia']) not in list_mk_id: continue
 
-                deleted_items = ['prodi_jenjang', 'kurikulum']
+                deleted_items = ['kurikulum']
                 [mk_kurikulum.pop(item) for item in deleted_items]
 
                 MataKuliahKurikulum.objects.create(
-                    prodi=prodi_jenjang_obj, 
                     kurikulum=kurikulum_obj, 
                     **mk_kurikulum
                 )
@@ -300,7 +297,7 @@ class KurikulumReadView(ProgramStudiMixin, DetailView):
     def setup(self, request: HttpRequest, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.object: Kurikulum = self.get_object()
-        self.program_studi_obj = self.object.prodi
+        self.program_studi_obj = self.object.prodi_jenjang.program_studi
 
 
 class KurikulumBulkDeleteView(ModelBulkDeleteView):

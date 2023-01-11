@@ -3493,6 +3493,14 @@ details.dropdown::marker {
   width: 85%;
 }
 
+.w-2 {
+  width: 0.5rem;
+}
+
+.w-28 {
+  width: 7rem;
+}
+
 .min-w-full {
   min-width: 100%;
 }

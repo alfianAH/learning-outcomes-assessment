@@ -30,7 +30,6 @@ def get_mk_kurikulum(kurikulum_id: int, prodi_jenjang_id: int):
             continue
 
         mata_kuliah = {
-            'prodi_jenjang': mata_kuliah_data['id_prodi'],
             'kurikulum': mata_kuliah_data['id_kurikulum'],
             'id_neosia': int(id_mk_kurikulum),
             'kode': mata_kuliah_data['kode'],
@@ -55,7 +54,6 @@ def get_detail_mk(mata_kuliah_id: int):
     detail_mata_kuliah = json_response[0]
     mata_kuliah_data = {
         'id_neosia': mata_kuliah_id,
-        'prodi_jenjang': detail_mata_kuliah['id_prodi'],
         'kurikulum': detail_mata_kuliah['id_kurikulum'],
         'kode': detail_mata_kuliah['kode'],
         'nama': detail_mata_kuliah['nama_resmi'],

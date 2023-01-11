@@ -3,7 +3,6 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
-from accounts.models import ProgramStudi
 from .models import MataKuliahKurikulum
 from kurikulum.models import Kurikulum
 from learning_outcomes_assessment.list_view.views import ListViewModelA
@@ -98,7 +97,6 @@ class MataKuliahKurikulumCreateView(FormView):
     form_class = MataKuliahKurikulumCreateForm
     template_name: str = 'mata-kuliah-kurikulum/create-view.html'
     kurikulum_obj: Kurikulum = None
-    prodi_id: int = None
     form_field_name: str = 'mk_from_neosia'
 
     def setup(self, request: HttpRequest, *args, **kwargs):
@@ -121,8 +119,10 @@ class MataKuliahKurikulumCreateView(FormView):
     def get_form(self, form_class = None):
         form = super().get_form(form_class)
 
-        self.prodi_id = self.request.user.prodi.id_neosia
-        mk_kurikulum_choices = get_mk_kurikulum_choices(self.kurikulum_obj.id_neosia, self.prodi_id)
+        mk_kurikulum_choices = get_mk_kurikulum_choices(
+            self.kurikulum_obj.id_neosia, 
+            self.kurikulum_obj.prodi_jenjang.id_neosia
+        )
 
         form.fields.get(self.form_field_name).choices = mk_kurikulum_choices
         
@@ -138,18 +138,19 @@ class MataKuliahKurikulumCreateView(FormView):
 
     def form_valid(self, form) -> HttpResponse:
         list_mk_id = form.cleaned_data.get(self.form_field_name)
-        prodi_obj = ProgramStudi.objects.get(id_neosia=self.prodi_id)
         
-        list_mk_kurikulum = get_mk_kurikulum(self.kurikulum_obj.id_neosia, self.prodi_id)
+        list_mk_kurikulum = get_mk_kurikulum(
+            self.kurikulum_obj.id_neosia, 
+            self.kurikulum_obj.prodi_jenjang.id_neosia
+        )
         
         for mk_kurikulum in list_mk_kurikulum:
             if str(mk_kurikulum['id_neosia']) not in list_mk_id: continue
 
-            deleted_items = ['prodi', 'kurikulum']
+            deleted_items = ['kurikulum']
             [mk_kurikulum.pop(item) for item in deleted_items]
 
             MataKuliahKurikulum.objects.create(
-                prodi=prodi_obj, 
                 kurikulum=self.kurikulum_obj, 
                 **mk_kurikulum
             )
@@ -168,7 +169,6 @@ class MataKuliahKurikulumBulkUpdateView(ModelBulkUpdateView):
     form_class = MataKuliahKurikulumBulkUpdateForm
     template_name: str = 'mata-kuliah-kurikulum/update-view.html'
     kurikulum_obj: Kurikulum = None
-    prodi_id: int = None
     form_field_name: str = 'update_data_mk_kurikulum'
 
     back_url: str = ''
@@ -181,14 +181,13 @@ class MataKuliahKurikulumBulkUpdateView(ModelBulkUpdateView):
 
         kurikulum_id = kwargs.get('kurikulum_id')
         self.kurikulum_obj = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
-        self.prodi_id = request.user.prodi.id_neosia
         self.success_url = self.kurikulum_obj.read_all_mk_kurikulum_url()
         self.back_url = self.success_url
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()        
         kwargs['kurikulum_id'] = self.kurikulum_obj.id_neosia
-        kwargs['prodi_id'] = self.prodi_id
+        kwargs['prodi_jenjang_id'] = self.kurikulum_obj.prodi_jenjang.id_neosia
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -199,12 +198,15 @@ class MataKuliahKurikulumBulkUpdateView(ModelBulkUpdateView):
         return context
 
     def update_mk_kurikulum(self, list_mk_kurikulum_id):
-        list_mk_kurikulum = get_mk_kurikulum(self.kurikulum_obj.id_neosia, self.prodi_id)
+        list_mk_kurikulum = get_mk_kurikulum(
+            self.kurikulum_obj.id_neosia, 
+            self.kurikulum_obj.prodi_jenjang.id_neosia
+        )
         
         for mk_kurikulum in list_mk_kurikulum:
             if str(mk_kurikulum['id_neosia']) not in list_mk_kurikulum_id: continue
 
-            deleted_items = ['prodi', 'kurikulum']
+            deleted_items = ['kurikulum']
             [mk_kurikulum.pop(item) for item in deleted_items]
 
             mk_kurikulum_obj = MataKuliahKurikulum.objects.filter(id_neosia=mk_kurikulum['id_neosia'])
