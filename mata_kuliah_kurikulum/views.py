@@ -6,6 +6,7 @@ from django.views.generic.edit import FormView
 from .models import MataKuliahKurikulum
 from kurikulum.models import Kurikulum
 from learning_outcomes_assessment.list_view.views import ListViewModelA
+from learning_outcomes_assessment.auth.mixins import ProgramStudiMixin
 from learning_outcomes_assessment.forms.edit import (
     ModelBulkDeleteView,
     ModelBulkUpdateView,
@@ -25,7 +26,7 @@ from mata_kuliah_kurikulum.utils import(
 
 
 # Create your views here.
-class MataKuliahKurikulumReadAllView(ListViewModelA):
+class MataKuliahKurikulumReadAllView(ProgramStudiMixin, ListViewModelA):
     model = MataKuliahKurikulum
     paginate_by: int = 10
     template_name: str = 'mata-kuliah-kurikulum/home.html'
@@ -52,6 +53,7 @@ class MataKuliahKurikulumReadAllView(ListViewModelA):
 
         kurikulum_id = kwargs.get('kurikulum_id')
         self.kurikulum_obj: Kurikulum = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
+        self.program_studi_obj = self.kurikulum_obj.prodi_jenjang.program_studi
 
         self.bulk_delete_url = self.kurikulum_obj.get_bulk_delete_mk_kurikulum_url()
         self.reset_url = self.kurikulum_obj.read_all_mk_kurikulum_url()
@@ -93,7 +95,7 @@ class MataKuliahKurikulumReadAllView(ListViewModelA):
         return context
 
 
-class MataKuliahKurikulumCreateView(FormView):
+class MataKuliahKurikulumCreateView(ProgramStudiMixin, FormView):
     form_class = MataKuliahKurikulumCreateForm
     template_name: str = 'mata-kuliah-kurikulum/create-view.html'
     kurikulum_obj: Kurikulum = None
@@ -104,6 +106,7 @@ class MataKuliahKurikulumCreateView(FormView):
 
         kurikulum_id = kwargs.get('kurikulum_id')
         self.kurikulum_obj = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
+        self.program_studi_obj = self.kurikulum_obj.prodi_jenjang.program_studi
         self.success_url = self.kurikulum_obj.read_all_mk_kurikulum_url()
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
@@ -159,13 +162,19 @@ class MataKuliahKurikulumCreateView(FormView):
         return redirect(self.success_url)
 
 
-class MataKuliahKurikulumReadView(DetailView):
+class MataKuliahKurikulumReadView(ProgramStudiMixin, DetailView):
     model = MataKuliahKurikulum
     pk_url_kwarg: str = 'mk_id'
     template_name: str = 'mata-kuliah-kurikulum/detail-view.html'
 
+    def setup(self, request: HttpRequest, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.object: MataKuliahKurikulum = self.get_object()
 
-class MataKuliahKurikulumBulkUpdateView(ModelBulkUpdateView):
+        self.program_studi_obj = self.object.kurikulum.prodi_jenjang.program_studi
+
+
+class MataKuliahKurikulumBulkUpdateView(ProgramStudiMixin, ModelBulkUpdateView):
     form_class = MataKuliahKurikulumBulkUpdateForm
     template_name: str = 'mata-kuliah-kurikulum/update-view.html'
     kurikulum_obj: Kurikulum = None
@@ -181,6 +190,7 @@ class MataKuliahKurikulumBulkUpdateView(ModelBulkUpdateView):
 
         kurikulum_id = kwargs.get('kurikulum_id')
         self.kurikulum_obj = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
+        self.program_studi_obj = self.kurikulum_obj.prodi_jenjang.program_studi
         self.success_url = self.kurikulum_obj.read_all_mk_kurikulum_url()
         self.back_url = self.success_url
 
@@ -220,7 +230,7 @@ class MataKuliahKurikulumBulkUpdateView(ModelBulkUpdateView):
         return super().form_valid(form)
 
 
-class MataKuliahKurikulumBulkDeleteView(ModelBulkDeleteView):
+class MataKuliahKurikulumBulkDeleteView(ProgramStudiMixin, ModelBulkDeleteView):
     model = MataKuliahKurikulum
     success_msg = 'Berhasil menghapus mata kuliah kurikulum'
     id_list_obj = 'id_mk_kurikulum'
@@ -229,6 +239,7 @@ class MataKuliahKurikulumBulkDeleteView(ModelBulkDeleteView):
         super().setup(request, *args, **kwargs)
         kurikulum_id = kwargs.get('kurikulum_id')
         kurikulum_obj: Kurikulum = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
+        self.program_studi_obj = kurikulum_obj.prodi_jenjang.program_studi
         self.success_url = kurikulum_obj.read_all_mk_kurikulum_url()
 
     def get_queryset(self):
