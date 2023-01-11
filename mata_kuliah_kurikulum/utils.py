@@ -7,9 +7,9 @@ DETAIL_MATA_KULIAH_URL = 'https://customapi.neosia.unhas.ac.id/getMKDetail'
 MATA_KULIAH_KURIKULUM_URL = 'https://customapi.neosia.unhas.ac.id/getMKbyKurikulumAndProdi'
 
 
-def get_mk_kurikulum(kurikulum_id: int, prodi_id: int):
+def get_mk_kurikulum(kurikulum_id: int, prodi_jenjang_id: int):
     parameters = {
-        'id_prodi': prodi_id,
+        'id_prodi': prodi_jenjang_id,
         'id_kurikulum': kurikulum_id
     }
 
@@ -30,7 +30,7 @@ def get_mk_kurikulum(kurikulum_id: int, prodi_id: int):
             continue
 
         mata_kuliah = {
-            'prodi': mata_kuliah_data['id_prodi'],
+            'prodi_jenjang': mata_kuliah_data['id_prodi'],
             'kurikulum': mata_kuliah_data['id_kurikulum'],
             'id_neosia': int(id_mk_kurikulum),
             'kode': mata_kuliah_data['kode'],
@@ -55,7 +55,7 @@ def get_detail_mk(mata_kuliah_id: int):
     detail_mata_kuliah = json_response[0]
     mata_kuliah_data = {
         'id_neosia': mata_kuliah_id,
-        'prodi': detail_mata_kuliah['id_prodi'],
+        'prodi_jenjang': detail_mata_kuliah['id_prodi'],
         'kurikulum': detail_mata_kuliah['id_kurikulum'],
         'kode': detail_mata_kuliah['kode'],
         'nama': detail_mata_kuliah['nama_resmi'],
@@ -65,8 +65,8 @@ def get_detail_mk(mata_kuliah_id: int):
     return mata_kuliah_data
 
 
-def get_mk_kurikulum_choices(kurikulum_id: int, prodi_id: int):
-    list_mk_kurikulum = get_mk_kurikulum(kurikulum_id, prodi_id)
+def get_mk_kurikulum_choices(kurikulum_id: int, prodi_jenjang_id: int):
+    list_mk_kurikulum = get_mk_kurikulum(kurikulum_id, prodi_jenjang_id)
     mk_kurikulum_choices = []
 
     for mk_kurikulum_data in list_mk_kurikulum:
@@ -81,8 +81,8 @@ def get_mk_kurikulum_choices(kurikulum_id: int, prodi_id: int):
     return mk_kurikulum_choices
 
 
-def get_update_mk_kurikulum_choices(kurikulum_id: int, prodi_id: int):
-    json_response = get_mk_kurikulum(kurikulum_id, prodi_id)
+def get_update_mk_kurikulum_choices(kurikulum_id: int, prodi_jenjang_id: int):
+    json_response = get_mk_kurikulum(kurikulum_id, prodi_jenjang_id)
     update_mk_kurikulum_choices = []
 
     for mk_kurikulum_data in json_response:
@@ -108,5 +108,3 @@ def get_update_mk_kurikulum_choices(kurikulum_id: int, prodi_id: int):
         update_mk_kurikulum_choices.append(update_mk_kurikulum_choice)
 
     return update_mk_kurikulum_choices
-
-

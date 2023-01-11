@@ -8,11 +8,16 @@ from learning_outcomes_assessment.widgets import (
     UpdateChoiceList,
     ChoiceListInteractiveModelA,
     MyNumberInput,
+    MyRadioInput,
 )
 from .models import ProgramStudi, ProgramStudiJenjang
 from .enums import RoleChoices
 from .widgets import LoginTextInput, LoginPasswordInput
-from .utils import get_all_prodi_choices, get_update_prodi_jenjang_choices
+from .utils import (
+    get_all_prodi_choices, 
+    get_update_prodi_jenjang_choices,
+    get_prodi_jenjang_db_choices,
+)
 
 
 class MahasiswaAuthForm(AuthenticationForm):
@@ -50,6 +55,35 @@ class MahasiswaAuthForm(AuthenticationForm):
                 self.confirm_login_allowed(self.user_cache)
 
         return self.cleaned_data
+
+
+class ProgramStudiJenjangSelectForm(forms.Form):
+    prodi_jenjang = forms.ChoiceField(
+        widget=MyRadioInput(),
+        label = 'Pilih Jenjang Program Studi',
+        help_text = 'Berikut adalah list jenjang program studi. Pilih salah satu untuk memilih kurikulum, di step selanjutnya, yang sesuai dengan jenjang program studi masing-masing.',
+    )
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user')
+        super().__init__(*args, **kwargs)
+        
+        prodi_obj: ProgramStudi = self.user.prodi
+        self.fields['prodi_jenjang'].choices = get_prodi_jenjang_db_choices(prodi_obj)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        prodi_jenjang_id = cleaned_data['prodi_jenjang']
+
+        try:
+            prodi_jenjang_id = int(prodi_jenjang_id)
+        except ValueError:
+            if settings.DEBUG:
+                print('Cannot convert prodi jenjang ID: {}'.format(prodi_jenjang_id))
+        
+        cleaned_data['prodi_jenjang'] = prodi_jenjang_id
+
+        return cleaned_data
 
 
 class ProgramStudiJenjangCreateForm(forms.Form):

@@ -12,7 +12,7 @@ def get_kurikulum_with_pi_area(kurikulum_obj: Kurikulum):
 
     # Get list kurikulum and exclude obj itself
     kurikulum_qs = Kurikulum.objects.filter(
-        prodi=kurikulum_obj.prodi.id_neosia).exclude(id_neosia=kurikulum_obj.id_neosia)
+        prodi=kurikulum_obj.prodi_jenjang.id_neosia).exclude(id_neosia=kurikulum_obj.id_neosia)
 
     # Filter Assessment Area and PI Area in the semester
     for kurikulum_obj in kurikulum_qs:

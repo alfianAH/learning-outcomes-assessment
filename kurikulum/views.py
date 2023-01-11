@@ -14,7 +14,8 @@ from learning_outcomes_assessment.forms.edit import (
     ModelBulkDeleteView,
     ModelBulkUpdateView
 )
-from accounts.models import ProgramStudi
+from accounts.models import ProgramStudiJenjang
+from accounts.forms import ProgramStudiJenjangSelectForm
 from .models import Kurikulum
 from .filters import (
     KurikulumFilter, 
@@ -38,9 +39,9 @@ from mata_kuliah_kurikulum.utils import(
 
 
 # Create your views here.
-class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
-    template_name: str = 'kurikulum/read-all-sync-form.html'
-    form_list: list = [KurikulumCreateForm, MataKuliahKurikulumCreateForm]
+class KurikulumCreateFormWizardView(MySessionWizardView):
+    template_name: str = 'kurikulum/create-view.html'
+    form_list: list = [ProgramStudiJenjangSelectForm, KurikulumCreateForm, MataKuliahKurikulumCreateForm]
 
     def get(self, request, *args, **kwargs):
         if request.user.prodi is None:
@@ -50,9 +51,14 @@ class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
     def get_form_kwargs(self, step=None):
         form_kwargs = super().get_form_kwargs(step)
         
-        if step == '0':
-            form_kwargs.update({'user': self.request.user})
-        
+        match step:
+            case '0':
+                form_kwargs.update({'user': self.request.user})
+            case '1':
+                selected_prodi_jenjang: int = self.get_cleaned_data_for_step('0')['prodi_jenjang']
+                form_kwargs.update({
+                    'prodi_jenjang_id': selected_prodi_jenjang
+                })
         return form_kwargs
 
     def get_context_data(self, form, **kwargs):
@@ -61,9 +67,13 @@ class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
         match(self.steps.current):
             case '0':
                 context.update({
-                    'search_placeholder': 'Cari nama kurikulum...'
+                    'search_text': False,
                 })
             case '1':
+                context.update({
+                    'search_placeholder': 'Cari nama kurikulum...'
+                })
+            case '2':
                 context.update({
                     'search_placeholder': 'Cari nama mata kuliah...'
                 })
@@ -72,14 +82,15 @@ class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
     def render_next_step(self, form, **kwargs):
         next_step = self.steps.next
         
-        match(next_step): 
-            case '1':
-                kurikulum_cleaned_data = self.get_cleaned_data_for_step('0').get('kurikulum_from_neosia')
-                prodi_id = self.request.user.prodi.id_neosia
+        match(next_step):
+            case '2':
+                prodi_jenjang_id = self.get_cleaned_data_for_step('0')['prodi_jenjang']
+                kurikulum_cleaned_data = self.get_cleaned_data_for_step('1')['kurikulum_from_neosia']
+                
                 mk_kurikulum_choices = []
                 
                 for kurikulum_id in kurikulum_cleaned_data:
-                    list_mk_kurikulum = get_mk_kurikulum_choices(kurikulum_id, prodi_id)
+                    list_mk_kurikulum = get_mk_kurikulum_choices(kurikulum_id, prodi_jenjang_id)
                     for mk_kurikulum_choice in list_mk_kurikulum:
                         mk_kurikulum_choices.append(mk_kurikulum_choice)
 
@@ -108,24 +119,26 @@ class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
         if step is None: step = self.steps.current
         
         match(step):
-            case '1':
+            case '2':
                 self.set_form_choices(form, 'mk_kurikulum_choices', 'mk_from_neosia')
         return form
 
     def save_kurikulum(self, kurikulum_id: int):
         kurikulum_detail = get_detail_kurikulum(kurikulum_id)
-        prodi_id = kurikulum_detail.get('prodi')
-        # Get Program studi object
-        prodi_obj = ProgramStudi.objects.get(id_neosia=prodi_id)
-        kurikulum_detail.pop('prodi')
+        prodi_jenjang_id = kurikulum_detail.get('prodi_jenjang')
 
-        Kurikulum.objects.get_or_create(prodi=prodi_obj, **kurikulum_detail)
+        # Get Program Studi Jenjang object
+        prodi_jenjang_obj = ProgramStudiJenjang.objects.get(id_neosia=prodi_jenjang_id)
+        kurikulum_detail.pop('prodi_jenjang')
+
+        Kurikulum.objects.get_or_create(prodi_jenjang=prodi_jenjang_obj, **kurikulum_detail)
         return True
     
     def save_mk_kurikulum(self, list_mk_id: list[int]):
-        list_kurikulum_id = self.get_cleaned_data_for_step('0').get('kurikulum_from_neosia')
-        prodi_id = self.request.user.prodi.id_neosia
-        prodi_obj = ProgramStudi.objects.get(id_neosia=prodi_id)
+        prodi_jenjang_id = self.get_cleaned_data_for_step('0')['prodi_jenjang']
+        list_kurikulum_id = self.get_cleaned_data_for_step('1')['kurikulum_from_neosia']
+        
+        prodi_jenjang_obj = ProgramStudiJenjang.objects.get(id_neosia=prodi_jenjang_id)
 
         for kurikulum_id in list_kurikulum_id:
             try:
@@ -137,16 +150,16 @@ class KurikulumReadAllSyncFormWizardView(MySessionWizardView):
                 )
                 continue
 
-            list_mk_kurikulum = get_mk_kurikulum(kurikulum_id, prodi_id)
+            list_mk_kurikulum = get_mk_kurikulum(kurikulum_id, prodi_jenjang_id)
             
             for mk_kurikulum in list_mk_kurikulum:
                 if str(mk_kurikulum['id_neosia']) not in list_mk_id: continue
 
-                deleted_items = ['prodi', 'kurikulum']
+                deleted_items = ['prodi_jenjang', 'kurikulum']
                 [mk_kurikulum.pop(item) for item in deleted_items]
 
                 MataKuliahKurikulum.objects.create(
-                    prodi=prodi_obj, 
+                    prodi=prodi_jenjang_obj, 
                     kurikulum=kurikulum_obj, 
                     **mk_kurikulum
                 )
@@ -252,7 +265,8 @@ class KurikulumReadAllView(ListViewModelA):
     sort_template: str = 'kurikulum/partials/kurikulum-sort-form.html'
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        kurikulum_qs = self.model.objects.filter(prodi=request.user.prodi)
+        kurikulum_qs = self.model.objects.filter(prodi_jenjang__program_studi=request.user.prodi)
+
         if kurikulum_qs.exists():
             filter_data = {
                 'nama': request.GET.get('nama', ''),
@@ -273,7 +287,7 @@ class KurikulumReadAllView(ListViewModelA):
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        self.queryset = self.model.objects.filter(prodi=self.request.user.prodi)
+        self.queryset = self.model.objects.filter(prodi_jenjang__program_studi=self.request.user.prodi)
 
         return super().get_queryset()
 

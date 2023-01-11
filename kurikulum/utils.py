@@ -7,9 +7,9 @@ KURIKULUM_URL = 'https://customapi.neosia.unhas.ac.id/getKurikulum'
 DETAIL_KURIKULUM_URL = 'https://customapi.neosia.unhas.ac.id/getKurikulumDetail'
 
 
-def get_kurikulum_by_prodi(prodi_id: int):
+def get_kurikulum_by_prodi_jenjang(prodi_jenjang_id: int):
     parameters = {
-        'prodi_kode': prodi_id
+        'prodi_kode': prodi_jenjang_id
     }
 
     json_response = request_data_to_neosia(KURIKULUM_URL, params=parameters)
@@ -19,7 +19,7 @@ def get_kurikulum_by_prodi(prodi_id: int):
     for kurikulum_data in json_response:
         kurikulum = {
             'id_neosia': kurikulum_data['id'],
-            'prodi': kurikulum_data['id_prodi'],
+            'prodi_jenjang': kurikulum_data['id_prodi'],
             'nama': kurikulum_data['nama'],
             'tahun_mulai': kurikulum_data['tahun'],
             'is_active': kurikulum_data['is_current'] == 1,
@@ -40,7 +40,7 @@ def get_detail_kurikulum(kurikulum_id: int):
 
     kurikulum_data = {
         'id_neosia': kurikulum_detail['id'],
-        'prodi': kurikulum_detail['id_prodi'],
+        'prodi_jenjang': kurikulum_detail['id_prodi'],
         'nama': kurikulum_detail['nama'],
         'tahun_mulai': kurikulum_detail['tahun'],
         'is_active': kurikulum_detail['is_current'] == 1,
@@ -49,8 +49,8 @@ def get_detail_kurikulum(kurikulum_id: int):
     return kurikulum_data
 
 
-def get_kurikulum_by_prodi_choices(prodi_id: int):
-    json_response = get_kurikulum_by_prodi(prodi_id)
+def get_kurikulum_by_prodi_jenjang_choices(prodi_jenjang_id: int):
+    json_response = get_kurikulum_by_prodi_jenjang(prodi_jenjang_id)
     kurikulum_choices = []
 
     for kurikulum_data in json_response:
@@ -60,8 +60,8 @@ def get_kurikulum_by_prodi_choices(prodi_id: int):
     return kurikulum_choices
 
 
-def get_update_kurikulum_choices(prodi_id: int):
-    json_response = get_kurikulum_by_prodi(prodi_id)
+def get_update_kurikulum_choices(prodi_jenjang_id: int):
+    json_response = get_kurikulum_by_prodi_jenjang(prodi_jenjang_id)
     update_kurikulum_choices = []
 
     for kurikulum_data in json_response:

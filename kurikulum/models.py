@@ -1,13 +1,13 @@
 from django.db import models
 from django.urls import reverse
 
-from accounts.models import ProgramStudi
+from accounts.models import ProgramStudiJenjang
 
 
 # Create your models here.
 class Kurikulum(models.Model):
     id_neosia = models.BigIntegerField(unique=True, null=False, primary_key=True)
-    prodi = models.ForeignKey(ProgramStudi, on_delete=models.CASCADE)
+    prodi_jenjang = models.ForeignKey(ProgramStudiJenjang, on_delete=models.CASCADE)
     nama = models.CharField(max_length=255, null=False)
     tahun_mulai = models.IntegerField(null=False)
     is_active = models.BooleanField(null=False)

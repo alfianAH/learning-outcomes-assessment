@@ -5,7 +5,7 @@ import requests
 from learning_outcomes_assessment.utils import request_data_to_neosia
 from requests import Request, Session
 from requests.exceptions import MissingSchema, SSLError
-from .models import ProgramStudiJenjang
+from .models import ProgramStudi, ProgramStudiJenjang
 from .enums import RoleChoices
 
 
@@ -212,6 +212,7 @@ def get_all_prodi():
 
     return list_prodi
 
+
 def get_all_prodi_choices():
     list_prodi = get_all_prodi()
     list_prodi_choices = []
@@ -256,3 +257,24 @@ def get_update_prodi_jenjang_choices(list_prodi_id: list[int]):
         update_prodi_jenjang_choices.append(update_prodi_jenjang_choice)
 
     return update_prodi_jenjang_choices
+
+
+def get_prodi_jenjang_db_choices(program_studi: ProgramStudi):
+    """Get program studi jenjang choices by program studi obj in database
+
+    Args:
+        program_studi (ProgramStudi): Program Studi object
+
+    Returns:
+        list: program studi jenjang choices (id, nama)
+    """
+    prodi_jenjang_qs = ProgramStudiJenjang.objects.filter(
+        program_studi=program_studi
+    )
+    prodi_jenjang_choices = []
+
+    for prodi_jenjang in prodi_jenjang_qs:
+        prodi_jenjang_choice = prodi_jenjang.id_neosia, prodi_jenjang.nama
+        prodi_jenjang_choices.append(prodi_jenjang_choice)
+
+    return prodi_jenjang_choices

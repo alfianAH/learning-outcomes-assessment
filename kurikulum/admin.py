@@ -4,6 +4,6 @@ from .models import Kurikulum
 
 # Register your models here.
 class KurikulumAdmin(admin.ModelAdmin):
-    list_display: tuple = ('id_neosia', 'prodi', 'nama', 'is_active')
+    list_display: tuple = ('id_neosia', 'prodi_jenjang', 'nama', 'is_active')
 
 admin.site.register(Kurikulum, KurikulumAdmin)

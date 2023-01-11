@@ -9,7 +9,7 @@ from mata_kuliah_kurikulum.utils import(
     get_mk_kurikulum,
 )
 from .utils import (
-    get_kurikulum_by_prodi_choices,
+    get_kurikulum_by_prodi_jenjang_choices,
     get_update_kurikulum_choices,
 )
 
@@ -28,14 +28,13 @@ class KurikulumCreateForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user')
+        prodi_jenjang_id = kwargs.pop('prodi_jenjang_id')
         super().__init__(*args, **kwargs)
         
-        prodi_id = self.user.prodi.id_neosia
-        kurikulum_choices = get_kurikulum_by_prodi_choices(prodi_id)
+        kurikulum_choices = get_kurikulum_by_prodi_jenjang_choices(prodi_jenjang_id)
         
         for kurikulum_id, _ in kurikulum_choices:
-            mk_kurikulum = get_mk_kurikulum(kurikulum_id, prodi_id)
+            mk_kurikulum = get_mk_kurikulum(kurikulum_id, prodi_jenjang_id)
 
             if len(mk_kurikulum) > 0: 
                 # Check in database

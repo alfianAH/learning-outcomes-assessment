@@ -35,7 +35,7 @@
                                 <p>{{ field.help_text|safe }}</p>
                             {% endif %}
                             
-                            {% if field.field.choices|length != 0 %}
+                            {% if field.field.choices|length != 0 and search_text is None %}
                                 {% include 'components/search-box.html' with search_by_js=True %}
                             {% endif %}
                             <div class="form-group space-y-2.5">

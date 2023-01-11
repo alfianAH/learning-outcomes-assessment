@@ -1,6 +1,6 @@
 from django.urls import path, include
 from .views import (
-    KurikulumReadAllSyncFormWizardView,
+    KurikulumCreateFormWizardView,
     KurikulumReadAllView,
     KurikulumReadView,
     KurikulumBulkUpdateView,
@@ -11,7 +11,7 @@ from .views import (
 app_name = 'kurikulum'
 urlpatterns = [
     path('', KurikulumReadAllView.as_view(), name='read-all'),
-    path('create/', KurikulumReadAllSyncFormWizardView.as_view(), name='read-all-sync'),
+    path('create/', KurikulumCreateFormWizardView.as_view(), name='create'),
     path('delete/', KurikulumBulkDeleteView.as_view(), name='bulk-delete'),
     path('update/', KurikulumBulkUpdateView.as_view(), name='bulk-update'),
     path('<int:kurikulum_id>/', KurikulumReadView.as_view(), name='read'),
