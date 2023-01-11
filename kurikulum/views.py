@@ -246,7 +246,7 @@ class KurikulumReadAllView(ListViewModelA):
     model = Kurikulum
     paginate_by: int = 10
     template_name: str = 'kurikulum/home.html'
-    ordering: str = 'tahun_mulai'
+    ordering: str = ['prodi_jenjang__jenjang_studi__kode', 'tahun_mulai']
     sort_form_ordering_by_key: str = 'ordering_by'
 
     filter_form: KurikulumFilter = None
@@ -275,7 +275,7 @@ class KurikulumReadAllView(ListViewModelA):
                 'is_active': request.GET.get('is_active', ''),
             }
             sort_data = {
-                'ordering_by': request.GET.get('ordering_by', self.ordering)
+                'ordering_by': request.GET.get('ordering_by', self.ordering[0])
             }
 
             self.filter_form = KurikulumFilter(

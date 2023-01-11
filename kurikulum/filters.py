@@ -18,7 +18,8 @@ KURIKULUM_IS_ACTIVE = (
 )
 KURIKULUM_ORDERING_BY = (
     ('nama', 'Nama'), 
-    ('tahun_mulai', 'Tahun Mulai'), 
+    ('tahun_mulai', 'Tahun Mulai'),
+    ('prodi_jenjang__jenjang_studi__kode', 'Jenjang Studi'), 
     ('is_active', 'Keaktifan')
 )
 
