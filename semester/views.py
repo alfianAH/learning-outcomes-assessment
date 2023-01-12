@@ -129,7 +129,8 @@ class SemesterCreateView(MySessionWizardView):
                 })
             case '1':
                 context.update({
-                    'search_placeholder': 'Cari nama semester...'
+                    'search_placeholder': 'Cari nama semester...',
+                    'list_item_name': 'semester/partials/list-item-name-semester-prodi.html'
                 })
         return context
     
@@ -149,7 +150,7 @@ class SemesterCreateView(MySessionWizardView):
             if str(semester_prodi['id_neosia']) not in list_semester_prodi_id: continue
 
             # Get or create tahun ajaran
-            tahun_ajaran_obj, _ = TahunAjaran.objects.get_or_create_tahun_ajaran(semester_prodi['tahun_ajaran'])
+            tahun_ajaran_obj, _ = TahunAjaran.objects.get_or_create_tahun_ajaran(semester_prodi['semester']['tahun_ajaran'])
 
             # Get or create tahun ajaran prodi
             tahun_ajaran_prodi_obj, _ = TahunAjaranProdi.objects.get_or_create(
@@ -158,7 +159,7 @@ class SemesterCreateView(MySessionWizardView):
             )
 
             # Get tipe semester
-            match(semester_prodi['tipe_semester']): 
+            match(semester_prodi['semester']['tipe_semester']): 
                 case 'ganjil':
                     tipe_semester = TipeSemester.GANJIL
                 case 'genap':
@@ -166,7 +167,7 @@ class SemesterCreateView(MySessionWizardView):
 
             # Get or create semester
             semester_obj, _ = Semester.objects.get_or_create(
-                id_neosia=semester_prodi['id_semester'],
+                id_neosia=semester_prodi['semester']['id_semester'],
                 tahun_ajaran=tahun_ajaran_obj,
                 nama=semester_prodi['nama'],
                 tipe_semester=tipe_semester

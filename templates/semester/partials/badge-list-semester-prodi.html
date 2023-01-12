@@ -1,6 +1,6 @@
 {% if option.wrap_label %}
-<div class="badge {% if option.label.tipe_semester|lower == "ganjil" %}badge-primary{% elif option.label.tipe_semester|lower == "genap" %}badge-success{% else %}badge-info{% endif %}">
-    {{ option.label.tipe_semester|capfirst }}
+<div class="badge {% if option.label.semester.tipe_semester|lower == "ganjil" %}badge-primary{% elif option.label.semester.tipe_semester|lower == "genap" %}badge-success{% else %}badge-info{% endif %}">
+    {{ option.label.semester.tipe_semester|capfirst }}
 </div>
 {% else %}
     {% if option.semester.get_tipe_semester_display %}

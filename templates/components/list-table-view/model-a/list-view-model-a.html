@@ -7,12 +7,16 @@
             {% for option in options %}
                 <li class="list-item-model-a" role="listitem">
                     <div class="flex space-x-2.5 items-center">
+                        {% comment %} Checkbox, number and name {% endcomment %}
                         {% include option.template_name with widget=option use_label=True %}
+
+                        {% comment %} Badge {% endcomment %}
                         {% if option.badge_template %}
                             {% include option.badge_template %}
                         {% endif %}
                     </div>
 
+                    {% comment %} Fields {% endcomment %}
                     {% if option.list_custom_field_template %}
                         {% include option.list_custom_field_template %}
                     {% endif %}
@@ -24,18 +28,22 @@
             <li class="list-item-model-a active:active transition-all" role="listitem">
                 <div class="flex space-x-2.5 items-center">
                     <label class="w-full flex space-x-2.5 items-center">
+                        {% comment %} Checkbox {% endcomment %}
                         <input type="checkbox" name="{{ input_name }}" {% if option.id_neosia %}value="{{ option.id_neosia }}" id="{{ prefix_id }}{{ option.id_neosia }}" {% else %}value="{{ option.id }}" id="{{ prefix_id }}{{ option.id }}" {% endif %}>
                         
+                        {% comment %} Number and name {% endcomment %}
                         {% with page_obj.start_index|add:forloop.counter|add:-1 as number %}
                             {% include list_item_name|default:'components/list-table-view/model-a/list-item-name.html' %}
                         {% endwith %}
                         
+                        {% comment %} Badge {% endcomment %}
                         {% if badge_template %}
                             {% include badge_template %}
                         {% endif %}
                     </label>
                 </div>
                 
+                {% comment %} Fields {% endcomment %}
                 <div>
                     <a href="{{ option.read_detail_url }}" class="cursor-pointer text-inherit hover:no-underline active:text-inherit transition-none">
                         {% if list_custom_field_template %}
@@ -53,11 +61,14 @@
     role="list">
     <thead>
         <tr>
+            {% comment %} Checkbox {% endcomment %}
             <th scope="col" class="text-center checkbox">
                 <input type="checkbox" name="table-checkbox" id="table-checkbox">
             </th>
+            {% comment %} Number {% endcomment %}
             <th scope="col" class="text-center number">No.</th>
             
+            {% comment %} Table header {% endcomment %}
             {% if use_widget %}
                 {% for group, options, index in widget.optgroups|slice:":1" %}
                     {% for option in options|slice:":1" %}
@@ -79,13 +90,16 @@
             {% for group, options, index in widget.optgroups %}
                 {% for option in options %}
                     <tr>
+                        {% comment %} Checkbox {% endcomment %}
                         <th scope="col" class="text-center checkbox">
                             {% if option.template_name %}
                                 {% include option.template_name with widget=option use_label=False %}
                             {% endif %}
                         </th>
+                        {% comment %} Number {% endcomment %}
                         <th scope="col" class="text-center number"></th>
-
+                        
+                        {% comment %} Fields {% endcomment %}
                         {% if option.table_custom_field_template %}
                             {% include option.table_custom_field_template %}
                         {% endif %}
@@ -95,15 +109,17 @@
         {% else %}
             {% for option in options %}
                 <tr class="{% if open_button and option.read_detail_url %} group {% endif %}">
+                    {% comment %} Checkbox {% endcomment %}
                     <th class="text-center checkbox">
                         <input type="checkbox" name="{{ input_name }}" {% if option.id_neosia %}value="{{ option.id_neosia }}" id="{{ prefix_id }}{{ option.id_neosia }}" {% else %}value="{{ option.id }}" id="{{ prefix_id }}{{ option.id }}" {% endif %}>
                     </th>
+                    {% comment %} Number {% endcomment %}
                     <th class="text-center {% if not page_obj.start_index %}number{% endif %}">
                         {% if page_obj.start_index %}
                             {{ page_obj.start_index|add:forloop.counter|add:-1 }}.
                         {% endif %}
                     </th>
-                    
+                    {% comment %} Fields {% endcomment %}
                     {% if table_custom_field_template %}
                         {% include table_custom_field_template %}
                     {% endif %}

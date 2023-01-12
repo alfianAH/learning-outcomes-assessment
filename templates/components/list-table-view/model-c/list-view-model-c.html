@@ -8,30 +8,39 @@
                     {% include option.template_name with widget=option %}
                 </div>
                 
+                {% comment %} New data {% endcomment %}
                 <div class="flex flex-col space-y-3 sm:space-y-0 sm:space-x-3 sm:flex-row w-full">
                     <div class="list-item-model-a bg-emerald-300 dark:bg-emerald-900">
                         <div class="flex space-x-2.5 items-center">
-                            <span class="list-item-title">{{ option.label.new.nama }}</span>
-        
+                            {% comment %} Name {% endcomment %}
+                            {% include option.list_item_name with option=option.label.new %}
+                            
+                            {% comment %} Badge {% endcomment %}
                             {% if option.badge_template %}
                                 {% include option.badge_template with option=option.label.new %}
                             {% endif %}
                         </div>
                         
+                        {% comment %} Fields {% endcomment %}
                         {% if option.list_custom_field_template %}
                             {% include option.list_custom_field_template with option=option.label.new %}
                         {% endif %}
                     </div>
-        
+                    
+                    {% comment %} Old data {% endcomment %}
                     <div class="list-item-model-a bg-rose-300 dark:bg-rose-900">
+                        {% comment %} Name {% endcomment %}
                         <div class="flex space-x-2.5 items-center">
-                            <span class="list-item-title">{{ option.label.old.nama }}</span>
-        
+                            {{ list_item_name }}
+                            {% include option.list_item_name with option=option.label.old %}
+                            
+                            {% comment %} Badge {% endcomment %}
                             {% if option.badge_template %}
                                 {% include option.badge_template with option=option.label.old %}
                             {% endif %}
                         </div>
-        
+                        
+                        {% comment %} Fields {% endcomment %}
                         {% if option.list_custom_field_template %}
                             {% include option.list_custom_field_template with option=option.label.old %}
                         {% endif %}

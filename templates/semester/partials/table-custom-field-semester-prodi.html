@@ -1,8 +1,8 @@
 {% if option.wrap_label %}
     <td class="text-left field-nama">
-        <span class="one-line" title="{{ option.label.nama }}">{{ option.label.nama }}</span>
+        <span class="one-line" title="{{ option.label.semester.nama }}">{{ option.label.semester.nama }}</span>
     </td>
-    <td class="text-left">{{ option.label.tahun_ajaran }}</td>
+    <td class="text-left">{{ option.label.semester.tahun_ajaran }}</td>
     <td class="text-left !align-middle">
         {% if option.badge_template %}
             {% include option.badge_template %}

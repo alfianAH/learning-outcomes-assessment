@@ -1,6 +1,8 @@
 from django import forms
 from django.conf import settings
 
+from accounts.models import ProgramStudi
+
 from .utils import (
     get_semester_prodi_choices,
     get_update_semester_prodi_choices,
@@ -18,9 +20,9 @@ from learning_outcomes_assessment.widgets import (
 class SemesterProdiCreateForm(forms.Form):
     semester_from_neosia = forms.MultipleChoiceField(
         widget=ChoiceListInteractiveModelA(
-            badge_template='semester/partials/badge-list-semester.html',
-            list_custom_field_template='semester/partials/list-custom-field-semester.html',
-            table_custom_field_template='semester/partials/table-custom-field-semester.html',
+            badge_template='semester/partials/badge-list-semester-prodi.html',
+            list_custom_field_template='semester/partials/list-custom-field-semester-prodi.html',
+            table_custom_field_template='semester/partials/table-custom-field-semester-prodi.html',
             table_custom_field_header_template='semester/partials/table-custom-field-header-semester.html',
         ),
         label = 'Tambahkan Semester dari Neosia',
@@ -68,8 +70,9 @@ class SemesterProdiCreateForm(forms.Form):
 class SemesterProdiBulkUpdateForm(forms.Form):
     update_data_semester = forms.MultipleChoiceField(
         widget=UpdateChoiceList(
-            badge_template='semester/partials/badge-list-semester.html',
-            list_custom_field_template='semester/partials/list-custom-field-semester.html',
+            badge_template='semester/partials/badge-list-semester-prodi.html',
+            list_custom_field_template='semester/partials/list-custom-field-semester-prodi.html',
+            list_item_name='semester/partials/list-item-name-semester-prodi-model-c.html',
         ),
         label = 'Update Data Semester',
         help_text = 'Data yang berwarna hijau merupakan data terbaru dari Neosia.<br>Data yang berwarna merah merupakan data lama pada sistem ini.<br>Beri centang pada item yang ingin anda update.',
@@ -77,9 +80,10 @@ class SemesterProdiBulkUpdateForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
-        prodi_jenjang_id = kwargs.pop('prodi_jenjang_id')
+        user = kwargs.pop('user')
         super().__init__(*args, **kwargs)
 
-        update_semester_choices = get_update_semester_prodi_choices(prodi_jenjang_id)
+        prodi_obj: ProgramStudi = user.prodi
+        update_semester_choices = get_update_semester_prodi_choices(prodi_obj)
 
         self.fields['update_data_semester'].choices = update_semester_choices

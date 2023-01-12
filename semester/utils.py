@@ -1,6 +1,8 @@
 from django.conf import settings
+from django.db.models.query import QuerySet
+from accounts.models import ProgramStudi, ProgramStudiJenjang
 from learning_outcomes_assessment.utils import request_data_to_neosia
-from .models import Semester, SemesterProdi
+from .models import SemesterProdi
 
 
 ALL_SEMESTER_URL = 'https://customapi.neosia.unhas.ac.id/getAllSemester'
@@ -95,13 +97,19 @@ def get_semester_prodi(prodi_jenjang_id: int):
 
         semester_prodi = {
             'id_neosia': semester_prodi_data['id'],
-            'id_semester': id_semester,
-            'tahun_ajaran': detail_semester['tahun_ajaran'],
-            'tipe_semester': detail_semester['tipe_semester'],
             'nama': 'Semester {} {}'.format(
                 detail_semester['tahun_ajaran'],
                 detail_semester['tipe_semester'].capitalize()
             ),
+            'semester': {
+                'id_semester': id_semester,
+                'tahun_ajaran': detail_semester['tahun_ajaran'],
+                'tipe_semester': detail_semester['tipe_semester'],
+                'nama': 'Semester {} {}'.format(
+                    detail_semester['tahun_ajaran'],
+                    detail_semester['tipe_semester'].capitalize()
+                ),
+            },
         }
         list_semester_prodi.append(semester_prodi)
     return list_semester_prodi
@@ -139,32 +147,36 @@ def get_semester_prodi_choices(prodi_jenjang_id: int):
     return semester_choices
 
 
-def get_update_semester_prodi_choices(prodi_jenjang_id: int):
-    # Request semester by kurikulum
-    json_response = get_semester_prodi(prodi_jenjang_id)
+def get_update_semester_prodi_choices(prodi: ProgramStudi):
+    list_prodi_jenjang: QuerySet[ProgramStudiJenjang] = prodi.get_prodi_jenjang()
     update_semester_choices = []
 
-    for semester_prodi_data in json_response:
-        id_semester_prodi = semester_prodi_data['id_neosia']
+    for prodi_jenjang in list_prodi_jenjang:
+        # Request semester by kurikulum
+        json_response = get_semester_prodi(prodi_jenjang.id_neosia)
 
-        try:
-            semester_prodi_obj = SemesterProdi.objects.get(id_neosia=id_semester_prodi)
-        except Semester.DoesNotExist:
-            continue
-        except Semester.MultipleObjectsReturned:
-            if settings.DEBUG: print('Semester Prodi object returns multiple objects. ID: {}'.format(id_semester_prodi))
-            continue
+        for semester_prodi_data in json_response:
+            id_semester_prodi = semester_prodi_data['id_neosia']
+            
+            try:
+                semester_prodi_obj = SemesterProdi.objects.get(id_neosia=id_semester_prodi)
+            except SemesterProdi.DoesNotExist:
+                continue
+            except SemesterProdi.MultipleObjectsReturned:
+                if settings.DEBUG: print('Semester Prodi object returns multiple objects. ID: {}'.format(id_semester_prodi))
+                continue
+            
+            isDataOkay = semester_prodi_obj.semester.nama == semester_prodi_data['semester']['nama'] and str(semester_prodi_obj.semester.tahun_ajaran) == semester_prodi_data['semester']['tahun_ajaran'] and semester_prodi_obj.semester.get_tipe_semester_display().lower() == semester_prodi_data['semester']['tipe_semester'].lower()
 
-        isDataOkay = semester_prodi_obj.semester.nama == semester_prodi_data['nama'] and str(semester_prodi_obj.semester.tahun_ajaran) == semester_prodi_data['tahun_ajaran'] and semester_prodi_obj.semester.get_tipe_semester_display().lower() == semester_prodi_data['tipe_semester'].lower()
+            if isDataOkay: continue
+            print('Semester Prodi: {}'.format(semester_prodi_obj.semester.nama))
 
-        if isDataOkay: continue
+            update_semester_data = {
+                'new': semester_prodi_data,
+                'old': semester_prodi_obj,
+            }
 
-        update_semester_data = {
-            'new': semester_prodi_data,
-            'old': semester_prodi_obj,
-        }
-
-        update_semester_choice = id_semester_prodi, update_semester_data
-        update_semester_choices.append(update_semester_choice)
-
+            update_semester_choice = id_semester_prodi, update_semester_data
+            update_semester_choices.append(update_semester_choice)
+    
     return update_semester_choices
