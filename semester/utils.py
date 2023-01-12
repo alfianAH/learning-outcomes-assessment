@@ -3,8 +3,30 @@ from learning_outcomes_assessment.utils import request_data_to_neosia
 from .models import Semester, SemesterProdi
 
 
+ALL_SEMESTER_URL = 'https://customapi.neosia.unhas.ac.id/getAllSemester'
 SEMESTER_PRODI_URL = 'https://customapi.neosia.unhas.ac.id/getProdiSemester'
 DETAIL_SEMESTER_URL = 'https://customapi.neosia.unhas.ac.id/getSemesterDetail'
+
+
+def get_all_semester():
+    json_response = request_data_to_neosia(ALL_SEMESTER_URL)
+    list_semester = []
+    if json_response is None: return list_semester
+
+    for semester_data in json_response:
+        semester = {
+            'id_neosia': semester_data['id'],
+            'tahun_ajaran': semester_data['tahun_ajaran'],
+            'tipe_semester': semester_data['jenis'],
+            'nama': 'Semester {} {}'.format(
+                semester_data['tahun_ajaran'],
+                semester_data['jenis'].capitalize()
+            ),
+        }
+
+        list_semester.append(semester)
+
+    return list_semester
 
 
 def get_detail_semester(semester_id: int):
@@ -56,10 +78,19 @@ def get_semester_prodi(prodi_jenjang_id: int):
     list_semester_prodi = []
     if json_response is None: return list_semester_prodi
     
+    all_semester = get_all_semester()
+
     # Get all semester
     for semester_prodi_data in json_response:
         id_semester = semester_prodi_data['id_semester']
-        detail_semester = get_detail_semester(id_semester)
+        
+        for semester in all_semester:
+            if semester['id_neosia'] != id_semester: continue
+            
+            # Get detail semester
+            detail_semester = semester
+            break
+        
         if detail_semester is None: continue
 
         semester_prodi = {
