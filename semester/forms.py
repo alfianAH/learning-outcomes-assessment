@@ -72,7 +72,7 @@ class SemesterProdiBulkUpdateForm(forms.Form):
         widget=UpdateChoiceList(
             badge_template='semester/partials/badge-list-semester-prodi.html',
             list_custom_field_template='semester/partials/list-custom-field-semester-prodi.html',
-            list_item_name='semester/partials/list-item-name-semester-prodi-model-c.html',
+            list_item_name='semester/partials/list-item-name-semester-prodi.html',
         ),
         label = 'Update Data Semester',
         help_text = 'Data yang berwarna hijau merupakan data terbaru dari Neosia.<br>Data yang berwarna merah merupakan data lama pada sistem ini.<br>Beri centang pada item yang ingin anda update.',

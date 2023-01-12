@@ -82,6 +82,16 @@ def get_semester_prodi(prodi_jenjang_id: int):
     
     all_semester = get_all_semester()
 
+    prodi_jenjang_obj = None
+    try:
+        prodi_jenjang_obj = ProgramStudiJenjang.objects.get(id_neosia=prodi_jenjang_id)
+    except ProgramStudiJenjang.DoesNotExist:
+        if settings.DEBUG:
+            print('Cannot get prodi jenjang with ID: {}'.format(prodi_jenjang_id))
+    except ProgramStudiJenjang.MultipleObjectsReturned:
+        if settings.DEBUG:
+            print('Prodi jenjang returns multiple objects')
+
     # Get all semester
     for semester_prodi_data in json_response:
         id_semester = semester_prodi_data['id_semester']
@@ -109,6 +119,9 @@ def get_semester_prodi(prodi_jenjang_id: int):
                     detail_semester['tahun_ajaran'],
                     detail_semester['tipe_semester'].capitalize()
                 ),
+            },
+            'tahun_ajaran_prodi':{
+                'prodi_jenjang': prodi_jenjang_obj,
             },
         }
         list_semester_prodi.append(semester_prodi)
