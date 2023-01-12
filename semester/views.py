@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic.edit import FormView
+from learning_outcomes_assessment.wizard.views import MySessionWizardView
 from learning_outcomes_assessment.forms.edit import (
     ModelBulkDeleteView,
     ModelBulkUpdateView
@@ -13,6 +14,7 @@ from learning_outcomes_assessment.list_view.views import (
     ListViewModelA,
     DetailWithListViewModelA,
 )
+from accounts.forms import ProgramStudiJenjangSelectForm
 from mata_kuliah_semester.filters import MataKuliahSemesterFilter, MataKuliahSemesterSort
 from mata_kuliah_semester.models import MataKuliahSemester
 from .filters import(
@@ -23,7 +25,7 @@ from .forms import(
     SemesterProdiCreateForm,
     SemesterProdiBulkUpdateForm,
 )
-from accounts.models import ProgramStudi
+from accounts.models import ProgramStudi, ProgramStudiJenjang
 from .models import(
     TahunAjaran,
     TahunAjaranProdi,
@@ -41,7 +43,7 @@ class SemesterReadAllView(ListViewModelA):
     model = SemesterProdi
     paginate_by: int = 10
     template_name: str = 'semester/home.html'
-    ordering: str = 'semester__nama'
+    ordering: str = ['tahun_ajaran_prodi__prodi_jenjang__jenjang_studi__kode', 'semester__nama']
     sort_form_ordering_by_key: str = 'ordering_by'
 
     semester_filter: SemesterProdiFilter = None
@@ -71,7 +73,7 @@ class SemesterReadAllView(ListViewModelA):
                 'tipe_semester': request.GET.get('tipe_semester', ''),
             }
             sort_data = {
-                self.sort_form_ordering_by_key: request.GET.get(self.sort_form_ordering_by_key, self.ordering)
+                self.sort_form_ordering_by_key: request.GET.get(self.sort_form_ordering_by_key, self.ordering[0])
             }
 
             self.filter_form = SemesterProdiFilter(
@@ -89,38 +91,58 @@ class SemesterReadAllView(ListViewModelA):
         prodi_id = self.request.user.prodi.id_neosia
         
         self.queryset = self.model.objects.filter(
-            tahun_ajaran_prodi__prodi__id_neosia=prodi_id
+            tahun_ajaran_prodi__prodi_jenjang__program_studi__id_neosia=prodi_id
         )
         return super().get_queryset()
 
 
-class SemesterCreateView(FormView):
-    form_class = SemesterProdiCreateForm
+class SemesterCreateView(MySessionWizardView):
+    form_list = [ProgramStudiJenjangSelectForm, SemesterProdiCreateForm]
     template_name = 'semester/create-view.html'
     success_url = reverse_lazy('semester:read-all')
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({
-            'search_placeholder': 'Cari nama semester...',
-            'back_url': self.success_url,
-            'submit_text': 'Tambahkan',
-        })
+    def get(self, request, *args, **kwargs):
+        if request.user.prodi is None:
+            raise PermissionDenied
+        return super().get(request, *args, **kwargs)
+
+    def get_form_kwargs(self, step=None):
+        form_kwargs = super().get_form_kwargs(step)
+
+        match step:
+            case '0':
+                form_kwargs.update({'user': self.request.user})
+            case '1':
+                selected_prodi_jenjang: int = self.get_cleaned_data_for_step('0')['prodi_jenjang']
+                form_kwargs.update({
+                    'prodi_jenjang_id': selected_prodi_jenjang
+                })
+
+        return form_kwargs
+
+    def get_context_data(self, form, **kwargs):
+        context = super().get_context_data(form, **kwargs)
+        match(self.steps.current):
+            case '0':
+                context.update({
+                    'search_text': False,
+                })
+            case '1':
+                context.update({
+                    'search_placeholder': 'Cari nama semester...'
+                })
         return context
+    
+    def done(self, form_list, **kwargs):
+        cleaned_data = self.get_all_cleaned_data()
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs.update({
-            'user': self.request.user
-        })
-        return kwargs
+        prodi_jenjang_id = cleaned_data.get('prodi_jenjang')
+        list_semester_prodi_id = cleaned_data.get('semester_from_neosia')
 
-    def form_valid(self, form) -> HttpResponse:
         # Get prodi object
-        prodi_obj: ProgramStudi = self.request.user.prodi
+        prodi_jenjang_obj: ProgramStudiJenjang = ProgramStudiJenjang.objects.get(id_neosia=prodi_jenjang_id)
 
-        list_semester_prodi_id = form.cleaned_data.get('semester_from_neosia')
-        list_semester_prodi = get_semester_prodi(prodi_obj.id_neosia)
+        list_semester_prodi = get_semester_prodi(prodi_jenjang_obj.id_neosia)
         
         # Get detail semester prodi from Neosia
         for semester_prodi in list_semester_prodi:
@@ -132,7 +154,7 @@ class SemesterCreateView(FormView):
             # Get or create tahun ajaran prodi
             tahun_ajaran_prodi_obj, _ = TahunAjaranProdi.objects.get_or_create(
                 tahun_ajaran=tahun_ajaran_obj,
-                prodi=prodi_obj
+                prodi_jenjang=prodi_jenjang_obj
             )
 
             # Get tipe semester
@@ -159,7 +181,7 @@ class SemesterCreateView(FormView):
 
         messages.success(self.request, 'Berhasil menambahkan semester')
 
-        return super().form_valid(form)
+        return redirect(self.success_url)
 
 
 class SemesterBulkUpdateView(ModelBulkUpdateView):

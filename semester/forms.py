@@ -29,12 +29,11 @@ class SemesterProdiCreateForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user')
+        prodi_jenjang_id = kwargs.pop('prodi_jenjang_id')
         super().__init__(*args, **kwargs)
         self.label_suffix = ""
 
-        prodi_id: int = self.user.prodi.id_neosia
-        semester_prodi_choices = get_semester_prodi_choices(prodi_id)
+        semester_prodi_choices = get_semester_prodi_choices(prodi_jenjang_id)
 
         for semester_prodi_id, _ in semester_prodi_choices:
             kelas_mk_semester = get_kelas_mk_semester(semester_prodi_id)
@@ -78,9 +77,9 @@ class SemesterProdiBulkUpdateForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user')
+        prodi_jenjang_id = kwargs.pop('prodi_jenjang_id')
         super().__init__(*args, **kwargs)
 
-        update_semester_choices = get_update_semester_prodi_choices(user.prodi.id_neosia)
+        update_semester_choices = get_update_semester_prodi_choices(prodi_jenjang_id)
 
         self.fields['update_data_semester'].choices = update_semester_choices

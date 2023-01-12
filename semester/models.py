@@ -2,8 +2,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from accounts.models import ProgramStudi
-from kurikulum.models import Kurikulum
+from accounts.models import ProgramStudiJenjang
 from learning_outcomes_assessment.utils import extract_tahun_ajaran
 
 # Create your models here.
@@ -34,7 +33,7 @@ class TahunAjaran(models.Model):
 
 class TahunAjaranProdi(models.Model):
     tahun_ajaran = models.ForeignKey(TahunAjaran, on_delete=models.CASCADE)
-    prodi = models.ForeignKey(ProgramStudi, on_delete=models.CASCADE)
+    prodi_jenjang = models.ForeignKey(ProgramStudiJenjang, on_delete=models.CASCADE)
 
 
 class Semester(models.Model):

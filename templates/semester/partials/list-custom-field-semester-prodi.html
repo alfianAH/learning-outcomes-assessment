@@ -9,5 +9,12 @@
                 <td>{{ option.semester.tahun_ajaran }}</td>
             {% endif %}
         </tr>
+
+        {% if not option.wrap_label %}
+        <tr class="flex px-3 py-1 space-x-2.5">
+            <td class="w-full">Jenjang studi</td>
+            <td>{{ option.tahun_ajaran_prodi.prodi_jenjang.jenjang_studi.kode }}</td>
+        </tr>
+        {% endif %}
     </tbody>
 </table>

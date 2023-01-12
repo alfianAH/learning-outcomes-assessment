@@ -38,11 +38,11 @@ def get_detail_semester(semester_id: int):
     return semester_detail
 
 
-def get_semester_prodi(prodi_id: int):
+def get_semester_prodi(prodi_jenjang_id: int):
     """Get semesters by prodi
 
     Args:
-        prodi_id (int): Program Studi ID
+        prodi_jenjang_id (int): Program Studi Jenjang ID
 
     Returns:
         list: All semester prodi
@@ -50,7 +50,7 @@ def get_semester_prodi(prodi_id: int):
 
     # Request semester prodi
     parameters = {
-        'prodi_kode': prodi_id
+        'prodi_kode': prodi_jenjang_id
     }
     json_response = request_data_to_neosia(SEMESTER_PRODI_URL, params=parameters)
     list_semester_prodi = []
@@ -76,18 +76,18 @@ def get_semester_prodi(prodi_id: int):
     return list_semester_prodi
 
 
-def get_semester_prodi_choices(prodi_id: int):
+def get_semester_prodi_choices(prodi_jenjang_id: int):
     """Get semester by prodi choices
 
     Args:
-        prodi_id (int): Program Studi ID
+        prodi_id (int): Program Studi Jenjang ID
 
     Returns:
         list: All semester by prodi ID with detail semester
     """
 
     # Request semester by kurikulum
-    list_semester_prodi = get_semester_prodi(prodi_id)
+    list_semester_prodi = get_semester_prodi(prodi_jenjang_id)
     semester_choices = []
 
     # Get all detail semester by semester ID
@@ -95,7 +95,7 @@ def get_semester_prodi_choices(prodi_id: int):
         semester_id = semester_prodi_data['id_neosia']
         # Search in database
         object_in_db = SemesterProdi.objects.filter(
-            tahun_ajaran_prodi__prodi__id_neosia=prodi_id, 
+            tahun_ajaran_prodi__prodi_jenjang__id_neosia=prodi_jenjang_id, 
             semester=int(semester_id)
         )
         if object_in_db.exists(): continue
@@ -108,9 +108,9 @@ def get_semester_prodi_choices(prodi_id: int):
     return semester_choices
 
 
-def get_update_semester_prodi_choices(prodi_id: int):
+def get_update_semester_prodi_choices(prodi_jenjang_id: int):
     # Request semester by kurikulum
-    json_response = get_semester_prodi(prodi_id)
+    json_response = get_semester_prodi(prodi_jenjang_id)
     update_semester_choices = []
 
     for semester_prodi_data in json_response:
