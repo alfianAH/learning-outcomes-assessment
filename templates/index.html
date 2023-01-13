@@ -621,6 +621,106 @@
 
         <hr class="my-12">
 
+        <h1>Table biasa</h1>
+
+        <div class="table-div">
+            <div class="tr-div">
+                <div>Lorem, ipsum dolor.</div>
+                <div>:</div>
+                <div>Lorem ipsum dolor sit amet.</div>
+            </div>
+            <div class="tr-div">
+                <div>Lorem, ipsum.</div>
+                <div>:</div>
+                <div>Lorem ipsum dolor sit amet.</div>
+            </div>
+        </div>
+
+        <hr class="my-12">
+
+        <h1>Table Model A (open btn)</h1>
+
+        <table class="table-css table-hover table-numbered table-checkbox" id="table-a">
+            <thead>
+                <tr>
+                    <th scope="col" class="text-center checkbox">
+                        <input type="checkbox" name="table-checkbox" id="table-checkbox">
+                    </th>
+                    <th scope="col" class="text-center number">No.</th>
+                    <th scope="col" class="text-left">Text</th>
+                    <th scope="col" class="text-left">Long Text</th>
+                    <th scope="col" class="text-left">Badge</th>
+                    <th scope="col" class="text-right">Number</th>
+                    <th scope="col" class="text-center">Aksi</th>
+                </tr>
+            </thead>
+
+            <tbody">
+                <tr class="group">
+                    <th scope="row" class="text-center checkbox">
+                        <input type="checkbox" name="data-1" id="data-1">
+                    </th>
+                    <th scope="row" class="text-center number"></th>
+                    <td class="truncate text-left max-w-[10rem] relative">
+                        Lorem ipsum dolor sit amet.
+                        <a href="#" class="btn btn-outline-light absolute right-4 top-3 h-7 invisible group-hover:visible opacity-0 group-hover:opacity-100 group-hover:transition-opacity group-hover:ease-in-out group-hover:duration-500">
+                            Buka
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-chevron-right ml-1 sm:ml-1 !w-4 !h-4" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+                            </svg>
+                        </a>
+                    </td>
+                    <td class="truncate max-w-[15rem]">Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem reiciendis odio quisquam doloremque quia perferendis accusantium harum laboriosam perspiciatis possimus.</td>
+                    <td class="text-left">
+                        <div class="badge badge-primary">
+                            Badge
+                        </div>
+                    </td>
+                    <td class="text-right">100</td>
+                    <td class="text-center">
+                        <button>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-5 h-5 fill-sky-600" focusable="False" aria-label="edit">
+                                <path d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                            </svg>
+                        </button>
+                    </td>
+                </tr>
+                <tr class="group">
+                    <th scope="row" class="text-center checkbox">
+                        <input type="checkbox" name="data-1" id="data-1">
+                    </th>
+                    <th scope="row" class="text-center number"></th>
+                    <td class="text-left truncate max-w-[10rem] relative">
+                        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Laboriosam, cupiditate
+                        <a href="#" class="btn btn-outline-light absolute right-4 top-3 h-7 invisible group-hover:visible opacity-0 group-hover:opacity-100 group-hover:transition-opacity group-hover:ease-in-out group-hover:duration-500">
+                            Buka
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-chevron-right ml-1 sm:ml-1 !w-4 !h-4" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+                            </svg>
+                        </a>
+                    </td>
+                    <td class="truncate max-w-[15rem]">Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem reiciendis odio quisquam doloremque quia perferendis accusantium harum laboriosam perspiciatis possimus.</td>
+                    <td class="text-left">
+                        <div class="badge badge-primary">
+                            Badge
+                        </div>
+                    </td>
+                    <td class="text-right">100</td>
+                    <td class="text-center">
+                        <button>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-5 h-5 fill-sky-600" focusable="False" aria-label="edit">
+                                <path d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                            </svg>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <hr class="my-12">
+
         <h1>Table Model B</h1>
 
         <table class="table-css table-hover table-numbered table-accordion">
@@ -630,7 +730,7 @@
                     <th scope="col" class="text-left number">
                         NIM
                     </th>
-                    <th scope="col" class="text-left w-80">
+                    <th scope="col" class="text-left max-w-[20rem]">
                         Nama
                     </th>
                     <th scope="col" class="text-left">
@@ -653,8 +753,8 @@
                     <td class="text-left">
                         D121181001
                     </td>
-                    <td class="text-left max-w-xs flex">
-                        <span class="one-line">Lorem ipsum dolor sit amet consectetur adipisicing elit. Explicabo, labore?</span>
+                    <td class="text-left max-w-[8rem] truncate">
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Explicabo, labore?
                     </td>
                     <td class="text-left">A</td>
                     <td class="text-right">100</td>
@@ -717,8 +817,8 @@
                     <td class="text-left">
                         D121181001
                     </td>
-                    <td class="text-left max-w-xs flex">
-                        <span class="one-line">Lorem ipsum dolor sit amet consectetur adipisicing elit. Explicabo, labore?</span>
+                    <td class="text-left max-w-[8rem] truncate">
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Explicabo, labore?
                     </td>
                     <td class="text-left">A</td>
                     <td class="text-right">100</td>
@@ -864,7 +964,7 @@
         <ul class="tab" role="tablist">
             <li class="tab-item w-40" id="tab-1" data-target="#tab-1-pane" role="presentation">
                 <div class="tab-title">
-                    <span class="one-line">Lorem ipsum, </span>
+                    <span class="truncate">Lorem ipsum, </span>
 
                     <div class="w-2 h-2 lg:w-2.5 lg:h-2.5 ml-2.5 badge-warning rounded-full"></div>
                 </div>
@@ -874,7 +974,7 @@
 
             <li class="tab-item disabled w-32" id="tab-2" data-target="#tab-2-pane" role="presentation">
                 <div class="tab-title">
-                    <span class="one-line">Title</span>
+                    <span class="truncate">Title</span>
 
                     <div class="w-2 h-2 lg:w-2.5 lg:h-2.5 ml-2.5 badge-warning rounded-full"></div>
                 </div>
@@ -884,7 +984,7 @@
 
             <li class="tab-item disabled w-32" id="tab-3" data-target="#tab-3-pane" role="presentation">
                 <div class="tab-title">
-                    <span class="one-line">Title</span>
+                    <span class="truncate">Title</span>
 
                     <div class="w-2 h-2 lg:w-2.5 lg:h-2.5 ml-2.5 badge-warning rounded-full"></div>
                 </div>
