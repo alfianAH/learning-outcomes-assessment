@@ -1,23 +1,23 @@
 <table class="w-full table-strip">
     <tbody class="space-y-1">
         {% if option.wrap_label %}
-            <tr class="flex px-3 py-1 space-x-2.5">
-                <td class="w-full">Kode</td>
+            <tr class="flex px-3 py-1 space-x-2.5 justify-between">
+                <td class="w-min whitespace-nowrap font-bold">Kode</td>
                 <td>{{ option.label.kode }}</td>
             </tr>
             
-            <tr class="flex px-3 py-1 space-x-2.5">
-                <td class="w-full">SKS</td>
+            <tr class="flex px-3 py-1 space-x-2.5 justify-between">
+                <td class="w-min whitespace-nowrap font-bold">SKS</td>
                 <td>{{ option.label.sks }}</td>
             </tr>
         {% else %}
-            <tr class="flex px-3 py-1 space-x-2.5">
-                <td class="w-full">Kode</td>
+            <tr class="flex px-3 py-1 space-x-2.5 justify-between">
+                <td class="w-min whitespace-nowrap font-bold">Kode</td>
                 <td>{{ option.kode }}</td>
             </tr>
             
-            <tr class="flex px-3 py-1 space-x-2.5">
-                <td class="w-full">SKS</td>
+            <tr class="flex px-3 py-1 space-x-2.5 justify-between">
+                <td class="w-min whitespace-nowrap font-bold">SKS</td>
                 <td>{{ option.sks }}</td>
             </tr>
         {% endif %}

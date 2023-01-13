@@ -115,10 +115,6 @@ def get_semester_prodi(prodi_jenjang_id: int):
                 'id_semester': id_semester,
                 'tahun_ajaran': detail_semester['tahun_ajaran'],
                 'tipe_semester': detail_semester['tipe_semester'],
-                'nama': 'Semester {} {}'.format(
-                    detail_semester['tahun_ajaran'],
-                    detail_semester['tipe_semester'].capitalize()
-                ),
             },
             'tahun_ajaran_prodi':{
                 'prodi_jenjang': prodi_jenjang_obj,
@@ -179,7 +175,7 @@ def get_update_semester_prodi_choices(prodi: ProgramStudi):
                 if settings.DEBUG: print('Semester Prodi object returns multiple objects. ID: {}'.format(id_semester_prodi))
                 continue
             
-            isDataOkay = semester_prodi_obj.semester.nama == semester_prodi_data['semester']['nama'] and str(semester_prodi_obj.semester.tahun_ajaran) == semester_prodi_data['semester']['tahun_ajaran'] and semester_prodi_obj.semester.get_tipe_semester_display().lower() == semester_prodi_data['semester']['tipe_semester'].lower()
+            isDataOkay = semester_prodi_obj.semester.nama == semester_prodi_data['nama'] and str(semester_prodi_obj.semester.tahun_ajaran) == semester_prodi_data['semester']['tahun_ajaran'] and semester_prodi_obj.semester.get_tipe_semester_display().lower() == semester_prodi_data['semester']['tipe_semester'].lower()
 
             if isDataOkay: continue
             print('Semester Prodi: {}'.format(semester_prodi_obj.semester.nama))

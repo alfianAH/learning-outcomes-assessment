@@ -1,6 +1,6 @@
 {% if option.wrap_label %}
-    <td class="text-left field-nama">
-        <span class="one-line" title="{{ option.label.nama }}">{{ option.label.nama }}</span>
+    <td class="text-left field-nama truncate max-w-xs">
+        {{ option.label.nama }}
     </td>
     <td class="text-left">{{ option.label.tahun_ajaran }}</td>
     <td class="text-left !align-middle">
@@ -9,8 +9,8 @@
         {% endif %}
     </td>
 {% else %}
-    <td scope="col" class="text-left field-nama {% if open_button and option.read_detail_url %} flex max-w-xs flex-row items-center relative {% endif %}">
-        <span class="one-line" title="{{ option.nama }}">{{ option.nama }}</span>
+    <td scope="col" class="text-left field-nama truncate max-w-xs {% if open_button and option.read_detail_url %} items-center relative {% endif %}">
+        {{ option.nama }}
         {% if open_button and option.read_detail_url %}
             {% include 'components/button/open-list-item-button.html' %}
         {% endif %}

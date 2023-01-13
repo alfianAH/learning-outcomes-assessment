@@ -1,19 +1,19 @@
 <table class="w-full table-strip">
     <tbody class="space-y-1">
-        <tr class="flex px-3 py-1 space-x-2.5">
+        <tr class="flex px-3 py-1 space-x-2.5 justify-between">
             {% if option.wrap_label %}
-                <td class="w-full">Tahun mulai</td>
+                <td class="w-min whitespace-nowrap font-bold">Tahun mulai</td>
                 <td>{{ option.label.tahun_mulai }}</td>
             {% else %}
-                <td class="w-full">Tahun mulai</td>
+                <td class="w-min whitespace-nowrap font-bold">Tahun mulai</td>
                 <td>{{ option.tahun_mulai }}</td>
             {% endif %}
         </tr>
         
         {% if not option.wrap_label %}
-        <tr class="flex px-3 py-1 space-x-2.5">
-            <td class="w-full">Jenjang studi</td>
-            <td>{{ option.prodi_jenjang.jenjang_studi.kode }}</td>
+        <tr class="flex px-3 py-1 space-x-2.5 justify-between">
+            <td class="w-min whitespace-nowrap font-bold">Jenjang studi</td>
+            <td class="truncate max-w-[10rem]">{{ option.prodi_jenjang.nama }}</td>
         </tr>
         {% endif %}
     </tbody>

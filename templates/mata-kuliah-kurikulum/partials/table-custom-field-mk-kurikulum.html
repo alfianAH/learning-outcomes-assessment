@@ -1,13 +1,13 @@
 {% if option.wrap_label %}
     <td class="text-left">{{ option.label.kode }}</td>   
-    <td class="text-left max-w-sm flex field-nama">
-        <span class="one-line" title="{{ option.label.nama }}">{{ option.label.nama }}</span>
+    <td class="text-left max-w-md field-nama truncate">
+        {{ option.label.nama }}
     </td>
     <td class="text-left">{{ option.label.sks }}</td>
 {% else %}
     <td class="text-left">{{ option.kode }}</td>
-    <td scope="col" class="text-left field-nama {% if open_button and option.read_detail_url %} flex max-w-sm flex-row items-center relative {% endif %}">
-        <span class="one-line" title="{{ option.nama }}">{{ option.nama }}</span>
+    <td scope="col" class="text-left field-nama truncate max-w-md {% if open_button and option.read_detail_url %} items-center relative {% endif %}">
+        {{ option.nama }}
         {% if open_button and option.read_detail_url %}
             {% include 'components/button/open-list-item-button.html' %}
         {% endif %}

@@ -2902,6 +2902,7 @@ details.dropdown::marker {
   border-left-width: 1px;
   --tw-border-opacity: 1;
   border-color: rgb(148 163 184 / var(--tw-border-opacity));
+  background-clip: padding-box;
   padding-left: 0.25rem;
   padding-right: 0.25rem;
   padding-top: 0.5rem;
@@ -3275,6 +3276,10 @@ details.dropdown::marker {
   right: 1rem;
 }
 
+.top-3 {
+  top: 0.75rem;
+}
+
 .z-40 {
   z-index: 40;
 }
@@ -3493,6 +3498,12 @@ details.dropdown::marker {
   width: 85%;
 }
 
+.w-min {
+  width: -webkit-min-content;
+  width: -moz-min-content;
+  width: min-content;
+}
+
 .min-w-full {
   min-width: 100%;
 }
@@ -3521,6 +3532,18 @@ details.dropdown::marker {
 
 .max-w-md {
   max-width: 28rem;
+}
+
+.max-w-\[10rem\] {
+  max-width: 10rem;
+}
+
+.max-w-\[20rem\] {
+  max-width: 20rem;
+}
+
+.max-w-lg {
+  max-width: 32rem;
 }
 
 .-translate-x-1\/2 {
@@ -3634,6 +3657,16 @@ details.dropdown::marker {
   --tw-space-y-reverse: 0;
   margin-top: calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));
   margin-bottom: calc(0.25rem * var(--tw-space-y-reverse));
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.whitespace-nowrap {
+  white-space: nowrap;
 }
 
 .rounded-full {
@@ -3901,12 +3934,6 @@ details.dropdown::marker {
 .noscroll {
   overflow: hidden;
   padding-right: 0.5rem;
-}
-
-.one-line {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 #dark-mode-toggle:checked ~ label div.toggle-circle {

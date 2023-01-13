@@ -447,7 +447,7 @@
     }
 
     .list-item-model-c .list-item-model-a{
-        @apply  rounded-md px-2 pt-2 pb-3 md:px-2.5 md:pt-2.5 xl:px-3 xl:pt-3 xl:pb-4;
+        @apply rounded-md px-2 pt-2 pb-3 md:px-2.5 md:pt-2.5 xl:px-3 xl:pt-3 xl:pb-4;
     }
 
     /* Model D */
@@ -700,7 +700,7 @@
     }
 
     .table-css > :not(caption) > * > *{
-        @apply border-b border-l border-slate-400 first:border-l-transparent  dark:first:border-l-transparent px-1 py-2 md:px-2.5 md:py-2.5 xl:px-3 xl:py-3 text-sm md:text-base xl:text-lg align-top;
+        @apply border-b border-l border-slate-400 first:border-l-transparent  dark:first:border-l-transparent px-1 py-2 md:px-2.5 md:py-2.5 xl:px-3 xl:py-3 text-sm md:text-base xl:text-lg align-top bg-clip-padding;
     }
 
     .table-css > :not(caption) > * > *.checkbox{
@@ -835,10 +835,6 @@
 
     .noscroll{
         @apply overflow-hidden pr-2;
-    }
-
-    .one-line{
-        @apply overflow-hidden overflow-ellipsis whitespace-nowrap;
     }
 
     #dark-mode-toggle:checked ~ label div.toggle-circle{

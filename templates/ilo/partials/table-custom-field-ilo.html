@@ -1,13 +1,13 @@
 {% if option.wrap_label %}
-    <td class="text-left max-w-xs flex field-nama">
-        <span class="one-line" title="{{ option.label.nama }}">{{ option.label.nama }}</span>
+    <td class="text-left max-w-xs field-nama">
+        {{ option.label.nama }}
     </td>
     <td class="text-left">{{ option.label.pi_area.pi_code }}</td>
     <td class="text-left">{{ option.label.satisfactory_level }}</td>
     <td class="text-left">{{ option.label.persentase_capaian_ilo }}</td>
 {% else %}
-    <td scope="col" class="text-left field-nama {% if open_button and option.read_detail_url %} flex max-w-xs flex-row items-center relative {% endif %}">
-        <span class="one-line" title="{{ option.nama }}">{{ option.nama }}</span>
+    <td scope="col" class="text-left field-nama {% if open_button and option.read_detail_url %} max-w-xs items-center relative {% endif %}">
+        {{ option.nama }}
         {% if open_button and option.read_detail_url %}
             {% include 'components/button/open-list-item-button.html' %}
         {% endif %}
