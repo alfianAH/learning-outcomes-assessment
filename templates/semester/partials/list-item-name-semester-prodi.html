@@ -1,3 +1,8 @@
-<span class="list-item-title" title="{{ option.semester.nama }}">
-    {% if number %}{{ number }}. {% endif %}{{ option.semester.nama }}
+<span class="list-item-title" title="{% if option.semester.nama %}{{ option.semester.nama }}{% else %}{{ option.nama }}{% endif %}">
+    {% if number %}{{ number }}. {% endif %}
+    {% if option.semester.nama %}
+        {{ option.semester.nama }}
+    {% else %}
+        {{ option.nama }}
+    {% endif %}
 </span>

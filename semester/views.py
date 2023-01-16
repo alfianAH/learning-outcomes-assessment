@@ -34,7 +34,8 @@ from .models import(
     SemesterProdi,
 )
 from .utils import(
-    get_semester_prodi
+    get_semester_prodi,
+    get_update_semester_prodi_choices
 )
 
 
@@ -216,18 +217,76 @@ class SemesterBulkUpdateView(ModelBulkUpdateView):
     def form_valid(self, form) -> HttpResponse:
         # Get semester prodi ids
         update_semester_data = form.cleaned_data.get(self.form_field_name, [])
+        update_semester_choices = get_update_semester_prodi_choices(self.request.user.prodi)
 
         # Update semester
-        for semester_prodi_id in update_semester_data:
-            try:
-                semester_prodi_id = int(semester_prodi_id)
-            except ValueError:
-                if settings.DEBUG:
-                    print('Cannot convert Semester Prodi ID ("{}") to integer'.format(semester_prodi_id))
-                messages.error(self.request, 'Tidak dapat mengonversi Semester Prodi ID: {} ke integer'.format(semester_prodi_id))
-                return redirect(self.success_url)
+        for update_semester_id, semester_data in update_semester_choices:
+            new_semester_data = semester_data['new']
+            
+            if str(update_semester_id) not in update_semester_data: continue
 
-            self.update_semester_prodi(semester_prodi_id)
+            # Get semester prodi
+            try:
+                semester_prodi_obj = SemesterProdi.objects.filter(id_neosia=update_semester_id)
+            except SemesterProdi.DoesNotExist:
+                messages.error(self.request, 
+                    'Semester Prodi dengan ID: {} tidak ditemukan, sehingga gagal mengupdate semester'.format(update_semester_id))
+            
+            # Get tahun ajaran
+            tahun_ajaran_obj, _ = TahunAjaran.objects.get_or_create_tahun_ajaran(new_semester_data['semester']['tahun_ajaran'])
+            
+            # Get tipe semester
+            match(new_semester_data['semester']['tipe_semester']):
+                case 'ganjil':
+                    tipe_semester = TipeSemester.GANJIL
+                case 'genap':
+                    tipe_semester = TipeSemester.GENAP
+
+            # Get prodi jenjang
+            prodi_jenjang_obj: ProgramStudiJenjang = new_semester_data['tahun_ajaran_prodi']['prodi_jenjang']
+            
+            # Get tahun ajaran prodi
+            try:
+                tahun_ajaran_prodi = TahunAjaranProdi.objects.get(
+                    tahun_ajaran=tahun_ajaran_obj,
+                    prodi_jenjang=prodi_jenjang_obj
+                )
+            except TahunAjaranProdi.DoesNotExist:
+                if settings.DEBUG:
+                    print('Tahun ajaran prodi does not exist. Tahun ajaran: {}, Prodi jenjang: {}'.format(tahun_ajaran_obj, prodi_jenjang_obj))
+
+                messages.error('Tidak berhasil mendapatkan tahun ajaran prodi')
+                continue
+            except TahunAjaranProdi.MultipleObjectsReturned:
+                if settings.DEBUG:
+                    print('Tahun ajaran prodi returns multiple objects. Tahun ajaran: {}, Prodi jenjang: {}'.format(tahun_ajaran_obj, prodi_jenjang_obj))
+                messages.error('Tahun ajaran prodi yang dikembalikan lebih dari 1.')
+
+                continue
+            
+            # Get semester
+            semester_qs = Semester.objects.filter(
+                id_neosia=new_semester_data['semester']['id_semester']
+            )
+            
+            if semester_qs.exists():
+                # Update semester object
+                semester_qs.update(
+                    tahun_ajaran = tahun_ajaran_obj,
+                    tipe_semester = tipe_semester,
+                    nama = new_semester_data['nama']
+                )
+
+                #   Update semester prodi
+                semester_prodi_obj.update(
+                    semester=semester_qs[0],
+                    tahun_ajaran_prodi=tahun_ajaran_prodi
+                )
+            else:
+                if settings.DEBUG:
+                    print('Semester query does not exist. ID {}'.format(new_semester_data['semester']['id_semester'])) 
+                continue
+
         
         messages.success(self.request, 'Proses mengupdate semester telah selesai.')
 
