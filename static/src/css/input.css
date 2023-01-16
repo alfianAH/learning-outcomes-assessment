@@ -760,7 +760,7 @@
         @apply inline-block overflow-x-scroll;
     }
 
-    .table-strip tr{
+    .table-strip tr, .table-strip > * > div{
         @apply odd:bg-slate-200 dark:odd:bg-neutral-700  rounded-lg;
     }
 
