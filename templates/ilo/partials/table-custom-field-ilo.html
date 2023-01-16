@@ -1,18 +1,9 @@
-{% if option.wrap_label %}
-    <td class="text-left max-w-xs field-nama">
-        {{ option.label.nama }}
-    </td>
-    <td class="text-left">{{ option.label.pi_area.pi_code }}</td>
-    <td class="text-left">{{ option.label.satisfactory_level }}</td>
-    <td class="text-left">{{ option.label.persentase_capaian_ilo }}</td>
-{% else %}
-    <td scope="col" class="text-left field-nama {% if open_button and option.read_detail_url %} max-w-xs items-center relative {% endif %}">
-        {{ option.nama }}
-        {% if open_button and option.read_detail_url %}
-            {% include 'components/button/open-list-item-button.html' %}
-        {% endif %}
-    </td>
-    <td class="text-left">{{ option.pi_area.pi_code }}</td>
-    <td class="text-left">{{ option.satisfactory_level }}</td>
-    <td class="text-left">{{ option.persentase_capaian_ilo|default:0 }}</td>
-{% endif %}
+<td scope="col" class="text-left field-nama min-w-[9rem] lg:min-w-[8rem] xl:min-w-[15rem] max-w-[10rem] truncate {% if open_button and option.read_detail_url %} items-center relative {% endif %}">
+    {{ option.nama }}
+    {% if open_button and option.read_detail_url %}
+        {% include 'components/button/open-list-item-button.html' %}
+    {% endif %}
+</td>
+<td class="text-left truncate max-w-[10rem]">{{ option.pi_area.pi_code }}</td>
+<td class="text-left">{{ option.satisfactory_level }}</td>
+<td class="text-left">{{ option.persentase_capaian_ilo|default:0 }}</td>

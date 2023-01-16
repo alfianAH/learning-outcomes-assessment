@@ -22,7 +22,18 @@ ILO -
         </button>
     </div>
 
-    <p>{{ kurikulum_obj.nama }}</p>
+    <div class="table-div">
+        <div class="tr-div">
+            <div class="w-24 md:w-40">Kurikulum</div>
+            <div>:</div>
+            <div>{{ kurikulum_obj.nama }}</div>
+        </div>
+        <div class="tr-div">
+            <div class="w-24 md:w-40">Jenjang prodi</div>
+            <div>:</div>
+            <div>{{ kurikulum_obj.prodi_jenjang.nama }}</div>
+        </div>
+    </div>
 
     {% include 'components/list-table-view/list-tools.html' with search_field=filter_form.nama %}
 
@@ -33,7 +44,18 @@ ILO -
     {% endif %}
 {% else %}
 <h1>Intended Learning Outcomes</h1>
-<p>{{ kurikulum_obj.nama }}</p>
+<div class="table-div">
+    <div class="tr-div">
+        <div class="w-24 md:w-40">Kurikulum</div>
+        <div>:</div>
+        <div>{{ kurikulum_obj.nama }}</div>
+    </div>
+    <div class="tr-div">
+        <div class="w-24 md:w-40">Jenjang prodi</div>
+        <div>:</div>
+        <div>{{ kurikulum_obj.prodi_jenjang.nama }}</div>
+    </div>
+</div>
 <button class="btn btn-primary" type="button" data-target="#create-modal" onclick="openModalByButton(this)" hx-get="{{ create_ilo_url }}" hx-target="#create-modal-content" hx-swap="outerHTML" hx-trigger="click">
     <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
         <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>

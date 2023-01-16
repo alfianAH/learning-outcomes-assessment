@@ -23,7 +23,7 @@ class SemesterProdiCreateForm(forms.Form):
             badge_template='semester/partials/badge-list-semester-prodi.html',
             list_custom_field_template='semester/partials/list-custom-field-semester-prodi.html',
             table_custom_field_template='semester/partials/table-custom-field-semester-prodi.html',
-            table_custom_field_header_template='semester/partials/table-custom-field-header-semester.html',
+            table_custom_field_header_template='semester/partials/table-custom-field-header-semester-prodi.html',
         ),
         label = 'Tambahkan Semester dari Neosia',
         help_text = 'Data di bawah ini merupakan data baru dari Neosia dan belum ditemukan dalam database. Beri centang pada item yang ingin anda tambahkan.<br>Note: Data semester yang tidak bisa dicentang berarti semester tidak memiliki data mata kuliah di Neosia atau mata kuliah semester sudah disinkronisasi semuanya.',

@@ -1,22 +1,22 @@
-<table class="w-full table-strip">
-    <tbody class="space-y-1">
-        <tr class="flex px-3 py-1 space-x-2.5 justify-between">
+<div class="w-full table-strip">
+    <div class="space-y-1">
+        <div class="flex px-3 py-1 space-x-2.5 justify-between">
             {% if option.wrap_label %}
-                <td class="w-min whitespace-nowrap font-bold">Jenjang Studi</td>
-                <td>{{ option.label.jenjang_studi.nama }}</td>
+                <div class="whitespace-nowrap font-bold">Jenjang Studi</div>
+                <div>{{ option.label.jenjang_studi.nama }}</div>
             {% else %}
-                <td class="w-min whitespace-nowrap font-bold">Jenjang Studi</td>
-                <td>{{ option.jenjang_studi.nama }}</td>
+                <div class="whitespace-nowrap font-bold">Jenjang Studi</div>
+                <div>{{ option.jenjang_studi.nama }}</div>
             {% endif %}
-        </tr>
-        <tr class="flex px-3 py-1 space-x-2.5 justify-between">
+        </div>
+        <div class="flex px-3 py-1 space-x-2.5 justify-between">
             {% if option.wrap_label %}
-                <td class="w-min whitespace-nowrap font-bold">Kode</td>
-                <td>{{ option.label.jenjang_studi.kode }}</td>
+                <div class="whitespace-nowrap font-bold">Kode</div>
+                <div>{{ option.label.jenjang_studi.kode }}</div>
             {% else %}
-                <td class="w-min whitespace-nowrap font-bold">Kode</td>
-                <td>{{ option.jenjang_studi.kode }}</td>
+                <div class="whitespace-nowrap font-bold">Kode</div>
+                <div>{{ option.jenjang_studi.kode }}</div>
             {% endif %}
-        </tr>
-    </tbody>
-</table>
+        </div>
+    </div>
+</div>

@@ -1,20 +1,20 @@
-<table class="w-full table-strip">
-    <tbody class="space-y-1">
-        <tr class="flex px-3 py-1 space-x-2.5 justify-between">
+<div class="w-full table-strip">
+    <div class="space-y-1">
+        <div class="flex px-3 py-1 space-x-2.5 justify-between">
             {% if option.wrap_label %}
-                <td class="w-min whitespace-nowrap font-bold">Tahun ajaran</td>
-                <td>{{ option.label.semester.tahun_ajaran }}</td>
+                <div class="whitespace-nowrap font-bold">Tahun ajaran</div>
+                <div>{{ option.label.semester.tahun_ajaran }}</div>
             {% else %}
-                <td class="w-min whitespace-nowrap font-bold">Tahun ajaran</td>
-                <td>{{ option.semester.tahun_ajaran }}</td>
+                <div class="whitespace-nowrap font-bold">Tahun ajaran</div>
+                <div>{{ option.semester.tahun_ajaran }}</div>
             {% endif %}
-        </tr>
+        </div>
 
         {% if not option.wrap_label %}
-        <tr class="flex px-3 py-1 space-x-2.5 justify-between">
-            <td class="w-min whitespace-nowrap font-bold">Jenjang studi</td>
-            <td class="truncate max-w-[10rem]">{{ option.tahun_ajaran_prodi.prodi_jenjang.nama }}</td>
-        </tr>
+        <div class="flex px-3 py-1 space-x-2.5 justify-between">
+            <div class="whitespace-nowrap font-bold">Jenjang studi</div>
+            <div class="truncate">{{ option.tahun_ajaran_prodi.prodi_jenjang.nama }}</div>
+        </div>
         {% endif %}
-    </tbody>
-</table>
+    </div>
+</div>

@@ -1,12 +1,12 @@
 {% if option.wrap_label %}
     <td class="text-left">{{ option.label.kode }}</td>   
-    <td class="text-left max-w-md field-nama truncate">
+    <td class="text-left max-w-[24rem] lg:max-w-[22rem] xl:max-w-md field-nama truncate">
         {{ option.label.nama }}
     </td>
     <td class="text-left">{{ option.label.sks }}</td>
 {% else %}
     <td class="text-left">{{ option.kode }}</td>
-    <td scope="col" class="text-left field-nama truncate max-w-md {% if open_button and option.read_detail_url %} items-center relative {% endif %}">
+    <td scope="col" class="text-left field-nama truncate max-w-[24rem] xl:max-w-md {% if open_button and option.read_detail_url %} items-center relative {% endif %}">
         {{ option.nama }}
         {% if open_button and option.read_detail_url %}
             {% include 'components/button/open-list-item-button.html' %}

@@ -1,35 +1,35 @@
-<table class="w-full table-strip">
-    <tbody class="space-y-1">
+<div class="w-full table-strip">
+    <div class="space-y-1">
         {% if option.wrap_label %}
-            <tr class="flex px-3 py-1 space-x-2.5 justify-between">
-                <td class="w-min whitespace-nowrap font-bold">Kode</td>
-                <td>{{ option.label.kode }}</td>
-            </tr>
+            <div class="flex px-3 py-1 space-x-2.5 justify-between">
+                <div class="whitespace-nowrap font-bold">Kode</div>
+                <div>{{ option.label.kode }}</div>
+            </div>
             
-            <tr class="flex px-3 py-1 space-x-2.5 justify-between">
-                <td class="w-min whitespace-nowrap font-bold">SKS</td>
-                <td>{{ option.label.sks }}</td>
-            </tr>
+            <div class="flex px-3 py-1 space-x-2.5 justify-between">
+                <div class="whitespace-nowrap font-bold">SKS</div>
+                <div>{{ option.label.sks }}</div>
+            </div>
         {% else %}
-            <tr class="flex px-3 py-1 space-x-2.5 justify-between">
-                <td class="w-min whitespace-nowrap font-bold">Kode</td>
-                <td>{{ option.mk_kurikulum.kode }}</td>
-            </tr>
+            <div class="flex px-3 py-1 space-x-2.5 justify-between">
+                <div class="whitespace-nowrap font-bold">Kode</div>
+                <div>{{ option.mk_kurikulum.kode }}</div>
+            </div>
             
-            <tr class="flex px-3 py-1 space-x-2.5 justify-between">
-                <td class="w-min whitespace-nowrap font-bold">SKS</td>
-                <td>{{ option.mk_kurikulum.sks }}</td>
-            </tr>
+            <div class="flex px-3 py-1 space-x-2.5 justify-between">
+                <div class="whitespace-nowrap font-bold">SKS</div>
+                <div>{{ option.mk_kurikulum.sks }}</div>
+            </div>
 
-            <tr class="flex px-3 py-1 space-x-2.5 justify-between">
-                <td class="w-min whitespace-nowrap font-bold">Status Nilai</td>
-                <td>{{ option.status_nilai }}</td>
-            </tr>
+            <div class="flex px-3 py-1 space-x-2.5 justify-between">
+                <div class="whitespace-nowrap font-bold">Status Nilai</div>
+                <div>{{ option.status_nilai }}</div>
+            </div>
 
-            <tr class="flex px-3 py-1 space-x-2.5 justify-between">
-                <td class="w-min whitespace-nowrap font-bold">Status Pedoman</td>
-                <td>{{ option.status_pedoman }}</td>
-            </tr>
+            <div class="flex px-3 py-1 space-x-2.5 justify-between">
+                <div class="whitespace-nowrap font-bold">Status Pedoman</div>
+                <div>{{ option.status_pedoman }}</div>
+            </div>
         {% endif %}
-    </tbody>
-</table>
+    </div>
+</div>

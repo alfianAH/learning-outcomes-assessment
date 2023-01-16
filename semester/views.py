@@ -57,10 +57,10 @@ class SemesterReadAllView(ListViewModelA):
     list_item_name: str = 'semester/partials/list-item-name-semester-prodi.html'
     badge_template: str = 'semester/partials/badge-list-semester-prodi.html'
     list_custom_field_template: str = 'semester/partials/list-custom-field-semester-prodi.html'
-    table_custom_field_header_template: str = 'semester/partials/table-custom-field-header-semester.html'
+    table_custom_field_header_template: str = 'semester/partials/table-custom-field-header-semester-prodi.html'
     table_custom_field_template: str = 'semester/partials/table-custom-field-semester-prodi.html'
     filter_template: str = 'semester/partials/semester-prodi-filter-form.html'
-    sort_template: str = 'semester/partials/semester-sort-form.html'
+    sort_template: str = 'semester/partials/semester-prodi-sort-form.html'
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         if request.user.prodi is None: raise PermissionDenied()

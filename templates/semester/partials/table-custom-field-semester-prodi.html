@@ -1,5 +1,5 @@
 {% if option.wrap_label %}
-    <td class="text-left field-nama truncate max-w-lg">
+    <td class="text-left field-nama truncate md:max-w-[15rem] lg:max-w-[18rem] xl:max-w-md">
         {{ option.label.nama }}
     </td>
     <td class="text-left">{{ option.label.semester.tahun_ajaran }}</td>
@@ -9,14 +9,14 @@
         {% endif %}
     </td>
 {% else %}
-    <td scope="col" class="text-left field-nama max-w-xs truncate{% if open_button and option.read_detail_url %} items-center relative {% endif %}">
+    <td scope="col" class="text-left field-nama md:max-w-[15rem] lg:max-w-[10rem] xl:max-w-[16rem] truncate{% if open_button and option.read_detail_url %} items-center relative {% endif %}">
         {{ option.semester.nama }}
         {% if open_button and option.read_detail_url %}
             {% include 'components/button/open-list-item-button.html' %}
         {% endif %}
     </td>
     <td class="text-left">{{ option.semester.tahun_ajaran }}</td>
-    <td class="text-left max-w-xs truncate">{{ option.tahun_ajaran_prodi.prodi_jenjang.nama }}</td>
+    <td class="text-left md:max-w-[10rem] xl:max-w-[16rem] truncate">{{ option.tahun_ajaran_prodi.prodi_jenjang.nama }}</td>
     <td class="text-left !align-middle">
         {% if badge_template %}
             {% include badge_template %}
