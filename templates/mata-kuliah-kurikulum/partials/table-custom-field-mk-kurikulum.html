@@ -1,8 +1,13 @@
 {% if option.wrap_label %}
     <td class="text-left">{{ option.label.kode }}</td>   
-    <td class="text-left max-w-[24rem] lg:max-w-[22rem] xl:max-w-md field-nama truncate">
+    <td class="text-left md:max-w-[18rem] lg:max-w-[13rem] xl:max-w-sm field-nama truncate" title="{{ option.label.nama }}">
         {{ option.label.nama }}
     </td>
+    {% if option.label.kurikulum.nama %}
+    <td class="text-left max-w-[10rem] xl:max-w-[12rem] truncate" title="{{ option.label.kurikulum.nama }}">
+        {{ option.label.kurikulum.nama }}
+    </td>
+    {% endif %}
     <td class="text-left">{{ option.label.sks }}</td>
 {% else %}
     <td class="text-left">{{ option.kode }}</td>

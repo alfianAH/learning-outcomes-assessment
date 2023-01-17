@@ -6,6 +6,13 @@
                 <div>{{ option.label.kode }}</div>
             </div>
             
+            {% if option.label.kurikulum.nama %}
+            <div class="flex px-3 py-1 space-x-2.5 justify-between">
+                <div class="whitespace-nowrap font-bold">Kurikulum</div>
+                <div class="truncate">{{ option.label.kurikulum.nama }}</div>
+            </div>
+            {% endif %}
+            
             <div class="flex px-3 py-1 space-x-2.5 justify-between">
                 <div class="whitespace-nowrap font-bold">SKS</div>
                 <div>{{ option.label.sks }}</div>

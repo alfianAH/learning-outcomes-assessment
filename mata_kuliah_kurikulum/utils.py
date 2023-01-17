@@ -1,5 +1,6 @@
 from django.conf import settings
 from learning_outcomes_assessment.utils import request_data_to_neosia
+from kurikulum.utils import get_detail_kurikulum
 from .models import MataKuliahKurikulum
 
 
@@ -17,6 +18,8 @@ def get_mk_kurikulum(kurikulum_id: int, prodi_jenjang_id: int):
     list_mata_kuliah_kurikulum = []
     list_id_mk_kurikulum = []
     if json_response is None: return list_mata_kuliah_kurikulum
+
+    detail_kurikulum = get_detail_kurikulum(kurikulum_id)
 
     for mata_kuliah_data in json_response:
         id_mk_kurikulum = mata_kuliah_data['id_mata_kuliah']
@@ -36,6 +39,9 @@ def get_mk_kurikulum(kurikulum_id: int, prodi_jenjang_id: int):
             'nama': mata_kuliah_data['nama_resmi'],
             'sks': sks_mk_kurikulum,
         }
+        
+        if detail_kurikulum is not None:
+            mata_kuliah['kurikulum'] = detail_kurikulum
 
         list_id_mk_kurikulum.append(id_mk_kurikulum)
         list_mata_kuliah_kurikulum.append(mata_kuliah)
