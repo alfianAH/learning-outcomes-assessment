@@ -1,5 +1,6 @@
 from django import forms
 from django.conf import settings
+from accounts.models import ProgramStudi
 from learning_outcomes_assessment.widgets import (
     ChoiceListInteractiveModelA,
     UpdateChoiceList,
@@ -92,9 +93,10 @@ class KurikulumBulkUpdateForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user')
+        user = kwargs.pop('user')
         super().__init__(*args, **kwargs)
 
-        update_kurikulum_choices = get_update_kurikulum_choices(self.user.prodi.id_neosia)
+        prodi_obj: ProgramStudi = user.prodi
+        update_kurikulum_choices = get_update_kurikulum_choices(prodi_obj)
 
         self.fields['update_data_kurikulum'].choices = update_kurikulum_choices

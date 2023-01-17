@@ -219,7 +219,7 @@ class SemesterBulkUpdateView(ModelBulkUpdateView):
                 semester_prodi_obj = SemesterProdi.objects.filter(id_neosia=update_semester_id)
             except SemesterProdi.DoesNotExist:
                 messages.error(self.request, 
-                    'Semester Prodi dengan ID: {} tidak ditemukan, sehingga gagal mengupdate semester'.format(update_semester_id))
+                    'Gagal mengupdate semester prodi. Error: Semester Prodi dengan ID: {} tidak ditemukan.'.format(update_semester_id))
                 continue
             
             # Get tahun ajaran

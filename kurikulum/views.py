@@ -26,6 +26,7 @@ from .forms import (
 )
 from .utils import (
     get_detail_kurikulum,
+    get_update_kurikulum_choices
 )
 from mata_kuliah_kurikulum.models import MataKuliahKurikulum
 from mata_kuliah_kurikulum.forms import (
@@ -218,18 +219,30 @@ class KurikulumBulkUpdateView(ModelBulkUpdateView):
     
     def form_valid(self, form) -> HttpResponse:
         update_kurikulum_data = form.cleaned_data.get(self.form_field_name, [])
+        update_kurikulum_choices = get_update_kurikulum_choices(self.request.user.prodi)
 
         # Update kurikulum
-        for kurikulum_id in update_kurikulum_data:
-            try:
-                kurikulum_id = int(kurikulum_id)
-            except ValueError:
-                if settings.DEBUG:
-                    print('Cannot convert Kurikulum ID ("{}") to integer'.format(kurikulum_id))
-                messages.error(self.request, 'Tidak dapat mengonversi Kurikulum ID: {} ke integer'.format(kurikulum_id))
-                return redirect(self.success_url)
+        for update_kurikulum_id, kurikulum_data in update_kurikulum_choices:
+            new_kurikulum_data = kurikulum_data['new']
 
-            self.update_kurikulum(kurikulum_id)
+            if str(update_kurikulum_id) not in update_kurikulum_data: continue
+
+            try:
+                kurikulum_obj = Kurikulum.objects.filter(id_neosia=update_kurikulum_id)
+            except Kurikulum.DoesNotExist:
+                messages.error(self.request, 'Gagal mengupdate kurikulum. Error: Kurikulum dengan ID: {} tidak ditemukan.'.format(update_kurikulum_id))
+                continue
+
+            # Get prodi jenjang
+            prodi_jenjang_obj: ProgramStudiJenjang = new_kurikulum_data['prodi_jenjang']
+
+            # Update kurikulum
+            kurikulum_obj.update(
+                prodi_jenjang=prodi_jenjang_obj,
+                nama=new_kurikulum_data['nama'],
+                tahun_mulai=new_kurikulum_data['tahun_mulai'],
+                is_active=new_kurikulum_data['is_active']
+            )
         
         messages.success(self.request, 'Proses mengupdate kurikulum telah selesai.')
         return redirect(self.success_url)
