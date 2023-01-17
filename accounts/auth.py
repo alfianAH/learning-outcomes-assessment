@@ -46,7 +46,7 @@ class MyBackend(BaseBackend):
                 }
 
                 # Get prodi from Neosia
-                if user['prodi'] is None:
+                if user.get('prodi') is None:
                     user_profile = get_user_profile(user, role)
                     
                     # Return None if user profile is None
@@ -152,10 +152,19 @@ class MyBackend(BaseBackend):
         """
         
         # Get Fakultas and Program Studi from user profile
-        fakultas = self.get_or_create_fakultas(
-            user_profile['id_fakultas'], 
-            user_profile['nama_fakultas']
-        )
+        nama_fakultas = user_profile.get('nama_fakultas')
+        if nama_fakultas is not None:
+            fakultas = self.get_or_create_fakultas(
+                user_profile['id_fakultas'], 
+                nama_fakultas
+            )
+        else:
+            nama_fakultas = user_profile.get('nama_resmi')
+            fakultas = self.get_or_create_fakultas(
+                user_profile['id_fakultas'], 
+                nama_fakultas
+            )
+        
         prodi = self.get_or_create_prodi(
             user_profile['id_prodi'], 
             user_profile['nama_prodi'], 

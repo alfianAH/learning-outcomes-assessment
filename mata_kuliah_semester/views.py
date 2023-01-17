@@ -1,11 +1,13 @@
+from django.contrib.auth import authenticate
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic.edit import FormView
 from django.views.generic.detail import DetailView
+from accounts.enums import RoleChoices
+from learning_outcomes_assessment.auth.mixins import ProgramStudiMixin
 from learning_outcomes_assessment.forms.edit import ModelBulkDeleteView
-from learning_outcomes_assessment.list_view.views import ListViewModelA
 from semester.models import SemesterProdi
 from .forms import (
     MataKuliahSemesterCreateForm,
@@ -16,15 +18,17 @@ from mata_kuliah_kurikulum.models import(
 from .models import (
     MataKuliahSemester,
     KelasMataKuliahSemester,
+    DosenMataKuliah,
 )
 from .utils import(
     get_kelas_mk_semester,
+    get_dosen_kelas_mk_semester,
     get_kelas_mk_semester_choices
 )
 
 
 # Create your views here.
-class MataKuliahSemesterCreateView(FormView):
+class MataKuliahSemesterCreateView(ProgramStudiMixin, FormView):
     form_class = MataKuliahSemesterCreateForm
     template_name: str = 'mata-kuliah-semester/create-view.html'
     semester_obj: SemesterProdi = None
@@ -35,6 +39,7 @@ class MataKuliahSemesterCreateView(FormView):
 
         semester_prodi_id = kwargs.get('semester_prodi_id')
         self.semester_obj: SemesterProdi = get_object_or_404(SemesterProdi, id_neosia=semester_prodi_id)
+        self.program_studi_obj = self.semester_obj.tahun_ajaran_prodi.prodi_jenjang.program_studi
 
         self.mk_semester_choices = get_kelas_mk_semester_choices(self.semester_obj.id_neosia)
 
@@ -89,13 +94,24 @@ class MataKuliahSemesterCreateView(FormView):
             )
 
             # Create Kelas MK Semester
-            KelasMataKuliahSemester.objects.create(
+            kelas_mk_semester_obj = KelasMataKuliahSemester.objects.create(
                 id_neosia=kelas_mk_semester['id'],
                 mk_semester=mk_semester_obj,
                 nama=kelas_mk_semester['nama']
             )
+
+            # Get list Dosen Kelas MK Semester
+            list_dosen_kelas_mk_semester = get_dosen_kelas_mk_semester(kelas_mk_semester_obj.id_neosia)
+
+            # Create dosen (user) and dosen (Kelas MK Semester) 
+            for dosen in list_dosen_kelas_mk_semester:
+                user = authenticate(self.request, user=dosen, role=RoleChoices.DOSEN)
+                DosenMataKuliah.objects.create(
+                    kelas_mk_semester=kelas_mk_semester_obj,
+                    dosen=user
+                )
         
-        messages.success(self.request, 'Proses menambahkan mata kuliah semester sudah selesai')
+        messages.success(self.request, 'Proses menambahkan mata kuliah semester sudah selesai. {}'.format(self.request.user.name))
 
         return super().form_valid(form)
 

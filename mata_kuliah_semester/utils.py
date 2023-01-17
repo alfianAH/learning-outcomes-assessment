@@ -32,6 +32,27 @@ def get_kelas_mk_semester(semester_prodi_id: int):
     return list_kelas_mk_semester
 
 
+def get_dosen_kelas_mk_semester(kelas_mk_semester_id: int):
+    list_dosen = []
+    parameters = {
+        'id_kelas': kelas_mk_semester_id
+    }
+
+    json_response = request_data_to_neosia(DOSEN_MATA_KULIAH_URL, parameters)
+    if json_response is None: return list_dosen
+
+    for dosen_data in json_response:
+        dosen = {
+            'nip': dosen_data['nip'],
+            'nama': dosen_data['nama'],
+            'id_prodi': dosen_data['id_prodi']
+        }
+
+        list_dosen.append(dosen)
+
+    return list_dosen
+
+
 def get_kelas_mk_semester_choices(semester_prodi_id: int):
     """Get mata kuliah semester choices for choice field
     Returns only mata kuliah kurikulum because all classess in mata kuliah

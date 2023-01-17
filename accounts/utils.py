@@ -37,7 +37,7 @@ def get_user_profile(user: dict, role: str):
     match(role):
         case RoleChoices.DOSEN:
             parameters = {
-                'nip': user
+                'nip': user['nip']
             }
             json_response = request_data_to_neosia(DOSEN_PROFILE_URL, params=parameters)
             if json_response is None: return None
