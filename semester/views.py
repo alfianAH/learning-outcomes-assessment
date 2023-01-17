@@ -4,7 +4,6 @@ from django.core.exceptions import PermissionDenied
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic.edit import FormView
 from learning_outcomes_assessment.wizard.views import MySessionWizardView
 from learning_outcomes_assessment.forms.edit import (
     ModelBulkDeleteView,
@@ -14,6 +13,7 @@ from learning_outcomes_assessment.list_view.views import (
     ListViewModelA,
     DetailWithListViewModelA,
 )
+from learning_outcomes_assessment.auth.mixins import ProgramStudiMixin
 from accounts.forms import ProgramStudiJenjangSelectForm
 from mata_kuliah_semester.filters import MataKuliahSemesterFilter, MataKuliahSemesterSort
 from mata_kuliah_semester.models import MataKuliahSemester
@@ -203,17 +203,6 @@ class SemesterBulkUpdateView(ModelBulkUpdateView):
         })
         return kwargs
 
-    def update_semester_prodi(self, semester_prodi_id: int):
-        try:
-            semester_prodi_obj = SemesterProdi.objects.filter(id_neosia=semester_prodi_id)
-        except SemesterProdi.DoesNotExist:
-            messages.error(self.request, 
-                'Semester Prodi dengan ID: {} tidak ditemukan, sehingga gagal mengupdate semester'.format(semester_prodi_id))
-            return
-        # TODO: not yet implemented
-        # new_semester_data = get_detail_semester_prodi(semester_prodi_id)
-        # semester_prodi_obj.update(**new_semester_data)
-
     def form_valid(self, form) -> HttpResponse:
         # Get semester prodi ids
         update_semester_data = form.cleaned_data.get(self.form_field_name, [])
@@ -231,6 +220,7 @@ class SemesterBulkUpdateView(ModelBulkUpdateView):
             except SemesterProdi.DoesNotExist:
                 messages.error(self.request, 
                     'Semester Prodi dengan ID: {} tidak ditemukan, sehingga gagal mengupdate semester'.format(update_semester_id))
+                continue
             
             # Get tahun ajaran
             tahun_ajaran_obj, _ = TahunAjaran.objects.get_or_create_tahun_ajaran(new_semester_data['semester']['tahun_ajaran'])
@@ -255,12 +245,12 @@ class SemesterBulkUpdateView(ModelBulkUpdateView):
                 if settings.DEBUG:
                     print('Tahun ajaran prodi does not exist. Tahun ajaran: {}, Prodi jenjang: {}'.format(tahun_ajaran_obj, prodi_jenjang_obj))
 
-                messages.error('Tidak berhasil mendapatkan tahun ajaran prodi')
+                messages.error(self.request, 'Gagal mengupdate semester prodi. ID: {}. Error: Tidak berhasil mendapatkan tahun ajaran prodi.'.format(update_semester_id))
                 continue
             except TahunAjaranProdi.MultipleObjectsReturned:
                 if settings.DEBUG:
                     print('Tahun ajaran prodi returns multiple objects. Tahun ajaran: {}, Prodi jenjang: {}'.format(tahun_ajaran_obj, prodi_jenjang_obj))
-                messages.error('Tahun ajaran prodi yang dikembalikan lebih dari 1.')
+                messages.error(self.request, 'Gagal mengupdate semester prodi. ID: {}. Error: Tahun ajaran prodi yang dikembalikan lebih dari 1.'.format(update_semester_id))
 
                 continue
             
@@ -277,7 +267,7 @@ class SemesterBulkUpdateView(ModelBulkUpdateView):
                     nama = new_semester_data['nama']
                 )
 
-                #   Update semester prodi
+                # Update semester prodi
                 semester_prodi_obj.update(
                     semester=semester_qs[0],
                     tahun_ajaran_prodi=tahun_ajaran_prodi
@@ -293,7 +283,7 @@ class SemesterBulkUpdateView(ModelBulkUpdateView):
         return super().form_valid(form)
 
 
-class SemesterReadView(DetailWithListViewModelA):
+class SemesterReadView(ProgramStudiMixin, DetailWithListViewModelA):
     single_model = SemesterProdi
     single_pk_url_kwarg = 'semester_prodi_id'
     single_object: SemesterProdi = None
@@ -322,6 +312,7 @@ class SemesterReadView(DetailWithListViewModelA):
     def setup(self, request: HttpRequest, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
+        self.program_studi_obj = self.single_object.tahun_ajaran_prodi.prodi_jenjang.program_studi
         self.bulk_delete_url = self.single_object.get_bulk_delete_mk_semester_url()
         self.reset_url = self.single_object.read_detail_url()
 

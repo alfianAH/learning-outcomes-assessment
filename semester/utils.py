@@ -175,10 +175,13 @@ def get_update_semester_prodi_choices(prodi: ProgramStudi):
                 if settings.DEBUG: print('Semester Prodi object returns multiple objects. ID: {}'.format(id_semester_prodi))
                 continue
             
+            # Check:
+            # *Semester Prodi > Semester > nama
+            # *Semester Prodi > Semester > Tahun Ajaran
+            # *Semester Prodi > Semester > tipe semester
             isDataOkay = semester_prodi_obj.semester.nama == semester_prodi_data['nama'] and str(semester_prodi_obj.semester.tahun_ajaran) == semester_prodi_data['semester']['tahun_ajaran'] and semester_prodi_obj.semester.get_tipe_semester_display().lower() == semester_prodi_data['semester']['tipe_semester'].lower()
 
             if isDataOkay: continue
-            print('Semester Prodi: {}'.format(semester_prodi_obj.semester.nama))
 
             update_semester_data = {
                 'new': semester_prodi_data,

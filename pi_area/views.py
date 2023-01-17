@@ -213,7 +213,7 @@ class PIAreaDuplicateFormView(FormView):
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         print(len(self.choices))
         if len(self.choices) == 0:
-            messages.info('Kurikulum lain belum mempunyai performance indicator.')
+            messages.info(self.request, 'Kurikulum lain belum mempunyai performance indicator.')
             return redirect(self.success_url)
 
         return super().get(request, *args, **kwargs)
