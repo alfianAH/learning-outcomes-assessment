@@ -15,33 +15,122 @@
 
 <div class="table-div">
     <div class="tr-div">
-        <div>Semester</div>
+        <div class="w-32 md:w-36">Semester</div>
         <div>:</div>
-        <div>{{ object.semester.nama }}</div>
+        <div>{{ object.semester.semester.nama }}</div>
     </div>
     <div class="tr-div">
-        <div>Kode</div>
+        <div class="w-32 md:w-36">Kode</div>
         <div>:</div>
         <div>{{ object.mk_kurikulum.nama }}</div>
     </div>
     <div class="tr-div">
-        <div>SKS</div>
+        <div class="w-32 md:w-36">SKS</div>
         <div>:</div>
         <div>{{ object.mk_kurikulum.sks }}</div>
     </div>
-    <div class="tr-div">
-        <div>Status nilai</div>
+    <div class="tr-div !items-center">
+        <div class="w-32 md:w-36">Status nilai</div>
         <div>:</div>
-        <div></div>
+        <div class="badge badge-info">test</div>
+    </div>
+    <div class="tr-div !items-center">
+        <div class="w-32 md:w-36">Status pedoman</div>
+        <div>:</div>
+        <div class="badge badge-info">test</div>
     </div>
     <div class="tr-div">
-        <div>Status pedoman</div>
+        <div class="w-32 md:w-36">Dosen</div>
         <div>:</div>
-        <div></div>
     </div>
     <div class="tr-div">
-        <div>Dosen</div>
-        <div>:</div>
+        <ol class="list-decimal ml-8">
+            {% for kelas_mk_semester in object.get_kelas_mk_semester %}
+                {% for dosen_mk in kelas_mk_semester.get_dosen_mata_kuliah %}
+                    <li>{{ dosen_mk.dosen.name }}</li>
+                {% endfor %}
+            {% endfor %}
+        </ol>
+    </div>
+</div>
+
+<ul class="tab" role="tablist">
+    <li class="tab-item w-40" id="tab-1" data-target="#tab-pedoman-pane" role="presentation">
+        <div class="tab-title">
+            <span class="truncate">Pedoman</span>
+
+            <div class="w-2 h-2 lg:w-2.5 lg:h-2.5 ml-2.5 badge-warning rounded-full"></div>
+        </div>
+
+        <div class="tab-item-line"></div>
+    </li>
+
+    <li class="tab-item disabled w-32" id="tab-2" data-target="#tab-peserta-pane" role="presentation">
+        <div class="tab-title">
+            <span class="truncate">Peserta</span>
+
+            <div class="w-2 h-2 lg:w-2.5 lg:h-2.5 ml-2.5 badge-warning rounded-full"></div>
+        </div>
+
+        <div class="tab-item-line"></div>
+    </li>
+
+    <li class="tab-item disabled w-32" id="tab-3" data-target="#tab-hasil-pane" role="presentation">
+        <div class="tab-title">
+            <span class="truncate">Hasil</span>
+
+            <div class="w-2 h-2 lg:w-2.5 lg:h-2.5 ml-2.5 badge-warning rounded-full"></div>
+        </div>
+
+        <div class="tab-item-line"></div>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade min-h-screen show active" id="tab-pedoman-pane" role="tabpanel" aria-labelledby="tab-1">
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti deserunt earum nemo assumenda possimus, eos pariatur, repellendus impedit voluptas nam molestiae voluptate debitis porro numquam veritatis mollitia aperiam ipsum necessitatibus? Cupiditate, nisi non natus corporis quia eaque odio? Accusantium, maxime illo assumenda dolorem natus veritatis laborum officia. Error, ex. Quas!
+    </div>
+
+    <div class="tab-pane fade min-h-screen" role="tabpanel" id="tab-peserta-pane" aria-labelledby="tab-2">
+        {% if object_list or data_exist %}
+            <div class="h-icon">
+                <h2>Nilai Mahasiswa</h2>
+                <a href="#" title="Tambah nilai mahasiswa" type="button" class="btn btn-success">
+                    <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                    </svg>
+                    <span class="hidden sm:block">Tambah</span>
+                </a>
+                <a href="#" title="Update nilai mahasiswa" type="button" class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" focusable="False" aria-label="sync">
+                        <path d="M.01 0h24v24h-24V0z" fill="none"/>
+                        <path d="M12 4V2.21c0-.45-.54-.67-.85-.35l-2.8 2.79c-.2.2-.2.51 0 .71l2.79 2.79c.32.31.86.09.86-.36V6c3.31 0 6 2.69 6 6 0 .79-.15 1.56-.44 2.25-.15.36-.04.77.23 1.04.51.51 1.37.33 1.64-.34.37-.91.57-1.91.57-2.95 0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-.79.15-1.56.44-2.25.15-.36.04-.77-.23-1.04-.51-.51-1.37-.33-1.64.34C4.2 9.96 4 10.96 4 12c0 4.42 3.58 8 8 8v1.79c0 .45.54.67.85.35l2.79-2.79c.2-.2.2-.51 0-.71l-2.79-2.79c-.31-.31-.85-.09-.85.36V18z"/>
+                    </svg>
+                    <span class="hidden sm:block">Update</span>
+                </a>
+            </div>
+            
+            {% include 'components/list-table-view/list-tools.html' with search_field=filter_form.nama ordering_by_field=sort_form.ordering_by %}
+            
+            {% if object_list %}
+                {% include 'components/list-table-view/model-a/read-all-view.html' %}
+            {% else %}
+                <p>Tidak ditemukan data dengan filter yang diberikan</p>
+            {% endif %}
+        {% else %}
+            <h2>Nilai Mahasiswa</h2>
+            <a href="#" type="button" class="btn btn-primary btn-icon-start max-w-min loading-trigger">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" focusable="False" aria-label="sync">
+                    <path d="M.01 0h24v24h-24V0z" fill="none"/>
+                    <path d="M12 4V2.21c0-.45-.54-.67-.85-.35l-2.8 2.79c-.2.2-.2.51 0 .71l2.79 2.79c.32.31.86.09.86-.36V6c3.31 0 6 2.69 6 6 0 .79-.15 1.56-.44 2.25-.15.36-.04.77.23 1.04.51.51 1.37.33 1.64-.34.37-.91.57-1.91.57-2.95 0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-.79.15-1.56.44-2.25.15-.36.04-.77-.23-1.04-.51-.51-1.37-.33-1.64.34C4.2 9.96 4 10.96 4 12c0 4.42 3.58 8 8 8v1.79c0 .45.54.67.85.35l2.79-2.79c.2-.2.2-.51 0-.71l-2.79-2.79c-.31-.31-.85-.09-.85.36V18z"/>
+                </svg>
+                Sinkronisasi nilai mahasiswa dengan Neosia
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="tab-pane fade min-h-screen" role="tabpanel" id="tab-hasil-pane" aria-labelledby="tab-3">
+        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Voluptatum voluptas, possimus eligendi incidunt, blanditiis rerum saepe accusantium est at, earum ipsa! Tempora itaque eaque voluptate!
     </div>
 </div>
 {% endblock content %}

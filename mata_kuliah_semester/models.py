@@ -42,6 +42,12 @@ class KelasMataKuliahSemester(models.Model):
     nama = models.CharField(max_length=255)
     kelas = models.CharField(max_length=255, null=True)
 
+    def get_dosen_mata_kuliah(self):
+        return self.dosenmatakuliah_set.all()
+    
+    def get_peserta_mata_kuliah(self):
+        return self.pesertamatakuliah_set.all()
+
 
 class PesertaMataKuliah(models.Model):
     kelas_mk_semester = models.ForeignKey(KelasMataKuliahSemester, on_delete=models.CASCADE)
