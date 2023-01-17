@@ -15,8 +15,8 @@
             {% include 'components/button/open-list-item-button.html' %}
         {% endif %}
     </td>
-    <td class="text-left">{{ option.semester.tahun_ajaran }}</td>
     <td class="text-left md:max-w-[10rem] xl:max-w-[16rem] truncate">{{ option.tahun_ajaran_prodi.prodi_jenjang.nama }}</td>
+    <td class="text-left">{{ option.semester.tahun_ajaran }}</td>
     <td class="text-left !align-middle">
         {% if badge_template %}
             {% include badge_template %}

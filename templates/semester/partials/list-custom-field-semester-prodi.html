@@ -1,5 +1,12 @@
 <div class="w-full table-strip">
     <div class="space-y-1">
+        {% if not option.wrap_label %}
+        <div class="flex px-3 py-1 space-x-2.5 justify-between">
+            <div class="whitespace-nowrap font-bold">Jenjang studi</div>
+            <div class="truncate">{{ option.tahun_ajaran_prodi.prodi_jenjang.nama }}</div>
+        </div>
+        {% endif %}
+        
         <div class="flex px-3 py-1 space-x-2.5 justify-between">
             {% if option.wrap_label %}
                 <div class="whitespace-nowrap font-bold">Tahun ajaran</div>
@@ -9,12 +16,5 @@
                 <div>{{ option.semester.tahun_ajaran }}</div>
             {% endif %}
         </div>
-
-        {% if not option.wrap_label %}
-        <div class="flex px-3 py-1 space-x-2.5 justify-between">
-            <div class="whitespace-nowrap font-bold">Jenjang studi</div>
-            <div class="truncate">{{ option.tahun_ajaran_prodi.prodi_jenjang.nama }}</div>
-        </div>
-        {% endif %}
     </div>
 </div>

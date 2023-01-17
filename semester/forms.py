@@ -10,7 +10,6 @@ from .utils import (
 from mata_kuliah_semester.utils import(
     get_kelas_mk_semester,
 )
-from mata_kuliah_semester.models import MataKuliahSemester
 from learning_outcomes_assessment.widgets import (
     ChoiceListInteractiveModelA, 
     UpdateChoiceList,
