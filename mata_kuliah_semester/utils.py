@@ -1,6 +1,10 @@
 from django.conf import settings
+from django.db.models import QuerySet
 from learning_outcomes_assessment.utils import request_data_to_neosia
-from .models import KelasMataKuliahSemester
+from .models import (
+    KelasMataKuliahSemester,
+    MataKuliahSemester,
+)
 from mata_kuliah_kurikulum.models import MataKuliahKurikulum
 
 
@@ -93,3 +97,43 @@ def get_kelas_mk_semester_choices(semester_prodi_id: int):
         kelas_mk_semester_choices.append(kelas_mk_semester_choice)
 
     return kelas_mk_semester_choices
+
+
+def get_update_kelas_mk_semester_choices(mk_semester: MataKuliahSemester):
+    list_kelas_mk_semester: QuerySet[KelasMataKuliahSemester] = mk_semester.get_kelas_mk_semester()
+    list_kelas_mk_semester_response = get_kelas_mk_semester(mk_semester.semester.id_neosia)
+    update_kelas_mk_semester_choices = []
+
+    for kelas_mk_semester in list_kelas_mk_semester:
+        for kelas_mk_semester_response in list_kelas_mk_semester_response:
+            if kelas_mk_semester.id_neosia != kelas_mk_semester_response['id']: continue
+
+            try:
+                mk_kurikulum_obj = MataKuliahKurikulum.objects.get(id_neosia=kelas_mk_semester_response['id_mata_kuliah'])
+            except MataKuliahKurikulum.DoesNotExist or MataKuliahKurikulum.MultipleObjectsReturned:
+                continue
+            
+            # Check:
+            # *Kelas MK Semester > nama
+            # *Kelas MK Semester > MK Semester > MK Kurikulum > id neosia
+            isDataOkay = kelas_mk_semester.nama == kelas_mk_semester_response['nama']
+            
+            if isDataOkay: break
+
+            # Just to show table strip in update choice field (list view model C)
+            kelas_mk_semester_response.update({
+                'mk_semester': {
+                    'mk_kurikulum': mk_kurikulum_obj
+                }
+            })
+            update_kelas_mk_semester_data = {
+                'new': kelas_mk_semester_response,
+                'old': kelas_mk_semester,
+            }
+
+            update_kelas_mk_semester_choice = kelas_mk_semester.id_neosia, update_kelas_mk_semester_data
+            update_kelas_mk_semester_choices.append(update_kelas_mk_semester_choice)
+
+            break
+    
+    return update_kelas_mk_semester_choices

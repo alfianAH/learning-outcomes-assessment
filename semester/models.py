@@ -72,11 +72,6 @@ class SemesterProdi(models.Model):
             'semester_prodi_id': self.id_neosia
         })
 
-    def get_update_mk_semester_url(self):
-        return reverse('semester:mata_kuliah_semester:update', kwargs={
-            'semester_prodi_id': self.id_neosia
-        })
-
     def get_bulk_delete_mk_semester_url(self):
         return reverse('semester:mata_kuliah_semester:bulk-delete', kwargs={
             'semester_prodi_id': self.id_neosia

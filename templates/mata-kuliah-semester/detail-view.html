@@ -11,7 +11,16 @@
 {% endblock breadcrumb %}
 
 {% block content %}
-<h1>{{ single_object.mk_kurikulum.nama }}</h1>
+<div class="h-icon">
+    <h1>{{ single_object.mk_kurikulum.nama }}</h1>
+    <a href="{{ single_object.get_mk_semester_update_url }}" title="Update data mata kuliah semester" type="button" class="btn btn-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" focusable="False" aria-label="sync">
+            <path d="M.01 0h24v24h-24V0z" fill="none"/>
+            <path d="M12 4V2.21c0-.45-.54-.67-.85-.35l-2.8 2.79c-.2.2-.2.51 0 .71l2.79 2.79c.32.31.86.09.86-.36V6c3.31 0 6 2.69 6 6 0 .79-.15 1.56-.44 2.25-.15.36-.04.77.23 1.04.51.51 1.37.33 1.64-.34.37-.91.57-1.91.57-2.95 0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-.79.15-1.56.44-2.25.15-.36.04-.77-.23-1.04-.51-.51-1.37-.33-1.64.34C4.2 9.96 4 10.96 4 12c0 4.42 3.58 8 8 8v1.79c0 .45.54.67.85.35l2.79-2.79c.2-.2.2-.51 0-.71l-2.79-2.79c-.31-.31-.85-.09-.85.36V18z"/>
+        </svg>
+        <span class="hidden sm:block">Update</span>
+    </a>
+</div>
 
 <div class="table-div">
     <div class="tr-div">
@@ -22,7 +31,7 @@
     <div class="tr-div">
         <div class="w-32 md:w-36">Kode</div>
         <div>:</div>
-        <div>{{ single_object.mk_kurikulum.nama }}</div>
+        <div>{{ single_object.mk_kurikulum.kode }}</div>
     </div>
     <div class="tr-div">
         <div class="w-32 md:w-36">SKS</div>
@@ -40,7 +49,18 @@
         <div class="badge badge-info">test</div>
     </div>
     <div class="tr-div">
-        <div class="w-32 md:w-36">Dosen</div>
+        <div>List Kelas</div>
+        <div>:</div>
+    </div>
+    <div class="tr-div">
+        <ol class="list-decimal ml-8">
+            {% for kelas_mk_semester in single_object.get_kelas_mk_semester %}
+                <li>{{ kelas_mk_semester.nama }} ({{ kelas_mk_semester.get_peserta_mata_kuliah|length }} peserta)</li>
+            {% endfor %}
+        </ol>
+    </div>
+    <div class="tr-div">
+        <div>Dosen</div>
         <div>:</div>
     </div>
     <div class="tr-div">

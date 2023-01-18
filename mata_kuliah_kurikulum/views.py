@@ -178,7 +178,6 @@ class MataKuliahKurikulumBulkUpdateView(ProgramStudiMixin, ModelBulkUpdateView):
     form_class = MataKuliahKurikulumBulkUpdateForm
     template_name: str = 'mata-kuliah-kurikulum/update-view.html'
     kurikulum_obj: Kurikulum = None
-    form_field_name: str = 'update_data_mk_kurikulum'
 
     back_url: str = ''
     form_field_name: str = 'update_data_mk_kurikulum'

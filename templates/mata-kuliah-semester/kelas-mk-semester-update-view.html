@@ -1,0 +1,16 @@
+{% extends 'home-view.html' %}
+
+{% block title %}
+Update Kelas MK - 
+{% endblock title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'semester:read-all' %}" role="listitem">Semester</a></li>
+<li class="breadcrumb-item"><a href="{{ mk_semester_obj.semester.read_detail_url }}" role="listitem">Detail</a></li>
+<li class="breadcrumb-item"><a href="{{ mk_semester_obj.read_detail_url }}" role="listitem">Detail</a></li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">Update Kelas MK</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+{% include 'components/form/single-form.html' with search_placeholder='Cari nama mata kuliah...' submit_text='Update' %}
+{% endblock %}

@@ -55,6 +55,12 @@ class MataKuliahSemester(models.Model):
             'semester_prodi_id': self.semester.pk,
             'mk_semester_id': self.pk
         })
+    
+    def get_mk_semester_update_url(self):
+        return reverse('semester:mata_kuliah_semester:update', kwargs={
+            'semester_prodi_id': self.semester.pk,
+            'mk_semester_id': self.pk
+        })
 
 
 class KelasMataKuliahSemester(models.Model):
@@ -62,7 +68,9 @@ class KelasMataKuliahSemester(models.Model):
     mk_semester = models.ForeignKey(MataKuliahSemester, on_delete=models.CASCADE)
 
     nama = models.CharField(max_length=255)
-    kelas = models.CharField(max_length=255, null=True)
+
+    class Meta:
+        ordering = ['nama',]
 
     def __str__(self) -> str:
         return self.nama
