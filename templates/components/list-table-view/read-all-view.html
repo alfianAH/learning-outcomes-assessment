@@ -1,0 +1,13 @@
+<div>
+    <form action="{{ bulk_delete_url }}" method="post" class="space-y-2.5 py-2.5 md:p-3">
+        {% csrf_token %}
+
+        {% include 'components/list-table-view/selected-indicator.html' with delete_button=True %}
+        
+        {% include list_view_model with use_widget=False open_button=True prefix_id=list_prefix_id options=object_list %}
+    </form>
+
+    {% if page_obj %}
+        {% include 'components/pagination/pagination.html' %}
+    {% endif %}
+</div>

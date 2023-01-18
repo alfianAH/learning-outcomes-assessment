@@ -28,6 +28,28 @@ class MataKuliahSemester(models.Model):
     def get_kelas_mk_semester(self):
         return self.kelasmatakuliahsemester_set.all()
 
+    def get_all_dosen_mk_semester(self):
+        list_dosen = []
+        list_kelas_mk_semester = self.get_kelas_mk_semester()
+
+        for kelas_mk_semester in list_kelas_mk_semester:
+            list_dosen_kelas_mk_semester = kelas_mk_semester.get_dosen_mata_kuliah()
+            for dosen_kelas_mk_semester in list_dosen_kelas_mk_semester:
+                list_dosen.append(dosen_kelas_mk_semester)
+        
+        return list_dosen
+    
+    def get_all_peserta_mk_semester(self):
+        list_peserta = []
+        list_kelas_mk_semester = self.get_kelas_mk_semester()
+
+        for kelas_mk_semester in list_kelas_mk_semester:
+            list_peserta_kelas_mk_semester = kelas_mk_semester.get_peserta_mata_kuliah()
+            for peserta_kelas_mk_semester in list_peserta_kelas_mk_semester:
+                list_peserta.append(peserta_kelas_mk_semester)
+        
+        return list_peserta
+
     def read_detail_url(self):
         return reverse('semester:mata_kuliah_semester:read', kwargs={
             'semester_prodi_id': self.semester.pk,
@@ -41,6 +63,9 @@ class KelasMataKuliahSemester(models.Model):
 
     nama = models.CharField(max_length=255)
     kelas = models.CharField(max_length=255, null=True)
+
+    def __str__(self) -> str:
+        return self.nama
 
     def get_dosen_mata_kuliah(self):
         return self.dosenmatakuliah_set.all()
@@ -60,7 +85,7 @@ class DosenMataKuliah(models.Model):
 
 
 class NilaiMataKuliahMahasiswa(models.Model):
-    peserta = models.ForeignKey(PesertaMataKuliah, on_delete=models.CASCADE)
+    peserta = models.OneToOneField(PesertaMataKuliah, on_delete=models.CASCADE)
     nilai_akhir = models.FloatField(null=True, 
         validators=[MinValueValidator(0.0), MaxValueValidator(100.0)])
     

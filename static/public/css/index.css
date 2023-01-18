@@ -3392,6 +3392,10 @@ details.dropdown::marker {
   margin-left: 2rem;
 }
 
+.ml-2\.5 {
+  margin-left: 0.625rem;
+}
+
 .mb-2\.5 {
   margin-bottom: 0.625rem;
 }
@@ -3422,10 +3426,6 @@ details.dropdown::marker {
 
 .mt-2 {
   margin-top: 0.5rem;
-}
-
-.ml-2\.5 {
-  margin-left: 0.625rem;
 }
 
 .block {
@@ -3476,12 +3476,12 @@ details.dropdown::marker {
   height: 12rem;
 }
 
-.\!h-4 {
-  height: 1rem !important;
-}
-
 .h-2 {
   height: 0.5rem;
+}
+
+.\!h-4 {
+  height: 1rem !important;
 }
 
 .max-h-10 {
@@ -3536,6 +3536,10 @@ details.dropdown::marker {
   width: 8rem;
 }
 
+.w-2 {
+  width: 0.5rem;
+}
+
 .\!w-4 {
   width: 1rem !important;
 }
@@ -3562,10 +3566,6 @@ details.dropdown::marker {
 
 .w-\[85\%\] {
   width: 85%;
-}
-
-.w-2 {
-  width: 0.5rem;
 }
 
 .min-w-full {
@@ -4650,16 +4650,16 @@ details.dropdown::marker {
     display: none;
   }
 
-  .lg\:h-7 {
-    height: 1.75rem;
-  }
-
   .lg\:h-2\.5 {
     height: 0.625rem;
   }
 
   .lg\:h-2 {
     height: 0.5rem;
+  }
+
+  .lg\:h-7 {
+    height: 1.75rem;
   }
 
   .lg\:w-\[480px\] {
@@ -4670,16 +4670,16 @@ details.dropdown::marker {
     width: 16rem;
   }
 
-  .lg\:w-\[90\%\] {
-    width: 90%;
-  }
-
   .lg\:w-2\.5 {
     width: 0.625rem;
   }
 
   .lg\:w-2 {
     width: 0.5rem;
+  }
+
+  .lg\:w-\[90\%\] {
+    width: 90%;
   }
 
   .lg\:min-w-\[8rem\] {

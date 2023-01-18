@@ -1,0 +1,194 @@
+<ol class="flex flex-col masonry {% if not page_obj.start_index %}list-numbered{% endif %} {% if classes %}{{ classes }}{% endif %}" 
+    {% if id %}id="{{ id }}"{% endif %}
+    role="list">
+
+    {% if use_widget %}
+        {% for group, options, index in widget.optgroups %}
+            {% for option in options %}
+                <li class="list-item-model-d" role="listitem">
+                    <div class="flex flex-row space-x-2.5">
+                        {% comment %} Checkbox, number and name {% endcomment %}
+                        {% include option.template_name with widget=option use_label=True %}
+            
+                        <div class="flex flex-row items-center space-x-2.5">
+                            {% comment %} Badge {% endcomment %}
+                            {% if option.badge_template %}
+                                {% include option.badge_template %}
+                            {% endif %}
+                            
+                            <button>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-4 h-4 fill-emerald-500" focusable="False" aria-label="edit">
+                                    <path d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                </svg>
+                            </button>
+            
+                            <button onclick="listItemCollapse(this)" class="list-item-collapse" data-target=".list-item-model-d">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="w-4 h-4" focusable="False" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+            
+                    {% comment %} Fields {% endcomment %}
+                    {% if option.list_custom_field_template %}
+                        {% include option.list_custom_field_template %}
+                    {% endif %}
+            
+                    <div class="list-item-model-d-details">
+                        {% comment %} Expand Fields {% endcomment %}
+                        {% if option.list_custom_expand_field_template %}
+                            {% include option.list_custom_expand_field_template %}
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        {% endfor %}
+    {% else %}
+        {% for option in options %}
+            <li class="list-item-model-d" role="listitem">
+                <div class="flex flex-row space-x-2.5">
+                    <label class="w-full flex space-x-2.5 items-center">
+                        {% comment %} Checkbox {% endcomment %}
+                        <input type="checkbox" name="{{ input_name }}" {% if option.id_neosia %}value="{{ option.id_neosia }}" id="{{ prefix_id }}{{ option.id_neosia }}" {% else %}value="{{ option.id }}" id="{{ prefix_id }}{{ option.id }}" {% endif %}>
+                        
+                        {% comment %} Number and name {% endcomment %}
+                        {% with page_obj.start_index|add:forloop.counter|add:-1 as number %}
+                            {% include list_item_name|default:'components/list-table-view/model-d/list-item-name.html' %}
+                        {% endwith %}
+                    </label>
+
+                    <div class="flex flex-row items-center space-x-2.5">
+                        {% comment %} Badge {% endcomment %}
+                        {% if badge_template %}
+                            {% include badge_template %}
+                        {% endif %}
+                        
+                        <button>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-4 h-4 fill-emerald-500" focusable="False" aria-label="edit">
+                                <path d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                            </svg>
+                        </button>
+        
+                        <button onclick="listItemCollapse(this)" class="list-item-collapse" data-target=".list-item-model-d">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="w-4 h-4" focusable="False" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                {% comment %} Fields {% endcomment %}
+                {% if list_custom_field_template %}
+                    {% include list_custom_field_template %}
+                {% endif %}
+
+                <div class="list-item-model-d-details">
+                    {% comment %} Expand Fields {% endcomment %}
+                    {% if list_custom_expand_field_template %}
+                        {% include list_custom_expand_field_template %}
+                    {% endif %}
+                </div>
+            </li>
+        {% endfor %}
+    {% endif %}
+</ol>
+
+<table class="table-css table-hover table-numbered table-accordion hidden md:table {% if not page_obj.start_index %}table-numbered{% endif %} {% if classes %}{{ classes }}{% endif %}"
+    {% if id %}id="{{ id }}"{% endif %}
+    role="list">
+
+    <thead>
+        <tr>
+            {% comment %} Checkbox {% endcomment %}
+            <th scope="col" class="text-center checkbox">
+                <input type="checkbox" name="table-checkbox" id="table-checkbox">
+            </th>
+            {% comment %} Number {% endcomment %}
+            <th scope="col" class="text-center number">No.</th>
+            {% comment %} Table header {% endcomment %}
+            {% if use_widget %}
+                {% for group, options, index in widget.optgroups|slice:":1" %}
+                    {% for option in options|slice:":1" %}
+                        {% if option.table_custom_field_header_template %}
+                            {% include option.table_custom_field_header_template %}
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+            {% else %}
+                {% if table_custom_field_header_template %}
+                    {% include table_custom_field_header_template %}
+                {% endif %}
+            {% endif %}
+        </tr>
+    </thead>
+
+    <tbody>
+        {% if use_widget %}
+            {% for group, options, index in widget.optgroups %}
+                {% for option in options %}
+                    <tr>
+                        {% comment %} Checkbox {% endcomment %}
+                        <th scope="col" class="text-center checkbox">
+                            {% if option.template_name %}
+                                {% include option.template_name with widget=option use_label=False %}
+                            {% endif %}
+                        </th>
+                        {% comment %} Number {% endcomment %}
+                        <th scope="row" class="text-center number"></th>
+
+                        {% comment %} Fields {% endcomment %}
+                        {% if option.table_custom_field_template %}
+                            {% include option.table_custom_field_template %}
+                        {% endif %}
+                    </tr>
+
+                    <tr class="table-details">
+                        <td class="bg-slate-200 dark:bg-zinc-600" colspan="{{ colspan_length }}">
+                            <div class="flex flex-row px-20 py-2.5">
+                                {% comment %} Expand Fields {% endcomment %}
+                                {% if option.table_custom_expand_field_template %}
+                                    {% include option.table_custom_expand_field_template %}
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+        {% else %}
+            {% for option in options %}
+                <tr>
+                    {% comment %} Checkbox {% endcomment %}
+                    <th class="text-center checkbox">
+                        <input type="checkbox" name="{{ input_name }}" {% if option.id_neosia %}value="{{ option.id_neosia }}" id="{{ prefix_id }}{{ option.id_neosia }}" {% else %}value="{{ option.id }}" id="{{ prefix_id }}{{ option.id }}" {% endif %}>
+                    </th>
+
+                    {% comment %} Number {% endcomment %}
+                    <th class="text-center {% if not page_obj.start_index %}number{% endif %}">
+                        {% if page_obj.start_index %}
+                            {{ page_obj.start_index|add:forloop.counter|add:-1 }}.
+                        {% endif %}
+                    </th>
+
+                    {% comment %} Fields {% endcomment %}
+                    {% if table_custom_field_template %}
+                        {% include table_custom_field_template %}
+                    {% endif %}
+                </tr>
+
+                <tr class="table-details">
+                    <td class="bg-slate-200 dark:bg-zinc-600" colspan="{{ colspan_length }}">
+                        <div class="flex flex-row px-20 py-2.5">
+                            {% comment %} Expand Fields {% endcomment %}
+                            {% if table_custom_expand_field_template %}
+                                {% include table_custom_expand_field_template %}
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+    </tbody>
+</table>

@@ -8,6 +8,15 @@ from .list import MyListView
 
 
 class ListViewModelA(MyListView):
+    """List view model A
+        * List view (small screen size, xs-sm)
+        * Table view (large screen size, >= md)
+        * Table strip
+        * Checkbox
+        * Badge
+        * Open button
+    """
+    
     filter_form = None
     sort_form: BaseForm = None
     sort_form_ordering_by_key: str = ''
@@ -82,9 +91,39 @@ class ListViewModelA(MyListView):
             context['sort_form'] = self.sort_form
         
         return context
+    
+
+class ListViewModelD(ListViewModelA):
+    """List View Model D
+
+    List view with expand button
+        * List view (small screen, xs-sm)
+        * Table view (large screen, >= md)
+        * Table strip
+        * Table without strip on the expand
+        * Checkbox
+        * Badge
+        * Expand button
+        * Action button
+    """
+    
+    table_custom_expand_field_template: str = ''
+    list_custom_expand_field_template: str = ''
+    list_item_name: str = 'components/list-table-view/model-d/list-item-name.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        if self.update_context(self.list_custom_expand_field_template):
+            context['list_custom_expand_field_template'] = self.list_custom_expand_field_template
+
+        if self.update_context(self.table_custom_expand_field_template):
+            context['table_custom_expand_field_template'] = self.table_custom_expand_field_template
+        
+        return context
 
 
-class DetailWithListViewModelA(ListViewModelA):
+class DetailWithListViewMixin():
     single_model = None
     single_slug_field = 'slug'
     single_pk_url_kwarg: str = 'pk'
@@ -92,10 +131,6 @@ class DetailWithListViewModelA(ListViewModelA):
     single_slug_url_kwarg: str = 'slug'
     single_queryset = None
     single_query_pk_and_slug = False
-
-    def setup(self, request: HttpRequest, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.single_object = self.get_single_object()
 
     def get_single_object(self, queryset=None):
         """
@@ -158,6 +193,26 @@ class DetailWithListViewModelA(ListViewModelA):
     def get_slug_field(self):
         """Get the name of a slug field to be used to look up by slug."""
         return self.single_slug_field
+
+
+class DetailWithListViewModelA(DetailWithListViewMixin, ListViewModelA):
+    def setup(self, request: HttpRequest, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.single_object = self.get_single_object()
+
+    def get_context_data(self, **kwargs):
+        """Insert the single object into the context dict."""
+        context = super().get_context_data()
+        if self.single_object:
+            context['single_object'] = self.single_object
+        
+        return context
+
+
+class DetailWithListViewModelD(DetailWithListViewMixin, ListViewModelD):
+    def setup(self, request: HttpRequest, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.single_object = self.get_single_object()
 
     def get_context_data(self, **kwargs):
         """Insert the single object into the context dict."""

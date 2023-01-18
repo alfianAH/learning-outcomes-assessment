@@ -7,6 +7,7 @@ from django.views.generic.edit import FormView
 from django.views.generic.detail import DetailView
 from accounts.enums import RoleChoices
 from learning_outcomes_assessment.auth.mixins import ProgramStudiMixin
+from learning_outcomes_assessment.list_view.views import DetailWithListViewModelD
 from learning_outcomes_assessment.forms.edit import ModelBulkDeleteView
 from semester.models import SemesterProdi
 from .forms import (
@@ -19,6 +20,7 @@ from .models import (
     MataKuliahSemester,
     KelasMataKuliahSemester,
     DosenMataKuliah,
+    PesertaMataKuliah,
 )
 from .utils import(
     get_kelas_mk_semester,
@@ -120,10 +122,70 @@ class MataKuliahSemesterUpdateView(FormView):
     pass
 
 
-class MataKuliahSemesterReadView(DetailView):
-    model = MataKuliahSemester
-    pk_url_kwarg = 'mk_semester_id'
+class MataKuliahSemesterReadView(ProgramStudiMixin, DetailWithListViewModelD):
+    single_model = MataKuliahSemester
+    single_pk_url_kwarg = 'mk_semester_id'
+    single_object: MataKuliahSemester = None
+
+    model = PesertaMataKuliah
     template_name = 'mata-kuliah-semester/detail-view.html'
+
+    ordering: str = 'mahasiswa__nama'
+    sort_form_ordering_by_key: str = 'ordering_by'
+
+    bulk_delete_url: str = ''
+    reset_url: str = ''
+    list_prefix_id: str = 'peserta-mk-semester-'
+    input_name: str = 'id_peserta_mk_semester'
+    list_id: str = 'peserta-mk-semester-list-content'
+    list_item_name: str = 'mata-kuliah-semester/partials/peserta/list-item-name-peserta-mk-semester.html'
+    list_custom_field_template: str = 'mata-kuliah-semester/partials/peserta/list-custom-field-peserta-mk-semester.html'
+    list_custom_expand_field_template: str = 'mata-kuliah-semester/partials/peserta/list-custom-expand-field-peserta-mk-semester.html'
+    table_custom_expand_field_template: str = 'mata-kuliah-semester/partials/peserta/table-custom-expand-field-peserta-mk-semester.html'
+    table_custom_field_header_template: str = 'mata-kuliah-semester/partials/peserta/table-custom-field-header-peserta-mk-semester.html'
+    table_custom_field_template: str = 'mata-kuliah-semester/partials/peserta/table-custom-field-peserta-mk-semester.html'
+    filter_template: str = 'mata-kuliah-semester/partials/peserta/peserta-mk-semester-filter-form.html'
+    sort_template: str = 'mata-kuliah-semester/partials/peserta/peserta-mk-semester-sort-form.html'
+
+    def setup(self, request: HttpRequest, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        self.program_studi_obj = self.single_object.semester.tahun_ajaran_prodi.prodi_jenjang.program_studi
+        # self.bulk_delete_url = self.single_object.get_bulk_delete_mk_semester_url()
+        # self.reset_url = self.single_object.read_detail_url()
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        peserta_mk_semester_qs = self.get_queryset()
+
+        if peserta_mk_semester_qs.exists():
+            filter_data = {
+                'nama': request.GET.get('nama', ''),
+            }
+
+            sort_data = {
+                self.sort_form_ordering_by_key: request.GET.get(self.sort_form_ordering_by_key, self.ordering)
+            }
+
+            # self.filter_form = MataKuliahSemesterFilter(
+            #     data=filter_data or None,
+            #     queryset=peserta_mk_semester_qs
+            # )
+            # self.sort_form = MataKuliahSemesterSort(data=sort_data)
+
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        self.queryset = self.model.objects.filter(
+            kelas_mk_semester__mk_semester=self.single_object.pk
+        )
+        return super().get_queryset()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'coslpan_length': 8,
+        })
+        return context
 
 
 class MataKuliahSemesterBulkDeleteView(ModelBulkDeleteView):
