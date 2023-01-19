@@ -80,6 +80,13 @@ class KelasMataKuliahSemester(models.Model):
     
     def get_peserta_mata_kuliah(self):
         return self.pesertamatakuliah_set.all()
+    
+    def get_delete_kelas_mk_semester_url(self):
+        return reverse('semester:mata_kuliah_semester:kelas-mk-semester-delete', kwargs={
+            'semester_prodi_id': self.mk_semester.semester.pk,
+            'mk_semester_id': self.mk_semester.pk,
+            'kelas_mk_semester_id': self.id_neosia
+        })
 
 
 class PesertaMataKuliah(models.Model):

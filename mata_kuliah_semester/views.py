@@ -3,6 +3,7 @@ from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
+from django.views.generic.base import View
 from django.views.generic.edit import FormView
 from django.views.generic.detail import DetailView
 from accounts.enums import RoleChoices
@@ -123,58 +124,6 @@ class MataKuliahSemesterCreateView(ProgramStudiMixin, FormView):
         return super().form_valid(form)
 
 
-class KelasMataKuliahSemesterUpdateView(ProgramStudiMixin, ModelBulkUpdateView):
-    form_class = KelasMataKuliahSemesterUpdateForm
-    template_name: str = 'mata-kuliah-semester/kelas-mk-semester-update-view.html'
-    mk_semester_obj: MataKuliahSemester = None
-
-    back_url: str = ''
-    form_field_name: str = 'update_data_kelas_mk_semester'
-    search_placeholder: str = 'Cari nama mata kuliah...'
-    no_choices_msg: str = 'Data mata kuliah semester sudah sinkron dengan data di Neosia'
-
-    def setup(self, request: HttpRequest, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-
-        mk_semester_id = kwargs.get('mk_semester_id')
-        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
-        self.program_studi_obj = self.mk_semester_obj.semester.tahun_ajaran_prodi.prodi_jenjang.program_studi
-        self.success_url = self.mk_semester_obj.read_detail_url()
-        self.back_url = self.success_url
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()        
-        kwargs['mk_semester'] = self.mk_semester_obj
-        return kwargs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({
-            'mk_semester_obj': self.mk_semester_obj,
-        })
-        return context
-
-    def update_kelas_mk_semester(self, list_kelas_mk_semester_id):
-        list_update_kelas_mk_semester = get_update_kelas_mk_semester_choices(self.mk_semester_obj)
-        
-        for kelas_mk_semester_id, kelas_mk_semester_data in list_update_kelas_mk_semester:
-            if str(kelas_mk_semester_id) not in list_kelas_mk_semester_id: continue
-
-            new_kelas_mk_semester = kelas_mk_semester_data['new']
-            
-            kelas_mk_semester_obj = KelasMataKuliahSemester.objects.filter(id_neosia=kelas_mk_semester_id)
-            kelas_mk_semester_obj.update(
-                nama=new_kelas_mk_semester['nama']
-            )
-
-    def form_valid(self, form) -> HttpResponse:
-        update_kelas_mk_semester_data = form.cleaned_data.get(self.form_field_name)
-
-        self.update_kelas_mk_semester(update_kelas_mk_semester_data)
-        messages.success(self.request, 'Berhasil mengupdate mata kuliah kurikulum')
-        return super().form_valid(form)
-
-
 class MataKuliahSemesterReadView(ProgramStudiMixin, DetailWithListViewModelD):
     single_model = MataKuliahSemester
     single_pk_url_kwarg = 'mk_semester_id'
@@ -255,3 +204,79 @@ class MataKuliahSemesterBulkDeleteView(ModelBulkDeleteView):
     def get_queryset(self):
         self.queryset = self.model.objects.filter(id__in=self.get_list_selected_obj())
         return super().get_queryset()
+
+
+class KelasMataKuliahSemesterUpdateView(ProgramStudiMixin, ModelBulkUpdateView):
+    form_class = KelasMataKuliahSemesterUpdateForm
+    template_name: str = 'mata-kuliah-semester/kelas-mk-semester-update-view.html'
+    mk_semester_obj: MataKuliahSemester = None
+
+    back_url: str = ''
+    form_field_name: str = 'update_data_kelas_mk_semester'
+    search_placeholder: str = 'Cari nama mata kuliah...'
+    no_choices_msg: str = 'Data mata kuliah semester sudah sinkron dengan data di Neosia'
+
+    def setup(self, request: HttpRequest, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        mk_semester_id = kwargs.get('mk_semester_id')
+        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+        self.program_studi_obj = self.mk_semester_obj.semester.tahun_ajaran_prodi.prodi_jenjang.program_studi
+        self.success_url = self.mk_semester_obj.read_detail_url()
+        self.back_url = self.success_url
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()        
+        kwargs['mk_semester'] = self.mk_semester_obj
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'mk_semester_obj': self.mk_semester_obj,
+        })
+        return context
+
+    def update_kelas_mk_semester(self, list_kelas_mk_semester_id):
+        list_update_kelas_mk_semester = get_update_kelas_mk_semester_choices(self.mk_semester_obj)
+        
+        for kelas_mk_semester_id, kelas_mk_semester_data in list_update_kelas_mk_semester:
+            if str(kelas_mk_semester_id) not in list_kelas_mk_semester_id: continue
+
+            new_kelas_mk_semester = kelas_mk_semester_data['new']
+            
+            kelas_mk_semester_obj = KelasMataKuliahSemester.objects.filter(id_neosia=kelas_mk_semester_id)
+            kelas_mk_semester_obj.update(
+                nama=new_kelas_mk_semester['nama']
+            )
+
+    def form_valid(self, form) -> HttpResponse:
+        update_kelas_mk_semester_data = form.cleaned_data.get(self.form_field_name)
+
+        self.update_kelas_mk_semester(update_kelas_mk_semester_data)
+        messages.success(self.request, 'Berhasil mengupdate mata kuliah kurikulum')
+        return super().form_valid(form)
+
+
+class KelasMataKuliahSemesterDeleteView(ProgramStudiMixin, View):
+    def setup(self, request: HttpRequest, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        mk_semester_id = kwargs.get('mk_semester_id')
+        self.mk_semester_obj: MataKuliahSemester = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+        self.success_url = self.mk_semester_obj.read_detail_url()
+
+        self.program_studi_obj = self.mk_semester_obj.semester.tahun_ajaran_prodi.prodi_jenjang.program_studi
+    
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        kelas_mk_semester_id = kwargs.get('kelas_mk_semester_id')
+
+        try:
+            kelas_mk_semester_obj = KelasMataKuliahSemester.objects.get(id_neosia = kelas_mk_semester_id)
+        except KelasMataKuliahSemester.DoesNotExist or KelasMataKuliahSemester.MultipleObjectsReturned:
+            messages.error(request, 'Gagal menghapus kelas mata kuliah dengan ID: {}'.format(kelas_mk_semester_id))
+            return redirect(self.success_url)
+        
+        messages.success(request, 'Berhasil menghapus kelas mata kuliah: {}'.format(kelas_mk_semester_obj.nama))
+        kelas_mk_semester_obj.delete()
+        
+        return redirect(self.success_url)
