@@ -1,13 +1,35 @@
 <table class="w-full table-strip">
     <tbody class="space-y-1">
-        <tr class="flex px-3 py-1 space-x-2.5">
-            <td class="w-full">NIM</td>
-            <td>{{ option.mahasiswa.username }}</td>
-        </tr>
+        {% if option.wrap_label %}
+            <tr class="flex px-3 py-1 space-x-2.5">
+                <td class="w-full">NIM</td>
+                <td>{{ option.label.nim }}</td>
+            </tr>
 
-        <tr class="flex px-3 py-1 space-x-2.5">
-            <td class="w-full">Nilai akhir</td>
-            <td>{{ option.nilai_mata_kuliah_mahasiswa.nilai_akhir|default:'-' }} </td>
-        </tr>
+            <tr class="flex px-3 py-1 space-x-2.5">
+                <td class="w-full">Nilai angka</td>
+                <td>{{ option.label.nilai_akhir|default:'-' }} </td>
+            </tr>
+
+            <tr class="flex px-3 py-1 space-x-2.5">
+                <td class="w-full">Nilai huruf</td>
+                <td>{{ option.label.nilai_huruf|default:'-' }} </td>
+            </tr>
+        {% else %}
+            <tr class="flex px-3 py-1 space-x-2.5">
+                <td class="w-full">NIM</td>
+                <td>{{ option.mahasiswa.username }}</td>
+            </tr>
+
+            <tr class="flex px-3 py-1 space-x-2.5">
+                <td class="w-full">Nilai angka</td>
+                <td>{{ option.nilaimatakuliahmahasiswa.nilai_akhir|default:'-' }} </td>
+            </tr>
+
+            <tr class="flex px-3 py-1 space-x-2.5">
+                <td class="w-full">Nilai huruf</td>
+                <td>{{ option.nilaimatakuliahmahasiswa.nilai_huruf|default:'-' }} </td>
+            </tr>
+        {% endif %}
     </tbody>
 </table>

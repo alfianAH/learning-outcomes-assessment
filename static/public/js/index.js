@@ -366,6 +366,9 @@ function checkboxTable(element) {
 }
 
 function listItemCheckbox(element) {
+    /**
+     * 
+     */
     let listItemClass = $(element);
 
     listItemClass.find("input[type='checkbox']").on("change", function () {
@@ -516,6 +519,7 @@ darkModeHandler();
 listItemCheckbox(".list-item-model-a");
 listItemCheckbox(".list-item-model-b");
 listItemCheckbox(".list-item-model-c");
+listItemCheckbox(".list-item-model-d");
 listItemRowCollapse(".list-item-model-f");
 pagination();
 passwordHandler();

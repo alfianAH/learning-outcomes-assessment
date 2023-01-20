@@ -52,3 +52,30 @@ class KelasMataKuliahSemesterUpdateForm(forms.Form):
 
         update_data_kelas_mk_semester_choices = get_update_kelas_mk_semester_choices(mk_semester)
         self.fields['update_data_kelas_mk_semester'].choices = update_data_kelas_mk_semester_choices
+
+
+class PesertaMataKuliahSemesterCreateForm(forms.Form):
+    peserta_mk_from_neosia = forms.MultipleChoiceField(
+        widget=ChoiceListInteractiveModelA(
+            list_custom_field_template='mata-kuliah-semester/partials/peserta/list-custom-field-peserta-mk-semester.html',
+            table_custom_field_template='mata-kuliah-semester/partials/peserta/table-custom-field-peserta-mk-semester.html',
+            table_custom_field_header_template='mata-kuliah-semester/partials/peserta/table-custom-field-header-peserta-mk-semester.html',
+        ),
+        label = 'Tambahkan Peserta Mata Kuliah Semester dari Neosia',
+        help_text = 'Data di bawah ini merupakan data baru dari Neosia dan belum ditemukan dalam database. Beri centang pada item yang ingin anda tambahkan.',
+        required = False,
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if len(self.fields['peserta_mk_from_neosia'].choices) == 0: return cleaned_data
+
+        # Clean kurikulum IDs
+        peserta_mk_from_neosia = cleaned_data.get('peserta_mk_from_neosia')
+        peserta_mk_from_neosia = [*set(peserta_mk_from_neosia)]
+        
+        cleaned_data['peserta_mk_from_neosia'] = peserta_mk_from_neosia
+
+        if settings.DEBUG: print("Clean data: {}".format(cleaned_data))
+        
+        return cleaned_data

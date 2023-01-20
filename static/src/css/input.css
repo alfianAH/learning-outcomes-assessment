@@ -455,6 +455,10 @@
         @apply space-y-2 px-2 pt-2 pb-3 h-min w-full sm:w-[calc(50%-8px)];
     }
 
+    .list-item-model-d.active{
+        @apply bg-indigo-200 dark:bg-zinc-500 rounded-lg;
+    }
+
     .list-item-model-d-details{
         @apply px-6 py-2.5 bg-slate-200 dark:bg-neutral-700 rounded-md space-y-1 hidden;
     }

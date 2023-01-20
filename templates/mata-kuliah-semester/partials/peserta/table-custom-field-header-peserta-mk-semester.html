@@ -4,14 +4,14 @@
 <th scope="col" class="text-left" title="Nama">
     Nama
 </th>
-<th scope="col" class="text-left" title="Kelas">
-    Kelas
-</th>
 <th scope="col" class="text-right" title="Nilai Akhir">
-    Nilai Akhir
+    Nilai Angka
 </th>
+{% if not option.wrap_label %}
 <th scope="col" class="text-center" title="Status">
     Status
 </th>
 <th scope="col" class="text-center" title="Aksi">Aksi</th>
+{% comment %} Expand {% endcomment %}
 <th scope="col" class="text-center"></th>
+{% endif %}

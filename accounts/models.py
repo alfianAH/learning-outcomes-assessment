@@ -98,12 +98,20 @@ class UserOAuthManager(UserManager):
     
     def create_mahasiswa_user(self, user: dict, prodi: ProgramStudi):
         mahasiswa_group, _ = Group.objects.get_or_create(name='Mahasiswa')
-        new_user = self.create_user(
-            user['nim'],
-            user['nama_mahasiswa'],
-            RoleChoices.MAHASISWA,
-            prodi
-        )
+        if user.get('nama_mahasiswa') is not None:
+            new_user = self.create_user(
+                user['nim'],
+                user['nama_mahasiswa'],
+                RoleChoices.MAHASISWA,
+                prodi
+            )
+        else:
+            new_user = self.create_user(
+                user['nim'],
+                user['nama'],
+                RoleChoices.MAHASISWA,
+                prodi
+            )
 
         new_user.groups.add(mahasiswa_group)
         return new_user

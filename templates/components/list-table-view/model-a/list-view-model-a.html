@@ -5,7 +5,7 @@
     {% if use_widget %}
         {% for group, options, index in widget.optgroups %}
             {% for option in options %}
-                <li class="list-item-model-a" role="listitem">
+                <li class="list-item-model-a active:active transition-all" role="listitem">
                     <div class="flex space-x-2.5 items-center">
                         {% comment %} Checkbox, number and name {% endcomment %}
                         {% include option.template_name with widget=option use_label=True %}

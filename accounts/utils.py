@@ -46,7 +46,7 @@ def get_user_profile(user: dict, role: str):
             return user_profile
         case RoleChoices.MAHASISWA:
             parameters = {
-                'nim': user
+                'nim': user['nim']
             }
             json_response = request_data_to_neosia(MHS_PROFILE_URL, parameters)
     

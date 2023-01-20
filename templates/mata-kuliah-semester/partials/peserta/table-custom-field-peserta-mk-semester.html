@@ -1,26 +1,48 @@
-<td class="text-left">
-    {{ option.mahasiswa.username }}
-</td>
-<td class="text-left max-w-[8rem] truncate">
-    {{ option.mahasiswa.name }}
-</td>
-<td class="text-left"></td>
-<td class="text-right">{{ option.nilai_mata_kuliah_mahasiswa.nilai_akhir|default:'-' }}</td>
-<td class="table-cell">
-    <div class="bg-emerald-500 w-4 h-4 rounded-full my-0 mx-auto"></div>
-</td>
-<td class="text-center">
-    <a href="#">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-5 h-5 fill-sky-600" focusable="False" aria-label="edit">
-            <path d="M0 0h24v24H0z" fill="none"/>
-            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-        </svg>
-    </a>
-</td>
-<td class="text-center">
-    <button onclick="tableAccordion(this)" class="table-collapse">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="w-5 h-5" focusable="False" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
-        </svg>
-    </button>
-</td>
+{% if option.wrap_label %}
+    <td class="text-left">
+        {{ option.label.nim }}
+    </td>
+    <td class="text-left truncate max-w-sm">
+        {{ option.label.nama }}
+    </td>
+    <td class="text-right">
+        {{ option.label.nilai_akhir|default:'-' }}
+    </td>
+    <td class="text-right md:hidden xl:table-cell">
+        {{ option.label.nilai_huruf|default:'-' }}
+    </td>
+{% else %}
+    {% comment %} NIM {% endcomment %}
+    <td class="text-left">
+        {{ option.mahasiswa.username }}
+    </td>
+    {% comment %} Nama {% endcomment %}
+    <td class="text-left max-w-[18rem] truncate">
+        {{ option.mahasiswa.name }}
+    </td>
+    {% comment %} Nilai angka {% endcomment %}
+    <td class="text-right">
+        {{ option.nilaimatakuliahmahasiswa.nilai_akhir|default:'-' }}
+    </td>
+    {% comment %} Status nilai CLO {% endcomment %}
+    <td class="table-cell">
+        <div class="bg-emerald-500 w-4 h-4 rounded-full my-0 mx-auto"></div>
+    </td>
+    {% comment %} Edit {% endcomment %}
+    <td class="text-center">
+        <a href="#">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-5 h-5 fill-sky-600" focusable="False" aria-label="edit">
+                <path d="M0 0h24v24H0z" fill="none"/>
+                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+            </svg>
+        </a>
+    </td>
+    {% comment %} Expand {% endcomment %}
+    <td class="text-center">
+        <button type="button" onclick="tableAccordion(this)" class="table-collapse">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="w-5 h-5" focusable="False" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+            </svg>
+        </button>
+    </td>
+{% endif %}

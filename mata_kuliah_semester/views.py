@@ -14,9 +14,14 @@ from learning_outcomes_assessment.forms.edit import (
     ModelBulkDeleteView
 )
 from semester.models import SemesterProdi
+from .filters import (
+    PesertaMataKuliahFilter,
+    PesertaMataKuliahSortForm,
+)
 from .forms import (
     MataKuliahSemesterCreateForm,
     KelasMataKuliahSemesterUpdateForm,
+    PesertaMataKuliahSemesterCreateForm,
 )
 from mata_kuliah_kurikulum.models import(
     MataKuliahKurikulum
@@ -26,12 +31,15 @@ from .models import (
     KelasMataKuliahSemester,
     DosenMataKuliah,
     PesertaMataKuliah,
+    NilaiMataKuliahMahasiswa,
 )
 from .utils import(
     get_kelas_mk_semester,
     get_dosen_kelas_mk_semester,
     get_kelas_mk_semester_choices,
-    get_update_kelas_mk_semester_choices
+    get_update_kelas_mk_semester_choices,
+    get_peserta_kelas_mk_semester,
+    get_peserta_kelas_mk_semester_choices
 )
 
 
@@ -114,7 +122,7 @@ class MataKuliahSemesterCreateView(ProgramStudiMixin, FormView):
             # Create dosen (user) and dosen (Kelas MK Semester) 
             for dosen in list_dosen_kelas_mk_semester:
                 user = authenticate(self.request, user=dosen, role=RoleChoices.DOSEN)
-                DosenMataKuliah.objects.create(
+                DosenMataKuliah.objects.get_or_create(
                     kelas_mk_semester=kelas_mk_semester_obj,
                     dosen=user
                 )
@@ -131,9 +139,11 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, DetailWithListViewModelD):
 
     model = PesertaMataKuliah
     template_name = 'mata-kuliah-semester/detail-view.html'
-
-    ordering: str = 'mahasiswa__nama'
+    ordering: str = 'mahasiswa__username'
     sort_form_ordering_by_key: str = 'ordering_by'
+
+    filter_form: PesertaMataKuliahFilter = None
+    sort_form: PesertaMataKuliahSortForm = None
 
     bulk_delete_url: str = ''
     reset_url: str = ''
@@ -153,8 +163,8 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, DetailWithListViewModelD):
         super().setup(request, *args, **kwargs)
 
         self.program_studi_obj = self.single_object.semester.tahun_ajaran_prodi.prodi_jenjang.program_studi
-        # self.bulk_delete_url = self.single_object.get_bulk_delete_mk_semester_url()
-        # self.reset_url = self.single_object.read_detail_url()
+        self.bulk_delete_url = self.single_object.get_peserta_mk_semester_bulk_delete_url()
+        self.reset_url = self.single_object.read_detail_url()
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         peserta_mk_semester_qs = self.get_queryset()
@@ -162,17 +172,19 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, DetailWithListViewModelD):
         if peserta_mk_semester_qs.exists():
             filter_data = {
                 'nama': request.GET.get('nama', ''),
+                'nilai_akhir_min': request.GET.get('nilai_akhir_min', ''),
+                'nilai_akhir_max': request.GET.get('nilai_akhir_max', ''),
             }
 
             sort_data = {
                 self.sort_form_ordering_by_key: request.GET.get(self.sort_form_ordering_by_key, self.ordering)
             }
 
-            # self.filter_form = MataKuliahSemesterFilter(
-            #     data=filter_data or None,
-            #     queryset=peserta_mk_semester_qs
-            # )
-            # self.sort_form = MataKuliahSemesterSort(data=sort_data)
+            self.filter_form = PesertaMataKuliahFilter(
+                data=filter_data or None,
+                queryset=peserta_mk_semester_qs
+            )
+            self.sort_form = PesertaMataKuliahSortForm(data=sort_data)
 
         return super().get(request, *args, **kwargs)
 
@@ -185,7 +197,7 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, DetailWithListViewModelD):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'coslpan_length': 8,
+            'colspan_length': 8,
         })
         return context
 
@@ -280,3 +292,96 @@ class KelasMataKuliahSemesterDeleteView(ProgramStudiMixin, View):
         kelas_mk_semester_obj.delete()
         
         return redirect(self.success_url)
+
+
+# Peserta Mata Kuliah
+class PesertaMataKuliahSemesterCreateView(ProgramStudiMixin, FormView):
+    form_class = PesertaMataKuliahSemesterCreateForm
+    mk_semester_obj: MataKuliahSemester = None
+    template_name = 'mata-kuliah-semester/peserta/create-view.html'
+    peserta_mk_choices = []
+
+    def setup(self, request: HttpRequest, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        mk_semester_id = kwargs.get('mk_semester_id')
+
+        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+        
+        self.program_studi_obj = self.mk_semester_obj.semester.tahun_ajaran_prodi.prodi_jenjang.program_studi
+        self.peserta_mk_choices = get_peserta_kelas_mk_semester_choices(self.mk_semester_obj)
+        self.success_url = self.mk_semester_obj.read_detail_url()
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if len(self.peserta_mk_choices) == 0:
+            messages.info(request, 'Pilihan peserta mata kuliah semester kosong.')
+            return redirect(self.success_url)
+        return super().get(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context.update({
+            'mk_semester_obj': self.mk_semester_obj,
+            'back_url': self.success_url,
+            'submit_text': 'Tambahkan'
+        })
+        return context
+    
+    def get_form(self, form_class = None):
+        form = super().get_form(form_class)
+        form.fields['peserta_mk_from_neosia'].choices = self.peserta_mk_choices
+        return form
+    
+    def form_valid(self, form) -> HttpResponse:
+        list_peserta_mk_semester_id = form.cleaned_data.get('peserta_mk_from_neosia')
+        list_peserta_mk_semester = get_peserta_kelas_mk_semester(self.mk_semester_obj)
+
+        for peserta_mk in list_peserta_mk_semester:
+            if str(peserta_mk['id_neosia']) not in list_peserta_mk_semester_id: continue
+
+            # Get kelas MK Semester
+            kelas_mk_semester_id = peserta_mk['id_kelas_mk_semester']
+            try: 
+                kelas_mk_semester_obj = KelasMataKuliahSemester.objects.get(id_neosia=kelas_mk_semester_id)
+            except KelasMataKuliahSemester.DoesNotExist or KelasMataKuliahSemester.MultipleObjectsReturned:
+                if settings.DEBUG:
+                    print('Kelas MK Semester cannot be found. ID: {}'.format(kelas_mk_semester_id))
+
+                messages.error(self.request, 'Gagal menambahkan peserta mata kuliah. Error: Object Kelas MK Semester tidak dapat ditemukan, ID: {}'.format(kelas_mk_semester_id))
+                break
+            
+            # Create user peserta
+            user = authenticate(self.request, user=peserta_mk, role=RoleChoices.MAHASISWA)
+            # Create peserta MK
+            peserta_mk_obj = PesertaMataKuliah.objects.create(
+                id_neosia=peserta_mk['id_neosia'],
+                kelas_mk_semester=kelas_mk_semester_obj,
+                mahasiswa=user,
+            )
+
+            # Create nilai mata kuliah mahasiswa
+            NilaiMataKuliahMahasiswa.objects.create(
+                peserta=peserta_mk_obj,
+                nilai_akhir=peserta_mk['nilai_akhir'],
+                nilai_huruf=peserta_mk['nilai_huruf'],
+            )
+        return super().form_valid(form)
+
+
+class PesertaMataKuliahBulkDeleteView(ModelBulkDeleteView):
+    model = PesertaMataKuliah
+    success_msg = 'Berhasil menghapus peserta mata kuliah semester'
+    id_list_obj = 'id_peserta_mk_semester'
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        mk_semester_id = kwargs.get('mk_semester_id')
+
+        mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+
+        self.program_studi_obj = mk_semester_obj.semester.tahun_ajaran_prodi.prodi_jenjang.program_studi
+        self.success_url = mk_semester_obj.read_detail_url()
+
+    def get_queryset(self):
+        self.queryset = self.model.objects.filter(id_neosia__in=self.get_list_selected_obj())
+        return super().get_queryset()

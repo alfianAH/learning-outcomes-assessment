@@ -14,6 +14,7 @@ from .models import ProgramStudi, ProgramStudiJenjang
 from .enums import RoleChoices
 from .widgets import LoginTextInput, LoginPasswordInput
 from .utils import (
+    validate_mahasiswa,
     get_all_prodi_choices, 
     get_update_prodi_jenjang_choices,
     get_prodi_jenjang_db_choices,
@@ -37,15 +38,21 @@ class MahasiswaAuthForm(AuthenticationForm):
         )
     )
 
-    def __init__(self, request, *args, **kwargs) -> None:
-        super().__init__(request, *args, **kwargs)
-
     def clean(self):
         username = self.cleaned_data.get('username')
         password = self.cleaned_data.get('password')
 
         if username is not None and password:
-            self.user_cache = authenticate(self.request, user=username, password=password, role=RoleChoices.MAHASISWA)
+            user_data = validate_mahasiswa(username, password)
+
+            # Return None if user data is None
+            if user_data is None: 
+                if settings.DEBUG: print("User data is not valid: {}".format(username))
+                self.add_error("username", "Username anda salah")
+                self.add_error("password", "Password anda salah")
+                raise self.get_invalid_login_error()
+
+            self.user_cache = authenticate(self.request, user=user_data, role=RoleChoices.MAHASISWA)
             
             if self.user_cache is None:
                 self.add_error("username", "Username anda salah")
@@ -53,7 +60,7 @@ class MahasiswaAuthForm(AuthenticationForm):
                 raise self.get_invalid_login_error()
             else:
                 self.confirm_login_allowed(self.user_cache)
-
+        
         return self.cleaned_data
 
 

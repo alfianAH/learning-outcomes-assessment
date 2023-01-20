@@ -4,6 +4,7 @@ from learning_outcomes_assessment.utils import request_data_to_neosia
 from .models import (
     KelasMataKuliahSemester,
     MataKuliahSemester,
+    PesertaMataKuliah,
 )
 from mata_kuliah_kurikulum.models import MataKuliahKurikulum
 
@@ -34,6 +35,34 @@ def get_kelas_mk_semester(semester_prodi_id: int):
         list_kelas_mk_semester.append(mata_kuliah)
 
     return list_kelas_mk_semester
+
+
+def get_peserta_kelas_mk_semester(mk_semester: MataKuliahSemester):
+    list_peserta = []
+    list_kelas_mk_semester: QuerySet[KelasMataKuliahSemester] = mk_semester.get_kelas_mk_semester()
+
+    for kelas_mk_semester in list_kelas_mk_semester:
+        parameters = {
+            'id_kelas': kelas_mk_semester.id_neosia
+        }
+
+        json_response = request_data_to_neosia(PESERTA_MATA_KULIAH_URL, parameters)
+        if json_response is None: return list_peserta
+
+        for peserta_data in json_response:
+            print(peserta_data)
+            peserta = {
+                'id_neosia': peserta_data['id'],
+                'id_kelas_mk_semester': peserta_data['id_kelas_kuliah'],
+                'nim': peserta_data['nim'],
+                'nama': peserta_data['nama_mahasiswa'],
+                'nilai_akhir': peserta_data['nilai_akhir'],
+                'nilai_huruf': peserta_data['nilai_huruf'],
+            }
+
+            list_peserta.append(peserta)
+
+    return list_peserta
 
 
 def get_dosen_kelas_mk_semester(kelas_mk_semester_id: int):
@@ -137,3 +166,23 @@ def get_update_kelas_mk_semester_choices(mk_semester: MataKuliahSemester):
             break
     
     return update_kelas_mk_semester_choices
+
+
+def get_peserta_kelas_mk_semester_choices(mk_semester: MataKuliahSemester):
+    peserta_choices = []
+
+    list_peserta_response = get_peserta_kelas_mk_semester(mk_semester)
+
+    for peserta in list_peserta_response:
+        id_peserta = peserta['id_neosia']
+        
+        peserta_qs = PesertaMataKuliah.objects.filter(id_neosia=id_peserta)
+        
+        # Skip peserta, if already in database
+        if peserta_qs.exists(): continue
+
+        peserta_choice = peserta['id_neosia'], peserta
+        peserta_choices.append(peserta_choice)
+    
+    print(peserta_choices)
+    return peserta_choices

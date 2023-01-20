@@ -14,13 +14,12 @@ from .utils import (
 DETAIL_FAKULTAS_URL = 'https://customapi.neosia.unhas.ac.id/getDetilFakultas'
 
 class MyBackend(BaseBackend):
-    def authenticate(self, request, user=None, password: str = None, role: RoleChoices = None):
+    def authenticate(self, request, user=None, role: RoleChoices = None):
         """Authenticate user
 
         Args:
             request (HttpRequest): 
-            user (str or dict, optional): user is user data (dictionary) for Dosen and Admin Prodi. user is username (str) for Mahasiswa. Defaults to None.
-            password (str, optional): Password for mahasiswa form. Defaults to None.
+            user (dict, optional): user is user data (dictionary) for Dosen, Admin Prodi, Mahasiswa. Defaults to None.
             role (RoleChoices, optional): User's role. Defaults to None.
 
         Returns:
@@ -64,13 +63,6 @@ class MyBackend(BaseBackend):
 
                     _, prodi = self.get_or_create_fakultas_and_prodi_from_mberkas(user_data)
             case RoleChoices.MAHASISWA:
-                user_data = validate_mahasiswa(user, password)
-
-                # Return None if user data is None
-                if user_data is None: 
-                    if settings.DEBUG: print("User data is not valid: {}".format(user))
-                    return None
-                
                 user_profile = get_user_profile(user, role)
                 
                 if user_profile is None:
@@ -81,7 +73,7 @@ class MyBackend(BaseBackend):
         # Get user
         try:
             if role == RoleChoices.MAHASISWA:
-                user_obj = MyUser.objects.get(username=user)
+                user_obj = MyUser.objects.get(username=user['nim'])
             else:
                 user_obj = MyUser.objects.get(username=user_data['username'])
         except MyUser.DoesNotExist:
@@ -92,7 +84,7 @@ class MyBackend(BaseBackend):
                 case RoleChoices.DOSEN:
                     user_obj = MyUser.objects.create_dosen_user(user_data, prodi)
                 case RoleChoices.MAHASISWA:
-                    user_obj = MyUser.objects.create_mahasiswa_user(user_data, prodi)
+                    user_obj = MyUser.objects.create_mahasiswa_user(user, prodi)
             
             return user_obj
         except MyUser.MultipleObjectsReturned:
