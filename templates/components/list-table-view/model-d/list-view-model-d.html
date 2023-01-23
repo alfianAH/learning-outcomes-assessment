@@ -9,7 +9,7 @@
                     <div class="flex flex-row space-x-2.5">
                         {% comment %} Checkbox, number and name {% endcomment %}
                         {% include option.template_name with widget=option use_label=True %}
-            
+                        
                         <div class="flex flex-row items-center space-x-2.5">
                             {% comment %} Badge {% endcomment %}
                             {% if option.badge_template %}
@@ -25,14 +25,14 @@
                             </a>
                             
                             {% comment %} Expand button {% endcomment %}
-                            <button type="button" onclick="listItemCollapse(this)" class="list-item-collapse">
+                            <button type="button" onclick="listItemCollapse(this)" class="list-item-collapse" data-target=".list-item-model-d">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="w-4 h-4" focusable="False" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
                                     <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
                                 </svg>
                             </button>
                         </div>
                     </div>
-            
+                    
                     {% comment %} Fields {% endcomment %}
                     {% if option.list_custom_field_template %}
                         {% include option.list_custom_field_template %}
@@ -51,7 +51,7 @@
         {% for option in options %}
             <li class="list-item-model-d" role="listitem">
                 <div class="flex flex-row space-x-2.5">
-                    <label class="w-full flex space-x-2.5 items-center">
+                    <label class="w-[calc(100%-42px-10px)] flex space-x-2.5 items-center">
                         {% comment %} Checkbox {% endcomment %}
                         <input type="checkbox" name="{{ input_name }}" {% if option.id_neosia %}value="{{ option.id_neosia }}" id="{{ prefix_id }}{{ option.id_neosia }}" {% else %}value="{{ option.id }}" id="{{ prefix_id }}{{ option.id }}" {% endif %}>
                         
@@ -76,7 +76,7 @@
                         </a>
                         
                         {% comment %} Expand button {% endcomment %}
-                        <button type="button" onclick="listItemCollapse(this)" class="list-item-collapse">
+                        <button type="button" onclick="listItemCollapse(this)" class="list-item-collapse" data-target=".list-item-model-d">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="w-4 h-4" focusable="False" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
                                 <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
                             </svg>

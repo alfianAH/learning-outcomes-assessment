@@ -367,7 +367,8 @@ function checkboxTable(element) {
 
 function listItemCheckbox(element) {
     /**
-     * 
+     * Add active class to list item view when checkbox on change
+     * to make transition
      */
     let listItemClass = $(element);
 

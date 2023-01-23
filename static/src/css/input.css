@@ -403,7 +403,7 @@
 
     /* List item */
     .list-item-title{
-        @apply w-full font-bold sm:w-fit whitespace-nowrap overflow-hidden overflow-ellipsis;
+        @apply w-full font-bold sm:w-fit truncate;
     }
 
     .list-numbered{

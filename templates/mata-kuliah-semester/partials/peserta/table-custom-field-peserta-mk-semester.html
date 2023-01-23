@@ -17,7 +17,7 @@
         {{ option.mahasiswa.username }}
     </td>
     {% comment %} Nama {% endcomment %}
-    <td class="text-left max-w-[18rem] truncate">
+    <td class="text-left md:max-w-[12rem] lg:max-w-[10rem] xl:max-w-[18rem] truncate" title="{{ option.mahasiswa.name }}">
         {{ option.mahasiswa.name }}
     </td>
     {% comment %} Nilai angka {% endcomment %}
@@ -25,7 +25,7 @@
         {{ option.nilaimatakuliahmahasiswa.nilai_akhir|default:'-' }}
     </td>
     {% comment %} Status nilai CLO {% endcomment %}
-    <td class="table-cell">
+    <td class="table-cell !align-middle">
         <div class="bg-emerald-500 w-4 h-4 rounded-full my-0 mx-auto"></div>
     </td>
     {% comment %} Edit {% endcomment %}
