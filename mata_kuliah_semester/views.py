@@ -195,9 +195,16 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, DetailWithListViewModelD):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         context.update({
             'colspan_length': 8,
         })
+
+        if self.request.GET.get('nama') or self.request.GET.get('nilai_akhir_min') or self.request.GET.get('nilai_akhir_max') or self.request.GET.get(self.sort_form_ordering_by_key):
+            context['is_peserta_pane'] = True
+        else:
+            context['is_peserta_pane'] = False
+        
         return context
 
 

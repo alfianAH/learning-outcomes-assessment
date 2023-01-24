@@ -21,6 +21,7 @@ MK_SEMESTER_ORDERING_BY = (
 PESERTA_MK_ORDERING_BY = (
     ('mahasiswa__username', 'NIM'),
     ('mahasiswa__name', 'Nama'),
+    ('nilai_akhir', 'Nilai angka')
 )
 
 class MataKuliahSemesterFilter(filter.FilterSet):
@@ -61,7 +62,7 @@ class MataKuliahSemesterSort(forms.Form):
 
 class PesertaMataKuliahFilter(filter.FilterSet):
     nama = filter.CharFilter(
-        field_name='peserta__mahasiswa__name',
+        field_name='mahasiswa__name',
         lookup_expr='icontains', 
         label='Nama mahasiswa',
         widget=MySearchInput(
@@ -74,7 +75,7 @@ class PesertaMataKuliahFilter(filter.FilterSet):
 
     nilai_akhir = filter.RangeFilter(
         field_name='nilai_akhir',
-        label='Nilai akhir',
+        label='Nilai angka',
         widget=MyRangeWidget(
             widgets=(
                 MyRangeInput(attrs={
