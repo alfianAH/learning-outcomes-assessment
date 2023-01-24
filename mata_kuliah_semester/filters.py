@@ -8,7 +8,7 @@ from learning_outcomes_assessment.widgets import (
 )
 from .models import (
     MataKuliahSemester,
-    NilaiMataKuliahMahasiswa,
+    PesertaMataKuliah,
 )
 
 
@@ -92,8 +92,8 @@ class PesertaMataKuliahFilter(filter.FilterSet):
     )
 
     class Meta:
-        model = NilaiMataKuliahMahasiswa
-        fields = ('nilai_akhir', 'peserta__mahasiswa__name')
+        model = PesertaMataKuliah
+        fields = ('nilai_akhir', 'mahasiswa__name')
 
 
 class PesertaMataKuliahSortForm(forms.Form):

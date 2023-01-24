@@ -110,15 +110,6 @@ class PesertaMataKuliah(models.Model):
     id_neosia = models.BigIntegerField(primary_key=True, null=False, unique=True)
     kelas_mk_semester = models.ForeignKey(KelasMataKuliahSemester, on_delete=models.CASCADE)
     mahasiswa = models.ForeignKey(User, on_delete=models.CASCADE)
-
-
-class DosenMataKuliah(models.Model):
-    kelas_mk_semester = models.ForeignKey(KelasMataKuliahSemester, on_delete=models.CASCADE)
-    dosen = models.ForeignKey(User, on_delete=models.CASCADE)
-
-
-class NilaiMataKuliahMahasiswa(models.Model):
-    peserta = models.OneToOneField(PesertaMataKuliah, on_delete=models.CASCADE)
     nilai_akhir = models.FloatField(null=True, 
         validators=[MinValueValidator(0.0), MaxValueValidator(100.0)])
     nilai_huruf = models.CharField(null=True, max_length=5)
@@ -130,6 +121,11 @@ class NilaiMataKuliahMahasiswa(models.Model):
                 name='nilai_akhir_range'
             ),
         ) 
+
+
+class DosenMataKuliah(models.Model):
+    kelas_mk_semester = models.ForeignKey(KelasMataKuliahSemester, on_delete=models.CASCADE)
+    dosen = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
 class NilaiMataKuliahIloMahasiswa(models.Model):

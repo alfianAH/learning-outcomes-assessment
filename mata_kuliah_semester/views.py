@@ -31,7 +31,6 @@ from .models import (
     KelasMataKuliahSemester,
     DosenMataKuliah,
     PesertaMataKuliah,
-    NilaiMataKuliahMahasiswa,
 )
 from .utils import(
     get_kelas_mk_semester,
@@ -353,18 +352,14 @@ class PesertaMataKuliahSemesterCreateView(ProgramStudiMixin, FormView):
             # Create user peserta
             user = authenticate(self.request, user=peserta_mk, role=RoleChoices.MAHASISWA)
             # Create peserta MK
-            peserta_mk_obj = PesertaMataKuliah.objects.create(
+            PesertaMataKuliah.objects.create(
                 id_neosia=peserta_mk['id_neosia'],
                 kelas_mk_semester=kelas_mk_semester_obj,
                 mahasiswa=user,
-            )
-
-            # Create nilai mata kuliah mahasiswa
-            NilaiMataKuliahMahasiswa.objects.create(
-                peserta=peserta_mk_obj,
                 nilai_akhir=peserta_mk['nilai_akhir'],
                 nilai_huruf=peserta_mk['nilai_huruf'],
             )
+
         return super().form_valid(form)
 
 

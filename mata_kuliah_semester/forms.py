@@ -59,7 +59,7 @@ class PesertaMataKuliahSemesterCreateForm(forms.Form):
         widget=ChoiceListInteractiveModelA(
             list_custom_field_template='mata-kuliah-semester/partials/peserta/list-custom-field-peserta-mk-semester.html',
             table_custom_field_template='mata-kuliah-semester/partials/peserta/table-custom-field-peserta-mk-semester.html',
-            table_custom_field_header_template='mata-kuliah-semester/partials/peserta/table-custom-field-header-peserta-mk-semester.html',
+            table_custom_field_header_template='mata-kuliah-semester/partials/peserta/table-custom-field-header-peserta-mk-semester-form.html',
         ),
         label = 'Tambahkan Peserta Mata Kuliah Semester dari Neosia',
         help_text = 'Data di bawah ini merupakan data baru dari Neosia dan belum ditemukan dalam database. Beri centang pada item yang ingin anda tambahkan.',
