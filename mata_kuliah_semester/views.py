@@ -22,6 +22,7 @@ from .forms import (
     MataKuliahSemesterCreateForm,
     KelasMataKuliahSemesterUpdateForm,
     PesertaMataKuliahSemesterCreateForm,
+    PesertaMataKuliahSemesterUpdateForm,
 )
 from mata_kuliah_kurikulum.models import(
     MataKuliahKurikulum
@@ -38,7 +39,8 @@ from .utils import(
     get_kelas_mk_semester_choices,
     get_update_kelas_mk_semester_choices,
     get_peserta_kelas_mk_semester,
-    get_peserta_kelas_mk_semester_choices
+    get_peserta_kelas_mk_semester_choices,
+    get_update_peserta_mk_semester_choices,
 )
 
 
@@ -126,7 +128,7 @@ class MataKuliahSemesterCreateView(ProgramStudiMixin, FormView):
                     dosen=user
                 )
         
-        messages.success(self.request, 'Proses menambahkan mata kuliah semester sudah selesai. {}'.format(self.request.user.name))
+        messages.success(self.request, 'Proses menambahkan mata kuliah semester sudah selesai')
 
         return super().form_valid(form)
 
@@ -272,7 +274,7 @@ class KelasMataKuliahSemesterUpdateView(ProgramStudiMixin, ModelBulkUpdateView):
         update_kelas_mk_semester_data = form.cleaned_data.get(self.form_field_name)
 
         self.update_kelas_mk_semester(update_kelas_mk_semester_data)
-        messages.success(self.request, 'Berhasil mengupdate mata kuliah kurikulum')
+        messages.success(self.request, 'Berhasil mengupdate mata kuliah semester')
         return super().form_valid(form)
 
 
@@ -357,7 +359,7 @@ class PesertaMataKuliahSemesterCreateView(ProgramStudiMixin, FormView):
                 break
             
             # Create user peserta
-            user = authenticate(self.request, user=peserta_mk, role=RoleChoices.MAHASISWA)
+            user = authenticate(self.request, user=peserta_mk['mahasiswa'], role=RoleChoices.MAHASISWA)
             # Create peserta MK
             PesertaMataKuliah.objects.create(
                 id_neosia=peserta_mk['id_neosia'],
@@ -370,7 +372,61 @@ class PesertaMataKuliahSemesterCreateView(ProgramStudiMixin, FormView):
         return super().form_valid(form)
 
 
-class PesertaMataKuliahBulkDeleteView(ModelBulkDeleteView):
+class PesertaMataKuliahBulkUpdateView(ProgramStudiMixin, ModelBulkUpdateView):
+    form_class = PesertaMataKuliahSemesterUpdateForm
+    template_name = 'mata-kuliah-semester/peserta/update-view.html'
+    mk_semester_obj: MataKuliahSemester = None
+
+    form_field_name: str = 'update_peserta'
+    search_placeholder: str = 'Cari nama peserta...'
+    no_choices_msg: str = 'Data peserta mata kuliah sudah sinkron dengan data di Neosia'
+
+    def setup(self, request: HttpRequest, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        mk_semester_id = kwargs.get('mk_semester_id')
+        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+        self.program_studi_obj = self.mk_semester_obj.semester.tahun_ajaran_prodi.prodi_jenjang.program_studi
+
+        self.choices = get_update_peserta_mk_semester_choices(self.mk_semester_obj)
+
+        self.success_url = self.mk_semester_obj.read_detail_url()
+        self.back_url = self.success_url
+
+    def get_form(self, form_class = None):
+        form = super().get_form(form_class)
+        form.fields[self.form_field_name].choices = self.choices
+        
+        return form
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'mk_semester_obj': self.mk_semester_obj,
+        })
+        return context
+    
+    def update_peserta_mk_semester(self, list_peserta_id):
+        for peserta_id, peserta_data in self.choices:
+            if str(peserta_id) not in list_peserta_id: continue
+
+            new_peserta_data = peserta_data['new']
+
+            peserta_mk_obj = PesertaMataKuliah.objects.filter(id_neosia=peserta_id)
+            peserta_mk_obj.update(
+                nilai_akhir=new_peserta_data['nilai_akhir'],
+                nilai_huruf=new_peserta_data['nilai_huruf'],
+            )
+    
+    def form_valid(self, form) -> HttpResponse:
+        update_peserta_data = form.cleaned_data.get(self.form_field_name)
+
+        self.update_peserta_mk_semester(update_peserta_data)
+        messages.success(self.request, 'Berhasil mengupdate peserta mata kuliah semester')
+        return super().form_valid(form)
+
+
+class PesertaMataKuliahBulkDeleteView(ProgramStudiMixin, ModelBulkDeleteView):
     model = PesertaMataKuliah
     success_msg = 'Berhasil menghapus peserta mata kuliah semester'
     id_list_obj = 'id_peserta_mk_semester'

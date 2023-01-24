@@ -78,6 +78,12 @@ class MataKuliahSemester(models.Model):
             'semester_prodi_id': self.semester.pk,
             'mk_semester_id': self.pk
         })
+    
+    def get_peserta_mk_semester_bulk_update_url(self):
+        return reverse('semester:mata_kuliah_semester:peserta-bulk-update', kwargs={
+            'semester_prodi_id': self.semester.pk,
+            'mk_semester_id': self.pk
+        })
 
 
 class KelasMataKuliahSemester(models.Model):

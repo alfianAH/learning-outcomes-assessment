@@ -62,7 +62,7 @@ class MataKuliahSemesterSort(forms.Form):
 
 class PesertaMataKuliahFilter(filter.FilterSet):
     nama = filter.CharFilter(
-        field_name='mahasiswa__name',
+        field_name='mahasiswa__nama',
         lookup_expr='icontains', 
         label='Nama mahasiswa',
         widget=MySearchInput(
@@ -94,7 +94,7 @@ class PesertaMataKuliahFilter(filter.FilterSet):
 
     class Meta:
         model = PesertaMataKuliah
-        fields = ('nilai_akhir', 'mahasiswa__name')
+        fields = ('nilai_akhir', 'mahasiswa__nama')
 
 
 class PesertaMataKuliahSortForm(forms.Form):

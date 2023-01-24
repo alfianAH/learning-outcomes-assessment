@@ -37,7 +37,7 @@ def get_user_profile(user: dict, role: str):
     match(role):
         case RoleChoices.DOSEN:
             parameters = {
-                'nip': user['nip']
+                'nip': user['username']
             }
             json_response = request_data_to_neosia(DOSEN_PROFILE_URL, params=parameters)
             if json_response is None: return None
@@ -46,7 +46,7 @@ def get_user_profile(user: dict, role: str):
             return user_profile
         case RoleChoices.MAHASISWA:
             parameters = {
-                'nim': user['nim']
+                'nim': user['username']
             }
             json_response = request_data_to_neosia(MHS_PROFILE_URL, parameters)
     
@@ -141,8 +141,11 @@ def validate_mahasiswa(username: str, password: str):
 
     # Return None if the request is not success
     if json_response['success'] == '0': return None
-    
-    user = json_response['data']
+    user_data = json_response['data']
+    user = {
+        'username': user_data['nim'],
+        'nama': user_data['nama_mahasiswa'],
+    }
     return user
 
 

@@ -7,7 +7,6 @@ from .models import (
 from .enums import RoleChoices
 from .utils import (
     get_user_profile,
-    validate_mahasiswa,
 )
 
 
@@ -46,7 +45,7 @@ class MyBackend(BaseBackend):
 
                 # Get prodi from Neosia
                 if user.get('prodi') is None:
-                    user_profile = get_user_profile(user, role)
+                    user_profile = get_user_profile(user_data, role)
                     
                     # Return None if user profile is None
                     if user_profile is None:
@@ -63,7 +62,8 @@ class MyBackend(BaseBackend):
 
                     _, prodi = self.get_or_create_fakultas_and_prodi_from_mberkas(user_data)
             case RoleChoices.MAHASISWA:
-                user_profile = get_user_profile(user, role)
+                user_data = user
+                user_profile = get_user_profile(user_data, role)
                 
                 if user_profile is None:
                     if settings.DEBUG: print("Failed to get user profile: {}".format(user['username']))
@@ -72,10 +72,7 @@ class MyBackend(BaseBackend):
         
         # Get user
         try:
-            if role == RoleChoices.MAHASISWA:
-                user_obj = MyUser.objects.get(username=user['nim'])
-            else:
-                user_obj = MyUser.objects.get(username=user_data['username'])
+            user_obj = MyUser.objects.get(username=user_data['username'])
         except MyUser.DoesNotExist:
             if settings.DEBUG: print("Create new user")
             match(role):
@@ -84,7 +81,7 @@ class MyBackend(BaseBackend):
                 case RoleChoices.DOSEN:
                     user_obj = MyUser.objects.create_dosen_user(user_data, prodi)
                 case RoleChoices.MAHASISWA:
-                    user_obj = MyUser.objects.create_mahasiswa_user(user, prodi)
+                    user_obj = MyUser.objects.create_mahasiswa_user(user_data, prodi)
             
             return user_obj
         except MyUser.MultipleObjectsReturned:

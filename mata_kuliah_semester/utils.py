@@ -50,13 +50,22 @@ def get_peserta_kelas_mk_semester(mk_semester: MataKuliahSemester):
         if json_response is None: return list_peserta
 
         for peserta_data in json_response:
-            print(peserta_data)
+            try:
+                nilai_akhir_response = float(peserta_data['nilai_akhir'])
+            except ValueError: 
+                if settings.DEBUG:
+                    print('Cannot convert {} to float.'.format(peserta_data['nilai_akhir']))
+                break
+
             peserta = {
                 'id_neosia': peserta_data['id'],
                 'id_kelas_mk_semester': peserta_data['id_kelas_kuliah'],
-                'nim': peserta_data['nim'],
+                'mahasiswa': {
+                    'username': peserta_data['nim'],
+                    'nama': peserta_data['nama_mahasiswa'],
+                },
                 'nama': peserta_data['nama_mahasiswa'],
-                'nilai_akhir': peserta_data['nilai_akhir'],
+                'nilai_akhir': nilai_akhir_response,
                 'nilai_huruf': peserta_data['nilai_huruf'],
             }
 
@@ -184,5 +193,34 @@ def get_peserta_kelas_mk_semester_choices(mk_semester: MataKuliahSemester):
         peserta_choice = peserta['id_neosia'], peserta
         peserta_choices.append(peserta_choice)
     
-    print(peserta_choices)
     return peserta_choices
+
+
+def get_update_peserta_mk_semester_choices(mk_semester: MataKuliahSemester):
+    print('get update choice')
+    list_peserta_mk_semester: QuerySet[PesertaMataKuliah] = mk_semester.get_all_peserta_mk_semester()
+    list_peserta_mk_semester_response = get_peserta_kelas_mk_semester(mk_semester)
+    update_peserta_mk_semester_choices = []
+
+    for peserta in list_peserta_mk_semester:
+        for peserta_response in list_peserta_mk_semester_response:
+            if peserta.id_neosia != peserta_response['id_neosia']: continue
+            
+            # Check:
+            # *Nilai akhir
+            # *Nilai huruf
+            isDataOkay = peserta.nilai_akhir == peserta_response['nilai_akhir'] and peserta.nilai_huruf == peserta_response['nilai_huruf']
+
+            if isDataOkay: break
+
+            update_peserta_mk_data = {
+                'new': peserta_response,
+                'old': peserta
+            }
+
+            update_peserta_mk_choice = peserta.id_neosia, update_peserta_mk_data
+
+            update_peserta_mk_semester_choices.append(update_peserta_mk_choice)
+            break
+    
+    return update_peserta_mk_semester_choices

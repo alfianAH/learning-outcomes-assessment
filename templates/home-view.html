@@ -173,9 +173,9 @@
 
     <div id="content">
         {% block content %}
-            <h2>Selamat Datang, {{ request.user.name }}</h2>
+            <h2>Selamat Datang, {{ request.user.nama }}</h2>
             {% if not request.user.prodi %}
-                <p class="text-danger">Saat akun anda tidak memiliki program studi. Hal ini dikarenakan akun anda di{% if request.user.role == 'd' or request.user.role == 'a' %} MBerkas {% else %} Neosia {% endif %}tidak memiliki program studi{% if request.user.role == 'd' %} atau data anda tidak tercatat di Neosia{% endif %}. Hubungi admin untuk memperbaiki hal ini.</p>
+                <p class="text-danger">Saat ini, akun anda tidak memiliki program studi. Hal ini dikarenakan akun anda di{% if request.user.role == 'd' or request.user.role == 'a' %} MBerkas {% else %} Neosia {% endif %}tidak memiliki program studi{% if request.user.role == 'd' %} atau data anda tidak tercatat di Neosia{% endif %}. Hubungi admin untuk memperbaiki hal ini.</p>
                 {% if request.user.role == 'a' %}
                     <p>Cara memperbaiki:</p>
                     <ul class="list-decimal ml-5">

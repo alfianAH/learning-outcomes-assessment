@@ -98,20 +98,12 @@ class UserOAuthManager(UserManager):
     
     def create_mahasiswa_user(self, user: dict, prodi: ProgramStudi):
         mahasiswa_group, _ = Group.objects.get_or_create(name='Mahasiswa')
-        if user.get('nama_mahasiswa') is not None:
-            new_user = self.create_user(
-                user['nim'],
-                user['nama_mahasiswa'],
-                RoleChoices.MAHASISWA,
-                prodi
-            )
-        else:
-            new_user = self.create_user(
-                user['nim'],
-                user['nama'],
-                RoleChoices.MAHASISWA,
-                prodi
-            )
+        new_user = self.create_user(
+            user['username'],
+            user['nama'],
+            RoleChoices.MAHASISWA,
+            prodi,
+        )
 
         new_user.groups.add(mahasiswa_group)
         return new_user
@@ -119,7 +111,7 @@ class UserOAuthManager(UserManager):
     def create_user(self, username: str, name: str, role: str, prodi: ProgramStudi):
         new_user = self.create(
             username = username,
-            name = name,
+            nama = name,
             prodi = prodi,
             role = role,
         )
@@ -137,7 +129,7 @@ class MyUser(AbstractUser):
     objects = UserOAuthManager()
     prodi = models.ForeignKey(ProgramStudi, on_delete=models.CASCADE, null=True)
     username = models.CharField(max_length=50, unique=True, null=False)
-    name = models.CharField(max_length=255, null=False)
+    nama = models.CharField(max_length=255, null=False)
     role = models.CharField(max_length=1, choices=RoleChoices.choices, null=False)
 
     def __str__(self) -> str:

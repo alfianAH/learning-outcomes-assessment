@@ -1,9 +1,9 @@
 {% if option.wrap_label %}
     <td class="text-left">
-        {{ option.label.nim }}
+        {{ option.label.mahasiswa.username }}
     </td>
     <td class="text-left truncate max-w-sm">
-        {{ option.label.nama }}
+        {{ option.label.mahasiswa.nama }}
     </td>
     <td class="text-right">
         {{ option.label.nilai_akhir|default:'-' }}
@@ -17,8 +17,8 @@
         {{ option.mahasiswa.username }}
     </td>
     {% comment %} Nama {% endcomment %}
-    <td class="text-left md:max-w-[12rem] lg:max-w-[10rem] xl:max-w-[18rem] truncate" title="{{ option.mahasiswa.name }}">
-        {{ option.mahasiswa.name }}
+    <td class="text-left md:max-w-[12rem] lg:max-w-[10rem] xl:max-w-[18rem] truncate" title="{{ option.mahasiswa.nama }}">
+        {{ option.mahasiswa.nama }}
     </td>
     {% comment %} Nilai angka {% endcomment %}
     <td class="text-right">

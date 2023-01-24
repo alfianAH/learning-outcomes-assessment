@@ -4,7 +4,7 @@ from .models import MyUser, Fakultas, ProgramStudi
 
 # Register your models here.
 class MyUserAdmin(admin.ModelAdmin):
-    list_display: tuple = ('id', 'username', 'name', 'prodi', 'role')
+    list_display: tuple = ('id', 'username', 'nama', 'prodi', 'role')
 
 class FakultasAdmin(admin.ModelAdmin):
     list_display: tuple = ('id_neosia', 'nama')

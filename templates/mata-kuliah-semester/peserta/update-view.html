@@ -1,14 +1,14 @@
 {% extends 'home-view.html' %}
 
 {% block title %}
-Update Kelas MK - 
+Update Peserta MK - 
 {% endblock title %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{% url 'semester:read-all' %}" role="listitem">Semester</a></li>
 <li class="breadcrumb-item"><a href="{{ mk_semester_obj.semester.read_detail_url }}" role="listitem">Detail</a></li>
 <li class="breadcrumb-item"><a href="{{ mk_semester_obj.read_detail_url }}" role="listitem">Detail</a></li>
-<li class="breadcrumb-item active" aria-current="page" role="listitem">Update Kelas MK</li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">Update Peserta MK</li>
 {% endblock breadcrumb %}
 
 {% block content %}
