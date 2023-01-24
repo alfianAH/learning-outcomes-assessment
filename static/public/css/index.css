@@ -3634,6 +3634,10 @@ details.dropdown::marker {
   width: 1.25rem;
 }
 
+.w-\[calc\(100\%-42px-10px\)\] {
+  width: calc(100% - 42px - 10px);
+}
+
 .w-64 {
   width: 16rem;
 }
@@ -3644,30 +3648,6 @@ details.dropdown::marker {
 
 .w-\[85\%\] {
   width: 85%;
-}
-
-.w-\[100\%\] {
-  width: 100%;
-}
-
-.w-\[100\%-\] {
-  width: 100%-;
-}
-
-.w-\[100\%-42px\] {
-  width: 100%-42px;
-}
-
-.w-\[100\%-42px-10px\] {
-  width: 100%-42px-10px;
-}
-
-.w-\[calc100\%-42px-10px\] {
-  width: calc100%-42px-10px;
-}
-
-.w-\[calc\(100\%-42px-10px\)\] {
-  width: calc(100% - 42px - 10px);
 }
 
 .min-w-full {
@@ -3706,10 +3686,6 @@ details.dropdown::marker {
 
 .max-w-sm {
   max-width: 24rem;
-}
-
-.max-w-\[18rem\] {
-  max-width: 18rem;
 }
 
 .-translate-x-1\/2 {
@@ -4709,10 +4685,6 @@ details.dropdown::marker {
     max-width: 15rem;
   }
 
-  .md\:max-w-\[16rem\] {
-    max-width: 16rem;
-  }
-
   .md\:max-w-\[12rem\] {
     max-width: 12rem;
   }
@@ -4860,14 +4832,6 @@ details.dropdown::marker {
 
   .lg\:max-w-\[10rem\] {
     max-width: 10rem;
-  }
-
-  .lg\:max-w-\[\] {
-    max-width: ;
-  }
-
-  .lg\:max-w-\[15rem\] {
-    max-width: 15rem;
   }
 
   .lg\:translate-x-0 {

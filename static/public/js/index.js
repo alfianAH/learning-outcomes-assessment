@@ -399,6 +399,7 @@ function tabElement() {
         // Tab contents classes
         activeTabContent.removeClass("show");
         clickedTabContent.addClass("active");
+        $('.masonry').masonry('layout');
 
         activeTabContent.one(transitionEvent, function () {
             activeTabContent.removeClass("active");
