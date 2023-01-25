@@ -50,12 +50,17 @@ def get_peserta_kelas_mk_semester(mk_semester: MataKuliahSemester):
         if json_response is None: return list_peserta
 
         for peserta_data in json_response:
+            if peserta_data['id'] is None: continue
+
             try:
                 nilai_akhir_response = float(peserta_data['nilai_akhir'])
             except ValueError: 
                 if settings.DEBUG:
                     print('Cannot convert {} to float.'.format(peserta_data['nilai_akhir']))
                 break
+            except TypeError:
+                # Nilai akhir from Neosia maybe null
+                nilai_akhir_response = peserta_data['nilai_akhir']
 
             peserta = {
                 'id_neosia': peserta_data['id'],
@@ -190,7 +195,7 @@ def get_peserta_kelas_mk_semester_choices(mk_semester: MataKuliahSemester):
         # Skip peserta, if already in database
         if peserta_qs.exists(): continue
 
-        peserta_choice = peserta['id_neosia'], peserta
+        peserta_choice = id_peserta, peserta
         peserta_choices.append(peserta_choice)
     
     return peserta_choices

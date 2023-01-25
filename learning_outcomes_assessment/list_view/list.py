@@ -7,7 +7,7 @@ class MyListView(ListView):
         get_data = request.GET
         try:
             data_per_page = int(get_data.get('data_per_page'))
-        except TypeError or ValueError:
+        except (ValueError, TypeError):
             data_per_page = None
 
         if data_per_page is not None:
