@@ -3605,6 +3605,38 @@ details.dropdown::marker {
   width: 85%;
 }
 
+.w-1\/2 {
+  width: 50%;
+}
+
+.w-auto {
+  width: auto;
+}
+
+.w-\[\] {
+  width: ;
+}
+
+.w-\[calc\(\)\] {
+  width: calc();
+}
+
+.w-\[calc\(100\)\] {
+  width: calc(100);
+}
+
+.w-\[calc\(100\%-\)\] {
+  width: calc(100% - );
+}
+
+.w-\[calc\(100\%-1rem\)\] {
+  width: calc(100% - 1rem);
+}
+
+.w-\[calc\(100\%-1rem-0\.75rem\)\] {
+  width: calc(100% - 1rem - 0.75rem);
+}
+
 .max-w-\[10rem\] {
   max-width: 10rem;
 }
@@ -4263,6 +4295,18 @@ details.dropdown::marker {
     width: 20rem;
   }
 
+  .sm\:w-1\/2 {
+    width: 50%;
+  }
+
+  .sm\:w-\[calc\(50\%-0\.75rem\)\] {
+    width: calc(50% - 0.75rem);
+  }
+
+  .sm\:w-\[calc\(50\%-0\.75rem\/2\)\] {
+    width: calc(50% - 0.75rem / 2);
+  }
+
   .sm\:grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -4367,6 +4411,14 @@ details.dropdown::marker {
 
   .md\:w-\[calc\(100\%-24rem\)\] {
     width: calc(100% - 24rem);
+  }
+
+  .md\:w-\[calc\(100\%-1\.25rem\)\] {
+    width: calc(100% - 1.25rem);
+  }
+
+  .md\:w-\[calc\(100\%-1\.25rem-1rem\)\] {
+    width: calc(100% - 1.25rem - 1rem);
   }
 
   .md\:max-w-sm {
