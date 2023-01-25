@@ -242,13 +242,11 @@ class KelasMataKuliahSemesterUpdateView(ProgramStudiMixin, ModelBulkUpdateView):
         mk_semester_id = kwargs.get('mk_semester_id')
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
         self.program_studi_obj = self.mk_semester_obj.semester.tahun_ajaran_prodi.prodi_jenjang.program_studi
+
+        self.choices = get_update_kelas_mk_semester_choices(self.mk_semester_obj)
+
         self.success_url = self.mk_semester_obj.read_detail_url()
         self.back_url = self.success_url
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()        
-        kwargs['mk_semester'] = self.mk_semester_obj
-        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -258,9 +256,7 @@ class KelasMataKuliahSemesterUpdateView(ProgramStudiMixin, ModelBulkUpdateView):
         return context
 
     def update_kelas_mk_semester(self, list_kelas_mk_semester_id):
-        list_update_kelas_mk_semester = get_update_kelas_mk_semester_choices(self.mk_semester_obj)
-        
-        for kelas_mk_semester_id, kelas_mk_semester_data in list_update_kelas_mk_semester:
+        for kelas_mk_semester_id, kelas_mk_semester_data in self.choices:
             if str(kelas_mk_semester_id) not in list_kelas_mk_semester_id: continue
 
             new_kelas_mk_semester = kelas_mk_semester_data['new']
@@ -392,12 +388,6 @@ class PesertaMataKuliahBulkUpdateView(ProgramStudiMixin, ModelBulkUpdateView):
 
         self.success_url = self.mk_semester_obj.read_detail_url()
         self.back_url = self.success_url
-
-    def get_form(self, form_class = None):
-        form = super().get_form(form_class)
-        form.fields[self.form_field_name].choices = self.choices
-        
-        return form
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

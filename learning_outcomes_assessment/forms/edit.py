@@ -1,6 +1,7 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse
+from django.forms import BaseForm
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.views.generic.edit import FormView
@@ -46,6 +47,7 @@ class ModelBulkUpdateView(FormView):
     search_placeholder: str = 'Cari ...'
     submit_text: str = 'Update'
     no_choices_msg: str = 'Data sudah sinkron dengan data di Neosia'
+    choices = []
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         form = self.get_form(form_class=self.form_class)
@@ -54,6 +56,12 @@ class ModelBulkUpdateView(FormView):
             messages.info(request, self.no_choices_msg)
             return redirect(self.success_url)
         return super().get(request, *args, **kwargs)
+    
+    def get_form(self, form_class = None) -> BaseForm:
+        form = super().get_form(form_class)
+        
+        form.fields[self.form_field_name].choices = self.choices
+        return form
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

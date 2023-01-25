@@ -201,10 +201,10 @@ class KurikulumBulkUpdateView(ModelBulkUpdateView):
     search_placeholder: str = 'Cari nama Kurikulum...'
     no_choices_msg: str = 'Data kurikulum sudah sinkron dengan data di Neosia'
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
-        return kwargs
+    def setup(self, request: HttpRequest, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        prodi_obj = request.user.prodi
+        self.choices = get_update_kurikulum_choices(prodi_obj)
 
     def update_kurikulum(self, kurikulum_id: int):
         try:
@@ -219,10 +219,9 @@ class KurikulumBulkUpdateView(ModelBulkUpdateView):
     
     def form_valid(self, form) -> HttpResponse:
         update_kurikulum_data = form.cleaned_data.get(self.form_field_name, [])
-        update_kurikulum_choices = get_update_kurikulum_choices(self.request.user.prodi)
 
         # Update kurikulum
-        for update_kurikulum_id, kurikulum_data in update_kurikulum_choices:
+        for update_kurikulum_id, kurikulum_data in self.choices:
             new_kurikulum_data = kurikulum_data['new']
 
             if str(update_kurikulum_id) not in update_kurikulum_data: continue

@@ -202,7 +202,6 @@ def get_peserta_kelas_mk_semester_choices(mk_semester: MataKuliahSemester):
 
 
 def get_update_peserta_mk_semester_choices(mk_semester: MataKuliahSemester):
-    print('get update choice')
     list_peserta_mk_semester: QuerySet[PesertaMataKuliah] = mk_semester.get_all_peserta_mk_semester()
     list_peserta_mk_semester_response = get_peserta_kelas_mk_semester(mk_semester)
     update_peserta_mk_semester_choices = []

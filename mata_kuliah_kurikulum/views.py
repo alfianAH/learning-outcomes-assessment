@@ -22,6 +22,7 @@ from .filters import(
 from mata_kuliah_kurikulum.utils import(
     get_mk_kurikulum,
     get_mk_kurikulum_choices,
+    get_update_mk_kurikulum_choices,
 )
 
 
@@ -190,14 +191,11 @@ class MataKuliahKurikulumBulkUpdateView(ProgramStudiMixin, ModelBulkUpdateView):
         kurikulum_id = kwargs.get('kurikulum_id')
         self.kurikulum_obj = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
         self.program_studi_obj = self.kurikulum_obj.prodi_jenjang.program_studi
+
+        self.choices = get_update_mk_kurikulum_choices(kurikulum_id, self.kurikulum_obj.prodi_jenjang.id_neosia)
+        
         self.success_url = self.kurikulum_obj.read_all_mk_kurikulum_url()
         self.back_url = self.success_url
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()        
-        kwargs['kurikulum_id'] = self.kurikulum_obj.id_neosia
-        kwargs['prodi_jenjang_id'] = self.kurikulum_obj.prodi_jenjang.id_neosia
-        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

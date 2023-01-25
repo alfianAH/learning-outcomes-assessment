@@ -1,9 +1,5 @@
 from django import forms
 from django.conf import settings
-from .utils import (
-    get_update_kelas_mk_semester_choices,
-    get_update_peserta_mk_semester_choices,
-)
 from learning_outcomes_assessment.widgets import (
     ChoiceListInteractiveModelA,
     UpdateChoiceList,
@@ -46,13 +42,6 @@ class KelasMataKuliahSemesterUpdateForm(forms.Form):
         help_text = 'Data yang berwarna hijau merupakan data terbaru dari Neosia.<br>Data yang berwarna merah merupakan data lama pada sistem ini.<br>Beri centang pada item yang ingin anda update.',
         required = False,
     )
-
-    def __init__(self, *args, **kwargs):
-        mk_semester = kwargs.pop('mk_semester')
-        super().__init__(*args, **kwargs)
-
-        update_data_kelas_mk_semester_choices = get_update_kelas_mk_semester_choices(mk_semester)
-        self.fields['update_data_kelas_mk_semester'].choices = update_data_kelas_mk_semester_choices
 
 
 class PesertaMataKuliahSemesterCreateForm(forms.Form):

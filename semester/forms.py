@@ -1,11 +1,7 @@
 from django import forms
 from django.conf import settings
-
-from accounts.models import ProgramStudi
-
 from .utils import (
     get_semester_prodi_choices,
-    get_update_semester_prodi_choices,
 )
 from mata_kuliah_semester.utils import(
     get_kelas_mk_semester,
@@ -77,12 +73,3 @@ class SemesterProdiBulkUpdateForm(forms.Form):
         help_text = 'Data yang berwarna hijau merupakan data terbaru dari Neosia.<br>Data yang berwarna merah merupakan data lama pada sistem ini.<br>Beri centang pada item yang ingin anda update.',
         required = False,
     )
-
-    def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user')
-        super().__init__(*args, **kwargs)
-
-        prodi_obj: ProgramStudi = user.prodi
-        update_semester_choices = get_update_semester_prodi_choices(prodi_obj)
-
-        self.fields['update_data_semester'].choices = update_semester_choices

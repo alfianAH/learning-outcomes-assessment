@@ -15,8 +15,7 @@ from .enums import RoleChoices
 from .widgets import LoginTextInput, LoginPasswordInput
 from .utils import (
     validate_mahasiswa,
-    get_all_prodi_choices, 
-    get_update_prodi_jenjang_choices,
+    get_all_prodi_choices,
     get_prodi_jenjang_db_choices,
 )
 
@@ -136,14 +135,6 @@ class ProgramStudiJenjangUpdateForm(forms.Form):
         help_text = 'Data yang berwarna hijau merupakan data terbaru dari Neosia.<br>Data yang berwarna merah merupakan data lama pada sistem ini.<br>Beri centang pada item yang ingin anda update.',
         required = False,
     )
-
-    def __init__(self, *args, **kwargs):
-        self.list_prodi_jenjang_id = kwargs.pop('list_prodi_jenjang_id')
-        super().__init__(*args, **kwargs)
-
-        update_kurikulum_choices = get_update_prodi_jenjang_choices(self.list_prodi_jenjang_id)
-
-        self.fields['update_data_prodi_jenjang'].choices = update_kurikulum_choices
 
 
 class ProgramStudiJenjangModelForm(forms.ModelForm):

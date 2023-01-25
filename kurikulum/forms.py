@@ -11,7 +11,6 @@ from mata_kuliah_kurikulum.utils import(
 )
 from .utils import (
     get_kurikulum_by_prodi_jenjang_choices,
-    get_update_kurikulum_choices,
 )
 
 
@@ -91,12 +90,3 @@ class KurikulumBulkUpdateForm(forms.Form):
         help_text = 'Data yang berwarna hijau merupakan data terbaru dari Neosia.<br>Data yang berwarna merah merupakan data lama pada sistem ini.<br>Beri centang pada item yang ingin anda update.',
         required = False,
     )
-
-    def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user')
-        super().__init__(*args, **kwargs)
-
-        prodi_obj: ProgramStudi = user.prodi
-        update_kurikulum_choices = get_update_kurikulum_choices(prodi_obj)
-
-        self.fields['update_data_kurikulum'].choices = update_kurikulum_choices

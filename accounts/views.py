@@ -235,20 +235,10 @@ class ProgramStudiJenjangBulkUpdateView(ProgramStudiMixin, ModelBulkUpdateView):
         self.back_url = self.success_url
 
         self.list_prodi_jenjang_id = [prodi_jenjang['id_neosia'] for prodi_jenjang in list(self.program_studi_obj.get_prodi_jenjang().values())]
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        
-        kwargs.update({
-            'list_prodi_jenjang_id': self.list_prodi_jenjang_id 
-        })
-        return kwargs
+        self.choices = get_update_prodi_jenjang_choices(self.list_prodi_jenjang_id)
 
     def update_prodi_jenjang(self, list_prodi_jenjang_id):
-        update_prodi_jenjang_data = get_update_prodi_jenjang_choices(self.list_prodi_jenjang_id)
-
-        for prodi_jenjang_id, update_data in update_prodi_jenjang_data:
-            print(prodi_jenjang_id, update_data)
+        for prodi_jenjang_id, update_data in self.choices:
             if str(prodi_jenjang_id) not in list_prodi_jenjang_id: continue
             
             jenjang_studi_qs = JenjangStudi.objects.filter(id_neosia=update_data['new']['jenjang_studi']['id_neosia'])

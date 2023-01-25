@@ -4,7 +4,6 @@ from learning_outcomes_assessment.widgets import (
     ChoiceListInteractiveModelA,
     UpdateChoiceList,
 )
-from .utils import get_update_mk_kurikulum_choices
 
 
 class MataKuliahKurikulumCreateForm(forms.Form):
@@ -47,13 +46,3 @@ class MataKuliahKurikulumBulkUpdateForm(forms.Form):
         help_text = 'Data yang berwarna hijau merupakan data terbaru dari Neosia.<br>Data yang berwarna merah merupakan data lama pada sistem ini.<br>Beri centang pada item yang ingin anda update.',
         required = False,
     )
-
-    def __init__(self, *args, **kwargs):
-        kurikulum_id = kwargs.pop('kurikulum_id')
-        prodi_jenjang_id = kwargs.pop('prodi_jenjang_id')
-        super().__init__(*args, **kwargs)
-
-        update_mk_kurikulum_choices = get_update_mk_kurikulum_choices(kurikulum_id, prodi_jenjang_id)
-
-        self.fields['update_data_mk_kurikulum'].choices = update_mk_kurikulum_choices
-

@@ -196,20 +196,16 @@ class SemesterBulkUpdateView(ModelBulkUpdateView):
     search_placeholder: str = 'Cari nama semester...'
     no_choices_msg: str = 'Data semester sudah sinkron dengan data di Neosia'
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs.update({
-            'user': self.request.user
-        })
-        return kwargs
+    def setup(self, request: HttpRequest, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.choices =  get_update_semester_prodi_choices(request.user.prodi)
 
     def form_valid(self, form) -> HttpResponse:
         # Get semester prodi ids
         update_semester_data = form.cleaned_data.get(self.form_field_name, [])
-        update_semester_choices = get_update_semester_prodi_choices(self.request.user.prodi)
 
         # Update semester
-        for update_semester_id, semester_data in update_semester_choices:
+        for update_semester_id, semester_data in self.choices:
             new_semester_data = semester_data['new']
             
             if str(update_semester_id) not in update_semester_data: continue
