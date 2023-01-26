@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'pi_area',
     'semester',
     'ilo',
+    'clo',
 ]
 
 MIDDLEWARE = [

@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from .views import (
     MataKuliahSemesterCreateView,
     MataKuliahSemesterReadView,
@@ -27,4 +27,7 @@ urlpatterns = [
     path('<int:mk_semester_id>/peserta/create/', PesertaMataKuliahSemesterCreateView.as_view(), name='peserta-create'),
     path('<int:mk_semester_id>/peserta/bulk-delete/', PesertaMataKuliahBulkDeleteView.as_view(), name='peserta-bulk-delete'),
     path('<int:mk_semester_id>/peserta/bulk-update/', PesertaMataKuliahBulkUpdateView.as_view(), name='peserta-bulk-update'),
+    
+    # CLO
+    path('<int:mk_semester_id>/clo/', include('clo.urls')),
 ]

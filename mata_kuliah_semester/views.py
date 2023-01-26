@@ -5,7 +5,6 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic.base import View
 from django.views.generic.edit import FormView
-from django.views.generic.detail import DetailView
 from accounts.enums import RoleChoices
 from learning_outcomes_assessment.auth.mixins import ProgramStudiMixin
 from learning_outcomes_assessment.list_view.views import DetailWithListViewModelD
