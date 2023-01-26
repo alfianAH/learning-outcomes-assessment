@@ -487,6 +487,42 @@ function listItemRowCollapse(element) {
     });
 }
 
+function showTooltip(tooltipIndicatorElement) {
+    let tooltip = $(tooltipIndicatorElement).siblings('.tooltip');
+    let top = $(tooltipIndicatorElement).offset().top;
+    // 8 = padding tooltip indicator (px)
+    let left = $(tooltipIndicatorElement).offset().left + $(tooltipIndicatorElement).width() + 8;
+    $(tooltip).css({ 'top': top, 'left': left }).fadeIn(100);
+}
+
+function hideTooltop(tooltipIndicatorElement) {
+    let tooltip = $(tooltipIndicatorElement).siblings('.tooltip');
+    $(tooltip).fadeOut(100);
+}
+
+function tooltip() {
+    $('.tooltip-indicator').on({
+        focusin: function () {
+            showTooltip(this);
+        },
+
+        focusout: function () {
+            hideTooltop(this);
+        },
+
+        mouseenter: function () {
+            isTooltipIndicatorClicked = false;
+            showTooltip(this);
+        },
+
+        mouseleave: function () {
+            if(!$(this).is(":focus")) {
+                hideTooltop(this);
+            }
+        }
+    });
+}
+
 var transitionEvent = whichTransitionEvent();
 console.log(transitionEvent);
 
@@ -504,3 +540,4 @@ pagination();
 passwordHandler();
 tabElement();
 toastHandler();
+tooltip();

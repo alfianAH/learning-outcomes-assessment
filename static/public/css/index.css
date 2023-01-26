@@ -3299,6 +3299,47 @@ details.dropdown::marker {
 
 /* Text */
 
+/* Tooltip */
+
+.tooltip {
+  pointer-events: none;
+  position: absolute;
+  top: 0px;
+  margin-left: 1rem;
+  margin-right: 1rem;
+  display: none;
+  max-width: -webkit-fit-content;
+  max-width: -moz-fit-content;
+  max-width: fit-content;
+  border-radius: 0.25rem;
+  --tw-bg-opacity: 1;
+  background-color: rgb(55 65 81 / var(--tw-bg-opacity));
+  padding: 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+@media (min-width: 640px) {
+  .tooltip {
+    max-width: 256px;
+  }
+}
+
+@media (min-width: 768px) {
+  .tooltip {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .tooltip {
+    max-width: 20rem;
+  }
+}
+
 .invisible {
   visibility: hidden;
 }
@@ -3585,6 +3626,10 @@ details.dropdown::marker {
   width: 66.666667%;
 }
 
+.w-\[calc\(100\%-1rem-0\.75rem\)\] {
+  width: calc(100% - 1rem - 0.75rem);
+}
+
 .w-2\.5 {
   width: 0.625rem;
 }
@@ -3603,38 +3648,6 @@ details.dropdown::marker {
 
 .w-\[85\%\] {
   width: 85%;
-}
-
-.w-1\/2 {
-  width: 50%;
-}
-
-.w-auto {
-  width: auto;
-}
-
-.w-\[\] {
-  width: ;
-}
-
-.w-\[calc\(\)\] {
-  width: calc();
-}
-
-.w-\[calc\(100\)\] {
-  width: calc(100);
-}
-
-.w-\[calc\(100\%-\)\] {
-  width: calc(100% - );
-}
-
-.w-\[calc\(100\%-1rem\)\] {
-  width: calc(100% - 1rem);
-}
-
-.w-\[calc\(100\%-1rem-0\.75rem\)\] {
-  width: calc(100% - 1rem - 0.75rem);
 }
 
 .max-w-\[10rem\] {
@@ -4291,20 +4304,12 @@ details.dropdown::marker {
     width: calc(100% - 18rem);
   }
 
-  .sm\:w-80 {
-    width: 20rem;
-  }
-
-  .sm\:w-1\/2 {
-    width: 50%;
-  }
-
-  .sm\:w-\[calc\(50\%-0\.75rem\)\] {
-    width: calc(50% - 0.75rem);
-  }
-
   .sm\:w-\[calc\(50\%-0\.75rem\/2\)\] {
     width: calc(50% - 0.75rem / 2);
+  }
+
+  .sm\:w-80 {
+    width: 20rem;
   }
 
   .sm\:grid-cols-2 {
@@ -4411,10 +4416,6 @@ details.dropdown::marker {
 
   .md\:w-\[calc\(100\%-24rem\)\] {
     width: calc(100% - 24rem);
-  }
-
-  .md\:w-\[calc\(100\%-1\.25rem\)\] {
-    width: calc(100% - 1.25rem);
   }
 
   .md\:w-\[calc\(100\%-1\.25rem-1rem\)\] {
