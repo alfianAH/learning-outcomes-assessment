@@ -99,7 +99,7 @@ class IloCreateView(HtmxCreateFormView):
     kurikulum_obj: Kurikulum = None
 
     modal_title: str = 'Tambah ILO'
-    modal_id: str = 'create-modal-content'
+    modal_content_id: str = 'create-modal-content'
     button_text: str = 'Tambah'
     success_msg: str = 'Berhasil menambahkan ILO'
     error_msg: str = 'Gagal menambahkan ILO. Pastikan data yang anda masukkan valid.'

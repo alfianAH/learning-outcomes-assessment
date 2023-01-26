@@ -131,6 +131,15 @@ function openModal(modal) {
     // Show modal
     $(modal).one(transitionEvent, function () {
         $(modal).removeClass('showing').addClass('show');
+
+        // Hide tooltip on modal body scroll
+        setTimeout(function () {
+            let modalBody = $(modal).find('.modal-body');
+            console.log(modalBody);
+            $(modalBody).on("scroll", function () {
+                $('.tooltip').hide();
+            })
+        }, 500);
     });
 }
 
@@ -508,6 +517,68 @@ function toastHandler() {
     });
 }
 
+function showTooltip(tooltipIndicatorElement) {
+    // Get tooltip
+    let tooltip = $(tooltipIndicatorElement).siblings('.tooltip');
+    // Get tooltip indicator position
+    let tooltipIndicatorElementPos = tooltipIndicatorElement.getBoundingClientRect();
+
+    // Get parent
+    let parent = tooltipIndicatorElement.closest('.modal-body');
+    let parentPos = parent ? parent.getBoundingClientRect() : {top: 0, left: 0};
+
+    // Get window scroll
+    let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    let scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+
+    // Get modal scroll
+    let modalScrollTop = parent ? parent.scrollTop : 0;
+
+    let top = tooltipIndicatorElementPos.top + scrollTop + modalScrollTop - parentPos.top;
+    // 8 = padding tooltip indicator (px)
+    let left = tooltipIndicatorElementPos.left + scrollLeft - parentPos.left + $(tooltipIndicatorElement).width() + 8;
+    $(tooltip).css({'top': top, 'left': left }).show();
+}
+
+function hideTooltop(tooltipIndicatorElement) {
+    let tooltip = $(tooltipIndicatorElement).siblings('.tooltip');
+    $(tooltip).hide();
+}
+
+function tooltip() {
+    $(document).on({
+        focusin: function (e) {
+            if(e.target.classList.contains('tooltip-indicator')){
+                showTooltip(e.target);
+            }
+        },
+
+        focusout: function (e) {
+            if (e.target.classList.contains('tooltip-indicator')) {
+                hideTooltop(e.target);
+            }
+        },
+
+        mouseenter: function (e) {
+            if (e.target.classList.contains('tooltip-indicator')) {
+                isTooltipIndicatorClicked = false;
+                showTooltip(e.target);
+            }
+        },
+
+        mouseleave: function (e) {
+            if (e.target.classList.contains('tooltip-indicator')) {
+                if (!$(e.target).is(":focus")) {
+                    hideTooltop(e.target);
+                }
+            }
+        }
+    }, '.tooltip-indicator');
+
+    $(window).on('scroll', function(){
+        $('.tooltip').hide();
+    });
+}
 
 var transitionEvent = whichTransitionEvent();
 console.log(transitionEvent);
@@ -527,3 +598,4 @@ pagination();
 passwordHandler();
 tabElement();
 toastHandler();
+tooltip();

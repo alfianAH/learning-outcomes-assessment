@@ -27,6 +27,10 @@ class AssessmentAreaForm(forms.ModelForm):
             }),
             'color': MyColorSelectInput
         }
+        help_texts = {
+            'nama': 'Nama area penilaian. Contoh: <b>Attitude</b>, <b>Knowledge</b>, dll.',
+            'color': 'Warna badge dari area penilaian.'
+        }
 
 
 class PerformanceIndicatorAreaForm(forms.ModelForm):
@@ -40,6 +44,9 @@ class PerformanceIndicatorAreaForm(forms.ModelForm):
             'pi_code': MyTextInput(attrs={
                 'placeholder': 'Kode PI: A1, K1, ...'
             })
+        }
+        help_texts = {
+            'pi_code': 'Kode PI. Contoh: <b>A1</b>, <b>A2</b>, <b>K1</b>, dll.'
         }
 
 

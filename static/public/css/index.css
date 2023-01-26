@@ -3380,6 +3380,47 @@ details.dropdown::marker {
   color: rgb(239 68 68 / var(--tw-text-opacity));
 }
 
+/* Tooltip */
+
+.tooltip {
+  pointer-events: none;
+  position: absolute;
+  top: 0px;
+  margin-left: 1rem;
+  margin-right: 1rem;
+  display: none;
+  max-width: -webkit-fit-content;
+  max-width: -moz-fit-content;
+  max-width: fit-content;
+  border-radius: 0.25rem;
+  --tw-bg-opacity: 1;
+  background-color: rgb(55 65 81 / var(--tw-bg-opacity));
+  padding: 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+@media (min-width: 640px) {
+  .tooltip {
+    max-width: 256px;
+  }
+}
+
+@media (min-width: 768px) {
+  .tooltip {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .tooltip {
+    max-width: 20rem;
+  }
+}
+
 .invisible {
   visibility: hidden;
 }

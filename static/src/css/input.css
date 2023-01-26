@@ -826,6 +826,11 @@
     .text-danger{
         @apply text-red-500;
     }
+
+    /* Tooltip */
+    .tooltip{
+        @apply absolute top-0 bg-gray-700 text-white text-xs md:text-sm rounded p-2 max-w-fit sm:max-w-[256px] xl:max-w-xs mx-4 pointer-events-none hidden;
+    }
 }
 
 @layer utilities{

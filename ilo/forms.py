@@ -34,6 +34,11 @@ class IloForm(forms.ModelForm):
             }),
         }
 
+        help_texts = {
+            'nama': 'Nama ILO. Contoh: <b>ILO 1</b>',
+            'satisfactory_level': 'Nilai standar dari ILO (0-100).'
+        }
+
     def __init__(self, *args, **kwargs):
         kurikulum_obj = kwargs.pop('kurikulum_obj')
         super().__init__(*args, **kwargs)
