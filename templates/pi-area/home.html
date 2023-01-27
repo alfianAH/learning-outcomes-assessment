@@ -65,7 +65,7 @@ Performance Indicators -
                         </a>
                     </div>
 
-                    {% include 'components/list-table-view/model-b/list-view-model-b.html' with objects=object.get_pi_area %}
+                    {% include 'components/list-table-view/model-b/list-view-model-b.html' with objects=object.get_pi_area use_checkbox=True %}
                 </li>
             {% endfor %}
         </ol>

@@ -1,0 +1,89 @@
+{% extends 'home-view.html' %}
+
+{% block title %}
+CLO - 
+{% endblock title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'semester:read-all' %}" role="listitem">Semester</a></li>
+<li class="breadcrumb-item"><a href="{{ mk_semester_obj.semester.read_detail_url }}" role="listitem">Detail</a></li>
+<li class="breadcrumb-item"><a href="{{ mk_semester_obj.read_detail_url }}" role="listitem">Detail MK</a></li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">CLO</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+{% if object_list or data_exist %}
+    <div class="h-icon">
+        <h1>Course Learning Outcomes</h1>
+        <a href="{{ mk_semester_obj.get_clo_create_url }}" title="Tambah CLO" type="button" class="btn btn-success loading-trigger">
+            <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+            </svg>
+            <span class="hidden sm:block">Tambah</span>
+        </a>
+
+        <button class="btn btn-warning" type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" focusable="False" fill="currentColor" class="bi bi-lock" viewBox="0 0 16 16">
+                <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/>
+            </svg>
+            <span class="hidden sm:block sm:ml-2.5">Kunci</span>
+        </button>
+    </div>
+
+    <div class="table-div">
+        <div class="tr-div">
+            <div class="w-24 md:w-40">Semester</div>
+            <div>:</div>
+            <div>{{ mk_semester_obj.semester.semester.nama }}</div>
+        </div>
+        <div class="tr-div">
+            <div class="w-24 md:w-40">Mata kuliah</div>
+            <div>:</div>
+            <div>{{ mk_semester_obj.mk_kurikulum.nama }}</div>
+        </div>
+        <div class="tr-div">
+            <div class="w-24 md:w-40">Status</div>
+            <div>:</div>
+            <div class="badge badge-warning">
+                Belum dikunci
+            </div>
+        </div>
+    </div>
+
+    {% include 'components/list-table-view/list-tools.html' with search_field=filter_form.nama %}
+
+    {% if object_list %}
+        {% include 'components/list-table-view/model-a/read-all-view.html' %}
+    {% else %}
+        <p>Tidak ditemukan data dengan filter yang diberikan</p>
+    {% endif %}
+{% else %}
+    <h1>Course Learning Outcomes</h1>
+    <div class="table-div">
+        <div class="tr-div">
+            <div class="w-24 md:w-40">Semester</div>
+            <div>:</div>
+            <div>{{ mk_semester_obj.semester.semester.nama }}</div>
+        </div>
+        <div class="tr-div">
+            <div class="w-24 md:w-40">Mata kuliah</div>
+            <div>:</div>
+            <div>{{ mk_semester_obj.mk_kurikulum.nama }}</div>
+        </div>
+        <div class="tr-div !items-center">
+            <div class="w-24 md:w-40">Status</div>
+            <div>:</div>
+            <div class="badge badge-warning">
+                Belum dikunci
+            </div>
+        </div>
+    </div>
+
+    <a href="{{ mk_semester_obj.get_clo_create_url }}" title="Tambah CLO" type="button" class="btn btn-primary max-w-min loading-trigger">
+        <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+        </svg>
+        <span class="hidden sm:block">Tambah CLO</span>
+    </a>
+{% endif %}
+{% endblock content %}

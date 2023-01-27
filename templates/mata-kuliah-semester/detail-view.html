@@ -116,10 +116,12 @@
 </ul>
 
 <div class="tab-content">
+    {% comment %} Pedoman {% endcomment %}
     <div class="tab-pane fade min-h-screen {% if not is_peserta_pane %}show active{% endif %}" id="tab-pedoman-pane" role="tabpanel" aria-labelledby="tab-1">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti deserunt earum nemo assumenda possimus, eos pariatur, repellendus impedit voluptas nam molestiae voluptate debitis porro numquam veritatis mollitia aperiam ipsum necessitatibus? Cupiditate, nisi non natus corporis quia eaque odio? Accusantium, maxime illo assumenda dolorem natus veritatis laborum officia. Error, ex. Quas!
+        {% include 'components/list-table-view/model-b/list-view-model-b.html' with objects=pedoman_objects use_checkbox=False %}
     </div>
 
+    {% comment %} Peserta {% endcomment %}
     <div class="tab-pane fade min-h-screen {% if is_peserta_pane %}show active{% endif %}" role="tabpanel" id="tab-peserta-pane" aria-labelledby="tab-2">
         {% if object_list or data_exist %}
             <div class="h-icon">
@@ -158,6 +160,7 @@
         {% endif %}
     </div>
 
+    {% comment %} Hasil {% endcomment %}
     <div class="tab-pane fade min-h-screen" role="tabpanel" id="tab-hasil-pane" aria-labelledby="tab-3">
         Lorem, ipsum dolor sit amet consectetur adipisicing elit. Voluptatum voluptas, possimus eligendi incidunt, blanditiis rerum saepe accusantium est at, earum ipsa! Tempora itaque eaque voluptate!
     </div>
