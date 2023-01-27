@@ -17,11 +17,13 @@
         </nav>
 
         <div class="form-wizard-parent md:space-y-4">
+            {% comment %} Formset {% endcomment %}
             {% if wizard.form.forms %}
                 {{ wizard.form.management_form }}
                 {% for form in wizard.form.forms %}
                     {{ form }}
                 {% endfor %}
+            {% comment %} Original Form {% endcomment %}
             {% else %}
                 {% for field in wizard.form %}
                     <div class="form-wizard-content {% if forloop.first %}active{% else %}hidden{% endif %}" 
