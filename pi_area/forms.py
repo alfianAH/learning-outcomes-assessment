@@ -1,5 +1,6 @@
 from django import forms
-from django.forms import inlineformset_factory, BaseInlineFormSet
+from django.forms import inlineformset_factory
+from learning_outcomes_assessment.forms.formset import CanDeleteInlineFormSet
 from learning_outcomes_assessment.widgets import (
     MyTextInput,
     MyColorSelectInput,
@@ -94,22 +95,11 @@ class PIAreaDuplicateForm(forms.Form):
         return cleaned_data
 
 
-class PerformanceIndicatorAreaInlineFormSet(BaseInlineFormSet):
-    def add_fields(self, form, index) -> None:
-        super().add_fields(form, index)
-        if 'DELETE' in form.fields:
-            form.fields['DELETE'].widget = forms.CheckboxInput(
-                attrs={
-                    'class': 'hidden'
-                }
-            )
-
-
 PerformanceIndicatorAreaFormSet = inlineformset_factory(
     AssessmentArea, 
     PerformanceIndicatorArea, 
     form=PerformanceIndicatorAreaForm, 
-    formset=PerformanceIndicatorAreaInlineFormSet,
+    formset=CanDeleteInlineFormSet,
     extra=0,
     can_delete=True
 )
@@ -118,7 +108,7 @@ PerformanceIndicatorFormSet = inlineformset_factory(
     PerformanceIndicatorArea,
     PerformanceIndicator,
     form=PerformanceIndicatorForm,
-    formset=PerformanceIndicatorAreaInlineFormSet,
+    formset=CanDeleteInlineFormSet,
     extra=0,
     can_delete=True,
 )
