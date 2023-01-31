@@ -4,6 +4,7 @@ from django.forms.widgets import (
     Input,
     Select,
     Textarea,
+    CheckboxSelectMultiple,
 )
 from django_filters.widgets import SuffixedMultiWidget
 
@@ -143,3 +144,8 @@ class MyRadioInput(ChoiceWidget):
     input_type: str = 'radio'
     template_name: str = 'custom-widgets/forms/widgets/radio-input.html'
     option_template_name: str = 'custom-widgets/forms/widgets/radio-option.html'
+
+
+class MyCheckboxInput(CheckboxSelectMultiple):
+    template_name = 'custom-widgets/forms/widgets/checkbox-select.html'
+    option_template_name: str = 'custom-widgets/forms/widgets/checkbox-option.html'

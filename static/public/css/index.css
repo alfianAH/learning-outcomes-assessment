@@ -3543,6 +3543,22 @@ details.dropdown::marker {
   margin-top: 0.5rem;
 }
 
+.mt-4 {
+  margin-top: 1rem;
+}
+
+.mt-0\.5 {
+  margin-top: 0.125rem;
+}
+
+.mt-0 {
+  margin-top: 0px;
+}
+
+.mt-\[0\.1rem\] {
+  margin-top: 0.1rem;
+}
+
 .block {
   display: block;
 }
@@ -3778,6 +3794,10 @@ details.dropdown::marker {
 
 .flex-col {
   flex-direction: column;
+}
+
+.items-start {
+  align-items: flex-start;
 }
 
 .items-center {
@@ -4694,12 +4714,12 @@ details.dropdown::marker {
     width: 1.25rem;
   }
 
-  .md\:w-8 {
-    width: 2rem;
-  }
-
   .md\:w-40 {
     width: 10rem;
+  }
+
+  .md\:w-8 {
+    width: 2rem;
   }
 
   .md\:w-36 {

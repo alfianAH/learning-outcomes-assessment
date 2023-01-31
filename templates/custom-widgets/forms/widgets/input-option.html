@@ -1,7 +1,13 @@
-{% include "django/forms/widgets/input.html" %}
 {% if widget.wrap_label %}
-<label class="form-label"
-    {% if widget.attrs.id %} for="{{ widget.attrs.id }}"{% endif %}>
-    {{ widget.label }}
-</label>
+<div class="flex flex-row space-x-2 items-start">
+    <div>
+{% endif %}
+    {% include "django/forms/widgets/input.html" %}
+{% if widget.wrap_label %}
+    </div>
+    <label class="form-label"
+        {% if widget.attrs.id %} for="{{ widget.attrs.id }}"{% endif %}>
+        {{ widget.label }}
+    </label>
+</div>
 {% endif %}
