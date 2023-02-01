@@ -1,9 +1,8 @@
 from django.forms import BaseForm
-from django.http import Http404, HttpRequest, HttpResponse
+from django.http import Http404, HttpRequest
 from django.db import models
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext as _
-from django.views.generic.base import ContextMixin
 from .list import MyListView
 
 
@@ -31,6 +30,7 @@ class ListViewModelA(MyListView):
     list_custom_field_template: str = ''
     table_custom_field_header_template: str = ''
     table_custom_field_template: str = ''
+    table_footer_custom_field_template: str = ''
     filter_template: str = ''
     sort_template: str = ''
 
@@ -73,6 +73,9 @@ class ListViewModelA(MyListView):
             'table_custom_field_header_template': self.table_custom_field_header_template,
             'table_custom_field_template': self.table_custom_field_template,
         })
+
+        if self.update_context(self.table_footer_custom_field_template):
+            context['table_footer_custom_field_template'] = self.table_footer_custom_field_template
 
         if self.update_context(self.badge_template):
             context['badge_template'] = self.badge_template

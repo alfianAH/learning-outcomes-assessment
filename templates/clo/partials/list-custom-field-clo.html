@@ -1,0 +1,18 @@
+<div class="w-full table-strip">
+    <div class="space-y-1">
+        <div class="flex px-3 py-1 space-x-2.5 justify-between">
+            <div class="whitespace-nowrap font-bold">ILO</div>
+            <div>{{ option.get_ilo.nama }}</div>
+        </div>
+        
+        <div class="flex px-3 py-1 space-x-2.5 justify-between">
+            <div class="whitespace-nowrap font-bold">Total komponen</div>
+            <div>{{ option.get_komponen_clo|length }}</div>
+        </div>
+
+        <div class="flex px-3 py-1 space-x-2.5 justify-between">
+            <div class="whitespace-nowrap font-bold">Total persentase</div>
+            <div>{{ option.get_total_persentase_komponen }}</div>
+        </div>
+    </div>
+</div>

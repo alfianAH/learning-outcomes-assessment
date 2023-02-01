@@ -1,4 +1,4 @@
-<ol class="flex flex-col sm:grid sm:grid-cols-2 md:hidden {% if not page_obj.start_index %}list-numbered{% endif %} {% if classes %}{{ classes }}{% endif %}" 
+<ol class="flex flex-col {% if not use_chart %}sm:grid sm:grid-cols-2{% endif %} md:hidden {% if not page_obj.start_index %}list-numbered{% endif %} {% if classes %}{{ classes }}{% endif %}" 
     {% if id %}id="{{ id }}"{% endif %}
     role="list">
 
@@ -127,6 +127,23 @@
             {% endfor %}
         {% endif %}
     </tbody>
+
+    {% if use_footer %}
+    <tfoot>
+        <tr>
+            {% if use_widget %}
+                {% comment %} Footer {% endcomment %}
+                {% if option.table_footer_custom_field_template %}
+                    {% include option.table_footer_custom_field_template %}
+                {% endif %}
+            {% else %}
+                {% if table_footer_custom_field_template %}
+                    {% include table_footer_custom_field_template %}
+                {% endif %}
+            {% endif %}
+        </tr>
+    </tfoot>
+    {% endif %}
 </table>
 
 <script>

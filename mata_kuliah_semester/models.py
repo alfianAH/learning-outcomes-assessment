@@ -25,9 +25,23 @@ class MataKuliahSemester(models.Model):
             ),
         )
 
+    def read_detail_url(self):
+        return reverse('semester:mata_kuliah_semester:read', kwargs={
+            'semester_prodi_id': self.semester.pk,
+            'mk_semester_id': self.pk
+        })
+    
+    # Kelas MK Semester
     def get_kelas_mk_semester(self):
         return self.kelasmatakuliahsemester_set.all()
-
+    
+    def get_kelas_mk_semester_update_url(self):
+        return reverse('semester:mata_kuliah_semester:kelas-mk-semester-bulk-update', kwargs={
+            'semester_prodi_id': self.semester.pk,
+            'mk_semester_id': self.pk
+        })
+    
+    # Dosen MK
     def get_all_dosen_mk_semester(self):
         list_user_dosen = []
         list_dosen = []
@@ -42,6 +56,7 @@ class MataKuliahSemester(models.Model):
         
         return list_dosen
     
+    # Peserta MK
     def get_all_peserta_mk_semester(self):
         list_peserta = []
         list_kelas_mk_semester = self.get_kelas_mk_semester()
@@ -52,21 +67,7 @@ class MataKuliahSemester(models.Model):
                 list_peserta.append(peserta_kelas_mk_semester)
         
         return list_peserta
-
-    def read_detail_url(self):
-        return reverse('semester:mata_kuliah_semester:read', kwargs={
-            'semester_prodi_id': self.semester.pk,
-            'mk_semester_id': self.pk
-        })
     
-    # Kelas MK Semester
-    def get_kelas_mk_semester_update_url(self):
-        return reverse('semester:mata_kuliah_semester:kelas-mk-semester-bulk-update', kwargs={
-            'semester_prodi_id': self.semester.pk,
-            'mk_semester_id': self.pk
-        })
-    
-    # Peserta MK
     def get_peserta_mk_semester_create_url(self):
         return reverse('semester:mata_kuliah_semester:peserta-create', kwargs={
             'semester_prodi_id': self.semester.pk,
@@ -86,6 +87,15 @@ class MataKuliahSemester(models.Model):
         })
     
     # CLO
+    def get_total_persentase_clo(self):
+        list_clo = self.clo_set.all()
+        total_persentase = 0
+
+        for clo in list_clo:
+            total_persentase += clo.get_total_persentase_komponen()
+        
+        return total_persentase
+    
     def get_clo_read_all_url(self):
         return reverse('semester:mata_kuliah_semester:clo:read-all', kwargs={
             'semester_prodi_id': self.semester.pk,

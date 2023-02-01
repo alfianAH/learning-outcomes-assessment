@@ -35,8 +35,9 @@ class CloReadAllView(ListViewModelA):
     list_custom_field_template: str = 'clo/partials/list-custom-field-clo.html'
     table_custom_field_header_template: str = 'clo/partials/table-custom-field-header-clo.html'
     table_custom_field_template: str = 'clo/partials/table-custom-field-clo.html'
-    filter_template: str = 'clo/partials/clo-filter-form.html'
-    sort_template: str = 'clo/partials/clo-sort-form.html'
+    table_footer_custom_field_template: str = 'clo/partials/table-footer-custom-field-clo.html'
+    # filter_template: str = 'clo/partials/clo-filter-form.html'
+    # sort_template: str = 'clo/partials/clo-sort-form.html'
 
     def setup(self, request: HttpRequest, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -45,19 +46,19 @@ class CloReadAllView(ListViewModelA):
         
         self.reset_url = self.mk_semester_obj.get_clo_read_all_url()
 
-    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        clo_qs = self.get_queryset()
+    # def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+    #     clo_qs = self.get_queryset()
 
-        if clo_qs.exists():
-            filter_data = {
-                'nama': request.GET.get('nama', '')
-            }
+    #     if clo_qs.exists():
+    #         filter_data = {
+    #             'nama': request.GET.get('nama', '')
+    #         }
 
-            sort_data = {
-                self.sort_form_ordering_by_key: request.GET.get(self.sort_form_ordering_by_key, self.ordering)
-            }
+    #         sort_data = {
+    #             self.sort_form_ordering_by_key: request.GET.get(self.sort_form_ordering_by_key, self.ordering)
+    #         }
 
-        return super().get(request, *args, **kwargs)
+    #     return super().get(request, *args, **kwargs)
     
     def get_queryset(self):
         self.queryset = self.model.objects.filter(

@@ -1,0 +1,5 @@
+<div class="mb-3">
+    <label for="{{ filter_form.sks.id_for_label }}" class="form-label">{{ filter_form.sks.label }}</label>
+    {{ filter_form.sks }}
+    {% include 'components/form/form-errors.html' with errors=filter_form.sks.errors %}
+</div>

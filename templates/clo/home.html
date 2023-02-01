@@ -1,4 +1,5 @@
 {% extends 'home-view.html' %}
+{% load mathfilters %}
 
 {% block title %}
 CLO - 
@@ -41,7 +42,7 @@ CLO -
             <div>:</div>
             <div>{{ mk_semester_obj.mk_kurikulum.nama }}</div>
         </div>
-        <div class="tr-div">
+        <div class="tr-div !items-center">
             <div class="w-24 md:w-40">Status</div>
             <div>:</div>
             <div class="badge badge-warning">
@@ -53,7 +54,12 @@ CLO -
     {% include 'components/list-table-view/list-tools.html' with search_field=filter_form.nama %}
 
     {% if object_list %}
-        {% include 'components/list-table-view/model-a/read-all-view.html' %}
+        <div class="flex flex-col sm:grid sm:grid-cols-2 md:block">
+            <div class="w-min block md:hidden text-center mx-auto my-0">
+                <canvas id="total-persentase-clo" class="max-w-[18rem] max-h-[18rem]"></canvas>
+            </div>
+            {% include 'components/list-table-view/model-a/read-all-view.html' with use_footer=True use_chart=True %}
+        </div>
     {% else %}
         <p>Tidak ditemukan data dengan filter yang diberikan</p>
     {% endif %}
@@ -87,3 +93,40 @@ CLO -
     </a>
 {% endif %}
 {% endblock content %}
+
+{% block script %}
+<script>
+    new Chart(
+        $('#total-persentase-clo'),
+        {
+            type: 'doughnut',
+            data: {
+                labels: [
+                    'Total Persentase CLO',
+                    'Kosong',
+                ],
+                datasets: [{
+                    data: [
+                        {{ mk_semester_obj.get_total_persentase_clo }}, 
+                        {{ 100|sub:mk_semester_obj.get_total_persentase_clo }}
+                    ],
+                    backgroundColor: [
+                        '#10b981', // Emerald 500
+                        '#a7f3d0', // Emerald 200
+                    ],
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Total persentase CLO Mata Kuliah',
+                        color: '#10b981'
+                    }
+                }
+            }
+        }
+    );
+</script>
+{% endblock script %}

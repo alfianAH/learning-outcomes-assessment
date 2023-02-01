@@ -715,7 +715,8 @@
         @apply w-14;
     }
 
-    .table-css > tbody > *:not(.table-details) > * {
+    .table-css > tbody > *:not(.table-details) > *, 
+    .table-css > tfoot > *:not(.table-details) > * {
         @apply bg-slate-50 dark:bg-zinc-700;
     }
 

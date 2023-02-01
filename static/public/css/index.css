@@ -3084,12 +3084,14 @@ details.dropdown::marker {
   width: 3.5rem;
 }
 
-.table-css > tbody > *:not(.table-details) > * {
+.table-css > tbody > *:not(.table-details) > *, 
+    .table-css > tfoot > *:not(.table-details) > * {
   --tw-bg-opacity: 1;
   background-color: rgb(248 250 252 / var(--tw-bg-opacity));
 }
 
-.dark .table-css > tbody > *:not(.table-details) > * {
+.dark .table-css > tbody > *:not(.table-details) > *,.dark  
+    .table-css > tfoot > *:not(.table-details) > * {
   --tw-bg-opacity: 1;
   background-color: rgb(63 63 70 / var(--tw-bg-opacity));
 }
@@ -3461,6 +3463,10 @@ details.dropdown::marker {
   z-index: 40;
 }
 
+.m-auto {
+  margin: auto;
+}
+
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
@@ -3469,6 +3475,16 @@ details.dropdown::marker {
 .my-0 {
   margin-top: 0px;
   margin-bottom: 0px;
+}
+
+.my-auto {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.mx-0 {
+  margin-left: 0px;
+  margin-right: 0px;
 }
 
 .mr-2\.5 {
@@ -3515,16 +3531,12 @@ details.dropdown::marker {
   margin-bottom: 0.625rem;
 }
 
-.ml-1 {
-  margin-left: 0.25rem;
-}
-
 .mb-3 {
   margin-bottom: 0.75rem;
 }
 
-.mb-1 {
-  margin-bottom: 0.25rem;
+.ml-1 {
+  margin-left: 0.25rem;
 }
 
 .ml-4 {
@@ -3543,28 +3555,16 @@ details.dropdown::marker {
   margin-top: 0.5rem;
 }
 
-.mt-4 {
-  margin-top: 1rem;
-}
-
-.mt-0\.5 {
-  margin-top: 0.125rem;
-}
-
-.mt-0 {
-  margin-top: 0px;
-}
-
-.mt-\[0\.1rem\] {
-  margin-top: 0.1rem;
-}
-
 .block {
   display: block;
 }
 
 .inline-block {
   display: inline-block;
+}
+
+.inline {
+  display: inline;
 }
 
 .flex {
@@ -3625,6 +3625,18 @@ details.dropdown::marker {
 
 .max-h-24 {
   max-height: 6rem;
+}
+
+.max-h-\[12rem\] {
+  max-height: 12rem;
+}
+
+.max-h-\[15rem\] {
+  max-height: 15rem;
+}
+
+.max-h-\[18rem\] {
+  max-height: 18rem;
 }
 
 .min-h-screen {
@@ -3711,8 +3723,22 @@ details.dropdown::marker {
   width: 85%;
 }
 
+.w-min {
+  width: -webkit-min-content;
+  width: -moz-min-content;
+  width: min-content;
+}
+
 .min-w-full {
   min-width: 100%;
+}
+
+.min-w-\[8rem\] {
+  min-width: 8rem;
+}
+
+.min-w-\[6rem\] {
+  min-width: 6rem;
 }
 
 .min-w-\[9rem\] {
@@ -3725,16 +3751,20 @@ details.dropdown::marker {
   max-width: min-content;
 }
 
+.max-w-\[10rem\] {
+  max-width: 10rem;
+}
+
+.max-w-\[8rem\] {
+  max-width: 8rem;
+}
+
 .max-w-xl {
   max-width: 36rem;
 }
 
 .max-w-none {
   max-width: none;
-}
-
-.max-w-\[10rem\] {
-  max-width: 10rem;
 }
 
 .max-w-md {
@@ -3747,6 +3777,22 @@ details.dropdown::marker {
 
 .max-w-sm {
   max-width: 24rem;
+}
+
+.max-w-\[2\] {
+  max-width: 2;
+}
+
+.max-w-\[15rem\] {
+  max-width: 15rem;
+}
+
+.max-w-\[12rem\] {
+  max-width: 12rem;
+}
+
+.max-w-\[18rem\] {
+  max-width: 18rem;
 }
 
 .-translate-x-1\/2 {
@@ -3868,6 +3914,10 @@ details.dropdown::marker {
   --tw-space-x-reverse: 0;
   margin-right: calc(0.75rem * var(--tw-space-x-reverse));
   margin-left: calc(0.75rem * calc(1 - var(--tw-space-x-reverse)));
+}
+
+.self-center {
+  align-self: center;
 }
 
 .truncate {
@@ -4694,6 +4744,10 @@ details.dropdown::marker {
     margin-right: 0.5rem;
   }
 
+  .md\:block {
+    display: block;
+  }
+
   .md\:table {
     display: table;
   }
@@ -4760,6 +4814,10 @@ details.dropdown::marker {
 
   .md\:max-w-\[12rem\] {
     max-width: 12rem;
+  }
+
+  .md\:grid-cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
   }
 
   .md\:space-y-3 > :not([hidden]) ~ :not([hidden]) {
@@ -4879,8 +4937,16 @@ details.dropdown::marker {
     width: 90%;
   }
 
+  .lg\:min-w-\[6rem\] {
+    min-width: 6rem;
+  }
+
   .lg\:min-w-\[8rem\] {
     min-width: 8rem;
+  }
+
+  .lg\:max-w-\[7rem\] {
+    max-width: 7rem;
   }
 
   .lg\:max-w-\[12rem\] {
@@ -4999,8 +5065,24 @@ details.dropdown::marker {
     width: 18rem;
   }
 
+  .xl\:min-w-\[10rem\] {
+    min-width: 10rem;
+  }
+
+  .xl\:min-w-\[8rem\] {
+    min-width: 8rem;
+  }
+
   .xl\:min-w-\[15rem\] {
     min-width: 15rem;
+  }
+
+  .xl\:max-w-\[12rem\] {
+    max-width: 12rem;
+  }
+
+  .xl\:max-w-\[10rem\] {
+    max-width: 10rem;
   }
 
   .xl\:max-w-\[18rem\] {
@@ -5013,10 +5095,6 @@ details.dropdown::marker {
 
   .xl\:max-w-sm {
     max-width: 24rem;
-  }
-
-  .xl\:max-w-\[12rem\] {
-    max-width: 12rem;
   }
 
   .xl\:max-w-md {
