@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.conf import settings
 from learning_outcomes_assessment.list_view.views import ListViewModelA
 from learning_outcomes_assessment.wizard.views import MySessionWizardView
+from learning_outcomes_assessment.forms.edit import ModelBulkDeleteView
 from mata_kuliah_semester.models import MataKuliahSemester
 from pi_area.models import PerformanceIndicator
 from .models import (
@@ -30,35 +31,20 @@ class CloReadAllView(ListViewModelA):
     bulk_delete_url: str = ''
     reset_url: str = ''
     list_prefix_id: str = 'list-clo-'
-    list_id: str = 'list-content'
-    input_name: str = 'id_clo_'
+    list_id: str = 'clo-list-content'
+    input_name: str = 'id_clo'
     list_custom_field_template: str = 'clo/partials/list-custom-field-clo.html'
     table_custom_field_header_template: str = 'clo/partials/table-custom-field-header-clo.html'
     table_custom_field_template: str = 'clo/partials/table-custom-field-clo.html'
     table_footer_custom_field_template: str = 'clo/partials/table-footer-custom-field-clo.html'
-    # filter_template: str = 'clo/partials/clo-filter-form.html'
-    # sort_template: str = 'clo/partials/clo-sort-form.html'
 
     def setup(self, request: HttpRequest, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         mk_semester_id = kwargs.get('mk_semester_id')
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
         
+        self.bulk_delete_url = self.mk_semester_obj.get_clo_bulk_delete_url()
         self.reset_url = self.mk_semester_obj.get_clo_read_all_url()
-
-    # def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-    #     clo_qs = self.get_queryset()
-
-    #     if clo_qs.exists():
-    #         filter_data = {
-    #             'nama': request.GET.get('nama', '')
-    #         }
-
-    #         sort_data = {
-    #             self.sort_form_ordering_by_key: request.GET.get(self.sort_form_ordering_by_key, self.ordering)
-    #         }
-
-    #     return super().get(request, *args, **kwargs)
     
     def get_queryset(self):
         self.queryset = self.model.objects.filter(
@@ -128,7 +114,6 @@ class CloCreateView(MySessionWizardView):
         return context
     
     def done(self, form_list, **kwargs):
-        cleaned_data = self.get_all_cleaned_data()
         success_url = self.mk_semester_obj.get_clo_read_all_url()
 
         # Save CLO
@@ -165,3 +150,20 @@ class CloCreateView(MySessionWizardView):
             )
 
         return redirect(success_url)    
+
+
+class CloBulkDeleteView(ModelBulkDeleteView):
+    model = Clo
+    id_list_obj = 'id_clo'
+    success_msg = 'Berhasil menghapus CLO'
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        mk_semester_id = kwargs.get('mk_semester_id')
+        mk_semester_obj: MataKuliahSemester = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+        self.success_url = mk_semester_obj.get_clo_read_all_url()
+
+    def get_queryset(self):
+        self.queryset = self.model.objects.filter(id__in=self.get_list_selected_obj())
+        return super().get_queryset()
+

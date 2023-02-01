@@ -107,6 +107,12 @@ class MataKuliahSemester(models.Model):
             'semester_prodi_id': self.semester.pk,
             'mk_semester_id': self.pk
         })
+    
+    def get_clo_bulk_delete_url(self):
+        return reverse('semester:mata_kuliah_semester:clo:bulk-delete', kwargs={
+            'semester_prodi_id': self.semester.pk,
+            'mk_semester_id': self.pk
+        }) 
 
 
 class KelasMataKuliahSemester(models.Model):
