@@ -1,6 +1,5 @@
 from django import forms
 from django.forms import inlineformset_factory
-from django.conf import settings
 from learning_outcomes_assessment.forms.formset import CanDeleteInlineFormSet
 from learning_outcomes_assessment.widgets import(
     MyCheckboxInput,
@@ -8,8 +7,10 @@ from learning_outcomes_assessment.widgets import(
     MySelectInput,
     MyTextInput,
     MyTextareaInput,
+    MyRadioInput,
 )
 from kurikulum.models import Kurikulum
+from mata_kuliah_semester.models import MataKuliahSemester
 from .models import (
     Clo,
     KomponenClo,
@@ -40,6 +41,22 @@ class CloForm(forms.ModelForm):
         help_texts = {
             'nama': 'Nama CLO. Contoh: <b>CLO 1</b>',
         }
+
+
+class CloDuplicateForm(forms.Form):
+    semester = forms.ChoiceField(
+        widget=MyRadioInput(),
+        label='Duplikasi Course Learning Outcomes',
+    )
+
+    def __init__(self, *args, **kwargs):
+        mk_semester: MataKuliahSemester = kwargs.pop('mk_semester')
+        choices = kwargs.pop('choices')
+        super().__init__(*args, **kwargs)
+        
+        self.fields['semester'].help_text = 'Berikut adalah pilihan semester dari <b>{}</b>. Pilih salah satu semester untuk menduplikasi Course Learning Outcomes dari semester tersebut ke <b>{}</b>'.format(mk_semester.mk_kurikulum.kurikulum.nama, mk_semester.semester.semester.nama)
+
+        self.fields['semester'].choices = choices
 
 
 class PerformanceIndicatorAreaForPiCloForm(forms.Form):

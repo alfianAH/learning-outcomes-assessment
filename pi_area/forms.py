@@ -74,7 +74,7 @@ class PIAreaDuplicateForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         kurikulum_name = kwargs.pop('kurikulum_name')
-        kurikulum_choices = kwargs.pop('kurikulum_choices')
+        kurikulum_choices = kwargs.pop('choices')
         super().__init__(*args, **kwargs)
 
         self.fields['kurikulum'].choices = kurikulum_choices

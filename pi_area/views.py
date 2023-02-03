@@ -6,7 +6,10 @@ from django.views.generic.base import View
 from django.views.generic.edit import DeleteView, FormView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from learning_outcomes_assessment.forms.edit import ModelBulkDeleteView
+from learning_outcomes_assessment.forms.edit import (
+    ModelBulkDeleteView,
+    DuplicateFormview,
+)
 from learning_outcomes_assessment.forms.views import (
     HtmxCreateInlineFormsetView, 
     HtmxUpdateInlineFormsetView,
@@ -195,12 +198,11 @@ class PerformanceIndicatorAreaUpdateView(UpdateInlineFormsetView):
 
 
 # Assessment area, PI Area, Performance Indicator
-class PIAreaDuplicateFormView(FormView):
-    model = AssessmentArea
+class PIAreaDuplicateFormView(DuplicateFormview):
     form_class = PIAreaDuplicateForm
     kurikulum_obj: Kurikulum = None
+    empty_choices_msg = 'Kurikulum lain belum mempunyai performance indicator.'
     template_name = 'pi-area/pi-area-duplicate-view.html'
-    choices = None
 
     def setup(self, request: HttpRequest, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -209,14 +211,6 @@ class PIAreaDuplicateFormView(FormView):
         self.kurikulum_obj = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
         self.success_url = self.kurikulum_obj.read_all_pi_area_url()
         self.choices = get_kurikulum_with_pi_area(self.kurikulum_obj)
-
-    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        print(len(self.choices))
-        if len(self.choices) == 0:
-            messages.info(self.request, 'Kurikulum lain belum mempunyai performance indicator.')
-            return redirect(self.success_url)
-
-        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -230,7 +224,6 @@ class PIAreaDuplicateFormView(FormView):
         kwargs = super().get_form_kwargs()
         kwargs.update({
             'kurikulum_name': self.kurikulum_obj.nama,
-            'kurikulum_choices': self.choices,
         })
         return kwargs
 

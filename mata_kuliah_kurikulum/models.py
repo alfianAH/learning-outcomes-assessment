@@ -20,3 +20,5 @@ class MataKuliahKurikulum(models.Model):
             'mk_id': self.id_neosia
         })
 
+    def get_mk_semester(self):
+        return self.matakuliahsemester_set.all()

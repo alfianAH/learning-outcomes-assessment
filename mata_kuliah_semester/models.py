@@ -87,8 +87,11 @@ class MataKuliahSemester(models.Model):
         })
     
     # CLO
+    def get_all_clo(self):
+        return self.clo_set.all()
+    
     def get_total_persentase_clo(self):
-        list_clo = self.clo_set.all()
+        list_clo = self.get_all_clo()
         total_persentase = 0
 
         for clo in list_clo:
@@ -112,7 +115,13 @@ class MataKuliahSemester(models.Model):
         return reverse('semester:mata_kuliah_semester:clo:bulk-delete', kwargs={
             'semester_prodi_id': self.semester.pk,
             'mk_semester_id': self.pk
-        }) 
+        })
+    
+    def get_clo_duplicate_url(self):
+        return reverse('semester:mata_kuliah_semester:clo:duplicate', kwargs={
+            'semester_prodi_id': self.semester.pk,
+            'mk_semester_id': self.pk
+        })
 
 
 class KelasMataKuliahSemester(models.Model):

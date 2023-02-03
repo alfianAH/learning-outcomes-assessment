@@ -1,9 +1,14 @@
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.conf import settings
+from django.contrib import messages
+from django.views.generic.edit import FormView
 from learning_outcomes_assessment.list_view.views import ListViewModelA
 from learning_outcomes_assessment.wizard.views import MySessionWizardView
-from learning_outcomes_assessment.forms.edit import ModelBulkDeleteView
+from learning_outcomes_assessment.forms.edit import (
+    ModelBulkDeleteView,
+    DuplicateFormview,
+)
 from mata_kuliah_semester.models import MataKuliahSemester
 from pi_area.models import PerformanceIndicator
 from .models import (
@@ -13,9 +18,14 @@ from .models import (
 )
 from .forms import (
     CloForm,
+    CloDuplicateForm,
     PerformanceIndicatorAreaForPiCloForm,
     PiCloForm,
     KomponenCloFormset,
+)
+from .utils import (
+    get_semester_choices_clo_duplicate,
+    duplicate_clo
 )
 
 
@@ -95,7 +105,7 @@ class CloCreateView(MySessionWizardView):
         match(self.steps.current):
             case '0':
                 current_title = 'Lengkapi Data CLO'
-                current_help_text = 'Masukkan nama dan deskripsi dari CLO terkait.'
+                current_help_text = 'Masukkan nama dan deskripsi dari CLO dari mata kuliah {0}. Untuk <b>menduplikasi CLO</b> mata kuliah <b>{0}</b> dari semester lain klik <a href="{1}">di sini</a>.'.format(self.mk_semester_obj.mk_kurikulum.nama, self.mk_semester_obj.get_clo_duplicate_url())
             case '1':
                 current_title = 'Pilih ILO'
                 current_help_text = 'Pilih salah satu ILO untuk mendapatkan Performance Indicator dari ILO tersebut. Performance Indicator dapat dipilih di step berikutnya.'
@@ -167,3 +177,38 @@ class CloBulkDeleteView(ModelBulkDeleteView):
         self.queryset = self.model.objects.filter(id__in=self.get_list_selected_obj())
         return super().get_queryset()
 
+
+class CloDuplicateView(DuplicateFormview):
+    form_class = CloDuplicateForm
+    empty_choices_msg = 'Semester lain belum mempunyai CLO.'
+    template_name = 'clo/duplicate-view.html'
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+
+        mk_semester_id = kwargs.get('mk_semester_id')
+        self.mk_semester_obj: MataKuliahSemester = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+
+        self.success_url = self.mk_semester_obj.get_clo_read_all_url()
+        self.choices = get_semester_choices_clo_duplicate(self.mk_semester_obj)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'mk_semester_obj': self.mk_semester_obj,
+            'back_url': self.success_url,
+        })
+        return context
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'mk_semester': self.mk_semester_obj,
+        })
+        return kwargs
+
+    def form_valid(self, form) -> HttpResponse:
+        semester_prodi_id = form.cleaned_data.get('semester')
+        messages.success(self.request, 'Berhasil menduplikasi CLO ke mata kuliah ini.')
+        duplicate_clo(semester_prodi_id, self.mk_semester_obj)
+        return super().form_valid(form)

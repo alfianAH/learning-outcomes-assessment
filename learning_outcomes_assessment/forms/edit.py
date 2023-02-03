@@ -71,3 +71,22 @@ class ModelBulkUpdateView(FormView):
             'submit_text': self.submit_text,
         })
         return context
+
+
+class DuplicateFormview(FormView):
+    choices = []
+    empty_choices_msg: str = 'Pilihan tidak ada'
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if len(self.choices) == 0:
+            messages.info(self.request, self.empty_choices_msg)
+            return redirect(self.success_url)
+
+        return super().get(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'choices': self.choices
+        })
+        return kwargs
