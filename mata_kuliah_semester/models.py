@@ -105,6 +105,12 @@ class MataKuliahSemester(models.Model):
             'mk_semester_id': self.pk
         })
     
+    def get_clo_read_all_graph_url(self):
+        return reverse('semester:mata_kuliah_semester:clo:read-all-graph', kwargs={
+            'semester_prodi_id': self.semester.pk,
+            'mk_semester_id': self.pk
+        })
+    
     def get_clo_create_url(self):
         return reverse('semester:mata_kuliah_semester:clo:create', kwargs={
             'semester_prodi_id': self.semester.pk,

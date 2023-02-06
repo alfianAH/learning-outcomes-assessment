@@ -3788,6 +3788,10 @@ details.dropdown::marker {
   cursor: pointer;
 }
 
+.resize {
+  resize: both;
+}
+
 .list-decimal {
   list-style-type: decimal;
 }

@@ -4,6 +4,14 @@ var grid = $('.masonry').masonry({
     itemSelector: 'li',
 });
 
+var debounce = function (fn, delay) {
+    let timer;
+    return function () {
+        clearTimeout(timer);
+        timer = setTimeout(fn, delay);
+    };
+};
+
 function whichTransitionEvent() {
     var t, el = document.createElement("fakeelement");
 

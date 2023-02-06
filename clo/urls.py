@@ -3,7 +3,8 @@ from .views import (
     CloReadAllView,
     CloCreateView,
     CloBulkDeleteView,
-    CloDuplicateView
+    CloDuplicateView,
+    CloReadAllGraphJsonResponse,
 )
 
 
@@ -13,4 +14,5 @@ urlpatterns = [
     path('create/', CloCreateView.as_view(), name='create'),
     path('duplicate/', CloDuplicateView.as_view(), name='duplicate'),
     path('bulk-delete/', CloBulkDeleteView.as_view(), name='bulk-delete'),
+    path('read-all-graph/', CloReadAllGraphJsonResponse.as_view(), name='read-all-graph'),
 ]

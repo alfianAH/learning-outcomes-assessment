@@ -96,37 +96,49 @@ CLO -
 
 {% block script %}
 <script>
-    new Chart(
-        $('#total-persentase-clo'),
-        {
-            type: 'doughnut',
-            data: {
-                labels: [
-                    'Total Persentase CLO',
-                    'Kosong',
-                ],
-                datasets: [{
-                    data: [
-                        {{ mk_semester_obj.get_total_persentase_clo }}, 
-                        {{ 100|sub:mk_semester_obj.get_total_persentase_clo }}
-                    ],
-                    backgroundColor: [
-                        '#10b981', // Emerald 500
-                        '#a7f3d0', // Emerald 200
-                    ],
-                    hoverOffset: 4
-                }]
-            },
-            options: {
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Total persentase CLO Mata Kuliah',
-                        color: '#10b981'
+    $.ajax({
+        method: "GET",
+        url: '{{ mk_semester_obj.get_clo_read_all_graph_url }}',
+        success: function(data) {
+            var chartConfig = {
+                type: 'doughnut',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.datasets.data,
+                        backgroundColor: data.datasets.backgroundColor,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Total persentase CLO Mata Kuliah',
+                            color: '#10b981' // Emerald 500
+                        }
                     }
                 }
             }
+
+            var myChart = new Chart(
+                document.getElementById('total-persentase-clo').getContext('2d'),
+                chartConfig
+            );
+            
+            var resizeChart = function() {
+                myChart.destroy();
+                myChart = new Chart(
+                    document.getElementById('total-persentase-clo').getContext('2d'),
+                    chartConfig
+                );
+            };
+        },
+        error: function(error_data) {
+            console.error(error_data);
         }
-    );
+    });
+    
+    window.addEventListener('resize', debounce(resizeChart, 200));
 </script>
 {% endblock script %}

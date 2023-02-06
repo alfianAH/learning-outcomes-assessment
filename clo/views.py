@@ -1,8 +1,9 @@
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.conf import settings
 from django.contrib import messages
-from django.views.generic.edit import FormView
+from django.views.generic.base import View
+from learning_outcomes_assessment.auth.mixins import ProgramStudiMixin
 from learning_outcomes_assessment.list_view.views import ListViewModelA
 from learning_outcomes_assessment.wizard.views import MySessionWizardView
 from learning_outcomes_assessment.forms.edit import (
@@ -68,6 +69,71 @@ class CloReadAllView(ListViewModelA):
             'mk_semester_obj': self.mk_semester_obj,
         })
         return context
+    
+
+class CloReadAllGraphJsonResponse(View):
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        mk_semester_id = kwargs.get('mk_semester_id')
+        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+    
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        total_percentage = self.mk_semester_obj.get_total_persentase_clo()
+        json_response = {
+            
+        }
+        if total_percentage > 100:
+            total_exceed = total_percentage - 100
+            json_response.update({
+                'labels': [
+                    'Persentase berlebihan',
+                    'Total Persentase CLO',
+                ],
+                'datasets': {
+                    'data': [
+                        total_exceed,
+                        total_percentage - total_exceed
+                    ],
+                    'backgroundColor': [
+                        '#f43f5e', # Rose 500
+                        '#10b981' # Emerald 500
+                    ]
+                }
+            })
+        elif total_percentage == 100:
+            json_response.update({
+                'labels': [
+                    'Total Persentase CLO',
+                ],
+                'datasets': {
+                    'data': [
+                        total_percentage
+                    ],
+                    'backgroundColor': [
+                        '#10b981' # Emerald 500
+                    ]
+                }
+            })
+        else:
+            json_response.update({
+                'labels': [
+                    'Total Persentase CLO',
+                    'Kosong',
+                ],
+                'datasets': {
+                    'data': [
+                        total_percentage,
+                        100 - total_percentage,
+                    ],
+                    'backgroundColor': [
+                        '#10b981', # Emerald 500
+                        '#a7f3d0' # Emerald 200
+                    ]
+                }
+            })
+
+
+        return JsonResponse(json_response)
 
 
 class CloCreateView(MySessionWizardView):
