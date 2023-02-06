@@ -127,11 +127,32 @@ class KomponenCloForm(forms.ModelForm):
         self.empty_permitted = False
 
 
+class KomponenCloInlineFormset(CanDeleteInlineFormSet):
+    def __init__(self, *args, **kwargs):
+        self.mk_semester: MataKuliahSemester = kwargs.pop('mk_semester')
+        super().__init__(*args, **kwargs)
+
+    def clean(self) -> None:
+        super().clean()
+
+        # Sum all of percentages
+        submitted_persentase = 0 
+        for form in self.forms:
+            submitted_persentase += form.cleaned_data['persentase']
+
+        total_persentase = self.mk_semester.get_total_persentase_clo() + submitted_persentase
+        
+        # Add error to field if total_persentase is more than 100
+        if total_persentase > 100:
+            for form in self.forms:
+                form.add_error('persentase', 'Total persentase semua komponen penilaian saat ini: {}%. Total persentase tidak boleh melebihi 100%'.format(total_persentase))
+
+
 KomponenCloFormset = inlineformset_factory(
     Clo,
     KomponenClo,
     form=KomponenCloForm,
-    formset=CanDeleteInlineFormSet,
+    formset=KomponenCloInlineFormset,
     extra=1,
     can_delete=True,
 )

@@ -3463,10 +3463,6 @@ details.dropdown::marker {
   z-index: 40;
 }
 
-.m-auto {
-  margin: auto;
-}
-
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
@@ -3475,16 +3471,6 @@ details.dropdown::marker {
 .my-0 {
   margin-top: 0px;
   margin-bottom: 0px;
-}
-
-.my-auto {
-  margin-top: auto;
-  margin-bottom: auto;
-}
-
-.mx-0 {
-  margin-left: 0px;
-  margin-right: 0px;
 }
 
 .mr-2\.5 {
@@ -3563,10 +3549,6 @@ details.dropdown::marker {
   display: inline-block;
 }
 
-.inline {
-  display: inline;
-}
-
 .flex {
   display: flex;
 }
@@ -3627,14 +3609,6 @@ details.dropdown::marker {
   max-height: 6rem;
 }
 
-.max-h-\[12rem\] {
-  max-height: 12rem;
-}
-
-.max-h-\[15rem\] {
-  max-height: 15rem;
-}
-
 .max-h-\[18rem\] {
   max-height: 18rem;
 }
@@ -3665,6 +3639,12 @@ details.dropdown::marker {
 
 .w-24 {
   width: 6rem;
+}
+
+.w-min {
+  width: -webkit-min-content;
+  width: -moz-min-content;
+  width: min-content;
 }
 
 .w-40 {
@@ -3723,12 +3703,6 @@ details.dropdown::marker {
   width: 85%;
 }
 
-.w-min {
-  width: -webkit-min-content;
-  width: -moz-min-content;
-  width: min-content;
-}
-
 .min-w-full {
   min-width: 100%;
 }
@@ -3743,6 +3717,10 @@ details.dropdown::marker {
 
 .min-w-\[9rem\] {
   min-width: 9rem;
+}
+
+.max-w-\[18rem\] {
+  max-width: 18rem;
 }
 
 .max-w-min {
@@ -3777,22 +3755,6 @@ details.dropdown::marker {
 
 .max-w-sm {
   max-width: 24rem;
-}
-
-.max-w-\[2\] {
-  max-width: 2;
-}
-
-.max-w-\[15rem\] {
-  max-width: 15rem;
-}
-
-.max-w-\[12rem\] {
-  max-width: 12rem;
-}
-
-.max-w-\[18rem\] {
-  max-width: 18rem;
 }
 
 .-translate-x-1\/2 {
@@ -3914,10 +3876,6 @@ details.dropdown::marker {
   --tw-space-x-reverse: 0;
   margin-right: calc(0.75rem * var(--tw-space-x-reverse));
   margin-left: calc(0.75rem * calc(1 - var(--tw-space-x-reverse)));
-}
-
-.self-center {
-  align-self: center;
 }
 
 .truncate {
@@ -4814,10 +4772,6 @@ details.dropdown::marker {
 
   .md\:max-w-\[12rem\] {
     max-width: 12rem;
-  }
-
-  .md\:grid-cols-1 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
   }
 
   .md\:space-y-3 > :not([hidden]) ~ :not([hidden]) {

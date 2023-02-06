@@ -79,6 +79,16 @@ class CloCreateView(MySessionWizardView):
         super().setup(request, *args, **kwargs)
         mk_semester_id = kwargs.get('mk_semester_id')
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+        self.success_url = self.mk_semester_obj.get_clo_read_all_url()
+    
+    def get(self, request, *args, **kwargs):
+        total_persentase = self.mk_semester_obj.get_total_persentase_clo()
+        # If total_persentase is 100, no need to add anymore
+        if total_persentase >= 100:
+            messages.info(self.request, 'Sudah tidak bisa menambahkan CLO lagi, karena persentase CLO sudah {}%'.format(total_persentase))
+            return redirect(self.success_url)
+
+        return super().get(request, *args, **kwargs)
 
     def get_form_kwargs(self, step=None):
         form_kwargs = super().get_form_kwargs(step)
@@ -92,6 +102,10 @@ class CloCreateView(MySessionWizardView):
                 pi_area_id = self.get_cleaned_data_for_step('1').get('pi_area')
                 form_kwargs.update({
                     'pi_area_id': pi_area_id
+                })
+            case '3':
+                form_kwargs.update({
+                    'mk_semester': self.mk_semester_obj
                 })
 
         return form_kwargs
@@ -124,8 +138,6 @@ class CloCreateView(MySessionWizardView):
         return context
     
     def done(self, form_list, **kwargs):
-        success_url = self.mk_semester_obj.get_clo_read_all_url()
-
         # Save CLO
         clo_form_cleaned_data = self.get_cleaned_data_for_step('0')
         clo_obj = Clo.objects.create(
@@ -158,8 +170,10 @@ class CloCreateView(MySessionWizardView):
                 instrumen_penilaian=komponen_clo_data['instrumen_penilaian'],
                 persentase=komponen_clo_data['persentase']
             )
+        
+        messages.success(self.request, 'Berhasil membuat CLO dan komponen-komponennya.')
 
-        return redirect(success_url)    
+        return redirect(self.success_url)    
 
 
 class CloBulkDeleteView(ModelBulkDeleteView):
@@ -192,6 +206,15 @@ class CloDuplicateView(DuplicateFormview):
         self.success_url = self.mk_semester_obj.get_clo_read_all_url()
         self.choices = get_semester_choices_clo_duplicate(self.mk_semester_obj)
 
+    def get(self, request, *args, **kwargs):
+        total_persentase = self.mk_semester_obj.get_total_persentase_clo()
+        # If total_persentase is 100, no need to add anymore
+        if total_persentase >= 100:
+            messages.info(self.request, 'Sudah tidak bisa menambahkan CLO lagi, karena persentase CLO sudah {}%'.format(total_persentase))
+            return redirect(self.success_url)
+
+        return super().get(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
@@ -211,4 +234,11 @@ class CloDuplicateView(DuplicateFormview):
         semester_prodi_id = form.cleaned_data.get('semester')
         messages.success(self.request, 'Berhasil menduplikasi CLO ke mata kuliah ini.')
         duplicate_clo(semester_prodi_id, self.mk_semester_obj)
+        
+        # If current duplicated percentages is more than 100, add warning message
+        current_total_persentase = self.mk_semester_obj.get_total_persentase_clo()
+        if current_total_persentase > 100:
+            messages.warning(self.request, 'Total persentase saat ini: {}. Diharap untuk mengubah komponen CLO agar mencukupi 100%'.format(current_total_persentase))
+
+        print(self.mk_semester_obj.get_total_persentase_clo())
         return super().form_valid(form)
