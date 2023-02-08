@@ -160,7 +160,7 @@ class CloReadView(DetailWithListViewModelA):
 
     def setup(self, request: HttpRequest, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        # self.bulk_delete_url = self.single_object
+        self.bulk_delete_url = self.single_object.get_komponen_clo_bulk_delete_url()
 
     def get_queryset(self):
         self.queryset = self.model.objects.filter(
@@ -341,3 +341,20 @@ class CloDuplicateView(DuplicateFormview):
 
         print(self.mk_semester_obj.get_total_persentase_clo())
         return super().form_valid(form)
+
+
+# Komponen CLO
+class KomponenCloBulkDeleteView(ModelBulkDeleteView):
+    model = KomponenClo
+    id_list_obj = 'id_komponen_clo'
+    success_msg = 'Berhasil menghapus komponen CLO'
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        clo_id = kwargs.get('clo_id')
+        clo_obj: Clo = get_object_or_404(Clo, id=clo_id)
+        self.success_url = clo_obj.read_detail_url()
+
+    def get_queryset(self):
+        self.queryset = self.model.objects.filter(id__in=self.get_list_selected_obj())
+        return super().get_queryset()

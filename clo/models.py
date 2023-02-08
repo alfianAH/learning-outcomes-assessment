@@ -35,6 +35,7 @@ class Clo(models.Model):
         ilo_obj: Ilo = pi_obj.pi_area.ilo
         return ilo_obj
     
+    # Komponen CLO
     def get_komponen_clo(self):
         return self.komponenclo_set.all()
     
@@ -46,6 +47,13 @@ class Clo(models.Model):
             total_persentase += komponen_clo.persentase
 
         return total_persentase
+    
+    def get_komponen_clo_bulk_delete_url(self):
+        return reverse('semester:mata_kuliah_semester:clo:komponen-clo-bulk-delete', kwargs={
+            'semester_prodi_id': self.mk_semester.semester.pk,
+            'mk_semester_id': self.mk_semester.pk,
+            'clo_id': self.pk
+        })
 
 
 class KomponenClo(models.Model):
