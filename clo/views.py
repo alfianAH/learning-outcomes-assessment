@@ -34,7 +34,7 @@ from .utils import (
 
 
 # Create your views here.
-class CloReadAllView(ListViewModelA):
+class CloReadAllView(ProgramStudiMixin, ListViewModelA):
     template_name = 'clo/home.html'
     model = Clo
     filter_form = None
@@ -56,6 +56,8 @@ class CloReadAllView(ListViewModelA):
         super().setup(request, *args, **kwargs)
         mk_semester_id = kwargs.get('mk_semester_id')
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+
+        self.program_studi_obj =self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
         
         self.bulk_delete_url = self.mk_semester_obj.get_clo_bulk_delete_url()
         self.reset_url = self.mk_semester_obj.get_clo_read_all_url()
@@ -74,11 +76,12 @@ class CloReadAllView(ListViewModelA):
         return context
     
 
-class CloReadAllGraphJsonResponse(View):
+class CloReadAllGraphJsonResponse(ProgramStudiMixin, View):
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
         mk_semester_id = kwargs.get('mk_semester_id')
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+        self.program_studi_obj =self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
     
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         total_percentage = self.mk_semester_obj.get_total_persentase_clo()
@@ -139,7 +142,7 @@ class CloReadAllGraphJsonResponse(View):
         return JsonResponse(json_response)
     
 
-class CloReadView(DetailWithListViewModelA):
+class CloReadView(ProgramStudiMixin, DetailWithListViewModelA):
     single_model = Clo
     single_pk_url_kwarg = 'clo_id'
     single_object: Clo = None
@@ -162,6 +165,8 @@ class CloReadView(DetailWithListViewModelA):
         super().setup(request, *args, **kwargs)
         self.bulk_delete_url = self.single_object.get_komponen_clo_bulk_delete_url()
 
+        self.program_studi_obj = self.single_object.mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
+
     def get_queryset(self):
         self.queryset = self.model.objects.filter(
             clo=self.single_object
@@ -169,7 +174,7 @@ class CloReadView(DetailWithListViewModelA):
         return super().get_queryset()
 
 
-class CloCreateView(MySessionWizardView):
+class CloCreateView(ProgramStudiMixin, MySessionWizardView):
     template_name: str = 'clo/create-view.html'
     form_list: list = [CloForm, PerformanceIndicatorAreaForPiCloForm, PiCloForm, KomponenCloFormset]
     mk_semester_obj: MataKuliahSemester = None
@@ -179,6 +184,7 @@ class CloCreateView(MySessionWizardView):
         mk_semester_id = kwargs.get('mk_semester_id')
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
         self.success_url = self.mk_semester_obj.get_clo_read_all_url()
+        self.program_studi_obj =self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
     
     def get(self, request, *args, **kwargs):
         total_persentase = self.mk_semester_obj.get_total_persentase_clo()
@@ -275,7 +281,7 @@ class CloCreateView(MySessionWizardView):
         return redirect(self.success_url)    
 
 
-class CloBulkDeleteView(ModelBulkDeleteView):
+class CloBulkDeleteView(ProgramStudiMixin, ModelBulkDeleteView):
     model = Clo
     id_list_obj = 'id_clo'
     success_msg = 'Berhasil menghapus CLO'
@@ -285,13 +291,14 @@ class CloBulkDeleteView(ModelBulkDeleteView):
         mk_semester_id = kwargs.get('mk_semester_id')
         mk_semester_obj: MataKuliahSemester = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
         self.success_url = mk_semester_obj.get_clo_read_all_url()
+        self.program_studi_obj =mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
 
     def get_queryset(self):
         self.queryset = self.model.objects.filter(id__in=self.get_list_selected_obj())
         return super().get_queryset()
 
 
-class CloDuplicateView(DuplicateFormview):
+class CloDuplicateView(ProgramStudiMixin, DuplicateFormview):
     form_class = CloDuplicateForm
     empty_choices_msg = 'Semester lain belum mempunyai CLO.'
     template_name = 'clo/duplicate-view.html'
@@ -301,6 +308,8 @@ class CloDuplicateView(DuplicateFormview):
 
         mk_semester_id = kwargs.get('mk_semester_id')
         self.mk_semester_obj: MataKuliahSemester = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+
+        self.program_studi_obj =self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
 
         self.success_url = self.mk_semester_obj.get_clo_read_all_url()
         self.choices = get_semester_choices_clo_duplicate(self.mk_semester_obj)
@@ -344,7 +353,7 @@ class CloDuplicateView(DuplicateFormview):
 
 
 # Komponen CLO
-class KomponenCloBulkDeleteView(ModelBulkDeleteView):
+class KomponenCloBulkDeleteView(ProgramStudiMixin, ModelBulkDeleteView):
     model = KomponenClo
     id_list_obj = 'id_komponen_clo'
     success_msg = 'Berhasil menghapus komponen CLO'
@@ -355,6 +364,12 @@ class KomponenCloBulkDeleteView(ModelBulkDeleteView):
         clo_obj: Clo = get_object_or_404(Clo, id=clo_id)
         self.success_url = clo_obj.read_detail_url()
 
+        self.program_studi_obj =clo_obj.mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
+
     def get_queryset(self):
         self.queryset = self.model.objects.filter(id__in=self.get_list_selected_obj())
         return super().get_queryset()
+
+
+class KomponenCloCreateView():
+    pass
