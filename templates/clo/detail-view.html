@@ -1,0 +1,91 @@
+{% extends 'home-view.html' %}
+
+{% block title %}
+{{ single_object.nama }} - 
+{% endblock title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'semester:read-all' %}" role="listitem">Semester</a></li>
+<li class="breadcrumb-item"><a href="{{ single_object.mk_semester.semester.read_detail_url }}" role="listitem">Detail</a></li>
+<li class="breadcrumb-item"><a href="{{ single_object.mk_semester.read_detail_url }}" role="listitem">Detail MK</a></li>
+<li class="breadcrumb-item"><a href="{{ single_object.mk_semester.get_clo_read_all_url }}" role="listitem">CLO</a></li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">Detail</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="h-icon">
+    <h1>{{ single_object.nama }}</h1>
+    <a href="#" class="btn btn-success btn-icon-start">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M0 0h24v24H0V0z" fill="none"/>
+            <path d="M3 17.46v3.04c0 .28.22.5.5.5h3.04c.13 0 .26-.05.35-.15L17.81 9.94l-3.75-3.75L3.15 17.1c-.1.1-.15.22-.15.36zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+        </svg>
+        <span class="hidden sm:block">Edit</span>
+    </a>
+</div>
+
+<div class="table-div">
+    <div class="tr-div">
+        <div class="w-20 md:w-32 lg:w-40">Semester</div>
+        <div>:</div>
+        <div>{{ single_object.mk_semester.semester.semester.nama }}</div>
+    </div>
+    <div class="tr-div">
+        <div class="w-20 md:w-32 lg:w-40">Mata kuliah</div>
+        <div>:</div>
+        <div>{{ single_object.mk_semester.mk_kurikulum.nama }}</div>
+    </div>
+    <div class="tr-div">
+        <div class="w-20 md:w-32 lg:w-40">ILO</div>
+        <div>:</div>
+        <div>{{ single_object.get_ilo.nama }}</div>
+    </div>
+    <div class="tr-div">
+        <div>PI ({{ single_object.get_ilo.pi_area }})</div>
+        <div>:</div>
+    </div>
+    <div class="tr-div">
+        <div>
+            <ol class="list-decimal ml-6">
+                {% for pi_clo in single_object.get_pi_clo %}
+                    <li>{{ pi_clo.performance_indicator.deskripsi }}</li>
+                {% endfor %}
+            </ol>
+        </div>
+        <div></div>
+    </div>
+    <div class="tr-div">
+        <div>Deskripsi</div>
+        <div>:</div>
+    </div>
+    <div class="tr-div">
+        <div>{{ single_object.deskripsi }}</div>
+    </div>
+</div>
+
+{% if object_list or data_exist %}
+    <div class="h-icon">
+        <h2>Komponen CLO</h2>
+        <a href="#" class="btn btn-primary btn-icon-start">
+            <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+            </svg>
+            <span class="hidden sm:block">Tambah</span>
+        </a>
+    </div>
+
+    {% if object_list %}
+        <div class="flex flex-col sm:grid sm:grid-cols-2 md:block">
+            <div class="w-min block md:hidden text-center mx-auto my-0">
+                <canvas id="total-persentase-clo" class="max-w-[18rem] max-h-[18rem]"></canvas>
+            </div>
+            {% include 'components/list-table-view/model-a/read-all-view.html' with use_footer=True use_chart=True %}
+        </div>
+    {% else %}
+        <p>Tidak ditemukan data dengan filter yang diberikan</p>
+    {% endif %}
+{% else %}
+
+{% endif %}
+
+{% endblock content %}

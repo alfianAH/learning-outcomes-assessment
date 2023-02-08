@@ -4,7 +4,10 @@ from django.conf import settings
 from django.contrib import messages
 from django.views.generic.base import View
 from learning_outcomes_assessment.auth.mixins import ProgramStudiMixin
-from learning_outcomes_assessment.list_view.views import ListViewModelA
+from learning_outcomes_assessment.list_view.views import (
+    ListViewModelA, 
+    DetailWithListViewModelA
+)
 from learning_outcomes_assessment.wizard.views import MySessionWizardView
 from learning_outcomes_assessment.forms.edit import (
     ModelBulkDeleteView,
@@ -134,6 +137,36 @@ class CloReadAllGraphJsonResponse(View):
 
 
         return JsonResponse(json_response)
+    
+
+class CloReadView(DetailWithListViewModelA):
+    single_model = Clo
+    single_pk_url_kwarg = 'clo_id'
+    single_object: Clo = None
+    
+    model = KomponenClo
+    template_name = 'clo/detail-view.html'
+    ordering = 'instrumen_penilaian'
+
+    bulk_delete_url: str = ''
+    list_prefix_id = 'komponen-clo-'
+    input_name = 'id_komponen_clo'
+    list_id = 'komponen-clo-list-content'
+    list_item_name: str = 'clo/partials/komponen/list-item-name-komponen-clo.html'
+    list_custom_field_template: str = 'clo/partials/komponen/list-custom-field-komponen-clo.html'
+    table_custom_field_header_template: str = 'clo/partials/komponen/table-custom-field-header-komponen-clo.html'
+    table_custom_field_template: str = 'clo/partials/komponen/table-custom-field-komponen-clo.html'
+    table_footer_custom_field_template: str = 'clo/partials/komponen/table-footer-custom-field-komponen-clo.html'
+
+    def setup(self, request: HttpRequest, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        # self.bulk_delete_url = self.single_object
+
+    def get_queryset(self):
+        self.queryset = self.model.objects.filter(
+            clo=self.single_object
+        )
+        return super().get_queryset()
 
 
 class CloCreateView(MySessionWizardView):

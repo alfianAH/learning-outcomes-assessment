@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import CheckConstraint, Q
+from django.urls import reverse
 from django.core.validators import MinValueValidator, MaxValueValidator
 from pi_area.models import PerformanceIndicator
 from ilo.models import Ilo
@@ -15,6 +16,13 @@ class Clo(models.Model):
 
     nama = models.CharField(max_length=255, null=False, blank=False)
     deskripsi = models.TextField(null=False)
+
+    def read_detail_url(self):
+        return reverse('semester:mata_kuliah_semester:clo:read', kwargs={
+            'semester_prodi_id': self.mk_semester.semester.pk,
+            'mk_semester_id': self.mk_semester.pk,
+            'clo_id': self.pk
+        })
 
     def get_pi_clo(self):
         return self.piclo_set.all()
