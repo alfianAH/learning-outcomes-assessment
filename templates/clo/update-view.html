@@ -1,0 +1,18 @@
+{% extends 'home-view.html' %}
+
+{% block title %}
+Update CLO - 
+{% endblock title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'semester:read-all' %}" role="listitem">Semester</a></li>
+<li class="breadcrumb-item"><a href="{{ clo_obj.mk_semester.semester.read_detail_url }}" role="listitem">Detail</a></li>
+<li class="breadcrumb-item"><a href="{{ clo_obj.mk_semester.read_detail_url }}" role="listitem">Detail MK</a></li>
+<li class="breadcrumb-item"><a href="{{ clo_obj.mk_semester.get_clo_read_all_url }}" role="listitem">CLO</a></li>
+<li class="breadcrumb-item"><a href="{{ clo_obj.read_detail_url }}" role="listitem">Detail</a></li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">Update CLO</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+{% include 'components/form/form-wizard.html' %}
+{% endblock content %}

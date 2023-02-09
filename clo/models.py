@@ -23,7 +23,15 @@ class Clo(models.Model):
             'mk_semester_id': self.mk_semester.pk,
             'clo_id': self.pk
         })
-
+    
+    def get_clo_update_url(self):
+        return reverse('semester:mata_kuliah_semester:clo:update', kwargs={
+            'semester_prodi_id': self.mk_semester.semester.pk,
+            'mk_semester_id': self.mk_semester.pk,
+            'clo_id': self.pk
+        })
+    
+    # PI CLO and ILO
     def get_pi_clo(self):
         return self.piclo_set.all()
     

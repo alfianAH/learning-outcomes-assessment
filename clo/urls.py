@@ -2,6 +2,7 @@ from django.urls import path
 from .views import (
     CloReadAllView,
     CloCreateView,
+    CloUpdateView,
     CloBulkDeleteView,
     CloDuplicateView,
     CloReadAllGraphJsonResponse,
@@ -17,6 +18,7 @@ app_name = 'clo'
 urlpatterns = [
     path('', CloReadAllView.as_view(), name='read-all'),
     path('<int:clo_id>/', CloReadView.as_view(), name='read'),
+    path('<int:clo_id>/update/', CloUpdateView.as_view(), name='update'),
     path('create/', CloCreateView.as_view(), name='create'),
     path('duplicate/', CloDuplicateView.as_view(), name='duplicate'),
     path('bulk-delete/', CloBulkDeleteView.as_view(), name='bulk-delete'),

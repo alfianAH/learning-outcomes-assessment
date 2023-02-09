@@ -1,4 +1,5 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.db.models import QuerySet
 from django.shortcuts import get_object_or_404, redirect
 from django.conf import settings
 from django.contrib import messages
@@ -253,12 +254,12 @@ class CloCreateView(ProgramStudiMixin, MySessionWizardView):
 
         # Save PI CLO
         pi_clo_cleaned_data = self.get_cleaned_data_for_step('2').get('performance_indicator')
-        for pi_clo_id in pi_clo_cleaned_data:
+        for pi_id in pi_clo_cleaned_data:
             try:
-                performance_indicator_obj = PerformanceIndicator.objects.get(id=pi_clo_id)
+                performance_indicator_obj = PerformanceIndicator.objects.get(id=pi_id)
             except (PerformanceIndicator.DoesNotExist, PerformanceIndicator.MultipleObjectsReturned):
                 if settings.DEBUG:
-                    print('Performance Indicator cannot be found. ID: {}'.format(pi_clo_id))
+                    print('Performance Indicator cannot be found. ID: {}'.format(pi_id))
                 continue
 
             PiClo.objects.create(
@@ -280,6 +281,124 @@ class CloCreateView(ProgramStudiMixin, MySessionWizardView):
         messages.success(self.request, 'Berhasil membuat CLO dan komponen-komponennya.')
 
         return redirect(self.success_url)    
+
+
+class CloUpdateView(ProgramStudiMixin, MySessionWizardView):
+    form_list = [CloForm, PerformanceIndicatorAreaForPiCloForm, PiCloForm]
+    template_name = 'clo/update-view.html'
+    clo_obj: Clo = None
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        clo_id = kwargs.get('clo_id')
+        self.clo_obj = get_object_or_404(Clo, id=clo_id)
+        self.success_url = self.clo_obj.read_detail_url()
+        self.program_studi_obj =self.clo_obj.mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
+    
+    def get_form_initial(self, step):
+        initial = super().get_form_initial(step)
+
+        match(step):
+            case '1':
+                initial.update({
+                    'pi_area': self.clo_obj.get_ilo().pi_area.pk
+                })
+            case '2':
+                initial.update({
+                    'performance_indicator': [pi_clo['performance_indicator_id'] for pi_clo in self.clo_obj.get_pi_clo().values()]
+                })
+        return initial
+
+    def get_form_kwargs(self, step=None):
+        form_kwargs = super().get_form_kwargs(step)
+
+        match(step):
+            case '0':
+                form_kwargs.update({
+                    'instance': self.clo_obj,
+                })
+            case '1':
+                form_kwargs.update({
+                    'kurikulum_obj': self.clo_obj.mk_semester.mk_kurikulum.kurikulum
+                })
+            case '2':
+                pi_area_id = self.get_cleaned_data_for_step('1').get('pi_area')
+                form_kwargs.update({
+                    'pi_area_id': pi_area_id
+                })
+
+        return form_kwargs
+    
+    def get_context_data(self, form, **kwargs):
+        context = super().get_context_data(form, **kwargs)
+        
+        current_title = ''
+        current_help_text = ''
+
+        match(self.steps.current):
+            case '0':
+                current_title = 'Lengkapi Data CLO'
+                current_help_text = 'Masukkan nama dan deskripsi dari CLO dari mata kuliah {}.'.format(self.clo_obj.mk_semester.mk_kurikulum.nama)
+            case '1':
+                current_title = 'Pilih ILO'
+                current_help_text = 'Pilih salah satu ILO untuk mendapatkan Performance Indicator dari ILO tersebut. Performance Indicator dapat dipilih di step berikutnya.'
+            case '2':
+                current_title = 'Pilih Performance Indicator'
+                current_help_text = 'Pilih Performance Indicator (PI) yang sesuai atau memiliki keterkaitan dengan CLO.'
+        
+        context.update({
+            'current_title': current_title,
+            'current_help_text': current_help_text,
+            'clo_obj': self.clo_obj
+        })
+        return context
+    
+    def done(self, form_list, **kwargs):
+        # Save CLO
+        clo_obj: Clo = form_list[0].save()
+
+        # Update PI CLO
+        pi_clo_cleaned_data = self.get_cleaned_data_for_step('2').get('performance_indicator')
+        pi_clo_in_db: QuerySet[PiClo] = self.clo_obj.get_pi_clo()
+        pi_id_in_db = [pi_clo.performance_indicator.pk for pi_clo in pi_clo_in_db]
+        
+        # Create new PI CLO
+        for pi_id in pi_clo_cleaned_data:
+            try:
+                pi_id = int(pi_id)
+            except ValueError:
+                if settings.DEBUG:
+                    print('Cannot convert PI CLO ID: {} to integer'.format(pi_id))
+                continue
+            
+            # Skip creating if PI CLO is already on database
+            if pi_id in pi_id_in_db: continue
+
+            try:
+                performance_indicator_obj = PerformanceIndicator.objects.get(id=pi_id)
+            except (PerformanceIndicator.DoesNotExist, PerformanceIndicator.MultipleObjectsReturned):
+                if settings.DEBUG:
+                    print('Performance Indicator cannot be found. ID: {}'.format(pi_id))
+                continue
+
+            PiClo.objects.create(
+                performance_indicator=performance_indicator_obj,
+                clo=clo_obj
+            )
+
+        # Delete PI CLO if it is changed
+        for pi_id in pi_id_in_db:
+            # Skip deleting if PI CLO is on cleaned data
+            if str(pi_id) in pi_clo_cleaned_data: continue
+            
+            # Delete PI CLO object 
+            PiClo.objects.filter(
+                performance_indicator__id=pi_id,
+                clo=self.clo_obj,
+            ).delete()
+            
+
+        return redirect(self.success_url)
 
 
 class CloBulkDeleteView(ProgramStudiMixin, ModelBulkDeleteView):
