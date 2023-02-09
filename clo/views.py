@@ -83,13 +83,12 @@ class CloReadAllGraphJsonResponse(ProgramStudiMixin, View):
         super().setup(request, *args, **kwargs)
         mk_semester_id = kwargs.get('mk_semester_id')
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
-        self.program_studi_obj =self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
+        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
     
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         total_percentage = self.mk_semester_obj.get_total_persentase_clo()
-        json_response = {
-            
-        }
+        json_response = {}
+
         if total_percentage > 100:
             total_exceed = total_percentage - 100
             json_response.update({
@@ -407,3 +406,80 @@ class KomponenCloCreateView(ProgramStudiMixin, FormView):
         form.save()
         messages.success(self.request, 'Berhasil menambahkan komponen CLO.')
         return super().form_valid(form)
+
+
+class KomponenCloGraphJsonResponse(ProgramStudiMixin, View):
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        clo_id = kwargs.get('clo_id')
+        self.clo_obj = get_object_or_404(Clo, id=clo_id)
+        self.program_studi_obj = self.clo_obj.mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        total_komponen_percentage = self.clo_obj.get_total_persentase_komponen()
+        total_clo_percentage = self.clo_obj.mk_semester.get_total_persentase_clo()
+        other_clo_percentage = total_clo_percentage - total_komponen_percentage
+
+        json_response = {}
+
+        if total_clo_percentage > 100:
+            total_exceed = total_clo_percentage - 100
+
+            json_response.update({
+                'labels': [
+                    'Persentase berlebihan',
+                    'Persentase CLO saat ini',
+                    'Persentase CLO lain',
+                ],
+                'datasets': {
+                    'data': [
+                        total_exceed,
+                        total_komponen_percentage,
+                        total_clo_percentage - total_exceed - total_komponen_percentage,
+                    ],
+                    'backgroundColor': [
+                        '#f43f5e',  # Rose 500
+                        '#10b981',  # Emerald 500
+                        '#86efac',  # Emerald 300
+                    ]
+                }
+            })
+        elif total_clo_percentage == 100:
+            json_response.update({
+                'labels': [
+                    'Persentase CLO saat ini',
+                    'Persentase CLO lain',
+                ],
+                'datasets': {
+                    'data': [
+                        total_komponen_percentage,
+                        total_clo_percentage - total_komponen_percentage,
+                    ],
+                    'backgroundColor': [
+                        '#10b981',  # Emerald 500
+                        '#86efac',  # Emerald 300
+                    ]
+                }
+            })
+        else:
+            json_response.update({
+                'labels': [
+                    'Persentase CLO saat ini',
+                    'Persentase CLO lain',
+                    'Kosong',
+                ],
+                'datasets': {
+                    'data': [
+                        total_komponen_percentage,
+                        total_clo_percentage - total_komponen_percentage,
+                        100 - total_clo_percentage,
+                    ],
+                    'backgroundColor': [
+                        '#10b981',  # Emerald 500
+                        '#86efac',  # Emerald 300
+                        '#dcfce7',  # Emerald 100
+                    ]
+                }
+            })
+
+        return JsonResponse(json_response)

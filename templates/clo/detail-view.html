@@ -77,7 +77,7 @@
 
     {% if object_list %}
         <div class="flex flex-col sm:grid sm:grid-cols-2 md:block">
-            <div class="w-min block md:hidden text-center mx-auto my-0">
+            <div class="w-min text-center mx-auto my-0">
                 <canvas id="total-persentase-komponen" class="max-w-[18rem] max-h-[18rem]"></canvas>
             </div>
             {% include 'components/list-table-view/model-a/read-all-view.html' with use_footer=True use_chart=True %}
@@ -96,3 +96,52 @@
 {% endif %}
 
 {% endblock content %}
+
+{% block script %}
+<script>
+    $.ajax({
+        method: "GET",
+        url: '{{ single_object.get_komponen_clo_graph_url }}',
+        success: function(data) {
+            var chartConfig = {
+                type: 'doughnut',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.datasets.data,
+                        backgroundColor: data.datasets.backgroundColor,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Total persentase CLO Mata Kuliah',
+                            color: '#10b981' // Emerald 500
+                        }
+                    }
+                }
+            }
+
+            var myChart = new Chart(
+                document.getElementById('total-persentase-komponen').getContext('2d'),
+                chartConfig
+            );
+            
+            var resizeChart = function() {
+                myChart.destroy();
+                myChart = new Chart(
+                    document.getElementById('total-persentase-komponen').getContext('2d'),
+                    chartConfig
+                );
+            };
+    
+            window.addEventListener('resize', debounce(resizeChart, 200));
+        },
+        error: function(error_data) {
+            console.error(error_data);
+        }
+    });
+</script>
+{% endblock script %}

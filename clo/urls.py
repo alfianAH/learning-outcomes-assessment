@@ -9,6 +9,7 @@ from .views import (
 
     KomponenCloBulkDeleteView,
     KomponenCloCreateView,
+    KomponenCloGraphJsonResponse,
 )
 
 
@@ -24,4 +25,5 @@ urlpatterns = [
     # Komponen CLO
     path('<int:clo_id>/bulk-delete/', KomponenCloBulkDeleteView.as_view(), name='komponen-clo-bulk-delete'),
     path('<int:clo_id>/create/', KomponenCloCreateView.as_view(), name='komponen-clo-create'),
+    path('<int:clo_id>/komponen-graph/', KomponenCloGraphJsonResponse.as_view(), name='komponen-clo-graph')
 ]

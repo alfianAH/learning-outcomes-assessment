@@ -132,12 +132,12 @@ CLO -
                     chartConfig
                 );
             };
+    
+            window.addEventListener('resize', debounce(resizeChart, 200));
         },
         error: function(error_data) {
             console.error(error_data);
         }
     });
-    
-    window.addEventListener('resize', debounce(resizeChart, 200));
 </script>
 {% endblock script %}
