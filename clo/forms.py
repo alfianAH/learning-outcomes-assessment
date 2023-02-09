@@ -136,11 +136,29 @@ class KomponenCloInlineFormset(CanDeleteInlineFormSet):
         super().clean()
 
         # Sum all of percentages
-        submitted_persentase = 0 
-        for form in self.forms:
-            submitted_persentase += form.cleaned_data['persentase']
+        submitted_persentase = 0
+        deleted_persentase = 0
+        exist_persentase = 0
 
-        total_persentase = self.mk_semester.get_total_persentase_clo() + submitted_persentase
+        for form in self.forms:
+            is_field_deleted = form.cleaned_data.get('DELETE')
+            persentase = form.cleaned_data.get('persentase', 0)
+            komponen_id = form.cleaned_data.get('id')
+
+            # If field is deleted, add persentase to deleted
+            if is_field_deleted: 
+                deleted_persentase += persentase
+                continue
+            
+            # If add new komponen, ...
+            if komponen_id is None:
+                # Add persentase to submitted
+                submitted_persentase += persentase
+            else:  # If komponen is already added, ...
+                # Add persentase to exist
+                exist_persentase += persentase
+
+        total_persentase = self.mk_semester.get_total_persentase_clo() - deleted_persentase - exist_persentase + submitted_persentase
         
         # Add error to field if total_persentase is more than 100
         if total_persentase > 100:

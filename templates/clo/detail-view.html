@@ -66,18 +66,19 @@
 {% if object_list or data_exist %}
     <div class="h-icon">
         <h2>Komponen CLO</h2>
-        <a href="#" class="btn btn-primary btn-icon-start">
-            <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+        <a href="{{ single_object.get_komponen_clo_create_url }}" class="btn btn-success btn-icon-start">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M0 0h24v24H0V0z" fill="none"/>
+                <path d="M3 17.46v3.04c0 .28.22.5.5.5h3.04c.13 0 .26-.05.35-.15L17.81 9.94l-3.75-3.75L3.15 17.1c-.1.1-.15.22-.15.36zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
             </svg>
-            <span class="hidden sm:block">Tambah</span>
+            <span class="hidden sm:block">Edit</span>
         </a>
     </div>
 
     {% if object_list %}
         <div class="flex flex-col sm:grid sm:grid-cols-2 md:block">
             <div class="w-min block md:hidden text-center mx-auto my-0">
-                <canvas id="total-persentase-clo" class="max-w-[18rem] max-h-[18rem]"></canvas>
+                <canvas id="total-persentase-komponen" class="max-w-[18rem] max-h-[18rem]"></canvas>
             </div>
             {% include 'components/list-table-view/model-a/read-all-view.html' with use_footer=True use_chart=True %}
         </div>
@@ -86,7 +87,7 @@
     {% endif %}
 {% else %}
     <h2>Komponen CLO</h2>
-    <a href="#" class="btn btn-primary btn-icon-start max-w-min">
+    <a href="{{ single_object.get_komponen_clo_create_url }}" class="btn btn-primary btn-icon-start max-w-min">
         <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
             <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
         </svg>

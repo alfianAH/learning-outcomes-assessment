@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.conf import settings
 from django.contrib import messages
 from django.views.generic.base import View
+from django.views.generic.edit import FormView
 from learning_outcomes_assessment.auth.mixins import ProgramStudiMixin
 from learning_outcomes_assessment.list_view.views import (
     ListViewModelA, 
@@ -26,6 +27,7 @@ from .forms import (
     PerformanceIndicatorAreaForPiCloForm,
     PiCloForm,
     KomponenCloFormset,
+    KomponenCloForm
 )
 from .utils import (
     get_semester_choices_clo_duplicate,
@@ -371,5 +373,37 @@ class KomponenCloBulkDeleteView(ProgramStudiMixin, ModelBulkDeleteView):
         return super().get_queryset()
 
 
-class KomponenCloCreateView():
-    pass
+class KomponenCloCreateView(ProgramStudiMixin, FormView): 
+    form_class = KomponenCloFormset
+    template_name = 'clo/komponen/create-view.html'
+    
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        clo_id = kwargs.get('clo_id')
+        self.clo_obj: Clo = get_object_or_404(Clo, id=clo_id)
+        
+        self.program_studi_obj = self.clo_obj.mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
+
+        self.success_url = self.clo_obj.read_detail_url()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context.update({
+            'clo_obj': self.clo_obj,
+            'id_total_form': '#id_komponenclo_set-TOTAL_FORMS',
+        })
+        return context
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'instance': self.clo_obj,
+            'mk_semester': self.clo_obj.mk_semester
+        })
+        return kwargs
+    
+    def form_valid(self, form) -> HttpResponse:
+        form.save()
+        messages.success(self.request, 'Berhasil menambahkan komponen CLO.')
+        return super().form_valid(form)

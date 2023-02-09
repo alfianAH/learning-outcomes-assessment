@@ -54,6 +54,13 @@ class Clo(models.Model):
             'mk_semester_id': self.mk_semester.pk,
             'clo_id': self.pk
         })
+    
+    def get_komponen_clo_create_url(self):
+        return reverse('semester:mata_kuliah_semester:clo:komponen-clo-create', kwargs={
+            'semester_prodi_id': self.mk_semester.semester.pk,
+            'mk_semester_id': self.mk_semester.pk,
+            'clo_id': self.pk
+        })
 
 
 class KomponenClo(models.Model):
