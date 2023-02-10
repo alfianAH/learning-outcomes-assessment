@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views.generic.base import View
 from django.views.generic.edit import FormView
 from accounts.enums import RoleChoices
+from clo.models import KomponenClo
 from learning_outcomes_assessment.auth.mixins import ProgramStudiMixin
 from learning_outcomes_assessment.list_view.views import DetailWithListViewModelD
 from learning_outcomes_assessment.forms.edit import (
@@ -16,6 +17,9 @@ from semester.models import SemesterProdi
 from .filters import (
     PesertaMataKuliahFilter,
     PesertaMataKuliahSortForm,
+)
+from clo.forms import (
+    NilaiKomponenCloPesertaFormset
 )
 from .forms import (
     MataKuliahSemesterCreateForm,
@@ -445,3 +449,66 @@ class PesertaMataKuliahBulkDeleteView(ProgramStudiMixin, ModelBulkDeleteView):
     def get_queryset(self):
         self.queryset = self.model.objects.filter(id_neosia__in=self.get_list_selected_obj())
         return super().get_queryset()
+
+
+# Nilai Komponen CLO Peserta
+class NilaiKomponenCloPesertaCreateView(ProgramStudiMixin, FormView):
+    form_class = NilaiKomponenCloPesertaFormset
+    template_name = 'mata-kuliah-semester/nilai-komponen/create-view.html'
+    mk_semester_obj: MataKuliahSemester = None
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        mk_semester_id = kwargs.get('mk_semester_id')
+        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+
+        self.program_studi_obj = self.mk_semester_obj.semester.tahun_ajaran_prodi.prodi_jenjang.program_studi
+        self.success_url = self.mk_semester_obj.read_detail_url()
+
+        self.list_peserta_mk = self.mk_semester_obj.get_all_peserta_mk_semester()
+        self.list_komponen_clo = KomponenClo.objects.filter(
+            clo__mk_semester=self.mk_semester_obj
+        )
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'list_peserta_mk': self.list_peserta_mk,
+            'list_komponen_clo': self.list_komponen_clo,
+        })
+        return kwargs
+    
+    def arr_dimen(self, a):
+        return [len(a)]+self.arr_dimen(a[0]) if(type(a) == list) else []
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        list_form_dict = []
+        form = self.get_form()
+        list_komponen_clo_len = self.list_komponen_clo.count()
+
+        for i, peserta in enumerate(self.list_peserta_mk):
+            peserta_dict = {}
+            peserta_form = []
+            for j, komponen_clo in enumerate(self.list_komponen_clo):
+                # Use the right increment for form index
+                form_index = i + i*(list_komponen_clo_len - 1) + j
+                peserta_form.append(form[form_index])
+            
+            peserta_dict = {
+                'index': i,
+                'peserta_form': peserta_form,
+                'nama': peserta.mahasiswa.nama,
+                'nilai_akhir': peserta.nilai_akhir,
+            }
+            list_form_dict.append(peserta_dict)
+        
+        context.update({
+            'mk_semester_obj': self.mk_semester_obj,
+            'back_url': self.success_url,
+            'list_peserta_mk': self.list_peserta_mk,
+            'list_komponen_clo': self.list_komponen_clo,
+            'list_form_dict': list_form_dict,
+        })
+        return context

@@ -1,4 +1,5 @@
-<input class="form-control invalid:border-rose-500 dark:invalid:border-rose-600 peer"
+<input class="form-control invalid:border-rose-500 dark:invalid:border-rose-600 peer 
+    {{ widget.attrs.class }}"
     type="{{ widget.type }}"
     name="{{ widget.name }}"
     {% if widget.value != None %}value="{{ widget.value|stringformat:'s' }}"{% endif %}

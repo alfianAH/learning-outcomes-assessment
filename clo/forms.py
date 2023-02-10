@@ -1,5 +1,6 @@
 from django import forms
-from django.forms import inlineformset_factory
+from django.db.models import QuerySet
+from django.forms import inlineformset_factory, formset_factory
 from learning_outcomes_assessment.forms.formset import CanDeleteInlineFormSet
 from learning_outcomes_assessment.widgets import(
     MyCheckboxInput,
@@ -10,10 +11,14 @@ from learning_outcomes_assessment.widgets import(
     MyRadioInput,
 )
 from kurikulum.models import Kurikulum
-from mata_kuliah_semester.models import MataKuliahSemester
+from mata_kuliah_semester.models import (
+    MataKuliahSemester,
+    PesertaMataKuliah
+)
 from .models import (
     Clo,
     KomponenClo,
+    NilaiKomponenCloPeserta,
 )
 from .utils import (
     get_pi_area_by_kurikulum_choices,
@@ -97,7 +102,6 @@ class PiCloForm(forms.Form):
         self.fields['performance_indicator'].choices = get_pi_by_pi_area_choices(pi_area_id)
 
 
-
 class KomponenCloForm(forms.ModelForm):
     class Meta:
         model = KomponenClo
@@ -173,4 +177,53 @@ KomponenCloFormset = inlineformset_factory(
     formset=KomponenCloInlineFormset,
     extra=1,
     can_delete=True,
+)
+
+
+class NilaiKomponenCloPesertaForm(forms.ModelForm):
+    class Meta:
+        model = NilaiKomponenCloPeserta
+        fields = ['nilai', 'peserta', 'komponen_clo']
+        widgets = {
+            'nilai': MyNumberInput(attrs={
+                'placeholder': 'Nilai (0-100)',
+                'min': 0,
+                'max': 100,
+                'step': 'any',
+                'class': 'w-full'
+            }),
+            'peserta': forms.HiddenInput(),
+            'komponen_clo': forms.HiddenInput(),
+        }
+
+
+class NilaiKomponenCloFormsetClass(forms.BaseFormSet):
+    def __init__(self, *args, **kwargs):
+        self.list_peserta_mk: list[PesertaMataKuliah] = kwargs.pop('list_peserta_mk')
+        self.list_komponen_clo: QuerySet[KomponenClo] = kwargs.pop('list_komponen_clo')
+        super().__init__(*args, **kwargs)
+        
+        list_komponen_clo_len = self.list_komponen_clo.count()
+
+        for i, peserta in enumerate(self.list_peserta_mk):
+            for j, komponen_clo in enumerate(self.list_komponen_clo):
+                # Use the right increment for form index
+                form_index = i + i*(list_komponen_clo_len-1) + j
+                
+                self.forms[form_index].initial.update({
+                    'peserta': peserta,
+                    'komponen_clo': komponen_clo
+                })
+
+                self.forms[form_index].fields['nilai'].label = '{} - {}'.format(komponen_clo.clo.nama, komponen_clo.instrumen_penilaian)
+
+    def total_form_count(self):
+        return len(self.list_peserta_mk) * self.list_komponen_clo.count()
+
+
+NilaiKomponenCloPesertaFormset = formset_factory(
+    NilaiKomponenCloPesertaForm,
+    formset=NilaiKomponenCloFormsetClass,
+    extra=0,
+    can_delete=False
 )

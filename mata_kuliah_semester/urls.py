@@ -10,6 +10,8 @@ from .views import (
     PesertaMataKuliahSemesterCreateView,
     PesertaMataKuliahBulkUpdateView,
     PesertaMataKuliahBulkDeleteView,
+
+    NilaiKomponenCloPesertaCreateView,
 )
 
 
@@ -27,6 +29,9 @@ urlpatterns = [
     path('<int:mk_semester_id>/peserta/create/', PesertaMataKuliahSemesterCreateView.as_view(), name='peserta-create'),
     path('<int:mk_semester_id>/peserta/bulk-delete/', PesertaMataKuliahBulkDeleteView.as_view(), name='peserta-bulk-delete'),
     path('<int:mk_semester_id>/peserta/bulk-update/', PesertaMataKuliahBulkUpdateView.as_view(), name='peserta-bulk-update'),
+
+    # Nilai Komponen CLO
+    path('<int:mk_semester_id>/nilai/create/', NilaiKomponenCloPesertaCreateView.as_view(), name='nilai-komponen-create'),
     
     # CLO
     path('<int:mk_semester_id>/clo/', include('clo.urls')),

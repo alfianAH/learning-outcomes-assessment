@@ -28,7 +28,6 @@ from .forms import (
     PerformanceIndicatorAreaForPiCloForm,
     PiCloForm,
     KomponenCloFormset,
-    KomponenCloForm
 )
 from .utils import (
     get_semester_choices_clo_duplicate,
