@@ -196,7 +196,19 @@ function toggleClass(element, className) {
 }
 
 $('.dropdown > summary').on('click', function () {
-    toggleClass($('body'), 'noscroll');
+    let currentDropdown = $(this).parent('.dropdown');
+    // If close dropdown, ...
+    if ($(currentDropdown).prop('open')) {
+        $('body').removeClass('noscroll');
+    } else { // If open dropdown, ...
+        for (let dropdown of $('.dropdown')) {
+            if ($(dropdown).is($(currentDropdown))) continue;
+            if ($(dropdown).prop('open')) {
+                $(dropdown).prop('open', false);
+            }
+        }
+        $('body').addClass('noscroll');
+    }
 });
 
 function breadcrumb() {
