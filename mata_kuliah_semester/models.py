@@ -177,7 +177,10 @@ class PesertaMataKuliah(models.Model):
                 check=Q(nilai_akhir__gte=0.0) & Q(nilai_akhir__lte=100.0),
                 name='nilai_akhir_range'
             ),
-        ) 
+        )
+
+    def get_nilai_komponen_clo_peserta(self):
+        return self.nilaikomponenclopeserta_set.filter(komponen_clo__clo__in=self.kelas_mk_semester.mk_semester.get_all_clo())
 
 
 class DosenMataKuliah(models.Model):

@@ -48,13 +48,13 @@ Edit Nilai -
             <span class="list-item-title">{{ form_dict.nama }}</span>
             <p>Nilai dari Neosia: {{ form_dict.nilai_akhir }}</p>
             
-            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-1">
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-1 md:gap-2 xl:gap-x-4">
                 {% for single_form in form_dict.peserta_form %}
                 <div>
                     {% for field in single_form %}
                         {% if not field.is_hidden %}
                             <div class="mb-2">
-                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                <label for="{{ field.id_for_label }}" class="form-label max-w-full sm:truncate" title="{{ field.label }}">{{ field.label }}</label>
                                 <div class="flex flex-row items-center">
                                     {{ field }}
                         
@@ -72,13 +72,20 @@ Edit Nilai -
                                     </div>
                                     {% endif %}
                                 </div>
-                                {% include 'components/form/form-errors.html' with errors=field.errors %}
                             </div>
                         {% else %}
                             {{ field }}
                         {% endif %}
                     {% endfor %}
                 </div>
+                {% endfor %}
+            </div>
+
+            <div>
+                {% for single_form in form_dict.peserta_form %}
+                    {% for field in single_form %}
+                        {% include 'components/form/form-errors.html' with errors=field.errors %}
+                    {% endfor %}
                 {% endfor %}
             </div>
         </li>

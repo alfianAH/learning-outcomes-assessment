@@ -19,7 +19,7 @@ from .filters import (
     PesertaMataKuliahSortForm,
 )
 from clo.forms import (
-    NilaiKomponenCloPesertaFormset
+    NilaiKomponenCloPesertaFormset,
 )
 from .forms import (
     MataKuliahSemesterCreateForm,
@@ -29,6 +29,9 @@ from .forms import (
 )
 from mata_kuliah_kurikulum.models import(
     MataKuliahKurikulum
+)
+from clo.models import(
+    NilaiKomponenCloPeserta
 )
 from .models import (
     MataKuliahSemester,
@@ -477,27 +480,25 @@ class NilaiKomponenCloPesertaCreateView(ProgramStudiMixin, FormView):
             'list_komponen_clo': self.list_komponen_clo,
         })
         return kwargs
-    
-    def arr_dimen(self, a):
-        return [len(a)]+self.arr_dimen(a[0]) if(type(a) == list) else []
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
         list_form_dict = []
-        form = self.get_form()
+        form = kwargs.get('form')
+        if form is None: form = self.get_form()
+
         list_komponen_clo_len = self.list_komponen_clo.count()
 
         for i, peserta in enumerate(self.list_peserta_mk):
             peserta_dict = {}
             peserta_form = []
-            for j, komponen_clo in enumerate(self.list_komponen_clo):
+            for j, _ in enumerate(self.list_komponen_clo):
                 # Use the right increment for form index
                 form_index = i + i*(list_komponen_clo_len - 1) + j
                 peserta_form.append(form[form_index])
             
             peserta_dict = {
-                'index': i,
                 'peserta_form': peserta_form,
                 'nama': peserta.mahasiswa.nama,
                 'nilai_akhir': peserta.nilai_akhir,
@@ -512,3 +513,11 @@ class NilaiKomponenCloPesertaCreateView(ProgramStudiMixin, FormView):
             'list_form_dict': list_form_dict,
         })
         return context
+    
+    def form_valid(self, form) -> HttpResponse:
+        cleaned_data = form.cleaned_data
+
+        for nilai_komponen_clo_submit in cleaned_data:
+            NilaiKomponenCloPeserta.objects.create(**nilai_komponen_clo_submit)
+        messages.success(self.request, 'Berhasil menambahkan nilai komponen CLO.')
+        return super().form_valid(form)

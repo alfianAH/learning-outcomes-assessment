@@ -1,9 +1,12 @@
 <table class="w-full">
     <tbody class="flex flex-col space-y-1">
-        <tr class="flex space-x-2.5">
-            <td class="w-full">CLO 1</td>
-            <td>90</td>
-        </tr>
+        {% for nilai in option.get_nilai_komponen_clo_peserta %}
+            <tr class="flex space-x-2.5">
+                <td class="w-full">{{ nilai.komponen_clo.clo.nama }} - {{ nilai.komponen_clo.teknik_penilaian }}</td>
+                <td>{{ nilai.nilai }}</td>
+            </tr>
+        {% endfor %}
+        
     </tbody>
 </table>
 

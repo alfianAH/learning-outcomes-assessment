@@ -4,14 +4,16 @@
             <tbody>
                 <tr>
                     <td class="w-full">Nilai huruf</td>
-                    <td class="table-cell">:</td>
-                    <td class="table-cell">{{ option.nilai_huruf|default:'-' }}</td>
+                    <td>:</td>
+                    <td>{{ option.nilai_huruf|default:'-' }}</td>
                 </tr>
-                <tr>
-                    <td class="w-full">CLO 1 (Presentasi)</td>
-                    <td class="table-cell">:</td>
-                    <td class="table-cell">90</td>
-                </tr>
+                {% for nilai in option.get_nilai_komponen_clo_peserta %}
+                    <tr>
+                        <td class="w-full">{{ nilai.komponen_clo.clo.nama }} - {{ nilai.komponen_clo.teknik_penilaian }}</td>
+                        <td>:</td>    
+                        <td>{{ nilai.nilai }}</td>
+                    </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>

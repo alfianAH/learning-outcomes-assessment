@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 from django.db.models import QuerySet
 from django.forms import inlineformset_factory, formset_factory
 from learning_outcomes_assessment.forms.formset import CanDeleteInlineFormSet
@@ -197,33 +198,58 @@ class NilaiKomponenCloPesertaForm(forms.ModelForm):
         }
 
 
-class NilaiKomponenCloFormsetClass(forms.BaseFormSet):
+class NilaiKomponenCloPesertaFormsetClass(forms.BaseFormSet):
     def __init__(self, *args, **kwargs):
         self.list_peserta_mk: list[PesertaMataKuliah] = kwargs.pop('list_peserta_mk')
         self.list_komponen_clo: QuerySet[KomponenClo] = kwargs.pop('list_komponen_clo')
         super().__init__(*args, **kwargs)
         
-        list_komponen_clo_len = self.list_komponen_clo.count()
+        self.list_komponen_clo_len = self.list_komponen_clo.count()
 
         for i, peserta in enumerate(self.list_peserta_mk):
             for j, komponen_clo in enumerate(self.list_komponen_clo):
                 # Use the right increment for form index
-                form_index = i + i*(list_komponen_clo_len-1) + j
+                form_index = i + i*(self.list_komponen_clo_len-1) + j
                 
                 self.forms[form_index].initial.update({
                     'peserta': peserta,
                     'komponen_clo': komponen_clo
                 })
 
-                self.forms[form_index].fields['nilai'].label = '{} - {}'.format(komponen_clo.clo.nama, komponen_clo.instrumen_penilaian)
+                self.forms[form_index].fields['nilai'].label = '{} - {} ({}%)'.format(komponen_clo.clo.nama, komponen_clo.instrumen_penilaian, komponen_clo.persentase)
 
     def total_form_count(self):
         return len(self.list_peserta_mk) * self.list_komponen_clo.count()
+    
+    def clean(self) -> None:
+        for i, peserta in enumerate(self.list_peserta_mk):
+            is_nilai_peserta_empty = False
+            nilai_peserta = 0
+
+            for j, komponen_clo in enumerate(self.list_komponen_clo):
+                # Use the right increment for form index
+                form_index = i + i*(self.list_komponen_clo_len-1) + j
+                
+                cleaned_data = self.forms[form_index].cleaned_data
+                
+                nilai_submit = cleaned_data.get('nilai', None)
+                if nilai_submit is None:
+                    is_nilai_peserta_empty = True 
+                    continue
+                
+                nilai_peserta += komponen_clo.persentase/100 * nilai_submit
+            
+            if is_nilai_peserta_empty:
+                self.forms[form_index].add_error('nilai', 'Nilai tidak boleh kosong.')
+                continue
+
+            if nilai_peserta != peserta.nilai_akhir:
+                self.forms[form_index].add_error('nilai', 'Nilai input tidak sesuai dengan nilai akhir. Nilai input: {}, Nilai akhir: {}'.format(nilai_peserta, peserta.nilai_akhir))
 
 
 NilaiKomponenCloPesertaFormset = formset_factory(
     NilaiKomponenCloPesertaForm,
-    formset=NilaiKomponenCloFormsetClass,
+    formset=NilaiKomponenCloPesertaFormsetClass,
     extra=0,
     can_delete=False
 )
