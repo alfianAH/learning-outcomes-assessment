@@ -196,6 +196,11 @@ class NilaiKomponenCloPesertaForm(forms.ModelForm):
             'peserta': forms.HiddenInput(),
             'komponen_clo': forms.HiddenInput(),
         }
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        print('Clean: {}'.format(cleaned_data))
+        return cleaned_data
 
 
 class NilaiKomponenCloPesertaFormsetClass(forms.BaseFormSet):
@@ -216,6 +221,16 @@ class NilaiKomponenCloPesertaFormsetClass(forms.BaseFormSet):
                     'komponen_clo': komponen_clo
                 })
 
+                nilai_peserta_qs = NilaiKomponenCloPeserta.objects.filter(
+                    peserta=peserta,
+                    komponen_clo=komponen_clo,
+                )
+                
+                if nilai_peserta_qs.exists():
+                    self.forms[form_index].initial.update({
+                        'nilai': nilai_peserta_qs.first().nilai
+                    })
+
                 self.forms[form_index].fields['nilai'].label = '{} - {} ({}%)'.format(komponen_clo.clo.nama, komponen_clo.instrumen_penilaian, komponen_clo.persentase)
 
     def total_form_count(self):
@@ -223,28 +238,40 @@ class NilaiKomponenCloPesertaFormsetClass(forms.BaseFormSet):
     
     def clean(self) -> None:
         for i, peserta in enumerate(self.list_peserta_mk):
-            is_nilai_peserta_empty = False
+            is_all_nilai_peserta_empty = []
             nilai_peserta = 0
 
             for j, komponen_clo in enumerate(self.list_komponen_clo):
+                is_nilai_peserta_empty = False
                 # Use the right increment for form index
                 form_index = i + i*(self.list_komponen_clo_len-1) + j
                 
-                cleaned_data = self.forms[form_index].cleaned_data
-                
-                nilai_submit = cleaned_data.get('nilai', None)
+                if self.forms[form_index].has_changed():
+                    cleaned_data = self.forms[form_index].clean()
+                    nilai_submit = cleaned_data.get('nilai', None)
+                else:
+                    init_data = self.forms[form_index].initial
+                    nilai_submit = init_data.get('nilai', None)
+
                 if nilai_submit is None:
-                    is_nilai_peserta_empty = True 
+                    is_nilai_peserta_empty = True
+                    is_all_nilai_peserta_empty.append(is_nilai_peserta_empty)
                     continue
                 
                 nilai_peserta += komponen_clo.persentase/100 * nilai_submit
+                is_all_nilai_peserta_empty.append(is_nilai_peserta_empty)
             
-            if is_nilai_peserta_empty:
-                self.forms[form_index].add_error('nilai', 'Nilai tidak boleh kosong.')
-                continue
-
+            # Use XNOR Logic to validate this
+            # User can submit the form if all forms are filled or all forms are empty
+            if all(is_all_nilai_peserta_empty) or not any(is_all_nilai_peserta_empty):
+                # Continue if all forms are empty
+                if all(is_all_nilai_peserta_empty):
+                    continue
+            else:
+                self.forms[form_index].add_error('nilai', 'Salah satu nilai tidak boleh kosong. Hanya diperbolehkan kosong semua atau terisi semua.')
+            
             if nilai_peserta != peserta.nilai_akhir:
-                self.forms[form_index].add_error('nilai', 'Nilai input tidak sesuai dengan nilai akhir. Nilai input: {}, Nilai akhir: {}'.format(nilai_peserta, peserta.nilai_akhir))
+                self.forms[form_index].add_error('nilai', 'Nilai input tidak sesuai dengan nilai akhir. Nilai input: {:.2f}, Nilai akhir: {:.2f}'.format(nilai_peserta, peserta.nilai_akhir))
 
 
 NilaiKomponenCloPesertaFormset = formset_factory(

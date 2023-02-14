@@ -516,8 +516,23 @@ class NilaiKomponenCloPesertaCreateView(ProgramStudiMixin, FormView):
     
     def form_valid(self, form) -> HttpResponse:
         cleaned_data = form.cleaned_data
-
+        
         for nilai_komponen_clo_submit in cleaned_data:
-            NilaiKomponenCloPeserta.objects.create(**nilai_komponen_clo_submit)
-        messages.success(self.request, 'Berhasil menambahkan nilai komponen CLO.')
+            # Check query first
+            nilai_peserta_qs = NilaiKomponenCloPeserta.objects.filter(
+                peserta=nilai_komponen_clo_submit.get('peserta'),
+                komponen_clo=nilai_komponen_clo_submit.get('komponen_clo')
+            )
+
+            # If exists, then update the query
+            if nilai_peserta_qs.exists():
+                nilai_peserta_qs.update(**nilai_komponen_clo_submit)
+            else:  # Else, create new one
+                # If form is empty, skip
+                if len(nilai_komponen_clo_submit.items()) == 0: continue
+
+                # Create new one
+                NilaiKomponenCloPeserta.objects.create(**nilai_komponen_clo_submit)
+
+        messages.success(self.request, 'Proses mengedit nilai komponen CLO sudah selesai.')
         return super().form_valid(form)

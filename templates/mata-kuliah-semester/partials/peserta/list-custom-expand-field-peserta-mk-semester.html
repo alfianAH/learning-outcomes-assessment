@@ -1,10 +1,17 @@
 <table class="w-full">
-    <tbody class="flex flex-col space-y-1">
+<tbody class="flex flex-col space-y-1">
         {% for nilai in option.get_nilai_komponen_clo_peserta %}
             <tr class="flex space-x-2.5">
-                <td class="w-full">{{ nilai.komponen_clo.clo.nama }} - {{ nilai.komponen_clo.teknik_penilaian }}</td>
+                <td class="w-full">{{ nilai.komponen_clo.clo.nama }} - {{ nilai.komponen_clo.instrumen_penilaian }}</td>
                 <td>{{ nilai.nilai }}</td>
             </tr>
+        {% empty %}
+            {% for komponen_clo in option.get_empty_komponen_clo %}
+                <tr class="flex space-x-2.5">
+                    <td class="w-full">{{ komponen_clo.clo.nama }} - {{ komponen_clo.instrumen_penilaian }}</td>
+                    <td>-</td>
+                </tr>
+            {% endfor %}
         {% endfor %}
         
     </tbody>

@@ -178,9 +178,21 @@ class PesertaMataKuliah(models.Model):
                 name='nilai_akhir_range'
             ),
         )
+    
+    def get_empty_komponen_clo(self):
+        list_clo = self.kelas_mk_semester.mk_semester.get_all_clo()
+        list_komponen_clo = []
+
+        for clo in list_clo:
+            for komponen_clo in clo.get_komponen_clo():
+                list_komponen_clo.append(komponen_clo)
+        
+        return list_komponen_clo
 
     def get_nilai_komponen_clo_peserta(self):
-        return self.nilaikomponenclopeserta_set.filter(komponen_clo__clo__in=self.kelas_mk_semester.mk_semester.get_all_clo())
+        return self.nilaikomponenclopeserta_set.filter(
+            komponen_clo__clo__in=self.kelas_mk_semester.mk_semester.get_all_clo()
+        )
 
 
 class DosenMataKuliah(models.Model):
