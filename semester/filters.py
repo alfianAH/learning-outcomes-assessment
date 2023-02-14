@@ -21,8 +21,8 @@ SEMESTER_ORDERING_BY = (
 
 SEMESTER_PRODI_ORDERING_BY = (
     ('tahun_ajaran_prodi__prodi_jenjang__jenjang_studi__kode', 'Jenjang studi'),
-    ('semester__tahun_ajaran', 'Tahun Ajaran'),
-    ('semester__tipe_semester', 'Tipe Semester'),
+    ('-semester__tahun_ajaran', 'Tahun Ajaran'),
+    ('-semester__tipe_semester', 'Tipe Semester'),
     ('semester__nama', 'Nama'),
 )
 
