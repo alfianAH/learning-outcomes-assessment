@@ -3,7 +3,8 @@ from django import forms
 from learning_outcomes_assessment.widgets import (
     MyRadioInput, 
     MySearchInput,
-    MySelectInput
+    MySelectInput,
+    MyCheckboxInput,
 )
 from .models import (
     Semester,
@@ -19,10 +20,10 @@ SEMESTER_ORDERING_BY = (
 )
 
 SEMESTER_PRODI_ORDERING_BY = (
-    ('semester__nama', 'Nama'),
-    ('semester__tahun_ajaran', 'Tahun Ajaran'),
     ('tahun_ajaran_prodi__prodi_jenjang__jenjang_studi__kode', 'Jenjang studi'),
+    ('semester__tahun_ajaran', 'Tahun Ajaran'),
     ('semester__tipe_semester', 'Tipe Semester'),
+    ('semester__nama', 'Nama'),
 )
 
 class SemesterFilter(filter.FilterSet):
@@ -73,18 +74,10 @@ class SemesterProdiFilter(filter.FilterSet):
         fields = ('semester__nama', 'semester__tipe_semester')
 
 
-class SemesterSort(forms.Form):
-    semester_ordering_by = forms.ChoiceField(
-        choices=SEMESTER_ORDERING_BY,
-        widget=MyRadioInput,
-        label='Urutkan berdasarkan',
-        initial='nama',
-    )
-
 class SemesterProdiSort(forms.Form):
-    ordering_by = forms.ChoiceField(
+    ordering_by = forms.MultipleChoiceField(
         choices=SEMESTER_PRODI_ORDERING_BY,
-        widget=MyRadioInput,
+        widget=MyCheckboxInput,
         label='Urutkan berdasarkan',
         initial='semester__nama',
     )

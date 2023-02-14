@@ -44,7 +44,7 @@ class SemesterReadAllView(ListViewModelA):
     model = SemesterProdi
     paginate_by: int = 10
     template_name: str = 'semester/home.html'
-    ordering: str = ['tahun_ajaran_prodi__prodi_jenjang__jenjang_studi__kode', 'semester__nama']
+    ordering: str = ['tahun_ajaran_prodi__prodi_jenjang__jenjang_studi__kode', 'semester__tahun_ajaran']
     sort_form_ordering_by_key: str = 'ordering_by'
 
     semester_filter: SemesterProdiFilter = None
@@ -74,7 +74,7 @@ class SemesterReadAllView(ListViewModelA):
                 'tipe_semester': request.GET.get('tipe_semester', ''),
             }
             sort_data = {
-                self.sort_form_ordering_by_key: request.GET.get(self.sort_form_ordering_by_key, self.ordering[0])
+                self.sort_form_ordering_by_key: request.GET.getlist(self.sort_form_ordering_by_key, self.ordering)
             }
 
             self.filter_form = SemesterProdiFilter(
