@@ -265,7 +265,7 @@ class SemesterBulkUpdateView(ModelBulkUpdateView):
 
                 # Update semester prodi
                 semester_prodi_obj.update(
-                    semester=semester_qs[0],
+                    semester=semester_qs.first(),
                     tahun_ajaran_prodi=tahun_ajaran_prodi
                 )
             else:
