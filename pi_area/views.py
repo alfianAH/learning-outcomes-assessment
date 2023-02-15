@@ -40,7 +40,7 @@ class PIAreaCreateView(HtmxCreateInlineFormsetView):
     form_class = AssessmentAreaForm
 
     modal_title: str = 'Tambah Assessment Area'
-    modal_id: str = 'create-modal-content'
+    modal_content_id: str = 'create-modal-content'
     button_text: str = 'Tambah'
     success_msg: str = 'Berhasil menambahkan assessment area dan PI area'
     error_msg: str = 'Gagal menambahkan assessment area dan PI area. Pastikan data yang anda masukkan valid.'
@@ -87,7 +87,7 @@ class PIAreaUpdateView(HtmxUpdateInlineFormsetView):
     object: AssessmentArea = None
     
     modal_title: str = 'Update Assessment Area'
-    modal_id: str = 'update-modal-content'
+    modal_content_id: str = 'update-modal-content'
     button_text: str = 'Update'
     success_msg: str = 'Berhasil mengupdate assessment area dan PI area'
     error_msg: str = 'Gagal mengupdate assessment area dan PI area. Pastikan data yang anda masukkan valid.'
