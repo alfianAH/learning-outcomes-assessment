@@ -130,8 +130,8 @@ class MataKuliahSemester(models.Model):
         })
     
     # Nilai Komponen CLO Peserta
-    def get_nilai_komponen_peserta_create_url(self):
-        return reverse('semester:mata_kuliah_semester:nilai-komponen-create', kwargs={
+    def get_nilai_komponen_edit_url(self):
+        return reverse('semester:mata_kuliah_semester:nilai-komponen-edit', kwargs={
             'semester_prodi_id': self.semester.pk,
             'mk_semester_id': self.pk
         })

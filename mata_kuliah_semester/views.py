@@ -455,7 +455,7 @@ class PesertaMataKuliahBulkDeleteView(ProgramStudiMixin, ModelBulkDeleteView):
 
 
 # Nilai Komponen CLO Peserta
-class NilaiKomponenCloPesertaCreateView(ProgramStudiMixin, FormView):
+class NilaiKomponenCloEditView(ProgramStudiMixin, FormView):
     form_class = NilaiKomponenCloPesertaFormset
     template_name = 'mata-kuliah-semester/nilai-komponen/create-view.html'
     mk_semester_obj: MataKuliahSemester = None

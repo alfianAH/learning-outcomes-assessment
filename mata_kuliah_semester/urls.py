@@ -11,7 +11,7 @@ from .views import (
     PesertaMataKuliahBulkUpdateView,
     PesertaMataKuliahBulkDeleteView,
 
-    NilaiKomponenCloPesertaCreateView,
+    NilaiKomponenCloEditView,
 )
 
 
@@ -31,7 +31,7 @@ urlpatterns = [
     path('<int:mk_semester_id>/peserta/bulk-update/', PesertaMataKuliahBulkUpdateView.as_view(), name='peserta-bulk-update'),
 
     # Nilai Komponen CLO
-    path('<int:mk_semester_id>/nilai/create/', NilaiKomponenCloPesertaCreateView.as_view(), name='nilai-komponen-create'),
+    path('<int:mk_semester_id>/nilai/edit/', NilaiKomponenCloEditView.as_view(), name='nilai-komponen-edit'),
     
     # CLO
     path('<int:mk_semester_id>/clo/', include('clo.urls')),
