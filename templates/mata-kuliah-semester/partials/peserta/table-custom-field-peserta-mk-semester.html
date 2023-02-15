@@ -29,13 +29,13 @@
         <div class="bg-emerald-500 w-4 h-4 rounded-full my-0 mx-auto"></div>
     </td>
     {% comment %} Edit {% endcomment %}
-    <td class="text-center !align-middle">
-        <a class="flex items-center justify-center" href="#">
+    <td class="text-center">
+        <button class="table-actions !align-middle" data-target="#edit-nilai-modal" onclick="openModalByButton(this)" hx-get="{{ option.get_hx_nilai_komponen_clo_peserta_edit_url }}" hx-target="#edit-nilai-modal-content" hx-swap="outerHTML" hx-trigger="click">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-5 h-5 fill-sky-600" focusable="False" aria-label="edit">
                 <path d="M0 0h24v24H0z" fill="none"/>
                 <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
             </svg>
-        </a>
+        </button>
     </td>
     {% comment %} Expand {% endcomment %}
     <td class="text-center !align-middle">

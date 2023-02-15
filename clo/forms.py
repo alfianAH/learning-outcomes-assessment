@@ -197,11 +197,6 @@ class NilaiKomponenCloPesertaForm(forms.ModelForm):
             'peserta': forms.HiddenInput(),
             'komponen_clo': forms.HiddenInput(),
         }
-    
-    def clean(self):
-        cleaned_data = super().clean()
-        print('Clean: {}'.format(cleaned_data))
-        return cleaned_data
 
 
 class NilaiKomponenCloPesertaFormsetClass(forms.BaseFormSet):

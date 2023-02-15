@@ -388,7 +388,7 @@ function checkboxTable(element) {
                     $(this).closest('tr').removeClass("active");
                 }
             }).trigger("change").end()
-        .find("tbody td a, input[type='checkbox'], .table-collapse")
+        .find("tbody td a, input[type='checkbox'], .table-collapse, .table-actions")
             .on("click", function (e) {
                 e.stopPropagation();
             }).end();

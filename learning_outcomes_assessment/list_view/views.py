@@ -112,6 +112,7 @@ class ListViewModelD(ListViewModelA):
     
     table_custom_expand_field_template: str = ''
     list_custom_expand_field_template: str = ''
+    list_edit_template: str = ''
     list_item_name: str = 'components/list-table-view/model-d/list-item-name.html'
 
     def get_context_data(self, **kwargs):
@@ -122,6 +123,9 @@ class ListViewModelD(ListViewModelA):
 
         if self.update_context(self.table_custom_expand_field_template):
             context['table_custom_expand_field_template'] = self.table_custom_expand_field_template
+
+        if self.update_context(self.list_edit_template):
+            context['list_edit_template'] = self.list_edit_template
         
         return context
 

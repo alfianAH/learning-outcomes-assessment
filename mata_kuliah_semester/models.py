@@ -193,6 +193,20 @@ class PesertaMataKuliah(models.Model):
         return self.nilaikomponenclopeserta_set.filter(
             komponen_clo__clo__in=self.kelas_mk_semester.mk_semester.get_all_clo()
         )
+    
+    def get_hx_nilai_komponen_clo_peserta_edit_url(self):
+        return reverse('semester:mata_kuliah_semester:hx-nilai-komponen-peserta-edit', kwargs={
+            'semester_prodi_id': self.kelas_mk_semester.mk_semester.semester.pk,
+            'mk_semester_id': self.kelas_mk_semester.mk_semester.pk,
+            'peserta_id': self.id_neosia,
+        })
+    
+    def get_nilai_komponen_clo_peserta_edit_url(self):
+        return reverse('semester:mata_kuliah_semester:nilai-komponen-peserta-edit', kwargs={
+            'semester_prodi_id': self.kelas_mk_semester.mk_semester.semester.pk,
+            'mk_semester_id': self.kelas_mk_semester.mk_semester.pk,
+            'peserta_id': self.id_neosia,
+        })
 
 
 class DosenMataKuliah(models.Model):

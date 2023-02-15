@@ -158,6 +158,7 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, DetailWithListViewModelD):
     input_name: str = 'id_peserta_mk_semester'
     list_id: str = 'peserta-mk-semester-list-content'
     list_item_name: str = 'mata-kuliah-semester/partials/peserta/list-item-name-peserta-mk-semester.html'
+    list_edit_template: str = 'mata-kuliah-semester/partials/peserta/list-edit-peserta-mk-semester.html'
     list_custom_field_template: str = 'mata-kuliah-semester/partials/peserta/list-custom-field-peserta-mk-semester.html'
     list_custom_expand_field_template: str = 'mata-kuliah-semester/partials/peserta/list-custom-expand-field-peserta-mk-semester.html'
     table_custom_expand_field_template: str = 'mata-kuliah-semester/partials/peserta/table-custom-expand-field-peserta-mk-semester.html'
@@ -455,23 +456,20 @@ class PesertaMataKuliahBulkDeleteView(ProgramStudiMixin, ModelBulkDeleteView):
 
 
 # Nilai Komponen CLO Peserta
-class NilaiKomponenCloEditView(ProgramStudiMixin, FormView):
+class NilaiKomponenCloEditTemplateView(FormView):
     form_class = NilaiKomponenCloPesertaFormset
-    template_name = 'mata-kuliah-semester/nilai-komponen/create-view.html'
     mk_semester_obj: MataKuliahSemester = None
+    list_komponen_clo = None
+    list_peserta_mk: list[PesertaMataKuliah] = []
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
-        mk_semester_id = kwargs.get('mk_semester_id')
-        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
-
         self.program_studi_obj = self.mk_semester_obj.semester.tahun_ajaran_prodi.prodi_jenjang.program_studi
         self.success_url = '{}?active_tab={}'.format(
             self.mk_semester_obj.read_detail_url(), 
             'peserta'
         )
 
-        self.list_peserta_mk = self.mk_semester_obj.get_all_peserta_mk_semester()
         self.list_komponen_clo = KomponenClo.objects.filter(
             clo__mk_semester=self.mk_semester_obj
         )
@@ -516,6 +514,17 @@ class NilaiKomponenCloEditView(ProgramStudiMixin, FormView):
             'list_form_dict': list_form_dict,
         })
         return context
+
+
+class NilaiKomponenCloEditView(ProgramStudiMixin, NilaiKomponenCloEditTemplateView):
+    template_name = 'mata-kuliah-semester/nilai-komponen/edit-view.html'
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        mk_semester_id = kwargs.get('mk_semester_id')
+        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+
+        self.list_peserta_mk = self.mk_semester_obj.get_all_peserta_mk_semester()
+        super().setup(request, *args, **kwargs)
     
     def form_valid(self, form) -> HttpResponse:
         cleaned_data = form.cleaned_data
@@ -539,3 +548,65 @@ class NilaiKomponenCloEditView(ProgramStudiMixin, FormView):
 
         messages.success(self.request, 'Proses mengedit nilai komponen CLO sudah selesai.')
         return super().form_valid(form)
+
+
+class NilaiKomponenCloPesertaEditView(ProgramStudiMixin, NilaiKomponenCloEditTemplateView):
+    peserta_mk_semester: PesertaMataKuliah = None
+
+    modal_title: str = 'Edit Nilai'
+    modal_content_id: str = 'edit-nilai-modal-content'
+    button_text: str = 'Submit'
+    success_msg: str = 'Proses mengedit nilai komponen CLO sudah selesai.'
+    error_msg: str = 'Gagal mengedit nilai. Pastikan data yang anda masukkan valid.'
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        peserta_id = kwargs.get('peserta_id')
+        self.peserta_mk_semester = get_object_or_404(PesertaMataKuliah, id_neosia=peserta_id)
+        self.mk_semester_obj = self.peserta_mk_semester.kelas_mk_semester.mk_semester
+
+        self.list_peserta_mk = [self.peserta_mk_semester]
+        super().setup(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'list_peserta_mk': self.list_peserta_mk,
+            'list_komponen_clo': self.list_komponen_clo,
+        })
+        return kwargs
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'modal_title': self.modal_title,
+            'modal_content_id': self.modal_content_id,
+            'peserta_obj': self.peserta_mk_semester,
+        })
+        return context
+
+    def form_valid(self, form) -> HttpResponse:
+        cleaned_data = form.cleaned_data
+        
+        for nilai_komponen_clo_submit in cleaned_data:
+            # Check query first
+            nilai_peserta_qs = NilaiKomponenCloPeserta.objects.filter(
+                peserta=self.peserta_mk_semester,
+                komponen_clo=nilai_komponen_clo_submit.get('komponen_clo')
+            )
+
+            # If exists, then update the query
+            if nilai_peserta_qs.exists():
+                nilai_peserta_qs.update(**nilai_komponen_clo_submit)
+            else:  # Else, create new one
+                # If form is empty, skip
+                if len(nilai_komponen_clo_submit.items()) == 0: continue
+
+                # Create new one
+                NilaiKomponenCloPeserta.objects.create(**nilai_komponen_clo_submit)
+
+        messages.success(self.request, self.success_msg)
+        return super().form_valid(form)
+
+    def form_invalid(self, form) -> HttpResponse:
+        messages.error(self.request, self.error_msg)
+        return super().form_invalid(form)
