@@ -8,15 +8,15 @@
                     <td>{{ option.nilai_huruf|default:'-' }}</td>
                 </tr>
                 {% for nilai in option.get_nilai_komponen_clo_peserta %}
-                    <tr>
-                        <td class="w-full">{{ nilai.komponen_clo.clo.nama }} - {{ nilai.komponen_clo.instrumen_penilaian }}</td>
+                    <tr class="align-top">
+                        <td class="w-full">{{ nilai.komponen_clo.clo.nama }} - {{ nilai.komponen_clo.instrumen_penilaian }} ({{ nilai.komponen_clo.persentase }}%</td>
                         <td>:</td>
                         <td>{{ nilai.nilai }}</td>
                     </tr>
                 {% empty %}
                     {% for komponen_clo in option.get_empty_komponen_clo %}
-                        <tr>
-                            <td class="w-full">{{ komponen_clo.clo.nama }} - {{ komponen_clo.instrumen_penilaian }}</td>
+                        <tr class="align-top">
+                            <td class="w-full">{{ komponen_clo.clo.nama }} - {{ komponen_clo.instrumen_penilaian }} ({{ komponen_clo.persentase }}%)</td>
                             <td>:</td>
                             <td>-</td>
                         </tr>

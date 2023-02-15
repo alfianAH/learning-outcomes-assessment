@@ -221,7 +221,7 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, DetailWithListViewModelD):
             'pedoman_objects': pedoman_objects
         })
 
-        if self.request.GET.get('nama') or self.request.GET.get('nilai_akhir_min') or self.request.GET.get('nilai_akhir_max') or self.request.GET.get(self.sort_form_ordering_by_key):
+        if self.request.GET.get('nama') or self.request.GET.get('nilai_akhir_min') or self.request.GET.get('nilai_akhir_max') or self.request.GET.get(self.sort_form_ordering_by_key) or self.request.GET.get('active_tab') == 'peserta':
             context['is_peserta_pane'] = True
         else:
             context['is_peserta_pane'] = False
@@ -466,7 +466,10 @@ class NilaiKomponenCloEditView(ProgramStudiMixin, FormView):
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
 
         self.program_studi_obj = self.mk_semester_obj.semester.tahun_ajaran_prodi.prodi_jenjang.program_studi
-        self.success_url = self.mk_semester_obj.read_detail_url()
+        self.success_url = '{}?active_tab={}'.format(
+            self.mk_semester_obj.read_detail_url(), 
+            'peserta'
+        )
 
         self.list_peserta_mk = self.mk_semester_obj.get_all_peserta_mk_semester()
         self.list_komponen_clo = KomponenClo.objects.filter(
