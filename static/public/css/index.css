@@ -3761,12 +3761,12 @@ details.dropdown::marker {
   max-width: 24rem;
 }
 
-.max-w-full {
-  max-width: 100%;
-}
-
 .max-w-sm {
   max-width: 24rem;
+}
+
+.max-w-full {
+  max-width: 100%;
 }
 
 .-translate-x-1\/2 {
@@ -4024,10 +4024,6 @@ details.dropdown::marker {
 
 .fill-slate-100 {
   fill: #f1f5f9;
-}
-
-.fill-emerald-500 {
-  fill: #10b981;
 }
 
 .fill-sky-600 {

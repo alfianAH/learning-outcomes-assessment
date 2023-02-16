@@ -333,7 +333,10 @@ class PesertaMataKuliahSemesterCreateView(ProgramStudiMixin, FormView):
         
         self.program_studi_obj = self.mk_semester_obj.semester.tahun_ajaran_prodi.prodi_jenjang.program_studi
         self.peserta_mk_choices = get_peserta_kelas_mk_semester_choices(self.mk_semester_obj)
-        self.success_url = self.mk_semester_obj.read_detail_url()
+        self.success_url = '{}?active_tab={}'.format(
+            self.mk_semester_obj.read_detail_url(), 
+            'peserta'
+        )
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         if len(self.peserta_mk_choices) == 0:
@@ -406,7 +409,10 @@ class PesertaMataKuliahBulkUpdateView(ProgramStudiMixin, ModelBulkUpdateView):
 
         self.choices = get_update_peserta_mk_semester_choices(self.mk_semester_obj)
 
-        self.success_url = self.mk_semester_obj.read_detail_url()
+        self.success_url = '{}?active_tab={}'.format(
+            self.mk_semester_obj.read_detail_url(), 
+            'peserta'
+        )
         self.back_url = self.success_url
 
     def get_context_data(self, **kwargs):
@@ -448,7 +454,10 @@ class PesertaMataKuliahBulkDeleteView(ProgramStudiMixin, ModelBulkDeleteView):
         mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
 
         self.program_studi_obj = mk_semester_obj.semester.tahun_ajaran_prodi.prodi_jenjang.program_studi
-        self.success_url = mk_semester_obj.read_detail_url()
+        self.success_url = '{}?active_tab={}'.format(
+            mk_semester_obj.read_detail_url(), 
+            'peserta'
+        )
 
     def get_queryset(self):
         self.queryset = self.model.objects.filter(id_neosia__in=self.get_list_selected_obj())
@@ -474,11 +483,19 @@ class NilaiKomponenCloEditTemplateView(FormView):
             clo__mk_semester=self.mk_semester_obj
         )
 
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if request.user.role == 'a':
+            if request.GET.get('generate') == 'true':
+                messages.info(request, 'Hasil generate sudah selesai. Generate nilai hanya berlaku untuk peserta yang belum memiliki nilai di semua komponen CLO.')
+        return super().get(request, *args, **kwargs)
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
+        
         kwargs.update({
             'list_peserta_mk': self.list_peserta_mk,
             'list_komponen_clo': self.list_komponen_clo,
+            'is_generate': self.request.GET.get('generate'),
         })
         return kwargs
 

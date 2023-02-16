@@ -25,6 +25,7 @@ from .models import (
 from .utils import (
     get_pi_area_by_kurikulum_choices,
     get_pi_by_pi_area_choices,
+    generate_nilai_clo,
 )
 
 
@@ -203,11 +204,17 @@ class NilaiKomponenCloPesertaFormsetClass(forms.BaseFormSet):
     def __init__(self, *args, **kwargs):
         self.list_peserta_mk: list[PesertaMataKuliah] = kwargs.pop('list_peserta_mk')
         self.list_komponen_clo: QuerySet[KomponenClo] = kwargs.pop('list_komponen_clo')
+        self.is_generate = kwargs.pop('is_generate') == 'true'
         super().__init__(*args, **kwargs)
+
+        # List persentase for each komponen CLO
+        list_persentase_komponen_clo = [komponen_clo.persentase for komponen_clo in self.list_komponen_clo]
         
         self.list_komponen_clo_len = self.list_komponen_clo.count()
 
         for i, peserta in enumerate(self.list_peserta_mk):
+            can_generate = False
+
             for j, komponen_clo in enumerate(self.list_komponen_clo):
                 # Use the right increment for form index
                 form_index = i + i*(self.list_komponen_clo_len-1) + j
@@ -226,8 +233,25 @@ class NilaiKomponenCloPesertaFormsetClass(forms.BaseFormSet):
                     self.forms[form_index].initial.update({
                         'nilai': nilai_peserta_qs.first().nilai
                     })
+                else:
+                    can_generate = True
 
                 self.forms[form_index].fields['nilai'].label = '{} - {} ({}%)'.format(komponen_clo.clo.nama, komponen_clo.instrumen_penilaian, komponen_clo.persentase)
+            
+            # Generate nilai
+            if self.is_generate and can_generate:
+                if settings.DEBUG: 
+                    print('Generate: {}'.format(peserta.mahasiswa.nama))
+
+                generated_nilai_peserta = generate_nilai_clo(list_persentase_komponen_clo, peserta.nilai_akhir)
+
+                for j, komponen_clo in enumerate(self.list_komponen_clo):
+                    # Use the right increment for form index
+                    form_index = i + i*(self.list_komponen_clo_len-1) + j
+
+                    self.forms[form_index].initial.update({
+                        'nilai': generated_nilai_peserta[j],
+                    })
 
     def total_form_count(self):
         return len(self.list_peserta_mk) * self.list_komponen_clo.count()

@@ -1,3 +1,4 @@
+import random
 from django.db.models import QuerySet
 from django.conf import settings
 from kurikulum.models import Kurikulum
@@ -111,3 +112,50 @@ def duplicate_clo(semester_prodi_id: int, new_mk_semester: MataKuliahSemester):
             new_pi_clo.pk = None
             new_pi_clo.clo = new_clo
             new_pi_clo.save()
+
+
+def generate_nilai_clo(persentase_komponen_clo, nilai_akhir: float):
+    batas = {
+        90: (20, 17), 
+        80: (19, 12), 
+        70: (18, 10),
+        60: (16, 6), 
+        50: (16, 0)
+    }
+
+    komponen_clo_len = len(persentase_komponen_clo)
+    hasil = [0] * komponen_clo_len
+
+    # Jika nilai 100
+    if nilai_akhir == 100:
+        for x in range(komponen_clo_len):
+            hasil[x] = 100
+
+    # Jika nilai 50-99
+    if (nilai_akhir < 100) and (nilai_akhir >= 50):
+        k = nilai_akhir - (nilai_akhir % 10)
+        b_atas = batas[k][0]
+        b_bawah = batas[k][1]
+
+        while True:
+            temp = 0
+            for x in range(komponen_clo_len - 1):
+                hasil[x] = random.randint(b_bawah, b_atas) * 5
+                temp += hasil[x] * persentase_komponen_clo[x] / 100
+            hasil[komponen_clo_len - 1] = int((nilai_akhir - temp) * 100 / persentase_komponen_clo[komponen_clo_len - 1])
+            if hasil[komponen_clo_len - 1] <= nilai_akhir and hasil[komponen_clo_len - 1] >= 0: break
+
+    # Jika nilai 1-49
+    if 50 > nilai_akhir > 0:
+        nol = random.randint(0, komponen_clo_len - 1)
+        while True:
+            temp = 0
+            for x in range(komponen_clo_len - 1):
+                if x != nol: hasil[x] = random.randint(0, 15) * 5
+                temp += hasil[x] * persentase_komponen_clo[x] / 100
+            
+            if nilai_akhir-temp < 0: continue
+            hasil[komponen_clo_len - 1] = round((nilai_akhir - temp) * 100 / persentase_komponen_clo[komponen_clo_len - 1])
+            if hasil[komponen_clo_len - 1] <= 95 and hasil[komponen_clo_len - 1] >= 0: break
+
+    return hasil
