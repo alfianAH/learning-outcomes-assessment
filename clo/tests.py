@@ -32,5 +32,3 @@ class CloTestCase(TestCase):
                 generated_nilai_akhir += persentase_komponen_clo/100 * generated_nilai_peserta[i] 
 
             self.assertAlmostEqual(generated_nilai_akhir, nilai_akhir, delta=1)
-
-            sys.stdout.flush()

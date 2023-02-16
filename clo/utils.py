@@ -115,6 +115,12 @@ def duplicate_clo(semester_prodi_id: int, new_mk_semester: MataKuliahSemester):
 
 
 def generate_nilai_clo(persentase_komponen_clo, nilai_akhir: float):
+    possibility_choices = {
+        'low': {
+            'choices': list(range(16)),
+            'weights': [5 if i == 0 else 1 for i in range(16)]
+        }
+    }
     batas = {
         90: (20, 17), 
         80: (19, 12), 
@@ -142,19 +148,35 @@ def generate_nilai_clo(persentase_komponen_clo, nilai_akhir: float):
             for x in range(komponen_clo_len - 1):
                 hasil[x] = random.randint(b_bawah, b_atas) * 5
                 temp += hasil[x] * persentase_komponen_clo[x] / 100
+            
+            # Rumus: nilai (0-100) * persen = nilai diskon
+            # Nilai sisa = nilai akhir - jumlah nilai sampai index sebelum terakhir
+            # Nilai di komponen terakhir (0-100) = nilai sisa (nilai diskon) * 100 / persen
             hasil[komponen_clo_len - 1] = int((nilai_akhir - temp) * 100 / persentase_komponen_clo[komponen_clo_len - 1])
             if hasil[komponen_clo_len - 1] <= nilai_akhir and hasil[komponen_clo_len - 1] >= 0: break
 
     # Jika nilai 1-49
     if 50 > nilai_akhir > 0:
+        # Pilih index untuk memberi nilai 0
         nol = random.randint(0, komponen_clo_len - 1)
+        possibility_choice = possibility_choices['low']
+
         while True:
             temp = 0
             for x in range(komponen_clo_len - 1):
-                if x != nol: hasil[x] = random.randint(0, 15) * 5
+                if x != nol: 
+                    random_number = random.choices(possibility_choice['choices'], possibility_choice['weights'])[0]
+                    hasil[x] = random_number * 5
                 temp += hasil[x] * persentase_komponen_clo[x] / 100
             
-            if nilai_akhir-temp < 0: continue
+            # Nilai akhir - jumlah nilai sampai index sebelum terakhir 
+            # tidak boleh lebih kecil dari 0
+            # Supaya setidaknya nilai di index terakhir bisa ada 0 atau lebih
+            if nilai_akhir - temp < 0: continue
+
+            # Rumus: nilai (0-100) * persen = nilai diskon
+            # Nilai sisa = nilai akhir - jumlah nilai sampai index sebelum terakhir
+            # Nilai di komponen terakhir (0-100) = nilai sisa (nilai diskon) * 100 / persen
             hasil[komponen_clo_len - 1] = round((nilai_akhir - temp) * 100 / persentase_komponen_clo[komponen_clo_len - 1])
             if hasil[komponen_clo_len - 1] <= 95 and hasil[komponen_clo_len - 1] >= 0: break
 

@@ -288,10 +288,16 @@ class NilaiKomponenCloPesertaFormsetClass(forms.BaseFormSet):
                 if all(is_all_nilai_peserta_empty):
                     continue
             else:
-                self.forms[form_index].add_error('nilai', 'Salah satu nilai tidak boleh kosong. Hanya diperbolehkan kosong semua atau terisi semua.')
+                self.forms[form_index].add_error(
+                    'nilai', 
+                    'Salah satu nilai tidak boleh kosong. Hanya diperbolehkan kosong semua atau terisi semua.'
+                )
             
-            if not math.isclose(nilai_peserta, peserta.nilai_akhir, rel_tol=1e-5, abs_tol=0.5):
-                self.forms[form_index].add_error('nilai', 'Nilai input tidak sesuai dengan nilai akhir. Nilai input: {:.2f}, Nilai akhir: {:.2f}'.format(nilai_peserta, peserta.nilai_akhir))
+            if not math.isclose(nilai_peserta, peserta.nilai_akhir, rel_tol=1e-5, abs_tol=1):
+                self.forms[form_index].add_error(
+                    'nilai', 
+                    'Nilai input tidak sesuai dengan nilai akhir. Nilai input: {:.2f}, Nilai akhir: {:.2f}'.format(nilai_peserta, peserta.nilai_akhir)
+                )
 
 
 NilaiKomponenCloPesertaFormset = formset_factory(
