@@ -3,6 +3,7 @@ from django.db.models import CheckConstraint, Q
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.urls import reverse
 from django.conf import settings
+from learning_outcomes_assessment.utils import get_reverse_url
 from ilo.models import Ilo
 from mata_kuliah_kurikulum.models import MataKuliahKurikulum
 from semester.models import SemesterProdi
@@ -24,22 +25,29 @@ class MataKuliahSemester(models.Model):
                 name='average_clo_achievement_range'
             ),
         )
+    
+    def get_reverse_url(self, viewname: str):
+        return reverse(viewname, kwargs={
+            'semester_prodi_id': self.semester.pk,
+            'mk_semester_id': self.pk,
+        })
+    
+    @property
+    def get_kwargs(self):
+        return {
+            **self.semester.get_kwargs,
+            'mk_semester_id': self.pk,
+        }
 
     def read_detail_url(self):
-        return reverse('semester:mata_kuliah_semester:read', kwargs={
-            'semester_prodi_id': self.semester.pk,
-            'mk_semester_id': self.pk
-        })
+        return get_reverse_url('semester:mata_kuliah_semester:read', self.get_kwargs)
     
     # Kelas MK Semester
     def get_kelas_mk_semester(self):
         return self.kelasmatakuliahsemester_set.all()
     
     def get_kelas_mk_semester_update_url(self):
-        return reverse('semester:mata_kuliah_semester:kelas-mk-semester-bulk-update', kwargs={
-            'semester_prodi_id': self.semester.pk,
-            'mk_semester_id': self.pk
-        })
+        return get_reverse_url('semester:mata_kuliah_semester:kelas-mk-semester-bulk-update', self.get_kwargs)
     
     # Dosen MK
     def get_all_dosen_mk_semester(self):
@@ -69,22 +77,13 @@ class MataKuliahSemester(models.Model):
         return list_peserta
     
     def get_peserta_mk_semester_create_url(self):
-        return reverse('semester:mata_kuliah_semester:peserta-create', kwargs={
-            'semester_prodi_id': self.semester.pk,
-            'mk_semester_id': self.pk
-        })
+        return get_reverse_url('semester:mata_kuliah_semester:peserta-create', self.get_kwargs)
     
     def get_peserta_mk_semester_bulk_delete_url(self):
-        return reverse('semester:mata_kuliah_semester:peserta-bulk-delete', kwargs={
-            'semester_prodi_id': self.semester.pk,
-            'mk_semester_id': self.pk
-        })
+        return get_reverse_url('semester:mata_kuliah_semester:peserta-bulk-delete', self.get_kwargs)
     
     def get_peserta_mk_semester_bulk_update_url(self):
-        return reverse('semester:mata_kuliah_semester:peserta-bulk-update', kwargs={
-            'semester_prodi_id': self.semester.pk,
-            'mk_semester_id': self.pk
-        })
+        return get_reverse_url('semester:mata_kuliah_semester:peserta-bulk-update', self.get_kwargs)
     
     # CLO
     def get_all_clo(self):
@@ -100,41 +99,29 @@ class MataKuliahSemester(models.Model):
         return total_persentase
     
     def get_clo_read_all_url(self):
-        return reverse('semester:mata_kuliah_semester:clo:read-all', kwargs={
-            'semester_prodi_id': self.semester.pk,
-            'mk_semester_id': self.pk
-        })
+        return get_reverse_url('semester:mata_kuliah_semester:clo:read-all', self.get_kwargs)
     
     def get_clo_read_all_graph_url(self):
-        return reverse('semester:mata_kuliah_semester:clo:read-all-graph', kwargs={
-            'semester_prodi_id': self.semester.pk,
-            'mk_semester_id': self.pk
-        })
+        return get_reverse_url('semester:mata_kuliah_semester:clo:read-all-graph', self.get_kwargs)
     
     def get_clo_create_url(self):
-        return reverse('semester:mata_kuliah_semester:clo:create', kwargs={
-            'semester_prodi_id': self.semester.pk,
-            'mk_semester_id': self.pk
-        })
+        return get_reverse_url('semester:mata_kuliah_semester:clo:create', self.get_kwargs)
     
     def get_clo_bulk_delete_url(self):
-        return reverse('semester:mata_kuliah_semester:clo:bulk-delete', kwargs={
-            'semester_prodi_id': self.semester.pk,
-            'mk_semester_id': self.pk
-        })
+        return get_reverse_url('semester:mata_kuliah_semester:clo:bulk-delete', self.get_kwargs)
     
     def get_clo_duplicate_url(self):
-        return reverse('semester:mata_kuliah_semester:clo:duplicate', kwargs={
-            'semester_prodi_id': self.semester.pk,
-            'mk_semester_id': self.pk
-        })
+        return get_reverse_url('semester:mata_kuliah_semester:clo:duplicate', self.get_kwargs)
+    
+    def get_clo_lock_url(self):
+        return get_reverse_url('semester:mata_kuliah_semester:clo:lock', self.get_kwargs)
+    
+    def get_clo_unlock_url(self):
+        return get_reverse_url('semester:mata_kuliah_semester:clo:unlock', self.get_kwargs)
     
     # Nilai Komponen CLO Peserta
     def get_nilai_komponen_edit_url(self):
-        return reverse('semester:mata_kuliah_semester:nilai-komponen-edit', kwargs={
-            'semester_prodi_id': self.semester.pk,
-            'mk_semester_id': self.pk
-        })
+        return get_reverse_url('semester:mata_kuliah_semester:nilai-komponen-edit', self.get_kwargs)
 
 
 class KelasMataKuliahSemester(models.Model):
@@ -179,6 +166,13 @@ class PesertaMataKuliah(models.Model):
             ),
         )
     
+    @property
+    def get_kwargs(self):
+        return {
+            **self.kelas_mk_semester.mk_semester.get_kwargs,
+            'peserta_id': self.pk
+        }
+    
     def get_empty_komponen_clo(self):
         list_clo = self.kelas_mk_semester.mk_semester.get_all_clo()
         list_komponen_clo = []
@@ -195,18 +189,10 @@ class PesertaMataKuliah(models.Model):
         )
     
     def get_hx_nilai_komponen_clo_peserta_edit_url(self):
-        return reverse('semester:mata_kuliah_semester:hx-nilai-komponen-peserta-edit', kwargs={
-            'semester_prodi_id': self.kelas_mk_semester.mk_semester.semester.pk,
-            'mk_semester_id': self.kelas_mk_semester.mk_semester.pk,
-            'peserta_id': self.id_neosia,
-        })
+        return get_reverse_url('semester:mata_kuliah_semester:hx-nilai-komponen-peserta-edit', self.get_kwargs)
     
     def get_nilai_komponen_clo_peserta_edit_url(self):
-        return reverse('semester:mata_kuliah_semester:nilai-komponen-peserta-edit', kwargs={
-            'semester_prodi_id': self.kelas_mk_semester.mk_semester.semester.pk,
-            'mk_semester_id': self.kelas_mk_semester.mk_semester.pk,
-            'peserta_id': self.id_neosia,
-        })
+        return get_reverse_url('semester:mata_kuliah_semester:nilai-komponen-peserta-edit', self.get_kwargs)
 
 
 class DosenMataKuliah(models.Model):

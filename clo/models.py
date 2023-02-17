@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models import CheckConstraint, Q
 from django.urls import reverse
 from django.core.validators import MinValueValidator, MaxValueValidator
+from learning_outcomes_assessment.utils import get_reverse_url
 from pi_area.models import PerformanceIndicator
 from ilo.models import Ilo
 from mata_kuliah_semester.models import (
@@ -16,20 +17,19 @@ class Clo(models.Model):
 
     nama = models.CharField(max_length=255, null=False, blank=False)
     deskripsi = models.TextField(null=False)
+    
+    @property
+    def get_kwargs(self):
+        return {
+            **self.mk_semester.get_kwargs,
+            'clo_id': self.pk
+        }
 
     def read_detail_url(self):
-        return reverse('semester:mata_kuliah_semester:clo:read', kwargs={
-            'semester_prodi_id': self.mk_semester.semester.pk,
-            'mk_semester_id': self.mk_semester.pk,
-            'clo_id': self.pk
-        })
+        return get_reverse_url('semester:mata_kuliah_semester:clo:read', self.get_kwargs)
     
     def get_clo_update_url(self):
-        return reverse('semester:mata_kuliah_semester:clo:update', kwargs={
-            'semester_prodi_id': self.mk_semester.semester.pk,
-            'mk_semester_id': self.mk_semester.pk,
-            'clo_id': self.pk
-        })
+        return get_reverse_url('semester:mata_kuliah_semester:clo:update', self.get_kwargs)
     
     # PI CLO and ILO
     def get_pi_clo(self):

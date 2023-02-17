@@ -1,5 +1,5 @@
 import os
-from django.shortcuts import redirect
+from django.urls import reverse
 import requests
 from django.conf import settings
 
@@ -61,19 +61,31 @@ def extract_tahun_ajaran(tahun_ajaran: str) -> dict:
     return result
 
 
-def post_request(auth_url: str, params: dict = {}, headers: dict = {}, verify: bool = True, timeout = None):
+def post_request(url: str, params: dict = {}, headers: dict = {}, verify: bool = True, timeout = None):
+    """Post request to auth URL
+
+    Args:
+        auth_url (str): URL
+        params (dict, optional): Request parameters. Defaults to {}.
+        headers (dict, optional): Request headers. Defaults to {}.
+        verify (bool, optional): Verify SSL Certificate. Defaults to True.
+        timeout (float, optional): Request timeout. Defaults to None.
+
+    Returns:
+        Response | None: Returns response if success, else, returns None
+    """
+
     try:
-        response = requests.post(auth_url, params=params, headers=headers, verify=verify, timeout=timeout)
+        response = requests.post(url, params=params, headers=headers, verify=verify, timeout=timeout)
     except requests.exceptions.SSLError:
         if settings.DEBUG: 
             print("SSL Error")
-        response = post_request(auth_url, params=params, headers=headers, verify=False)
+        response = post_request(url, params=params, headers=headers, verify=False)
     except requests.exceptions.MissingSchema:
         if settings.DEBUG:
             print('URL POST has not been set')
-        return None
+        raise
     except requests.exceptions.Timeout:
-        # TODO: ACTIONS ON CONNECT TIMEOUT
         if settings.DEBUG:
             print('Timeout')
         raise
@@ -82,6 +94,17 @@ def post_request(auth_url: str, params: dict = {}, headers: dict = {}, verify: b
 
 
 def request_data_to_neosia(auth_url: str, params: dict = {}, headers: dict = {}):
+    """Request data to neosia
+
+    Args:
+        auth_url (str): URL
+        params (dict, optional): Request parameters. Defaults to {}.
+        headers (dict, optional): Request headers. Defaults to {}.
+
+    Returns:
+        dict | None: Returns JSON Response if success, else, returns None
+    """
+    
     headers['token'] = os.environ.get('NEOSIA_API_TOKEN')
     
     response = post_request(auth_url, params=params, headers=headers)
@@ -98,3 +121,15 @@ def request_data_to_neosia(auth_url: str, params: dict = {}, headers: dict = {})
         if settings.DEBUG: print(response.raw)
         return None
 
+
+def get_reverse_url(viewname: str, kwargs):
+    """Get reverse URL
+
+    Args:
+        viewname (str): View name that registered in urls
+
+    Returns:
+        str: Reverse URL for viewname
+    """
+    
+    return reverse(viewname, kwargs=kwargs)

@@ -3,7 +3,10 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from accounts.models import ProgramStudiJenjang
-from learning_outcomes_assessment.utils import extract_tahun_ajaran
+from learning_outcomes_assessment.utils import (
+    extract_tahun_ajaran,
+    get_reverse_url
+)
 
 # Create your models here.
 class TipeSemester(models.IntegerChoices):
@@ -53,26 +56,24 @@ class SemesterProdi(models.Model):
     tahun_ajaran_prodi = models.ForeignKey(TahunAjaranProdi, on_delete=models.CASCADE)
     semester = models.ForeignKey(Semester, on_delete=models.CASCADE)
 
+    @property
+    def get_kwargs(self):
+        return {
+            'semester_prodi_id': self.pk
+        }
+
     def get_mk_semester(self):
         return self.matakuliahsemester_set.all()
 
     def read_detail_url(self):
-        return reverse('semester:read', kwargs={
-            'semester_prodi_id': self.id_neosia
-        })
+        return get_reverse_url('semester:read', self.get_kwargs)
 
     # Mata kuliah semester
     def read_all_mk_semester_url(self):
-        return reverse('semester:mata_kuliah_semester:read-all', kwargs={
-            'semester_prodi_id': self.id_neosia
-        })
+        return get_reverse_url('semester:mata_kuliah_semester:read-all', self.get_kwargs)
 
     def get_create_mk_semester_url(self):
-        return reverse('semester:mata_kuliah_semester:create', kwargs={
-            'semester_prodi_id': self.id_neosia
-        })
+        return get_reverse_url('semester:mata_kuliah_semester:create', self.get_kwargs)
 
     def get_bulk_delete_mk_semester_url(self):
-        return reverse('semester:mata_kuliah_semester:bulk-delete', kwargs={
-            'semester_prodi_id': self.id_neosia
-        })
+        return get_reverse_url('semester:mata_kuliah_semester:bulk-delete', self.get_kwargs)

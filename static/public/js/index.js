@@ -143,7 +143,6 @@ function openModal(modal) {
         // Hide tooltip on modal body scroll
         setTimeout(function () {
             let modalBody = $(modal).find('.modal-body');
-            console.log(modalBody);
             $(modalBody).on("scroll", function () {
                 $('.tooltip').hide();
             })
