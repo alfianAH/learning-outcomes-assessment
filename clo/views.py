@@ -3,7 +3,7 @@ from django.db.models import QuerySet
 from django.shortcuts import get_object_or_404, redirect
 from django.conf import settings
 from django.contrib import messages
-from django.views.generic.base import View
+from django.views.generic.base import View, RedirectView
 from django.views.generic.edit import FormView
 from learning_outcomes_assessment.auth.mixins import ProgramStudiMixin
 from learning_outcomes_assessment.list_view.views import (
@@ -15,6 +15,7 @@ from learning_outcomes_assessment.forms.edit import (
     ModelBulkDeleteView,
     DuplicateFormview,
 )
+from lock_model.models import Lock
 from mata_kuliah_semester.models import MataKuliahSemester
 from pi_area.models import PerformanceIndicator
 from .models import (
@@ -299,13 +300,15 @@ class CloUpdateView(ProgramStudiMixin, MySessionWizardView):
 
         match(step):
             case '1':
-                initial.update({
-                    'pi_area': self.clo_obj.get_ilo().pi_area.pk
-                })
+                if self.clo_obj.get_ilo() is not None:
+                    initial.update({
+                        'pi_area': self.clo_obj.get_ilo().pi_area.pk
+                    })
             case '2':
-                initial.update({
-                    'performance_indicator': [pi_clo['performance_indicator_id'] for pi_clo in self.clo_obj.get_pi_clo().values()]
-                })
+                if self.clo_obj.get_pi_clo() is not None:
+                    initial.update({
+                        'performance_indicator': [pi_clo['performance_indicator_id'] for pi_clo in self.clo_obj.get_pi_clo().values()]
+                    })
         return initial
 
     def get_form_kwargs(self, step=None):
@@ -469,6 +472,66 @@ class CloDuplicateView(ProgramStudiMixin, DuplicateFormview):
 
         print(self.mk_semester_obj.get_total_persentase_clo())
         return super().form_valid(form)
+
+
+class CloLockView(RedirectView):
+    mk_semester_obj: MataKuliahSemester = None
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        mk_semester_id = kwargs.get('mk_semester_id')
+        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+    
+    def get_redirect_url(self, *args, **kwargs):
+        self.url = self.mk_semester_obj.get_clo_read_all_url()
+        return super().get_redirect_url(*args, **kwargs)
+    
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        clo_qs: QuerySet[Clo] = self.mk_semester_obj.get_all_clo()
+        is_success = True
+
+        for clo_obj in clo_qs:
+            komponen_clo_qs: QuerySet[KomponenClo] = clo_obj.get_komponen_clo()
+
+            for komponen_clo_obj in komponen_clo_qs:
+                is_success = is_success and komponen_clo_obj.lock_object(request.user)
+            
+            is_success = is_success and clo_obj.lock_object(request.user)
+
+        if is_success:
+            messages.success(request, 'Berhasil mengunci CLO dan komponennya.')
+        else:
+            messages.error(request, 'Gagal mengunci CLO dan komponennya.')
+        return super().get(request, *args, **kwargs)
+
+
+class CloUnlockView(RedirectView):
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        mk_semester_id = kwargs.get('mk_semester_id')
+        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+    
+    def get_redirect_url(self, *args, **kwargs):
+        self.url = self.mk_semester_obj.get_clo_read_all_url()
+        return super().get_redirect_url(*args, **kwargs)
+    
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        clo_qs: QuerySet[Clo] = self.mk_semester_obj.get_all_clo()
+        is_success = True
+
+        for clo_obj in clo_qs:
+            komponen_clo_qs: QuerySet[KomponenClo] = clo_obj.get_komponen_clo()
+
+            for komponen_clo_obj in komponen_clo_qs:
+                is_success = komponen_clo_obj.unlock_object()
+            is_success = clo_obj.unlock_object()
+
+        if is_success:
+            messages.success(request, 'Berhasil membuka kunci CLO dan komponennya.')
+        else:
+            messages.error(request, 'Gagal membuka kunci CLO dan komponennya.')
+
+        return super().get(request, *args, **kwargs)
 
 
 # Komponen CLO

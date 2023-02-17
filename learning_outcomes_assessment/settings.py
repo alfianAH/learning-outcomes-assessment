@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'semester',
     'ilo',
     'clo',
+    'lock_model',
 ]
 
 MIDDLEWARE = [

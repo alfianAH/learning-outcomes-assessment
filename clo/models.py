@@ -1,8 +1,8 @@
 from django.db import models
 from django.db.models import CheckConstraint, Q
-from django.urls import reverse
 from django.core.validators import MinValueValidator, MaxValueValidator
 from learning_outcomes_assessment.utils import get_reverse_url
+from lock_model.models import LockableMixin
 from pi_area.models import PerformanceIndicator
 from ilo.models import Ilo
 from mata_kuliah_semester.models import (
@@ -12,7 +12,7 @@ from mata_kuliah_semester.models import (
 
 
 # Create your models here.
-class Clo(models.Model):
+class Clo(LockableMixin, models.Model):
     mk_semester = models.ForeignKey(MataKuliahSemester, on_delete=models.CASCADE)
 
     nama = models.CharField(max_length=255, null=False, blank=False)
@@ -57,28 +57,16 @@ class Clo(models.Model):
         return total_persentase
     
     def get_komponen_clo_bulk_delete_url(self):
-        return reverse('semester:mata_kuliah_semester:clo:komponen-clo-bulk-delete', kwargs={
-            'semester_prodi_id': self.mk_semester.semester.pk,
-            'mk_semester_id': self.mk_semester.pk,
-            'clo_id': self.pk
-        })
+        return get_reverse_url('semester:mata_kuliah_semester:clo:komponen-clo-bulk-delete', self.get_kwargs)
     
     def get_komponen_clo_create_url(self):
-        return reverse('semester:mata_kuliah_semester:clo:komponen-clo-create', kwargs={
-            'semester_prodi_id': self.mk_semester.semester.pk,
-            'mk_semester_id': self.mk_semester.pk,
-            'clo_id': self.pk
-        })
+        return get_reverse_url('semester:mata_kuliah_semester:clo:komponen-clo-create', self.get_kwargs)
     
     def get_komponen_clo_graph_url(self):
-        return reverse('semester:mata_kuliah_semester:clo:komponen-clo-graph', kwargs={
-            'semester_prodi_id': self.mk_semester.semester.pk,
-            'mk_semester_id': self.mk_semester.pk,
-            'clo_id': self.pk
-        })
+        return get_reverse_url('semester:mata_kuliah_semester:clo:komponen-clo-graph', self.get_kwargs)
 
 
-class KomponenClo(models.Model):
+class KomponenClo(LockableMixin, models.Model):
     clo = models.ForeignKey(Clo, on_delete=models.CASCADE)
 
     teknik_penilaian = models.CharField(null=False, blank=False, max_length=255)

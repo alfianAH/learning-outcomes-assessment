@@ -1,7 +1,6 @@
 from django.db import models
 from django.db.models import CheckConstraint, Q
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.urls import reverse
 from django.conf import settings
 from learning_outcomes_assessment.utils import get_reverse_url
 from ilo.models import Ilo
@@ -25,12 +24,6 @@ class MataKuliahSemester(models.Model):
                 name='average_clo_achievement_range'
             ),
         )
-    
-    def get_reverse_url(self, viewname: str):
-        return reverse(viewname, kwargs={
-            'semester_prodi_id': self.semester.pk,
-            'mk_semester_id': self.pk,
-        })
     
     @property
     def get_kwargs(self):
@@ -135,6 +128,13 @@ class KelasMataKuliahSemester(models.Model):
 
     def __str__(self) -> str:
         return self.nama
+    
+    @property
+    def get_kwargs(self):
+        return {
+            **self.mk_semester.get_kwargs,
+            'kelas_mk_semester_id': self.pk
+        }
 
     def get_dosen_mata_kuliah(self):
         return self.dosenmatakuliah_set.all()
@@ -143,11 +143,7 @@ class KelasMataKuliahSemester(models.Model):
         return self.pesertamatakuliah_set.all()
     
     def get_delete_kelas_mk_semester_url(self):
-        return reverse('semester:mata_kuliah_semester:kelas-mk-semester-delete', kwargs={
-            'semester_prodi_id': self.mk_semester.semester.pk,
-            'mk_semester_id': self.mk_semester.pk,
-            'kelas_mk_semester_id': self.id_neosia
-        })
+        return get_reverse_url('semester:mata_kuliah_semester:kelas-mk-semester-delete', self.get_kwargs)
 
 
 class PesertaMataKuliah(models.Model):
