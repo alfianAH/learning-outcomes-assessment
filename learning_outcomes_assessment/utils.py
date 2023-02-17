@@ -1,4 +1,5 @@
 import os
+from django.shortcuts import redirect
 import requests
 from django.conf import settings
 
@@ -60,23 +61,30 @@ def extract_tahun_ajaran(tahun_ajaran: str) -> dict:
     return result
 
 
-def request_data_to_neosia(auth_url: str, params: dict = {}, headers: dict = {}):
-    headers['token'] = os.environ.get('NEOSIA_API_TOKEN')
-    
+def post_request(auth_url: str, params: dict = {}, headers: dict = {}, verify: bool = True, timeout = None):
     try:
-        response = requests.post(auth_url, params=params, headers=headers)
+        response = requests.post(auth_url, params=params, headers=headers, verify=verify, timeout=timeout)
     except requests.exceptions.SSLError:
-        if settings.DEBUG: print("SSL Error")
-        response = requests.post(auth_url, params=params, headers=headers, verify=False)
+        if settings.DEBUG: 
+            print("SSL Error")
+        response = post_request(auth_url, params=params, headers=headers, verify=False)
     except requests.exceptions.MissingSchema:
         if settings.DEBUG:
             print('URL POST has not been set')
         return None
-    except requests.exceptions.ConnectTimeout:
+    except requests.exceptions.Timeout:
         # TODO: ACTIONS ON CONNECT TIMEOUT
         if settings.DEBUG:
             print('Timeout')
-        return None
+        raise
+
+    return response
+
+
+def request_data_to_neosia(auth_url: str, params: dict = {}, headers: dict = {}):
+    headers['token'] = os.environ.get('NEOSIA_API_TOKEN')
+    
+    response = post_request(auth_url, params=params, headers=headers)
 
     if response.status_code == 200:
         json_response = response.json()

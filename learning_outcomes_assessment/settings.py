@@ -74,6 +74,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_htmx.middleware.HtmxMiddleware',
+
+    'learning_outcomes_assessment.middleware.TimeoutMiddleware',
 ]
 
 ROOT_URLCONF = 'learning_outcomes_assessment.urls'
