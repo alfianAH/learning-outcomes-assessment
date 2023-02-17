@@ -1,4 +1,7 @@
 from django.shortcuts import render
+from learning_outcomes_assessment.exceptions import(
+    ConditionTimeoutException
+)
 import requests
 
 class TimeoutMiddleware:
@@ -10,7 +13,10 @@ class TimeoutMiddleware:
         return response
 
     def process_exception(self, request, exception):
-        if isinstance(exception, requests.exceptions.Timeout):
+        if isinstance(
+            exception,
+            (requests.exceptions.Timeout, ConditionTimeoutException) 
+        ):
             return render(request, 'errors/timeout.html')
 
         # If the exception is not handled, return None

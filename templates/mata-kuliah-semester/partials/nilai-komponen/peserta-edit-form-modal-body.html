@@ -1,1 +1,5 @@
+{% if request.user.role == 'a' %}
+<p>Untuk melakukan generate nilai peserta, klik <a href="{{ peserta_obj.get_nilai_komponen_clo_peserta_edit_url }}">di sini</a>.</p>
+{% endif %}
+
 {% include 'mata-kuliah-semester/partials/nilai-komponen/nilai-komponen-clo-form-content.html' with post_url=peserta_obj.get_nilai_komponen_clo_peserta_edit_url is_modal=True %}

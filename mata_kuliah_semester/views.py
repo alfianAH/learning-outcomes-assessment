@@ -484,9 +484,14 @@ class NilaiKomponenCloEditTemplateView(FormView):
         )
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if len(self.get_form().forms) == 0:
+            messages.warning(self.request, 'Edit nilai belum bisa dilakukan. Pastikan anda sudah melengkapi CLO dan komponen penilaiannya.')
+            return redirect(self.success_url)
+
         if request.user.role == 'a':
             if request.GET.get('generate') == 'true':
-                messages.info(request, 'Hasil generate sudah selesai. Generate nilai hanya berlaku untuk peserta yang belum memiliki nilai di semua komponen CLO.')
+                messages.info(request, 'Proses generate sudah selesai. Generate nilai hanya berlaku untuk peserta yang belum memiliki nilai di semua komponen CLO.')
+        
         return super().get(request, *args, **kwargs)
 
     def get_form_kwargs(self):

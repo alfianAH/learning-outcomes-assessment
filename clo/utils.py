@@ -1,6 +1,8 @@
 import random
+import time
 from django.db.models import QuerySet
 from django.conf import settings
+from learning_outcomes_assessment.exceptions import ConditionTimeoutException
 from kurikulum.models import Kurikulum
 from semester.models import SemesterProdi
 from pi_area.models import (
@@ -114,7 +116,7 @@ def duplicate_clo(semester_prodi_id: int, new_mk_semester: MataKuliahSemester):
             new_pi_clo.save()
 
 
-def generate_nilai_clo(persentase_komponen_clo, nilai_akhir: float):
+def generate_nilai_clo(persentase_komponen_clo, nilai_akhir: float, timeout = 10):
     possibility_choices = {
         'low': {
             'choices': list(range(16)),
@@ -128,6 +130,7 @@ def generate_nilai_clo(persentase_komponen_clo, nilai_akhir: float):
         60: (16, 6), 
         50: (16, 0)
     }
+    start_time = time.time()
 
     komponen_clo_len = len(persentase_komponen_clo)
     hasil = [0] * komponen_clo_len
@@ -155,6 +158,11 @@ def generate_nilai_clo(persentase_komponen_clo, nilai_akhir: float):
             hasil[komponen_clo_len - 1] = int((nilai_akhir - temp) * 100 / persentase_komponen_clo[komponen_clo_len - 1])
             if hasil[komponen_clo_len - 1] <= nilai_akhir and hasil[komponen_clo_len - 1] >= 0: break
 
+            # Check if the timeout has been exceeded
+            elapsed_time = time.time() - start_time
+            if elapsed_time >= timeout:
+                raise ConditionTimeoutException("Kondisi generate nilai tidak terpenuhi dalam periode timeout {}".format(timeout))
+
     # Jika nilai 1-49
     if 50 > nilai_akhir > 0:
         # Pilih index untuk memberi nilai 0
@@ -179,5 +187,10 @@ def generate_nilai_clo(persentase_komponen_clo, nilai_akhir: float):
             # Nilai di komponen terakhir (0-100) = nilai sisa (nilai diskon) * 100 / persen
             hasil[komponen_clo_len - 1] = round((nilai_akhir - temp) * 100 / persentase_komponen_clo[komponen_clo_len - 1])
             if hasil[komponen_clo_len - 1] <= 95 and hasil[komponen_clo_len - 1] >= 0: break
+
+            # Check if the timeout has been exceeded
+            elapsed_time = time.time() - start_time
+            if elapsed_time >= timeout:
+                raise ConditionTimeoutException("Kondisi generate nilai tidak terpenuhi dalam periode timeout {}".format(timeout))
 
     return hasil
