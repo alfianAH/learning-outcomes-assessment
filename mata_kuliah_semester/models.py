@@ -91,6 +91,20 @@ class MataKuliahSemester(models.Model):
         
         return total_persentase
     
+    def is_all_clo_locked(self):
+        list_clo = self.get_all_clo()
+        lock_status = True
+
+        for clo in list_clo:
+            lock_status = lock_status and clo.is_locked
+            for komponen_clo in clo.get_komponen_clo():
+                lock_status = lock_status and komponen_clo.is_locked
+            
+            if lock_status is False: break
+        
+        print('Status: {}'.format(lock_status))
+        return lock_status
+    
     def get_clo_read_all_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:clo:read-all', self.get_kwargs)
     

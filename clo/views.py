@@ -487,17 +487,32 @@ class CloLockView(RedirectView):
         return super().get_redirect_url(*args, **kwargs)
     
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        total_persentase_clo = self.mk_semester_obj.get_total_persentase_clo()
+
+        # Can't lock if total persentase CLO is not 100%
+        if total_persentase_clo != 100: 
+            messages.warning(request, 'Gagal mengunci CLO dan komponennya. Pastikan total persentase semua komponen CLO adalah 100%.')
+            return super().get(request, *args, **kwargs)
+
         clo_qs: QuerySet[Clo] = self.mk_semester_obj.get_all_clo()
         is_success = True
+        is_locking_success = True
 
         for clo_obj in clo_qs:
             komponen_clo_qs: QuerySet[KomponenClo] = clo_obj.get_komponen_clo()
 
             for komponen_clo_obj in komponen_clo_qs:
-                is_success = is_success and komponen_clo_obj.lock_object(request.user)
+                # Lock komponen CLO
+                is_locking_success = is_locking_success and komponen_clo_obj.lock_object(request.user)
+                is_success = is_success and komponen_clo_obj.is_locked
             
-            is_success = is_success and clo_obj.lock_object(request.user)
+            is_locking_success = is_locking_success and clo_obj.lock_object(request.user)
+            is_success = is_success and clo_obj.is_locked
 
+        if not is_locking_success:
+            messages.info(request, 'CLO dan komponennya sudah terkunci.')
+            return super().get(request, *args, **kwargs)
+            
         if is_success:
             messages.success(request, 'Berhasil mengunci CLO dan komponennya.')
         else:
@@ -518,13 +533,21 @@ class CloUnlockView(RedirectView):
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         clo_qs: QuerySet[Clo] = self.mk_semester_obj.get_all_clo()
         is_success = True
+        is_unlocking_success = True
 
         for clo_obj in clo_qs:
             komponen_clo_qs: QuerySet[KomponenClo] = clo_obj.get_komponen_clo()
 
             for komponen_clo_obj in komponen_clo_qs:
-                is_success = komponen_clo_obj.unlock_object()
-            is_success = clo_obj.unlock_object()
+                is_unlocking_success = is_unlocking_success and komponen_clo_obj.unlock_object()
+                is_success = is_success and not komponen_clo_obj.is_locked
+            
+            is_unlocking_success = is_unlocking_success and clo_obj.unlock_object()
+            is_success = is_success and not clo_obj.is_locked
+
+        if not is_unlocking_success:
+            messages.info(request, 'CLO dan komponenya sudah tidak terkunci.')
+            return super().get(request, *args, **kwargs)
 
         if is_success:
             messages.success(request, 'Berhasil membuka kunci CLO dan komponennya.')

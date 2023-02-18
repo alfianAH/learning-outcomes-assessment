@@ -23,28 +23,41 @@ class Lock(models.Model):
 
 
 class LockableMixin(models.Model):
-    lock = models.ForeignKey(Lock, on_delete=models.SET_NULL, null=True, blank=True)
+    lock = models.OneToOneField(Lock, on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         abstract = True
 
     def lock_object(self, user) -> bool:
-        lock_obj, _ = Lock.objects.get_or_create(
-            content_type=ContentType.objects.get_for_model(self),
-            object_id=self.pk,
-            defaults={'locked_object': self, 'locked_by': user},
-        )
-        if lock_obj is None: return False
+        # If lock is None, create new one
+        if not self.lock:
+            content_type = ContentType.objects.get_for_model(self)
+            self.lock = Lock.objects.create(
+                is_locked=True,
+                locked_by=user,
+                content_type=content_type,
+                object_id=self.pk,
+                locked_object=self,
+            )
 
-        lock_obj.is_locked = True
-        self.lock = lock_obj
-        self.save()
-        return True
+            self.lock.save()
+            self.save()
+            return True
+        
+        # If object has lock
+        # Return False if has been locked 
+        if self.lock.is_locked: 
+            return False
+        # Lock, if not yet lock
+        else:
+            self.lock.is_locked = True
+            self.lock.save()
+            return True
 
     def unlock_object(self) -> bool:
         # Return if lock is deleted
-        if not self.lock: return False
-        
+        if not self.lock or not self.lock.is_locked: return False
+
         self.lock.unlock()
         return True
     
