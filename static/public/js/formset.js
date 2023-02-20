@@ -3,8 +3,9 @@ function addMoreForm(totalFormId) {
         const currentFormCount = $('.added-form').length; // + 1
         const copyEmptyFormEl = $('#empty-form').clone(true);
 
-        copyEmptyFormEl.removeClass('hidden').addClass('added-form mb-3 flex');
-        copyEmptyFormEl.attr('id', `form-${currentFormCount}`);
+        copyEmptyFormEl.removeClass('hidden').addClass('added-form mb-3');
+        copyEmptyFormEl.removeAttr('id');
+        $(copyEmptyFormEl.children()[0]).attr('id', `form-${currentFormCount}`);
         
         copyEmptyFormEl.find('.form-control').attr('required', 'true');
         
@@ -15,16 +16,6 @@ function addMoreForm(totalFormId) {
         // now add new empty form element to our html form
         $('#form-list').append(copyEmptyFormEl);
     });
-}
-
-function deleteForm(button, totalFormId) {
-    // Delete form
-    const formNumber = $(button).attr('data-delete');
-    $(`#form-${formNumber}`).remove();
-
-    // Update total form
-    const currentFormCount = $('.added-form').length;
-    $(totalFormId).val(currentFormCount);
 }
 
 function changeDeleteFieldValue(deleteFormId) {
