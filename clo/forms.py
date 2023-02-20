@@ -135,16 +135,16 @@ class KomponenCloForm(forms.ModelForm):
 
 
 class KomponenCloInlineFormset(CanDeleteInlineFormSet):
-    def __init__(self, *args, **kwargs):
-        self.mk_semester: MataKuliahSemester = kwargs.pop('mk_semester')
+    def __init__(self, mk_semester, clo=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.mk_semester: MataKuliahSemester = mk_semester
+        self.current_clo: Clo = clo
 
     def clean(self) -> None:
         super().clean()
 
         # Sum all of percentages
         submitted_persentase = 0
-        deleted_persentase = 0
         exist_persentase = 0
 
         for form in self.forms:
@@ -152,10 +152,8 @@ class KomponenCloInlineFormset(CanDeleteInlineFormSet):
             persentase = form.cleaned_data.get('persentase', 0)
             komponen_id = form.cleaned_data.get('id')
 
-            # If field is deleted, add persentase to deleted
-            if is_field_deleted: 
-                deleted_persentase += persentase
-                continue
+            # Skip, if field is deleted
+            if is_field_deleted: continue
             
             # If add new komponen, ...
             if komponen_id is None:
@@ -164,9 +162,15 @@ class KomponenCloInlineFormset(CanDeleteInlineFormSet):
             else:  # If komponen is already added, ...
                 # Add persentase to exist
                 exist_persentase += persentase
-
-        total_persentase = self.mk_semester.get_total_persentase_clo() - deleted_persentase - exist_persentase + submitted_persentase
         
+        if self.current_clo is None:
+            total_persentase = self.mk_semester.get_total_persentase_clo() - exist_persentase + submitted_persentase
+        else:
+            old_clo_persentase = self.current_clo.get_total_persentase_komponen()
+            new_clo_persentase = exist_persentase + submitted_persentase
+            total_persentase = self.mk_semester.get_total_persentase_clo() - old_clo_persentase + new_clo_persentase
+        
+        print('Total: {}'.format(total_persentase))
         # Add error to field if total_persentase is more than 100
         if total_persentase > 100:
             for form in self.forms:

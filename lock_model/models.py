@@ -32,7 +32,7 @@ class LockableMixin(models.Model):
         # If lock is None, create new one
         if not self.lock:
             content_type = ContentType.objects.get_for_model(self)
-            self.lock = Lock.objects.create(
+            Lock.objects.create(
                 is_locked=True,
                 locked_by=user,
                 content_type=content_type,
@@ -40,8 +40,6 @@ class LockableMixin(models.Model):
                 locked_object=self,
             )
 
-            self.lock.save()
-            self.save()
             return True
         
         # If object has lock

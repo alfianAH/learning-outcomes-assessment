@@ -10,6 +10,13 @@ from semester.models import SemesterProdi
 User = settings.AUTH_USER_MODEL
 
 # Create your models here.
+class MataKuliahSemesterLock(models.Model):
+    is_clo_locked = models.BooleanField(default=False)
+    
+    class Meta:
+        abstract = True
+
+
 class MataKuliahSemester(models.Model):
     mk_kurikulum = models.ForeignKey(MataKuliahKurikulum, on_delete=models.CASCADE)
     semester = models.ForeignKey(SemesterProdi, on_delete=models.CASCADE)
@@ -100,9 +107,11 @@ class MataKuliahSemester(models.Model):
             for komponen_clo in clo.get_komponen_clo():
                 lock_status = lock_status and komponen_clo.is_locked
             
+            for pi_clo in clo.get_pi_clo():
+                lock_status = lock_status and pi_clo.is_locked
+            
             if lock_status is False: break
         
-        print('Status: {}'.format(lock_status))
         return lock_status
     
     def get_clo_read_all_url(self):

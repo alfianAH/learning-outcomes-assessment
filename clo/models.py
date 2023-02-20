@@ -82,7 +82,7 @@ class KomponenClo(LockableMixin, models.Model):
         )
 
 
-class PiClo(models.Model):
+class PiClo(LockableMixin, models.Model):
     performance_indicator = models.ForeignKey(PerformanceIndicator, on_delete=models.CASCADE)
     clo = models.ForeignKey(Clo, on_delete=models.CASCADE)
 

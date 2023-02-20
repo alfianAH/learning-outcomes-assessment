@@ -236,6 +236,9 @@ class CloCreateView(ProgramStudiMixin, MySessionWizardView):
             case '3':
                 current_title = 'Tambahkan Komponen Penilaian'
                 current_help_text = 'Tambahkan komponen penilaian pada CLO, yang terdiri dari teknik dan instrumen penilaian, dan persentasenya.<p class="text-danger">Peringatan: Jika anda meninggalkan step ini sebelum submit, maka seluruh data komponen penilaian yang diisi tidak akan tersimpan. Contoh meninggalkan step ini: pergi ke step sebelumnya atau me-refresh page.</p>'
+                context.update({
+                    'id_total_form': '#id_{}-TOTAL_FORMS'.format(self.steps.current)
+                })
         
         context.update({
             'current_title': current_title,
@@ -473,19 +476,69 @@ class CloDuplicateView(ProgramStudiMixin, DuplicateFormview):
         print(self.mk_semester_obj.get_total_persentase_clo())
         return super().form_valid(form)
 
-
-class CloLockView(RedirectView):
+class CloLockAndUnlockView(ProgramStudiMixin, RedirectView):
     mk_semester_obj: MataKuliahSemester = None
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
         mk_semester_id = kwargs.get('mk_semester_id')
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
     
     def get_redirect_url(self, *args, **kwargs):
         self.url = self.mk_semester_obj.get_clo_read_all_url()
         return super().get_redirect_url(*args, **kwargs)
     
+    def lock_clo(self, clo_qs: QuerySet[Clo]):
+        is_success = True
+        is_locking_success = True
+
+        for clo_obj in clo_qs:
+            komponen_clo_qs: QuerySet[KomponenClo] = clo_obj.get_komponen_clo()
+            pi_clo_qs: QuerySet[PiClo] = clo_obj.get_pi_clo()
+
+            for komponen_clo_obj in komponen_clo_qs:
+                # Lock komponen CLO
+                is_locking_success = is_locking_success and komponen_clo_obj.lock_object(self.request.user)
+                is_success = is_success and komponen_clo_obj.is_locked
+
+            for pi_clo_obj in pi_clo_qs:
+                # Lock PI CLO
+                is_locking_success = is_locking_success and pi_clo_obj.lock_object(self.request.user)
+                is_success = is_success and pi_clo_obj.is_locked
+            
+            # Lock CLO
+            is_locking_success = is_locking_success and clo_obj.lock_object(self.request.user)
+            is_success = is_success and clo_obj.is_locked
+        
+        return is_success, is_locking_success
+    
+    def unlock_clo(self, clo_qs: QuerySet[Clo]):
+        is_success = True
+        is_unlocking_success = True
+
+        for clo_obj in clo_qs:
+            komponen_clo_qs: QuerySet[KomponenClo] = clo_obj.get_komponen_clo()
+            pi_clo_qs: QuerySet[PiClo] = clo_obj.get_pi_clo()
+
+            # Unlock komponen CLO
+            for komponen_clo_obj in komponen_clo_qs:
+                is_unlocking_success = is_unlocking_success and komponen_clo_obj.unlock_object()
+                is_success = is_success and not komponen_clo_obj.is_locked
+            
+            # Unlock PI CLO
+            for pi_clo_obj in pi_clo_qs:
+                is_unlocking_success = is_unlocking_success and pi_clo_obj.unlock_object()
+                is_success = is_success and not pi_clo_obj.is_locked
+            
+            # Unlock CLO
+            is_unlocking_success = is_unlocking_success and clo_obj.unlock_object()
+            is_success = is_success and not clo_obj.is_locked
+
+        return is_success, is_unlocking_success
+
+
+class CloLockView(CloLockAndUnlockView):
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         total_persentase_clo = self.mk_semester_obj.get_total_persentase_clo()
 
@@ -495,19 +548,7 @@ class CloLockView(RedirectView):
             return super().get(request, *args, **kwargs)
 
         clo_qs: QuerySet[Clo] = self.mk_semester_obj.get_all_clo()
-        is_success = True
-        is_locking_success = True
-
-        for clo_obj in clo_qs:
-            komponen_clo_qs: QuerySet[KomponenClo] = clo_obj.get_komponen_clo()
-
-            for komponen_clo_obj in komponen_clo_qs:
-                # Lock komponen CLO
-                is_locking_success = is_locking_success and komponen_clo_obj.lock_object(request.user)
-                is_success = is_success and komponen_clo_obj.is_locked
-            
-            is_locking_success = is_locking_success and clo_obj.lock_object(request.user)
-            is_success = is_success and clo_obj.is_locked
+        is_success, is_locking_success = self.lock_clo(clo_qs)
 
         if not is_locking_success:
             messages.info(request, 'CLO dan komponennya sudah terkunci.')
@@ -516,34 +557,15 @@ class CloLockView(RedirectView):
         if is_success:
             messages.success(request, 'Berhasil mengunci CLO dan komponennya.')
         else:
+            self.unlock_clo(clo_qs)
             messages.error(request, 'Gagal mengunci CLO dan komponennya.')
         return super().get(request, *args, **kwargs)
 
 
-class CloUnlockView(RedirectView):
-    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
-        super().setup(request, *args, **kwargs)
-        mk_semester_id = kwargs.get('mk_semester_id')
-        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
-    
-    def get_redirect_url(self, *args, **kwargs):
-        self.url = self.mk_semester_obj.get_clo_read_all_url()
-        return super().get_redirect_url(*args, **kwargs)
-    
+class CloUnlockView(CloLockAndUnlockView):
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         clo_qs: QuerySet[Clo] = self.mk_semester_obj.get_all_clo()
-        is_success = True
-        is_unlocking_success = True
-
-        for clo_obj in clo_qs:
-            komponen_clo_qs: QuerySet[KomponenClo] = clo_obj.get_komponen_clo()
-
-            for komponen_clo_obj in komponen_clo_qs:
-                is_unlocking_success = is_unlocking_success and komponen_clo_obj.unlock_object()
-                is_success = is_success and not komponen_clo_obj.is_locked
-            
-            is_unlocking_success = is_unlocking_success and clo_obj.unlock_object()
-            is_success = is_success and not clo_obj.is_locked
+        is_success, is_unlocking_success = self.unlock_clo(clo_qs)
 
         if not is_unlocking_success:
             messages.info(request, 'CLO dan komponenya sudah tidak terkunci.')
@@ -552,6 +574,7 @@ class CloUnlockView(RedirectView):
         if is_success:
             messages.success(request, 'Berhasil membuka kunci CLO dan komponennya.')
         else:
+            self.lock_clo(clo_qs)
             messages.error(request, 'Gagal membuka kunci CLO dan komponennya.')
 
         return super().get(request, *args, **kwargs)
@@ -602,7 +625,8 @@ class KomponenCloCreateView(ProgramStudiMixin, FormView):
         kwargs = super().get_form_kwargs()
         kwargs.update({
             'instance': self.clo_obj,
-            'mk_semester': self.clo_obj.mk_semester
+            'mk_semester': self.clo_obj.mk_semester,
+            'clo': self.clo_obj,
         })
         return kwargs
     
