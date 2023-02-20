@@ -26,9 +26,15 @@
                 <div>{{ option.status_nilai }}</div>
             </div>
 
-            <div class="flex px-3 py-1 space-x-2.5 justify-between">
+            <div class="flex px-3 py-1 space-x-2.5 justify-between items-center">
                 <div class="whitespace-nowrap font-bold">Status Pedoman</div>
-                <div>{{ option.status_pedoman }}</div>
+                <div>
+                    {% if single_object.status_pedoman %}
+                    <div class="badge badge-success">Sudah dikunci</div>
+                    {% else %}
+                    <div class="badge badge-warning">Belum dikunci</div>
+                    {% endif %}
+                </div>
             </div>
         {% endif %}
     </div>

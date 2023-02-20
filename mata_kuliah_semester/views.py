@@ -202,21 +202,36 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, DetailWithListViewModelD):
         )
         return super().get_queryset()
 
+    def update_status_pedoman(self, status_pedoman: bool, pedoman_objects_dict: dict):
+        if status_pedoman:
+            pedoman_objects_dict.update({
+                'badge_type': 'badge-success',
+                'badge_text': 'Sudah dikunci',
+            })
+        else:
+            pedoman_objects_dict.update({
+                'badge_type': 'badge-warning',
+                'badge_text': 'Belum dikunci',
+            })
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         pedoman_objects = [
             {
-                'badge_type': 'badge-warning',
-                'badge_text': 'Belum dikunci',
                 'title': 'Course Learning Outcomes (CLO)',
                 'read_detail_url': self.single_object.get_clo_read_all_url()
             },
             {
-                'badge_type': 'badge-warning',
-                'badge_text': 'Belum dikunci',
                 'title': 'Rencana Pembelajaran Semester (RPS)'
             }
         ]
+        
+        # Status Pedoman CLO
+        self.update_status_pedoman(self.single_object.is_clo_locked, pedoman_objects[0])
+        
+        # Status pedoman RPS
+        self.update_status_pedoman(self.single_object.is_rps_locked, pedoman_objects[1])
+
         context.update({
             'colspan_length': 8,
             'pedoman_objects': pedoman_objects

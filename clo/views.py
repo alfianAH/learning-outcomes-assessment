@@ -476,6 +476,7 @@ class CloDuplicateView(ProgramStudiMixin, DuplicateFormview):
         print(self.mk_semester_obj.get_total_persentase_clo())
         return super().form_valid(form)
 
+
 class CloLockAndUnlockView(ProgramStudiMixin, RedirectView):
     mk_semester_obj: MataKuliahSemester = None
 
@@ -510,6 +511,10 @@ class CloLockAndUnlockView(ProgramStudiMixin, RedirectView):
             # Lock CLO
             is_locking_success = is_locking_success and clo_obj.lock_object(self.request.user)
             is_success = is_success and clo_obj.is_locked
+
+        if is_success:
+            self.mk_semester_obj.is_clo_locked = True
+            self.mk_semester_obj.save()
         
         return is_success, is_locking_success
     
@@ -534,6 +539,10 @@ class CloLockAndUnlockView(ProgramStudiMixin, RedirectView):
             # Unlock CLO
             is_unlocking_success = is_unlocking_success and clo_obj.unlock_object()
             is_success = is_success and not clo_obj.is_locked
+
+        if is_success:
+            self.mk_semester_obj.is_clo_locked = False
+            self.mk_semester_obj.save()
 
         return is_success, is_unlocking_success
 

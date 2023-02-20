@@ -12,12 +12,13 @@ User = settings.AUTH_USER_MODEL
 # Create your models here.
 class MataKuliahSemesterLock(models.Model):
     is_clo_locked = models.BooleanField(default=False)
+    is_rps_locked = models.BooleanField(default=False)
     
     class Meta:
         abstract = True
 
 
-class MataKuliahSemester(models.Model):
+class MataKuliahSemester(MataKuliahSemesterLock):
     mk_kurikulum = models.ForeignKey(MataKuliahKurikulum, on_delete=models.CASCADE)
     semester = models.ForeignKey(SemesterProdi, on_delete=models.CASCADE)
 
@@ -38,6 +39,11 @@ class MataKuliahSemester(models.Model):
             **self.semester.get_kwargs,
             'mk_semester_id': self.pk,
         }
+    
+    # Pedoman
+    @property
+    def status_pedoman(self):
+        return self.is_clo_locked and self.is_rps_locked
 
     def read_detail_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:read', self.get_kwargs)
@@ -97,22 +103,6 @@ class MataKuliahSemester(models.Model):
             total_persentase += clo.get_total_persentase_komponen()
         
         return total_persentase
-    
-    def is_all_clo_locked(self):
-        list_clo = self.get_all_clo()
-        lock_status = True
-
-        for clo in list_clo:
-            lock_status = lock_status and clo.is_locked
-            for komponen_clo in clo.get_komponen_clo():
-                lock_status = lock_status and komponen_clo.is_locked
-            
-            for pi_clo in clo.get_pi_clo():
-                lock_status = lock_status and pi_clo.is_locked
-            
-            if lock_status is False: break
-        
-        return lock_status
     
     def get_clo_read_all_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:clo:read-all', self.get_kwargs)

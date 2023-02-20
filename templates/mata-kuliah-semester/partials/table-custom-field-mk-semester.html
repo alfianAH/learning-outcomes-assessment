@@ -17,6 +17,10 @@
         <div class="w-5 h-5 rounded-full badge-success" title="Sudah lengkap"></div>
     </td>
     <td class="text-left hidden xl:table-cell !align-middle">
-        <div class="w-5 h-5 rounded-full badge-success" title="Sudah lengkap"></div>
+        {% if option.status_pedoman %}
+        <div class="w-5 h-5 rounded-full badge-success" title="Sudah dikunci"></div>
+        {% else %}
+        <div class="w-5 h-5 rounded-full badge-warning" title="Belum dikunci"></div>
+        {% endif %}
     </td>
 {% endif %}
