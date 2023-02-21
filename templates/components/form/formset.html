@@ -19,7 +19,7 @@
                 </div>
 
                 {% if form.DELETE %}
-                <p id="deleted-form-{{ forloop.counter0 }}" class="{% if form.DELETE.value == False %} hidden {% endif %} mb-2">Item berhasil dihapus. <a href="javascript:void();" data-delete="{{ forloop.counter0 }}" onclick="undoDeleteExistingForm(this, '{{ form.DELETE.id_for_label }}')">Kembalikan item.</a></p>
+                <p id="deleted-form-{{ forloop.counter0 }}" class="{% if not form.DELETE.value == True %} hidden {% endif %} mb-2">Item berhasil dihapus. <a href="javascript:void();" data-delete="{{ forloop.counter0 }}" onclick="undoDeleteExistingForm(this, '{{ form.DELETE.id_for_label }}')">Kembalikan item.</a></p>
                 {% endif %}
             </div>
         {% endfor %}

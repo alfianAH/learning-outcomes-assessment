@@ -15,9 +15,9 @@ from learning_outcomes_assessment.forms.edit import (
     ModelBulkDeleteView,
     DuplicateFormview,
 )
-from lock_model.models import Lock
 from mata_kuliah_semester.models import MataKuliahSemester
 from pi_area.models import PerformanceIndicator
+from .mixins import CloLockedObjectPermissionMixin
 from .models import (
     Clo,
     PiClo,
@@ -176,7 +176,7 @@ class CloReadView(ProgramStudiMixin, DetailWithListViewModelA):
         return super().get_queryset()
 
 
-class CloCreateView(ProgramStudiMixin, MySessionWizardView):
+class CloCreateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, MySessionWizardView):
     template_name: str = 'clo/create-view.html'
     form_list: list = [CloForm, PerformanceIndicatorAreaForPiCloForm, PiCloForm, KomponenCloFormset]
     mk_semester_obj: MataKuliahSemester = None
@@ -186,6 +186,7 @@ class CloCreateView(ProgramStudiMixin, MySessionWizardView):
         mk_semester_id = kwargs.get('mk_semester_id')
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
         self.success_url = self.mk_semester_obj.get_clo_read_all_url()
+        self.access_denied_url = self.success_url
         self.program_studi_obj =self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
     
     def get(self, request, *args, **kwargs):
@@ -286,7 +287,7 @@ class CloCreateView(ProgramStudiMixin, MySessionWizardView):
         return redirect(self.success_url)    
 
 
-class CloUpdateView(ProgramStudiMixin, MySessionWizardView):
+class CloUpdateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, MySessionWizardView):
     form_list = [CloForm, PerformanceIndicatorAreaForPiCloForm, PiCloForm]
     template_name = 'clo/update-view.html'
     clo_obj: Clo = None
@@ -295,6 +296,8 @@ class CloUpdateView(ProgramStudiMixin, MySessionWizardView):
         super().setup(request, *args, **kwargs)
         clo_id = kwargs.get('clo_id')
         self.clo_obj = get_object_or_404(Clo, id=clo_id)
+        self.mk_semester_obj = self.clo_obj.mk_semester
+
         self.success_url = self.clo_obj.read_detail_url()
         self.program_studi_obj =self.clo_obj.mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
     
@@ -406,7 +409,7 @@ class CloUpdateView(ProgramStudiMixin, MySessionWizardView):
         return redirect(self.success_url)
 
 
-class CloBulkDeleteView(ProgramStudiMixin, ModelBulkDeleteView):
+class CloBulkDeleteView(ProgramStudiMixin, CloLockedObjectPermissionMixin, ModelBulkDeleteView):
     model = Clo
     id_list_obj = 'id_clo'
     success_msg = 'Berhasil menghapus CLO'
@@ -414,16 +417,16 @@ class CloBulkDeleteView(ProgramStudiMixin, ModelBulkDeleteView):
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
         mk_semester_id = kwargs.get('mk_semester_id')
-        mk_semester_obj: MataKuliahSemester = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
-        self.success_url = mk_semester_obj.get_clo_read_all_url()
-        self.program_studi_obj =mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
+        self.mk_semester_obj: MataKuliahSemester = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+        self.success_url = self.mk_semester_obj.get_clo_read_all_url()
+        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
 
     def get_queryset(self):
         self.queryset = self.model.objects.filter(id__in=self.get_list_selected_obj())
         return super().get_queryset()
 
 
-class CloDuplicateView(ProgramStudiMixin, DuplicateFormview):
+class CloDuplicateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, DuplicateFormview):
     form_class = CloDuplicateForm
     empty_choices_msg = 'Semester lain belum mempunyai CLO.'
     template_name = 'clo/duplicate-view.html'
@@ -590,7 +593,7 @@ class CloUnlockView(CloLockAndUnlockView):
 
 
 # Komponen CLO
-class KomponenCloBulkDeleteView(ProgramStudiMixin, ModelBulkDeleteView):
+class KomponenCloBulkDeleteView(ProgramStudiMixin, CloLockedObjectPermissionMixin, ModelBulkDeleteView):
     model = KomponenClo
     id_list_obj = 'id_komponen_clo'
     success_msg = 'Berhasil menghapus komponen CLO'
@@ -598,17 +601,19 @@ class KomponenCloBulkDeleteView(ProgramStudiMixin, ModelBulkDeleteView):
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
         clo_id = kwargs.get('clo_id')
-        clo_obj: Clo = get_object_or_404(Clo, id=clo_id)
-        self.success_url = clo_obj.read_detail_url()
+        self.clo_obj: Clo = get_object_or_404(Clo, id=clo_id)
+        self.mk_semester_obj = self.clo_obj.mk_semester
 
-        self.program_studi_obj =clo_obj.mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
+        self.success_url = self.clo_obj.read_detail_url()
+
+        self.program_studi_obj = self.clo_obj.mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
 
     def get_queryset(self):
         self.queryset = self.model.objects.filter(id__in=self.get_list_selected_obj())
         return super().get_queryset()
 
 
-class KomponenCloCreateView(ProgramStudiMixin, FormView): 
+class KomponenCloCreateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, FormView): 
     form_class = KomponenCloFormset
     template_name = 'clo/komponen/create-view.html'
     
@@ -616,6 +621,7 @@ class KomponenCloCreateView(ProgramStudiMixin, FormView):
         super().setup(request, *args, **kwargs)
         clo_id = kwargs.get('clo_id')
         self.clo_obj: Clo = get_object_or_404(Clo, id=clo_id)
+        self.mk_semester_obj = self.clo_obj.mk_semester
         
         self.program_studi_obj = self.clo_obj.mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
 

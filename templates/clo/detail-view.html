@@ -15,6 +15,7 @@
 {% block content %}
 <div class="h-icon">
     <h1>{{ single_object.nama }}</h1>
+    {% if not single_object.mk_semester.is_clo_locked %}
     <a href="{{ single_object.get_clo_update_url }}" class="btn btn-success btn-icon-start">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <path d="M0 0h24v24H0V0z" fill="none"/>
@@ -22,6 +23,7 @@
         </svg>
         <span class="hidden sm:block">Edit</span>
     </a>
+    {% endif %}
 </div>
 
 <div class="table-div">
@@ -66,6 +68,7 @@
 {% if object_list or data_exist %}
     <div class="h-icon">
         <h2>Komponen CLO</h2>
+        {% if not single_object.mk_semester.is_clo_locked %}
         <a href="{{ single_object.get_komponen_clo_create_url }}" class="btn btn-success btn-icon-start">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path d="M0 0h24v24H0V0z" fill="none"/>
@@ -73,6 +76,7 @@
             </svg>
             <span class="hidden sm:block">Edit</span>
         </a>
+        {% endif %}
     </div>
 
     {% if object_list %}
