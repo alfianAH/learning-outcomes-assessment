@@ -157,6 +157,7 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, DetailWithListViewModelD):
     list_prefix_id: str = 'peserta-mk-semester-'
     input_name: str = 'id_peserta_mk_semester'
     list_id: str = 'peserta-mk-semester-list-content'
+    badge_template: str = 'mata-kuliah-semester/partials/peserta/badge-peserta-mk-semester.html'
     list_item_name: str = 'mata-kuliah-semester/partials/peserta/list-item-name-peserta-mk-semester.html'
     list_edit_template: str = 'mata-kuliah-semester/partials/peserta/list-edit-peserta-mk-semester.html'
     list_custom_field_template: str = 'mata-kuliah-semester/partials/peserta/list-custom-field-peserta-mk-semester.html'

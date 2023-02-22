@@ -3609,6 +3609,10 @@ details.dropdown::marker {
   height: 1rem !important;
 }
 
+.h-2\.5 {
+  height: 0.625rem;
+}
+
 .max-h-10 {
   max-height: 2.5rem;
 }
@@ -3707,12 +3711,20 @@ details.dropdown::marker {
   width: calc((100% - 8px - 10px * 2) / 2);
 }
 
-.w-\[85\%\] {
-  width: 85%;
+.w-2\.5 {
+  width: 0.625rem;
 }
 
 .w-72 {
   width: 18rem;
+}
+
+.w-\[85\%\] {
+  width: 85%;
+}
+
+.w-\[calc\(100\%-62px-10px\)\] {
+  width: calc(100% - 62px - 10px);
 }
 
 .min-w-full {
@@ -5087,10 +5099,6 @@ details.dropdown::marker {
 
   .xl\:w-36 {
     width: 9rem;
-  }
-
-  .xl\:w-72 {
-    width: 18rem;
   }
 
   .xl\:w-80 {
