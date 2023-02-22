@@ -499,6 +499,10 @@ class NilaiKomponenCloEditTemplateView(FormView):
         )
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if not self.mk_semester_obj.is_clo_locked:
+            messages.warning(request, 'Pastikan anda sudah mengunci CLO terlebih dahulu sebelum memasukkan nilai.')
+            return redirect(self.success_url)
+        
         if len(self.get_form().forms) == 0:
             messages.warning(self.request, 'Edit nilai belum bisa dilakukan. Pastikan anda sudah melengkapi CLO dan komponen penilaiannya.')
             return redirect(self.success_url)

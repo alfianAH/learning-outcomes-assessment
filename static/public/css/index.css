@@ -3711,6 +3711,10 @@ details.dropdown::marker {
   width: 85%;
 }
 
+.w-72 {
+  width: 18rem;
+}
+
 .min-w-full {
   min-width: 100%;
 }
@@ -4010,6 +4014,11 @@ details.dropdown::marker {
   background-color: rgb(16 185 129 / var(--tw-bg-opacity));
 }
 
+.bg-amber-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(245 158 11 / var(--tw-bg-opacity));
+}
+
 .fill-slate-50 {
   fill: #f8fafc;
 }
@@ -4103,10 +4112,6 @@ details.dropdown::marker {
 
 .\!align-middle {
   vertical-align: middle !important;
-}
-
-.align-middle {
-  vertical-align: middle;
 }
 
 .text-2xl {
@@ -5086,6 +5091,10 @@ details.dropdown::marker {
 
   .xl\:w-72 {
     width: 18rem;
+  }
+
+  .xl\:w-80 {
+    width: 20rem;
   }
 
   .xl\:min-w-\[10rem\] {

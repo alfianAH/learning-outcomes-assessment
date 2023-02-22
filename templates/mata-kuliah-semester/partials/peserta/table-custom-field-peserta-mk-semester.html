@@ -26,7 +26,12 @@
     </td>
     {% comment %} Status nilai CLO {% endcomment %}
     <td class="table-cell !align-middle">
-        <div class="bg-emerald-500 w-4 h-4 rounded-full my-0 mx-auto"></div>
+        {% if option.status_nilai %}
+        <div class="bg-emerald-500 w-4 h-4 rounded-full my-0 mx-auto" title="Sudah lengkap"></div>
+        {% else %}
+        <div class="bg-amber-500 w-4 h-4 rounded-full my-0 mx-auto" title="Belum lengkap"></div>
+        {% endif %}
+        
     </td>
     {% comment %} Edit {% endcomment %}
     <td class="text-center">

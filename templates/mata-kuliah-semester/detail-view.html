@@ -41,7 +41,11 @@
     <div class="tr-div !items-center">
         <div class="w-32 md:w-36">Status nilai</div>
         <div>:</div>
-        <div class="badge badge-info">test</div>
+        {% if single_object.status_nilai %}
+        <div class="badge badge-success">Sudah lengkap</div>
+        {% else %}
+        <div class="badge badge-warning">Belum lengkap</div>
+        {% endif %}
     </div>
     <div class="tr-div !items-center">
         <div class="w-32 md:w-36">Status pedoman</div>
@@ -92,8 +96,10 @@
     <li class="tab-item w-40 {% if is_peserta_pane %}disabled{% endif %}" id="tab-1" data-target="#tab-pedoman-pane" role="presentation">
         <div class="tab-title">
             <span class="truncate">Pedoman</span>
-
+            
+            {% if not single_object.status_pedoman %}
             <div class="w-2 h-2 lg:w-2.5 lg:h-2.5 ml-2.5 badge-warning rounded-full"></div>
+            {% endif %}
         </div>
 
         <div class="tab-item-line"></div>
@@ -102,8 +108,10 @@
     <li class="tab-item w-40 {% if not is_peserta_pane %}disabled{% endif %}" id="tab-2" data-target="#tab-peserta-pane" role="presentation">
         <div class="tab-title">
             <span class="truncate">{{ object_list|length }} Peserta</span>
-
+            
+            {% if not single_object.status_nilai %}
             <div class="w-2 h-2 lg:w-2.5 lg:h-2.5 ml-2.5 badge-warning rounded-full"></div>
+            {% endif %}
         </div>
 
         <div class="tab-item-line"></div>

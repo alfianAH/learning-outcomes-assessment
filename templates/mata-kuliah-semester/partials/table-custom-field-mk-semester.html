@@ -14,7 +14,11 @@
     </td>
     <td class="text-left">{{ option.mk_kurikulum.sks }}</td>
     <td class="text-left hidden xl:table-cell !align-middle">
+        {% if option.status_nilai %}
         <div class="w-5 h-5 rounded-full badge-success" title="Sudah lengkap"></div>
+        {% else %}
+        <div class="w-5 h-5 rounded-full badge-warning" title="Belum lengkap"></div>
+        {% endif %}
     </td>
     <td class="text-left hidden xl:table-cell !align-middle">
         {% if option.status_pedoman %}

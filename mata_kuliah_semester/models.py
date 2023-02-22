@@ -82,6 +82,19 @@ class MataKuliahSemester(MataKuliahSemesterLock):
         
         return list_peserta
     
+    @property
+    def status_nilai(self) -> bool:
+        """Status nilai all peserta in MK Semester
+
+        Returns:
+            bool: Returns True if all nilai peserta are complete, else returns False. Returns False if MK Semester has no peserta. 
+        """
+        
+        list_peserta_mk = self.get_all_peserta_mk_semester()
+        if len(list_peserta_mk) == 0:
+            return False
+        return all(peserta.status_nilai for peserta in list_peserta_mk)
+    
     def get_peserta_mk_semester_create_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:peserta-create', self.get_kwargs)
     
@@ -196,6 +209,28 @@ class PesertaMataKuliah(models.Model):
         return self.nilaikomponenclopeserta_set.filter(
             komponen_clo__clo__in=self.kelas_mk_semester.mk_semester.get_all_clo()
         )
+    
+    @property
+    def status_nilai(self) -> bool:
+        """Status nilai peserta
+
+        Returns:
+            bool: Returns true if all nilai komponen are complete, else returns False
+        """
+
+        list_komponen_clo = self.get_empty_komponen_clo()
+        list_nilai_komponen_clo_peserta = self.get_nilai_komponen_clo_peserta()
+        
+        # If there are no komponen CLO or Nilai, return False
+        if len(list_komponen_clo) == 0 or len(list_nilai_komponen_clo_peserta) == 0:
+            return False 
+        
+        # If there are komponen CLO and nilai and their length match each other, return True
+        if len(list_komponen_clo) == list_nilai_komponen_clo_peserta.count():
+            return True
+        
+        # Return False if the length doesn't match
+        return False
     
     def get_hx_nilai_komponen_clo_peserta_edit_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:hx-nilai-komponen-peserta-edit', self.get_kwargs)
