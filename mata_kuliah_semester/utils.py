@@ -1,3 +1,4 @@
+import numpy as np
 from django.conf import settings
 from django.db.models import QuerySet
 from learning_outcomes_assessment.utils import request_data_to_neosia
@@ -5,6 +6,12 @@ from .models import (
     KelasMataKuliahSemester,
     MataKuliahSemester,
     PesertaMataKuliah,
+)
+from clo.models import (
+    Clo,
+    KomponenClo,
+    NilaiKomponenCloPeserta,
+    NilaiCloMataKuliahSemester,
 )
 from mata_kuliah_kurikulum.models import MataKuliahKurikulum
 
@@ -228,3 +235,55 @@ def get_update_peserta_mk_semester_choices(mk_semester: MataKuliahSemester):
             break
     
     return update_peserta_mk_semester_choices
+
+
+def calculate_nilai_per_clo_mk_semester(mk_semester: MataKuliahSemester):
+    list_peserta_mk: list[PesertaMataKuliah] = mk_semester.get_all_peserta_mk_semester()
+    list_clo: QuerySet[Clo] = mk_semester.get_all_clo()
+    
+    average_clo_achievement = 0
+
+    # Loop through CLO
+    for clo_obj in list_clo:
+        list_komponen_clo: QuerySet[KomponenClo] = clo_obj.get_komponen_clo()
+        clo_achievement_components = []
+
+        # Loop through komponen CLO
+        for komponen_clo_obj in list_komponen_clo:
+            list_nilai_komponen_all_peserta = []
+
+            # Loop through peserta MK Semester
+            for peserta in list_peserta_mk:
+                # Get nilai komponen CLO peserta
+                nilai_komponen_peserta: QuerySet[NilaiKomponenCloPeserta] = peserta.get_nilai_komponen_clo_peserta(komponen_clo_obj)
+                
+                list_nilai_komponen_all_peserta.append(nilai_komponen_peserta.first().nilai)
+
+            # Calculate average of list nilai komponen of all peserta
+            average_assessment_form = np.average(list_nilai_komponen_all_peserta)
+
+            clo_achievement_components.append({
+                'average_assessment_form': average_assessment_form,
+                'persentase_komponen': komponen_clo_obj.persentase
+            })
+        
+        # Loop through average assessment form to get clo achievement
+        clo_achievement = 0
+        clo_percentage = clo_obj.get_total_persentase_komponen()
+        for clo_achievement_component in clo_achievement_components:
+            # Calculate CLO achievement
+            clo_achievement += (100 / clo_percentage) * (clo_achievement_component['persentase_komponen']/100) * clo_achievement_component['average_assessment_form']
+
+        # Save clo_achievement to database
+        nilai_clo_mk_semester, _ = NilaiCloMataKuliahSemester.objects.get_or_create(
+            clo=clo_obj,
+            mk_semester=mk_semester,
+        )
+
+        nilai_clo_mk_semester.nilai = clo_achievement
+        nilai_clo_mk_semester.save()
+
+        # Sum all CLO Achievement
+        average_clo_achievement += clo_percentage * clo_achievement
+    
+    return clo_achievement

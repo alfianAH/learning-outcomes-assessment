@@ -1,6 +1,6 @@
 <table class="w-full">
 <tbody class="flex flex-col space-y-1">
-        {% for nilai in option.get_nilai_komponen_clo_peserta %}
+        {% for nilai in option.get_all_nilai_komponen_clo_peserta %}
             <tr class="flex space-x-2.5">
                 <td class="w-full">{{ nilai.komponen_clo.clo.nama }} - {{ nilai.komponen_clo.instrumen_penilaian }} ({{ nilai.komponen_clo.persentase }}%)</td>
                 <td>{{ nilai.nilai }}</td>

@@ -93,10 +93,10 @@
 </div>
 
 <ul class="tab" role="tablist">
-    <li class="tab-item w-40 {% if is_peserta_pane %}disabled{% endif %}" id="tab-1" data-target="#tab-pedoman-pane" role="presentation">
+    <li class="tab-item w-40 {% if is_peserta_pane or is_hasil_pane %}disabled{% endif %}" id="tab-1" data-target="#tab-pedoman-pane" role="presentation">
         <div class="tab-title">
             <span class="truncate">Pedoman</span>
-            
+
             {% if not single_object.status_pedoman %}
             <div class="w-2 h-2 lg:w-2.5 lg:h-2.5 ml-2.5 badge-warning rounded-full"></div>
             {% endif %}
@@ -117,7 +117,7 @@
         <div class="tab-item-line"></div>
     </li>
 
-    <li class="tab-item w-40 disabled" id="tab-3" data-target="#tab-hasil-pane" role="presentation">
+    <li class="tab-item w-40 {% if not is_hasil_pane %}disabled{% endif %}" id="tab-3" data-target="#tab-hasil-pane" role="presentation">
         <div class="tab-title">
             <span class="truncate">Hasil</span>
 
@@ -130,7 +130,7 @@
 
 <div class="tab-content">
     {% comment %} Pedoman {% endcomment %}
-    <div class="tab-pane fade min-h-screen {% if not is_peserta_pane %}show active{% endif %}" id="tab-pedoman-pane" role="tabpanel" aria-labelledby="tab-1">
+    <div class="tab-pane fade min-h-screen {% if not is_peserta_pane and not is_hasil_pane %}show active{% endif %}" id="tab-pedoman-pane" role="tabpanel" aria-labelledby="tab-1">
         {% include 'components/list-table-view/model-b/list-view-model-b.html' with objects=pedoman_objects use_checkbox=False id=None %}
     </div>
 
@@ -228,8 +228,19 @@
     </div>
 
     {% comment %} Hasil {% endcomment %}
-    <div class="tab-pane fade min-h-screen" role="tabpanel" id="tab-hasil-pane" aria-labelledby="tab-3">
-        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Voluptatum voluptas, possimus eligendi incidunt, blanditiis rerum saepe accusantium est at, earum ipsa! Tempora itaque eaque voluptate!
+    <div class="tab-pane fade min-h-screen {% if is_hasil_pane %}show active{% endif %}" role="tabpanel" id="tab-hasil-pane" aria-labelledby="tab-3">
+        {% if single_object.average_clo_achievement %}
+        
+        {{ single_object.average_clo_achievement }}
+
+        <a href="{{ single_object.get_nilai_average_calculate_url }}" class="btn btn-primary max-w-min">
+            <span>Hitung capaian CLO rata-rata</span>
+        </a>
+        {% else %}
+        <a href="{{ single_object.get_nilai_average_calculate_url }}" class="btn btn-primary max-w-min">
+            <span>Hitung capaian CLO rata-rata</span>
+        </a>
+        {% endif %}
     </div>
 </div>
 

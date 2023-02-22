@@ -141,7 +141,20 @@ class MataKuliahSemester(MataKuliahSemesterLock):
     # Nilai Komponen CLO Peserta
     def get_nilai_komponen_edit_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:nilai-komponen-edit', self.get_kwargs)
+    
+    # Nilai Average CLO Achivement
+    def get_nilai_average_calculate_url(self):
+        return get_reverse_url('semester:mata_kuliah_semester:nilai-avg-calculate', self.get_kwargs)
 
+    def get_capaian_per_clo_graph_url(self):
+        return get_reverse_url('semester:mata_kuliah_semester:capaian-per-clo-graph', self.get_kwargs)
+    
+    def get_clo_rerata_graph_url(self):
+        return get_reverse_url('semester:mata_kuliah_semester:clo-rerata-graph', self.get_kwargs)
+    
+    def get_nilai_huruf_graph_url(self):
+        return get_reverse_url('semester:mata_kuliah_semester:nilai-huruf-graph', self.get_kwargs)
+    
 
 class KelasMataKuliahSemester(models.Model):
     id_neosia = models.BigIntegerField(primary_key=True, null=False, unique=True)
@@ -205,9 +218,14 @@ class PesertaMataKuliah(models.Model):
         
         return list_komponen_clo
 
-    def get_nilai_komponen_clo_peserta(self):
+    def get_all_nilai_komponen_clo_peserta(self):
         return self.nilaikomponenclopeserta_set.filter(
             komponen_clo__clo__in=self.kelas_mk_semester.mk_semester.get_all_clo()
+        )
+    
+    def get_nilai_komponen_clo_peserta(self, komponen_clo):
+        return self.nilaikomponenclopeserta_set.filter(
+            komponen_clo=komponen_clo
         )
     
     @property
@@ -219,7 +237,7 @@ class PesertaMataKuliah(models.Model):
         """
 
         list_komponen_clo = self.get_empty_komponen_clo()
-        list_nilai_komponen_clo_peserta = self.get_nilai_komponen_clo_peserta()
+        list_nilai_komponen_clo_peserta = self.get_all_nilai_komponen_clo_peserta()
         
         # If there are no komponen CLO or Nilai, return False
         if len(list_komponen_clo) == 0 or len(list_nilai_komponen_clo_peserta) == 0:

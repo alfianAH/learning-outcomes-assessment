@@ -97,6 +97,21 @@ class NilaiKomponenCloPeserta(models.Model):
         constraints = (
             CheckConstraint(
                 check=Q(nilai__gte=0.0) & Q(nilai__lte=100.0),
-                name='nilai_range'
+                name='nilai_komponen_clo_range'
+            ),
+        )
+
+
+class NilaiCloMataKuliahSemester(models.Model):
+    mk_semester = models.ForeignKey(MataKuliahSemester, on_delete=models.CASCADE)
+    clo = models.ForeignKey(Clo, on_delete=models.CASCADE)
+
+    nilai = models.FloatField(null=True, validators=[MinValueValidator(0.0), MaxValueValidator(100.0)])
+
+    class Meta:
+        constraints = (
+            CheckConstraint(
+                check=Q(nilai__gte=0.0) & Q(nilai__lte=100.0),
+                name='nilai_clo_mk_semester_range'
             ),
         )

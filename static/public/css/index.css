@@ -3699,8 +3699,8 @@ details.dropdown::marker {
   width: calc(100% - 1rem - 0.75rem);
 }
 
-.w-\[calc\(100\%-42px-10px\)\] {
-  width: calc(100% - 42px - 10px);
+.w-\[calc\(100\%-62px-10px\)\] {
+  width: calc(100% - 62px - 10px);
 }
 
 .w-64 {
@@ -3721,10 +3721,6 @@ details.dropdown::marker {
 
 .w-\[85\%\] {
   width: 85%;
-}
-
-.w-\[calc\(100\%-62px-10px\)\] {
-  width: calc(100% - 62px - 10px);
 }
 
 .min-w-full {

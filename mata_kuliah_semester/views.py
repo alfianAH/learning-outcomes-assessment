@@ -3,7 +3,7 @@ from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
-from django.views.generic.base import View
+from django.views.generic.base import View, RedirectView
 from django.views.generic.edit import FormView
 from accounts.enums import RoleChoices
 from clo.models import KomponenClo
@@ -47,6 +47,7 @@ from .utils import(
     get_peserta_kelas_mk_semester,
     get_peserta_kelas_mk_semester_choices,
     get_update_peserta_mk_semester_choices,
+    calculate_nilai_per_clo_mk_semester,
 )
 
 
@@ -238,10 +239,11 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, DetailWithListViewModelD):
             'pedoman_objects': pedoman_objects
         })
 
+        if self.request.GET.get('active_tab') == 'hasil':
+            context['is_hasil_pane'] = True
+
         if self.request.GET.get('nama') or self.request.GET.get('nilai_akhir_min') or self.request.GET.get('nilai_akhir_max') or self.request.GET.get(self.sort_form_ordering_by_key) or self.request.GET.get('active_tab') == 'peserta':
             context['is_peserta_pane'] = True
-        else:
-            context['is_peserta_pane'] = False
         
         return context
 
@@ -652,3 +654,45 @@ class NilaiKomponenCloPesertaEditView(ProgramStudiMixin, NilaiKomponenCloEditTem
     def form_invalid(self, form) -> HttpResponse:
         messages.error(self.request, self.error_msg)
         return super().form_invalid(form)
+
+
+# Nilai average CLO achievement
+class NilaiAverageCloAchievementCalculateView(ProgramStudiMixin, RedirectView):
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        mk_semester_id = kwargs.get('mk_semester_id')
+        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
+
+    def get_redirect_url(self, *args, **kwargs):
+        self.url = '{}?active_tab={}'.format(
+            self.mk_semester_obj.read_detail_url(), 
+            'hasil'
+        )
+        return super().get_redirect_url(*args, **kwargs)
+    
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        average_clo_achievement = calculate_nilai_per_clo_mk_semester(self.mk_semester_obj)
+        
+        if self.mk_semester_obj.average_clo_achievement is None:
+            self.mk_semester_obj.average_clo_achievement = average_clo_achievement
+            self.mk_semester_obj.save()
+        else:
+            if self.mk_semester_obj.average_clo_achievement != average_clo_achievement:
+                self.mk_semester_obj.average_clo_achievement = average_clo_achievement
+                self.mk_semester_obj.save()
+        
+        messages.success(request, 'Proses perhitungan capaian CLO rata-rata sudah selesai.')
+        return super().get(request, *args, **kwargs)
+
+
+class PencapaianPerCloGraphJsonResponse(ProgramStudiMixin, View):
+    pass
+
+
+class PencapaianCloRataRataGraphJsonResponse(ProgramStudiMixin, View):
+    pass
+
+
+class DistribusiNilaiHurufMahasiswaGraphJsonResponse(ProgramStudiMixin, View):
+    pass
