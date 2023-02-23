@@ -143,6 +143,9 @@ class MataKuliahSemester(MataKuliahSemesterLock):
         return get_reverse_url('semester:mata_kuliah_semester:nilai-komponen-edit', self.get_kwargs)
     
     # Nilai Average CLO Achivement
+    def get_nilai_clo_mk_semester(self):
+        return self.nilaiclomatakuliahsemester_set.all()
+    
     def get_nilai_average_calculate_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:nilai-avg-calculate', self.get_kwargs)
 

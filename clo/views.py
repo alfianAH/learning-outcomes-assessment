@@ -140,7 +140,6 @@ class CloReadAllGraphJsonResponse(ProgramStudiMixin, View):
                 }
             })
 
-
         return JsonResponse(json_response)
     
 

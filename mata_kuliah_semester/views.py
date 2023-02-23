@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate
 from django.conf import settings
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic.base import View, RedirectView
@@ -672,6 +672,11 @@ class NilaiAverageCloAchievementCalculateView(ProgramStudiMixin, RedirectView):
         return super().get_redirect_url(*args, **kwargs)
     
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        # If CLO is not locked and status nilai is not True, give error message
+        if not self.mk_semester_obj.is_clo_locked and not self.mk_semester_obj.status_nilai:
+            messages.error(request, 'Gagal menghitung capaian CLO rata-rata. Pastikan anda sudah melengkapi dan mengunci CLO serta melengkapi nilai peserta mata kuliah.')
+            return super().get(request, *args, **kwargs)
+        
         average_clo_achievement = calculate_nilai_per_clo_mk_semester(self.mk_semester_obj)
         
         if self.mk_semester_obj.average_clo_achievement is None:
@@ -691,7 +696,68 @@ class PencapaianPerCloGraphJsonResponse(ProgramStudiMixin, View):
 
 
 class PencapaianCloRataRataGraphJsonResponse(ProgramStudiMixin, View):
-    pass
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        mk_semester_id = kwargs.get('mk_semester_id')
+        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        print('MK: {}'.format(self.mk_semester_obj))
+        average_clo_achievement = self.mk_semester_obj.average_clo_achievement
+        json_response = {}
+
+        if average_clo_achievement > 100:
+            total_exceed = average_clo_achievement - 100
+            json_response.update({
+                'labels': [
+                    'Persentase berlebihan',
+                    'Capaian CLO rata-rata',
+                ],
+                'datasets': {
+                    'data': [
+                        total_exceed,
+                        average_clo_achievement - total_exceed
+                    ],
+                    'backgroundColor': [
+                        '#f43f5e', # Rose 500
+                        '#10b981' # Emerald 500
+                    ]
+                }
+            })
+        elif average_clo_achievement == 100:
+            json_response.update({
+                'labels': [
+                    'Capaian CLO rata-rata',
+                ],
+                'datasets': {
+                    'data': [
+                        average_clo_achievement
+                    ],
+                    'backgroundColor': [
+                        '#10b981' # Emerald 500
+                    ]
+                }
+            })
+        else:
+            json_response.update({
+                'labels': [
+                    'Capaian CLO rata-rata',
+                    '-',
+                ],
+                'datasets': {
+                    'data': [
+                        average_clo_achievement,
+                        100 - average_clo_achievement,
+                    ],
+                    'backgroundColor': [
+                        '#10b981', # Emerald 500
+                        '#a7f3d0' # Emerald 200
+                    ]
+                }
+            })
+
+        return JsonResponse(json_response)
 
 
 class DistribusiNilaiHurufMahasiswaGraphJsonResponse(ProgramStudiMixin, View):
