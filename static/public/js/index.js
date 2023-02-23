@@ -507,7 +507,7 @@ function tooltip() {
         },
 
         focusout: function () {
-            hideTooltop(this);
+            hideTooltop(this);0
         },
 
         mouseenter: function () {
@@ -521,6 +521,14 @@ function tooltip() {
             }
         }
     });
+}
+
+function selectInputContent() {
+    $('.select-input-content').on('change', function () {
+        let selectContentId = $(this).val();
+        $('.select-content').fadeOut();
+        $(`#${selectContentId}`).fadeIn();
+    }).trigger('change');
 }
 
 var transitionEvent = whichTransitionEvent();
@@ -541,3 +549,4 @@ passwordHandler();
 tabElement();
 toastHandler();
 tooltip();
+selectInputContent();
