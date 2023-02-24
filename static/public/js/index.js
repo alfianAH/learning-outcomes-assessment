@@ -566,6 +566,46 @@ function hideTooltop(tooltipIndicatorElement) {
     $(tooltip).hide();
 }
 
+function selectInputContent() {
+    window.onload = function () {
+        // Reset select input content selected option
+        $('.select-input-content').each(function () {
+            // Get default selected option and its index
+            const select = $(this);
+            const defaultSelect = select.find('option').filter('[selected]').first();
+            const defaultIndex = defaultSelect.index();
+            
+            select.prop('selectedIndex', defaultIndex).val(defaultSelect.val());
+        });
+        
+        // Event trigger on change
+        $('.select-input-content').on('change', function () {
+            let selectContentId = $(this).val();
+            $('.select-content').fadeOut();
+            $(`#${selectContentId}`).fadeIn();
+        }).trigger('change');
+    }
+}
+
+function createChart(canvasId, chartConfig) {
+    let canvas = document.getElementById(canvasId);
+
+    var myChart = new Chart(
+        canvas,
+        chartConfig
+    );
+
+    var resizeChart = function() {
+        myChart.destroy();
+        myChart = new Chart(
+            canvas,
+            chartConfig
+        );
+    };
+
+    window.addEventListener('resize', debounce(resizeChart, 200));
+}
+
 function tooltip() {
     $(document).on({
         focusin: function (e) {
@@ -620,3 +660,4 @@ passwordHandler();
 tabElement();
 toastHandler();
 tooltip();
+selectInputContent();

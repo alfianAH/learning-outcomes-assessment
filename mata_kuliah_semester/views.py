@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate
 from django.conf import settings
+from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
@@ -31,6 +32,8 @@ from mata_kuliah_kurikulum.models import(
     MataKuliahKurikulum
 )
 from clo.models import(
+    Clo,
+    NilaiCloMataKuliahSemester,
     NilaiKomponenCloPeserta
 )
 from .models import (
@@ -692,7 +695,23 @@ class NilaiAverageCloAchievementCalculateView(ProgramStudiMixin, RedirectView):
 
 
 class PencapaianPerCloGraphJsonResponse(ProgramStudiMixin, View):
-    pass
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        mk_semester_id = kwargs.get('mk_semester_id')
+        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        list_nilai_clo: QuerySet[NilaiCloMataKuliahSemester] = self.mk_semester_obj.get_nilai_clo_mk_semester()
+
+        json_response = {
+            'labels': [nilai_clo.clo.nama for nilai_clo in list_nilai_clo],
+            'datasets': {
+                'data': [nilai_clo.clo.get_total_persentase_komponen()/100 * nilai_clo.nilai for nilai_clo in list_nilai_clo],
+            }
+        }
+
+        return JsonResponse(json_response)
 
 
 class PencapaianCloRataRataGraphJsonResponse(ProgramStudiMixin, View):

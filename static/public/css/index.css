@@ -3769,6 +3769,10 @@ details.dropdown::marker {
   width: 85%;
 }
 
+.w-0 {
+  width: 0px;
+}
+
 .min-w-full {
   min-width: 100%;
 }
@@ -5015,6 +5019,10 @@ details.dropdown::marker {
     height: 1.75rem;
   }
 
+  .lg\:max-h-52 {
+    max-height: 13rem;
+  }
+
   .lg\:max-h-64 {
     max-height: 16rem;
   }
@@ -5051,6 +5059,10 @@ details.dropdown::marker {
     min-width: 8rem;
   }
 
+  .lg\:max-w-\[13rem\] {
+    max-width: 13rem;
+  }
+
   .lg\:max-w-\[16rem\] {
     max-width: 16rem;
   }
@@ -5061,10 +5073,6 @@ details.dropdown::marker {
 
   .lg\:max-w-\[12rem\] {
     max-width: 12rem;
-  }
-
-  .lg\:max-w-\[13rem\] {
-    max-width: 13rem;
   }
 
   .lg\:max-w-sm {
@@ -5173,6 +5181,10 @@ details.dropdown::marker {
     height: 1.5rem;
   }
 
+  .xl\:max-h-64 {
+    max-height: 16rem;
+  }
+
   .xl\:w-6 {
     width: 1.5rem;
   }
@@ -5201,6 +5213,10 @@ details.dropdown::marker {
     min-width: 15rem;
   }
 
+  .xl\:max-w-\[16rem\] {
+    max-width: 16rem;
+  }
+
   .xl\:max-w-\[12rem\] {
     max-width: 12rem;
   }
@@ -5227,10 +5243,6 @@ details.dropdown::marker {
 
   .xl\:max-w-lg {
     max-width: 32rem;
-  }
-
-  .xl\:max-w-\[16rem\] {
-    max-width: 16rem;
   }
 
   .xl\:grid-cols-3 {

@@ -245,31 +245,57 @@
                 {% comment %} Pencapaian per CLO & Pencapaian CLO rata-rata {% endcomment %}
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 md:gap-2.5 xl:gap-6">
                     <div class="space-y-2.5">
-                        <h3>Pencapaian per CLO</h3>
-                        <ul class="space-y-2.5 pr-4 w-full max-h-80 overflow-y-auto" role="list">
-                            {% for nilai_clo in single_object.get_nilai_clo_mk_semester %}
-                            <li class="list-item-model-e" role="listitem">
-                                <table class="w-full">
-                                    <tbody class="flex flex-col space-y-2.5 md:space-y-3 xl:space-y-4">
-                                        <tr class="flex space-x-2.5">
-                                            <th scope="row" class="w-full">{{ nilai_clo.clo.nama }}</th>
-                                            <td class="text-right  whitespace-nowrap">{{ nilai_clo.nilai|floatformat:2 }}</td>
-                                        </tr>
-                                        <tr class="flex space-x-2.5">
-                                            <th scope="row" class="w-full">{{ nilai_clo.clo.nama }} - {{ nilai_clo.clo.get_ilo.nama }}</th>
-                                            <td class="text-right  whitespace-nowrap">{{ nilai_clo.clo.get_total_persentase_komponen }}% ({{ nilai_clo.clo.get_total_persentase_komponen|div:100|mul:nilai_clo.nilai|floatformat:2 }})</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </li>
-                            {% endfor %}
-                        </ul>
+                        <div class="flex flex-row justify-between items-center space-x-4">
+                            <h3 class="truncate">Pencapaian per CLO</h3>
+                            <select class="form-control select-input-content">
+                                <option value="capaian-per-clo-1" selected>Pie chart</option>
+                                <option value="capaian-per-clo-2">List view</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            {% comment %} Capaian per CLO pie chart {% endcomment %}
+                            <div class="select-content hidden" id="capaian-per-clo-1">
+                                <div class="w-min mx-auto my-0">
+                                    <canvas id="capaian-per-clo" class="max-w-[10rem] max-h-40 md:max-w-[12rem] md:max-h-48 lg:max-w-[13rem] lg:max-h-52 xl:max-w-[16rem] xl:max-h-64 fill-slate-100"></canvas>
+                                </div>
+                            </div>
+
+                            {% comment %} Capaian per CLO List view {% endcomment %}
+                            <div class="select-content hidden" id="capaian-per-clo-2">
+                                <ul class="space-y-2.5 pr-4 w-full max-h-80 overflow-y-auto" role="list">
+                                    {% for nilai_clo in single_object.get_nilai_clo_mk_semester %}
+                                    <li class="list-item-model-e" role="listitem">
+                                        <table class="w-full">
+                                            <tbody class="flex flex-col space-y-2.5 md:space-y-3 xl:space-y-4">
+                                                <tr class="flex space-x-2.5">
+                                                    <th scope="row" class="w-full">{{ nilai_clo.clo.nama }}</th>
+                                                    <td class="text-right  whitespace-nowrap">{{ nilai_clo.nilai|floatformat:2 }}</td>
+                                                </tr>
+                                                <tr class="flex space-x-2.5">
+                                                    <th scope="row" class="w-full">{{ nilai_clo.clo.nama }} - {{ nilai_clo.clo.get_ilo.nama }}</th>
+                                                    <td class="text-right  whitespace-nowrap">{{ nilai_clo.clo.get_total_persentase_komponen }}% ({{ nilai_clo.clo.get_total_persentase_komponen|div:100|mul:nilai_clo.nilai|floatformat:2 }})</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="space-y-2.5">
-                        <h3>Pencapaian CLO Rata-Rata</h3>
+                        <div class="flex flex-row justify-between items-center space-x-4">
+                            <h3 class="truncate">Pencapaian CLO rata-rata</h3>
+                            <select class="form-control w-0 invisible">
+                                <option value="">List view</option>
+                                <option value="">Pie chart</option>
+                            </select>
+                        </div>
+
                         <div class="w-min mx-auto my-0">
-                            <canvas id="capaian-clo-rata-rata" class="max-w-[10rem] max-h-40 md:max-w-[12rem] md:max-h-48 lg:max-w-[16rem] lg:max-h-64 fill-slate-100"></canvas>
+                            <canvas id="capaian-clo-rata-rata" class="max-w-[10rem] max-h-40 md:max-w-[12rem] md:max-h-48 lg:max-w-[13rem] lg:max-h-52 xl:max-w-[16rem] xl:max-h-64 fill-slate-100"></canvas>
                         </div>
                     </div>
                 </div>
@@ -300,6 +326,32 @@
 
 {% block script %}
 <script>
+    {% comment %} Capaian per CLO {% endcomment %}
+    $.ajax({
+        method: "GET",
+        url: '{{ single_object.get_capaian_per_clo_graph_url }}',
+        success: function(data) {
+            var canvas = document.getElementById('capaian-per-clo');
+            var ctx = canvas.getContext("2d");
+
+            var chartConfig = {
+                type: 'pie',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.datasets.data,
+                        hoverOffset: 4
+                    }]
+                },
+            };
+
+            createChart('capaian-per-clo', chartConfig);
+        },
+        error: function(error_data) {
+            console.error(error_data);
+        }
+    });
+
     {% comment %} Capaian CLO rata-rata {% endcomment %}
     $.ajax({
         method: "GET",
@@ -345,20 +397,7 @@
                 ]
             };
 
-            var myChart = new Chart(
-                canvas,
-                chartConfig
-            );
-
-            var resizeChart = function() {
-                myChart.destroy();
-                myChart = new Chart(
-                    canvas,
-                    chartConfig
-                );
-            };
-    
-            window.addEventListener('resize', debounce(resizeChart, 200));
+            createChart('capaian-clo-rata-rata', chartConfig);
         },
         error: function(error_data) {
             console.error(error_data);
