@@ -779,4 +779,38 @@ class PencapaianCloRataRataGraphJsonResponse(ProgramStudiMixin, View):
 
 
 class DistribusiNilaiHurufMahasiswaGraphJsonResponse(ProgramStudiMixin, View):
-    pass
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        mk_semester_id = kwargs.get('mk_semester_id')
+        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        list_peserta_mk: QuerySet[PesertaMataKuliah] = self.mk_semester_obj.get_all_peserta_mk_semester()
+        list_nilai = {
+            'A': 0,
+            'A-': 0,
+            'B+': 0,
+            'B': 0,
+            'B-': 0,
+            'C+': 0,
+            'C': 0,
+            'D': 0,
+            'E': 0,
+        }
+
+        for peserta in list_peserta_mk:
+            if peserta.nilai_huruf in list_nilai.keys():
+                list_nilai[peserta.nilai_huruf] += 1
+            else:
+                if settings.DEBUG:
+                    print('Nilai {} tidak ada di list nilai'.format(peserta.nilai_huruf))
+        
+        json_response = {
+            'labels': list(list_nilai.keys()),
+            'datasets': {
+                'data': list(list_nilai.values()),
+            }
+        }
+
+        return JsonResponse(json_response)

@@ -302,7 +302,30 @@
 
                 {% comment %} Distribusi nilai huruf mahasiswa {% endcomment %}
                 <div class="space-y-2.5">
-                    <h3>Distribusi Nilai Huruf Mahasiswa</h3>
+                    <div class="flex flex-row justify-between items-center space-x-4">
+                        <h3>Distribusi Nilai Huruf Mahasiswa</h3>
+                        <select class="form-control select-input-content">
+                            <option value="distribusi-nilai-1" selected>Bar chart</option>
+                            <option value="distribusi-nilai-2">Pie Chart</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        {% comment %} Distribusi nilai bar chart {% endcomment %}
+                        <div class="select-content hidden" id="distribusi-nilai-1">
+                            <div class="w-full mx-auto my-0">
+                                <canvas id="distribusi-nilai-bar" class="w-full max-h-40 md:max-h-48 lg:max-h-52 xl:max-h-64 fill-slate-100"></canvas>
+                            </div>
+                        </div>
+
+                        {% comment %} Distribusi nilai pie chart {% endcomment %}
+                        <div class="select-content hidden" id="distribusi-nilai-2">
+                            <div class="w-full mx-auto my-0">
+                                <canvas id="distribusi-nilai-pie" class="w-full max-h-40 md:max-h-48 lg:max-h-52 xl:max-h-64 fill-slate-100"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
                 </div>
             </div>
         
@@ -331,10 +354,10 @@
         method: "GET",
         url: '{{ single_object.get_capaian_per_clo_graph_url }}',
         success: function(data) {
-            var canvas = document.getElementById('capaian-per-clo');
-            var ctx = canvas.getContext("2d");
+            let canvas = document.getElementById('capaian-per-clo');
+            let ctx = canvas.getContext("2d");
 
-            var chartConfig = {
+            let chartConfig = {
                 type: 'pie',
                 data: {
                     labels: data.labels,
@@ -364,10 +387,10 @@
         method: "GET",
         url: '{{ single_object.get_clo_rerata_graph_url }}',
         success: function(data) {
-            var canvas = document.getElementById('capaian-clo-rata-rata');
-            var ctx = canvas.getContext("2d");
+            let canvas = document.getElementById('capaian-clo-rata-rata');
+            let ctx = canvas.getContext("2d");
 
-            var chartConfig = {
+            let chartConfig = {
                 type: 'doughnut',
                 data: {
                     labels: data.labels,
@@ -405,6 +428,89 @@
             };
 
             createChart('capaian-clo-rata-rata', chartConfig);
+        },
+        error: function(error_data) {
+            console.error(error_data);
+        }
+    });
+
+    {% comment %} Distribusi nilai bar {% endcomment %}
+    $.ajax({
+        method: "GET",
+        url: '{{ single_object.get_nilai_huruf_graph_url }}',
+        success: function(data) {
+            let canvas = document.getElementById('distribusi-nilai-bar');
+            let ctx = canvas.getContext("2d");
+
+            let chartConfig = {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.datasets.data,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: {
+                            display: false,
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Nilai',
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Jumlah mahasiswa',
+                            },
+                            ticks: {
+                                stepSize: 1,
+                            }
+                        }
+                    }
+                }
+            };
+
+            createChart('distribusi-nilai-bar', chartConfig);
+        },
+        error: function(error_data) {
+            console.error(error_data);
+        }
+    });
+
+    {% comment %} Distribusi nilai pie {% endcomment %}
+    $.ajax({
+        method: "GET",
+        url: '{{ single_object.get_nilai_huruf_graph_url }}',
+        success: function(data) {
+            let canvas = document.getElementById('distribusi-nilai-pie');
+            let ctx = canvas.getContext("2d");
+
+            let chartConfig = {
+                type: 'pie',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.datasets.data,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        }
+                    }
+                }
+            };
+
+            createChart('distribusi-nilai-pie', chartConfig);
         },
         error: function(error_data) {
             console.error(error_data);

@@ -173,3 +173,4 @@ FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 DIRS = [
     BASE_DIR / 'templates' / 'custom-widgets' / 'forms' / 'widgets'
 ]
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240

@@ -581,8 +581,11 @@ function selectInputContent() {
         // Event trigger on change
         $('.select-input-content').on('change', function () {
             let selectContentId = $(this).val();
-            $('.select-content').fadeOut();
-            $(`#${selectContentId}`).fadeIn();
+            let targetContent = $(`#${selectContentId}`);
+
+            // Get select content siblings
+            targetContent.siblings('.select-content').fadeOut();
+            targetContent.fadeIn();
         }).trigger('change');
     }
 }
