@@ -17,6 +17,9 @@ class Clo(LockableMixin, models.Model):
 
     nama = models.CharField(max_length=255, null=False, blank=False)
     deskripsi = models.TextField(null=False)
+
+    class Meta:
+        ordering = ['nama']
     
     @property
     def get_kwargs(self):
@@ -74,6 +77,9 @@ class KomponenClo(LockableMixin, models.Model):
     persentase = models.FloatField(null=False, blank=False, validators=[MinValueValidator(0.0), MaxValueValidator(100.0)])
 
     class Meta:
+        ordering = ['clo__nama', 'instrumen_penilaian']
+
+    class Meta:
         constraints = (
             CheckConstraint(
                 check=Q(persentase__gte=0.0) & Q(persentase__lte=100.0),
@@ -109,6 +115,7 @@ class NilaiCloMataKuliahSemester(models.Model):
     nilai = models.FloatField(null=True, validators=[MinValueValidator(0.0), MaxValueValidator(100.0)])
 
     class Meta:
+        ordering = ['clo__nama']
         constraints = (
             CheckConstraint(
                 check=Q(nilai__gte=0.0) & Q(nilai__lte=100.0),

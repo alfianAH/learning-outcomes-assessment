@@ -256,14 +256,14 @@
                         <div>
                             {% comment %} Capaian per CLO pie chart {% endcomment %}
                             <div class="select-content hidden" id="capaian-per-clo-1">
-                                <div class="w-min mx-auto my-0">
-                                    <canvas id="capaian-per-clo" class="max-w-[10rem] max-h-40 md:max-w-[12rem] md:max-h-48 lg:max-w-[13rem] lg:max-h-52 xl:max-w-[16rem] xl:max-h-64 fill-slate-100"></canvas>
+                                <div class="w-full mx-auto my-0">
+                                    <canvas id="capaian-per-clo" class="w-full max-h-40 md:max-h-48 lg:max-h-52 xl:max-h-64 fill-slate-100"></canvas>
                                 </div>
                             </div>
 
                             {% comment %} Capaian per CLO List view {% endcomment %}
                             <div class="select-content hidden" id="capaian-per-clo-2">
-                                <ul class="space-y-2.5 pr-4 w-full max-h-80 overflow-y-auto" role="list">
+                                <ul class="space-y-2.5 pr-4 w-full max-h-64 overflow-y-auto" role="list">
                                     {% for nilai_clo in single_object.get_nilai_clo_mk_semester %}
                                     <li class="list-item-model-e" role="listitem">
                                         <table class="w-full">
@@ -343,6 +343,13 @@
                         hoverOffset: 4
                     }]
                 },
+                options: {
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        }
+                    }
+                }
             };
 
             createChart('capaian-per-clo', chartConfig);

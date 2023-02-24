@@ -3663,12 +3663,12 @@ details.dropdown::marker {
   max-height: 18rem;
 }
 
-.max-h-80 {
-  max-height: 20rem;
-}
-
 .max-h-40 {
   max-height: 10rem;
+}
+
+.max-h-64 {
+  max-height: 16rem;
 }
 
 .min-h-screen {
@@ -3725,6 +3725,10 @@ details.dropdown::marker {
   width: 0.5rem;
 }
 
+.w-0 {
+  width: 0px;
+}
+
 .\!w-4 {
   width: 1rem !important;
 }
@@ -3767,10 +3771,6 @@ details.dropdown::marker {
 
 .w-\[85\%\] {
   width: 85%;
-}
-
-.w-0 {
-  width: 0px;
 }
 
 .min-w-full {
@@ -5023,10 +5023,6 @@ details.dropdown::marker {
     max-height: 13rem;
   }
 
-  .lg\:max-h-64 {
-    max-height: 16rem;
-  }
-
   .lg\:w-\[480px\] {
     width: 480px;
   }
@@ -5061,10 +5057,6 @@ details.dropdown::marker {
 
   .lg\:max-w-\[13rem\] {
     max-width: 13rem;
-  }
-
-  .lg\:max-w-\[16rem\] {
-    max-width: 16rem;
   }
 
   .lg\:max-w-\[7rem\] {
