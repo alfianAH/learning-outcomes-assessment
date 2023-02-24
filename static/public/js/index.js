@@ -432,6 +432,8 @@ function tabElement() {
         activeTabContent.one(transitionEvent, function () {
             activeTabContent.removeClass("active");
             clickedTabContent.addClass("show");
+            // Trigger resize event so chart JS can function properly
+            window.dispatchEvent(new Event('resize'));
         });
     });
 }

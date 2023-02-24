@@ -3667,20 +3667,8 @@ details.dropdown::marker {
   max-height: 20rem;
 }
 
-.max-h-5 {
-  max-height: 1.25rem;
-}
-
-.max-h-\[10rem\] {
-  max-height: 10rem;
-}
-
 .max-h-40 {
   max-height: 10rem;
-}
-
-.max-h-64 {
-  max-height: 16rem;
 }
 
 .min-h-screen {
@@ -3990,10 +3978,6 @@ details.dropdown::marker {
   overflow-y: auto;
 }
 
-.overflow-y-scroll {
-  overflow-y: scroll;
-}
-
 .truncate {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -4121,10 +4105,6 @@ details.dropdown::marker {
   fill: #0284c7;
 }
 
-.fill-slate-800 {
-  fill: #1e293b;
-}
-
 .p-1 {
   padding: 0.25rem;
 }
@@ -4224,11 +4204,6 @@ details.dropdown::marker {
   line-height: 1.25rem;
 }
 
-.text-xl {
-  font-size: 1.25rem;
-  line-height: 1.75rem;
-}
-
 .font-bold {
   font-weight: 700;
 }
@@ -4268,11 +4243,6 @@ details.dropdown::marker {
 .text-slate-800 {
   --tw-text-opacity: 1;
   color: rgb(30 41 59 / var(--tw-text-opacity));
-}
-
-.text-slate-100 {
-  --tw-text-opacity: 1;
-  color: rgb(241 245 249 / var(--tw-text-opacity));
 }
 
 .opacity-25 {
@@ -4884,10 +4854,6 @@ details.dropdown::marker {
     height: 2rem;
   }
 
-  .md\:max-h-12 {
-    max-height: 3rem;
-  }
-
   .md\:max-h-48 {
     max-height: 12rem;
   }
@@ -4920,6 +4886,10 @@ details.dropdown::marker {
     min-width: 24rem;
   }
 
+  .md\:max-w-\[12rem\] {
+    max-width: 12rem;
+  }
+
   .md\:max-w-\[13rem\] {
     max-width: 13rem;
   }
@@ -4938,10 +4908,6 @@ details.dropdown::marker {
 
   .md\:max-w-\[15rem\] {
     max-width: 15rem;
-  }
-
-  .md\:max-w-\[12rem\] {
-    max-width: 12rem;
   }
 
   .md\:gap-2\.5 {
@@ -5085,6 +5051,10 @@ details.dropdown::marker {
     min-width: 8rem;
   }
 
+  .lg\:max-w-\[16rem\] {
+    max-width: 16rem;
+  }
+
   .lg\:max-w-\[7rem\] {
     max-width: 7rem;
   }
@@ -5111,10 +5081,6 @@ details.dropdown::marker {
 
   .lg\:max-w-\[10rem\] {
     max-width: 10rem;
-  }
-
-  .lg\:max-w-\[16rem\] {
-    max-width: 16rem;
   }
 
   .lg\:translate-x-0 {
@@ -5205,18 +5171,6 @@ details.dropdown::marker {
 
   .xl\:h-6 {
     height: 1.5rem;
-  }
-
-  .xl\:max-h-60 {
-    max-height: 15rem;
-  }
-
-  .xl\:max-h-6 {
-    max-height: 1.5rem;
-  }
-
-  .xl\:max-h-64 {
-    max-height: 16rem;
   }
 
   .xl\:w-6 {
@@ -5314,10 +5268,6 @@ details.dropdown::marker {
     --tw-space-y-reverse: 0;
     margin-top: calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));
     margin-bottom: calc(0.75rem * var(--tw-space-y-reverse));
-  }
-
-  .xl\:fill-slate-100 {
-    fill: #f1f5f9;
   }
 
   .xl\:text-xl {

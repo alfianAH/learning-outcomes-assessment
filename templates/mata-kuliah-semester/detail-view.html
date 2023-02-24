@@ -300,6 +300,7 @@
 
 {% block script %}
 <script>
+    {% comment %} Capaian CLO rata-rata {% endcomment %}
     $.ajax({
         method: "GET",
         url: '{{ single_object.get_clo_rerata_graph_url }}',
@@ -318,30 +319,46 @@
                     }]
                 },
                 options: {
-                    animation: {
-                        onComplete: function(context){
-                            let cx = context.chart.width / 2;
-                            let cy = context.chart.height / 2;
+                    plugins: {
+                        legend: {
+                            display: false,
+                        },
+                        customPercentage: {
+                            content: {{ single_object.average_clo_achievement|floatformat:2 }},
+                        },
+                    }
+                },
+                plugins: [
+                    {
+                        id:'customPercentage',
+                        afterDraw: (chart, args, options) => {
+                            let cx = chart.width / 2;
+                            let cy = chart.height / 2;
         
                             ctx.textAlign = 'center';
                             ctx.textBaseline = 'middle';
                             ctx.font = "bold 18px Inter";
-                            ctx.fillStyle = "#10b981"
-                            ctx.fillText("{{ single_object.average_clo_achievement|floatformat:2 }}", cx, cy);
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false,
+                            ctx.fillStyle = "#10b981";
+                            ctx.fillText(options.content, cx, cy);
                         }
                     }
-                },
-            }
+                ]
+            };
 
             var myChart = new Chart(
                 canvas,
                 chartConfig
             );
+
+            var resizeChart = function() {
+                myChart.destroy();
+                myChart = new Chart(
+                    canvas,
+                    chartConfig
+                );
+            };
+    
+            window.addEventListener('resize', debounce(resizeChart, 200));
         },
         error: function(error_data) {
             console.error(error_data);

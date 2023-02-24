@@ -703,7 +703,6 @@ class PencapaianCloRataRataGraphJsonResponse(ProgramStudiMixin, View):
         self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        print('MK: {}'.format(self.mk_semester_obj))
         average_clo_achievement = self.mk_semester_obj.average_clo_achievement
         json_response = {}
 
