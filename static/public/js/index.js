@@ -42,23 +42,43 @@ function chartDarkMode(isDarkMode) {
         if (chart == null) continue;
 
         if (isDarkMode) {
-            chart.options.color = '#f5f5f5'; // Neutral 100
-            chart.options.borderColor = '#f5f5f5'; 
+            // Dark (Neutral 100)
+            let textNeutral100 = 'rgba(245, 245, 245, 0.8)';
+            let borderNeutral100 = 'rgba(245, 245, 245, 0.2)';
 
-            if (chart.options.scales.x == null) continue;
-            chart.options.scales.x.ticks.color = '#f5f5f5';
-            chart.options.scales.x.title.color = '#f5f5f5';
-            chart.options.scales.y.ticks.color = '#f5f5f5';
-            chart.options.scales.y.title.color = '#f5f5f5';
+            chart.options.color = textNeutral100;
+            chart.options.borderColor = borderNeutral100; 
+
+            if (chart.options.scales.x != null){
+                // Ticks
+                chart.options.scales.x.ticks.color = textNeutral100;
+                chart.options.scales.y.ticks.color = textNeutral100;
+                // Titles
+                chart.options.scales.x.title.color = textNeutral100;
+                chart.options.scales.y.title.color = textNeutral100;
+                // Grid line
+                chart.options.scales.x.grid.color = borderNeutral100;
+                chart.options.scales.y.grid.color = borderNeutral100;
+            }
         } else {
-            chart.options.color = '#1e293b'; // Slate 800
-            chart.options.borderColor = '#1e293b';
+            // Light (Slate 800)
+            let textSlate800 = 'rgba(30, 41, 59, 0.8)';
+            let borderSlate800 = 'rgba(30, 41, 59, 0.2)';
+
+            chart.options.color = textSlate800;
+            chart.options.borderColor = borderSlate800;
             
-            if (chart.options.scales.x == null) continue;
-            chart.options.scales.x.ticks.color = '#1e293b';
-            chart.options.scales.x.title.color = '#1e293b';
-            chart.options.scales.y.ticks.color = '#1e293b';
-            chart.options.scales.y.title.color = '#1e293b';
+            if (chart.options.scales.x != null){
+                // Ticks
+                chart.options.scales.x.ticks.color = textSlate800;
+                chart.options.scales.y.ticks.color = textSlate800;
+                // Titles
+                chart.options.scales.x.title.color = textSlate800;
+                chart.options.scales.y.title.color = textSlate800;
+                // Grid line
+                chart.options.scales.x.grid.color = borderSlate800;
+                chart.options.scales.y.grid.color = borderSlate800;
+            }
         }
 
         chart.update();

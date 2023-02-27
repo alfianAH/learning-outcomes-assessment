@@ -314,6 +314,17 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, DetailWithListViewModelD):
             'labels': list(list_nilai.keys()),
             'datasets': {
                 'data': list(list_nilai.values()),
+                'backgroundColor': [
+                    '#EF4444',
+                    '#F59E0B',
+                    '#84CC16',
+                    '#10B981',
+                    '#06B6D4',
+                    '#3B82F6',
+                    '#8B5CF6',
+                    '#D946EF',
+                    '#78716C'
+                ]
             }
         }
 
