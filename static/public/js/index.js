@@ -33,8 +33,42 @@ function checkForStorage() {
     return typeof(Storage) !== "undefined"
 }
 
+function chartDarkMode(isDarkMode) {
+    let canvases = document.getElementsByTagName('canvas');
+
+    for (const canvas of canvases) {
+        let chart = Chart.getChart(canvas);
+        
+        if (chart == null) continue;
+
+        if (isDarkMode) {
+            chart.options.color = '#f5f5f5'; // Neutral 100
+            chart.options.borderColor = '#f5f5f5'; 
+
+            if (chart.options.scales.x == null) continue;
+            chart.options.scales.x.ticks.color = '#f5f5f5';
+            chart.options.scales.x.title.color = '#f5f5f5';
+            chart.options.scales.y.ticks.color = '#f5f5f5';
+            chart.options.scales.y.title.color = '#f5f5f5';
+        } else {
+            chart.options.color = '#1e293b'; // Slate 800
+            chart.options.borderColor = '#1e293b';
+            
+            if (chart.options.scales.x == null) continue;
+            chart.options.scales.x.ticks.color = '#1e293b';
+            chart.options.scales.x.title.color = '#1e293b';
+            chart.options.scales.y.ticks.color = '#1e293b';
+            chart.options.scales.y.title.color = '#1e293b';
+        }
+
+        chart.update();
+    }
+}
+
 function darkModeClass(isDarkMode) {
     isDarkMode ? $('body').addClass("dark") : $('body').removeClass('dark');
+    // Update chart to dark mode 
+    chartDarkMode(isDarkMode);
 }
 
 function darkModeHandler(){

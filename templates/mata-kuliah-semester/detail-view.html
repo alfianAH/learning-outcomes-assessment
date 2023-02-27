@@ -474,5 +474,9 @@
     };
 
     createChart('distribusi-nilai-pie', distribusiNilaiHurufPieChartConfig);
+
+    // Update chart to dark mode
+    let isDarkMode = $('body').hasClass('dark');
+    chartDarkMode(isDarkMode);
 </script>
 {% endblock script %}
