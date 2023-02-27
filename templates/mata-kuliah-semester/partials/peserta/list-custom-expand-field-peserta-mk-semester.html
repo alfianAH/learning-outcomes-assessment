@@ -6,7 +6,7 @@
                 <td>{{ nilai.nilai }}</td>
             </tr>
         {% empty %}
-            {% for komponen_clo in option.get_empty_komponen_clo %}
+            {% for komponen_clo in empty_komponen_clo %}
                 <tr class="flex space-x-2.5">
                     <td class="w-full">{{ komponen_clo.clo.nama }} - {{ komponen_clo.instrumen_penilaian }} ({{ komponen_clo.persentase }}%)</td>
                     <td>-</td>

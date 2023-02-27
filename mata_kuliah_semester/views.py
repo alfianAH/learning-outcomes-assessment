@@ -1,3 +1,4 @@
+import json
 from django.contrib.auth import authenticate
 from django.conf import settings
 from django.db.models import QuerySet
@@ -180,9 +181,9 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, DetailWithListViewModelD):
         self.reset_url = self.single_object.read_detail_url()
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        peserta_mk_semester_qs = self.get_queryset()
+        self.peserta_mk_semester_qs = self.get_queryset()
 
-        if peserta_mk_semester_qs.exists():
+        if self.peserta_mk_semester_qs.exists():
             filter_data = {
                 'nama': request.GET.get('nama', ''),
                 'nilai_akhir_min': request.GET.get('nilai_akhir_min', ''),
@@ -195,15 +196,15 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, DetailWithListViewModelD):
 
             self.filter_form = PesertaMataKuliahFilter(
                 data=filter_data or None,
-                queryset=peserta_mk_semester_qs
+                queryset=self.peserta_mk_semester_qs
             )
             self.sort_form = PesertaMataKuliahSortForm(data=sort_data)
 
         return super().get(request, *args, **kwargs)
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[PesertaMataKuliah]:
         self.queryset = self.model.objects.filter(
-            kelas_mk_semester__mk_semester=self.single_object.pk
+            kelas_mk_semester__mk_semester=self.single_object
         )
         return super().get_queryset()
 
@@ -219,6 +220,115 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, DetailWithListViewModelD):
                 'badge_text': 'Belum dikunci',
             })
     
+    def pencapaian_per_clo_graph(self):
+        list_nilai_clo: QuerySet[NilaiCloMataKuliahSemester] = self.single_object.get_nilai_clo_mk_semester()
+
+        json_response = {
+            'labels': [nilai_clo.clo.nama for nilai_clo in list_nilai_clo],
+            'datasets': {
+                'data': [nilai_clo.clo.get_total_persentase_komponen()/100 * nilai_clo.nilai for nilai_clo in list_nilai_clo],
+            }
+        }
+
+        return json.dumps(json_response)
+    
+    def pencapaian_clo_rerata_graph(self):
+        average_clo_achievement = self.single_object.average_clo_achievement
+        json_response = {}
+
+        if average_clo_achievement is None: return json.dumps(json_response)
+
+        if average_clo_achievement > 100:
+            total_exceed = average_clo_achievement - 100
+            json_response.update({
+                'labels': [
+                    'Persentase berlebihan',
+                    'Capaian CLO rata-rata',
+                ],
+                'datasets': {
+                    'data': [
+                        total_exceed,
+                        average_clo_achievement - total_exceed
+                    ],
+                    'backgroundColor': [
+                        '#f43f5e', # Rose 500
+                        '#10b981' # Emerald 500
+                    ]
+                }
+            })
+        elif average_clo_achievement == 100:
+            json_response.update({
+                'labels': [
+                    'Capaian CLO rata-rata',
+                ],
+                'datasets': {
+                    'data': [
+                        average_clo_achievement
+                    ],
+                    'backgroundColor': [
+                        '#10b981' # Emerald 500
+                    ]
+                }
+            })
+        else:
+            json_response.update({
+                'labels': [
+                    'Capaian CLO rata-rata',
+                    '-',
+                ],
+                'datasets': {
+                    'data': [
+                        average_clo_achievement,
+                        100 - average_clo_achievement,
+                    ],
+                    'backgroundColor': [
+                        '#10b981', # Emerald 500
+                        '#a7f3d0' # Emerald 200
+                    ]
+                }
+            })
+        
+        return json.dumps(json_response)
+    
+    def distribusi_nilai_huruf_graph(self):
+        list_nilai = {
+            'A': 0,
+            'A-': 0,
+            'B+': 0,
+            'B': 0,
+            'B-': 0,
+            'C+': 0,
+            'C': 0,
+            'D': 0,
+            'E': 0,
+        }
+
+        for peserta in self.peserta_mk_semester_qs:
+            if peserta.nilai_huruf in list_nilai.keys():
+                list_nilai[peserta.nilai_huruf] += 1
+            else:
+                if settings.DEBUG:
+                    print('Nilai {} tidak ada di list nilai'.format(peserta.nilai_huruf))
+        
+        json_response = {
+            'labels': list(list_nilai.keys()),
+            'datasets': {
+                'data': list(list_nilai.values()),
+            }
+        }
+
+        return json.dumps(json_response)
+    
+    def get_empty_komponen_clo(self):
+        list_clo: QuerySet[Clo] = self.single_object.get_all_clo()
+        list_komponen_clo = []
+
+        for clo in list_clo:
+            for komponen_clo in clo.get_komponen_clo():
+                list_komponen_clo.append(komponen_clo)
+        
+        return list_komponen_clo
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         pedoman_objects = [
@@ -239,13 +349,18 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, DetailWithListViewModelD):
 
         context.update({
             'colspan_length': 8,
-            'pedoman_objects': pedoman_objects
+            'pedoman_objects': pedoman_objects,
+            'empty_komponen_clo': self.get_empty_komponen_clo(),
+            'pencapaian_per_clo_graph': self.pencapaian_per_clo_graph(),
+            'pencapaian_clo_rerata_graph': self.pencapaian_clo_rerata_graph(),
+            'distribusi_nilai_huruf_graph': self.distribusi_nilai_huruf_graph(),
         })
-
-        if self.request.GET.get('active_tab') == 'hasil':
+        
+        get_request = self.request.GET
+        if get_request.get('active_tab') == 'hasil':
             context['is_hasil_pane'] = True
 
-        if self.request.GET.get('nama') or self.request.GET.get('nilai_akhir_min') or self.request.GET.get('nilai_akhir_max') or self.request.GET.get(self.sort_form_ordering_by_key) or self.request.GET.get('active_tab') == 'peserta':
+        if get_request.get('nama') or get_request.get('nilai_akhir_min') or get_request.get('nilai_akhir_max') or get_request.get(self.sort_form_ordering_by_key) or get_request.get('active_tab') == 'peserta':
             context['is_peserta_pane'] = True
         
         return context
@@ -577,21 +692,30 @@ class NilaiKomponenCloEditView(ProgramStudiMixin, NilaiKomponenCloEditTemplateVi
         cleaned_data = form.cleaned_data
         
         for nilai_komponen_clo_submit in cleaned_data:
+            peserta_obj: PesertaMataKuliah = nilai_komponen_clo_submit.get('peserta')
+
             # Check query first
             nilai_peserta_qs = NilaiKomponenCloPeserta.objects.filter(
-                peserta=nilai_komponen_clo_submit.get('peserta'),
+                peserta=peserta_obj,
                 komponen_clo=nilai_komponen_clo_submit.get('komponen_clo')
             )
 
             # If exists, then update the query
             if nilai_peserta_qs.exists():
                 nilai_peserta_qs.update(**nilai_komponen_clo_submit)
+                # Update status nilai
+                peserta_obj.status_nilai = True
+                peserta_obj.save()
             else:  # Else, create new one
                 # If form is empty, skip
                 if len(nilai_komponen_clo_submit.items()) == 0: continue
 
                 # Create new one
                 NilaiKomponenCloPeserta.objects.create(**nilai_komponen_clo_submit)
+
+                # Update status nilai
+                peserta_obj.status_nilai = True
+                peserta_obj.save()
 
         messages.success(self.request, 'Proses mengedit nilai komponen CLO sudah selesai.')
         return super().form_valid(form)
@@ -644,12 +768,20 @@ class NilaiKomponenCloPesertaEditView(ProgramStudiMixin, NilaiKomponenCloEditTem
             # If exists, then update the query
             if nilai_peserta_qs.exists():
                 nilai_peserta_qs.update(**nilai_komponen_clo_submit)
+                
+                # Update status nilai
+                self.peserta_mk_semester.status_nilai = True
+                self.peserta_mk_semester.save()
             else:  # Else, create new one
                 # If form is empty, skip
                 if len(nilai_komponen_clo_submit.items()) == 0: continue
 
                 # Create new one
                 NilaiKomponenCloPeserta.objects.create(**nilai_komponen_clo_submit)
+
+                # Update status nilai
+                self.peserta_mk_semester.status_nilai = True
+                self.peserta_mk_semester.save()
 
         messages.success(self.request, self.success_msg)
         return super().form_valid(form)
@@ -692,125 +824,3 @@ class NilaiAverageCloAchievementCalculateView(ProgramStudiMixin, RedirectView):
         
         messages.success(request, 'Proses perhitungan capaian CLO rata-rata sudah selesai.')
         return super().get(request, *args, **kwargs)
-
-
-class PencapaianPerCloGraphJsonResponse(ProgramStudiMixin, View):
-    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
-        super().setup(request, *args, **kwargs)
-        mk_semester_id = kwargs.get('mk_semester_id')
-        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
-        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
-
-    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        list_nilai_clo: QuerySet[NilaiCloMataKuliahSemester] = self.mk_semester_obj.get_nilai_clo_mk_semester()
-
-        json_response = {
-            'labels': [nilai_clo.clo.nama for nilai_clo in list_nilai_clo],
-            'datasets': {
-                'data': [nilai_clo.clo.get_total_persentase_komponen()/100 * nilai_clo.nilai for nilai_clo in list_nilai_clo],
-            }
-        }
-
-        return JsonResponse(json_response)
-
-
-class PencapaianCloRataRataGraphJsonResponse(ProgramStudiMixin, View):
-    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
-        super().setup(request, *args, **kwargs)
-        mk_semester_id = kwargs.get('mk_semester_id')
-        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
-        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
-
-    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        average_clo_achievement = self.mk_semester_obj.average_clo_achievement
-        json_response = {}
-
-        if average_clo_achievement > 100:
-            total_exceed = average_clo_achievement - 100
-            json_response.update({
-                'labels': [
-                    'Persentase berlebihan',
-                    'Capaian CLO rata-rata',
-                ],
-                'datasets': {
-                    'data': [
-                        total_exceed,
-                        average_clo_achievement - total_exceed
-                    ],
-                    'backgroundColor': [
-                        '#f43f5e', # Rose 500
-                        '#10b981' # Emerald 500
-                    ]
-                }
-            })
-        elif average_clo_achievement == 100:
-            json_response.update({
-                'labels': [
-                    'Capaian CLO rata-rata',
-                ],
-                'datasets': {
-                    'data': [
-                        average_clo_achievement
-                    ],
-                    'backgroundColor': [
-                        '#10b981' # Emerald 500
-                    ]
-                }
-            })
-        else:
-            json_response.update({
-                'labels': [
-                    'Capaian CLO rata-rata',
-                    '-',
-                ],
-                'datasets': {
-                    'data': [
-                        average_clo_achievement,
-                        100 - average_clo_achievement,
-                    ],
-                    'backgroundColor': [
-                        '#10b981', # Emerald 500
-                        '#a7f3d0' # Emerald 200
-                    ]
-                }
-            })
-
-        return JsonResponse(json_response)
-
-
-class DistribusiNilaiHurufMahasiswaGraphJsonResponse(ProgramStudiMixin, View):
-    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
-        super().setup(request, *args, **kwargs)
-        mk_semester_id = kwargs.get('mk_semester_id')
-        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
-        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
-
-    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        list_peserta_mk: QuerySet[PesertaMataKuliah] = self.mk_semester_obj.get_all_peserta_mk_semester()
-        list_nilai = {
-            'A': 0,
-            'A-': 0,
-            'B+': 0,
-            'B': 0,
-            'B-': 0,
-            'C+': 0,
-            'C': 0,
-            'D': 0,
-            'E': 0,
-        }
-
-        for peserta in list_peserta_mk:
-            if peserta.nilai_huruf in list_nilai.keys():
-                list_nilai[peserta.nilai_huruf] += 1
-            else:
-                if settings.DEBUG:
-                    print('Nilai {} tidak ada di list nilai'.format(peserta.nilai_huruf))
-        
-        json_response = {
-            'labels': list(list_nilai.keys()),
-            'datasets': {
-                'data': list(list_nilai.values()),
-            }
-        }
-
-        return JsonResponse(json_response)

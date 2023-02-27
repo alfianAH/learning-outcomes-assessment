@@ -148,15 +148,6 @@ class MataKuliahSemester(MataKuliahSemesterLock):
     
     def get_nilai_average_calculate_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:nilai-avg-calculate', self.get_kwargs)
-
-    def get_capaian_per_clo_graph_url(self):
-        return get_reverse_url('semester:mata_kuliah_semester:capaian-per-clo-graph', self.get_kwargs)
-    
-    def get_clo_rerata_graph_url(self):
-        return get_reverse_url('semester:mata_kuliah_semester:clo-rerata-graph', self.get_kwargs)
-    
-    def get_nilai_huruf_graph_url(self):
-        return get_reverse_url('semester:mata_kuliah_semester:nilai-huruf-graph', self.get_kwargs)
     
 
 class KelasMataKuliahSemester(models.Model):
@@ -195,6 +186,7 @@ class PesertaMataKuliah(models.Model):
     nilai_akhir = models.FloatField(null=True, 
         validators=[MinValueValidator(0.0), MaxValueValidator(100.0)])
     nilai_huruf = models.CharField(null=True, max_length=5)
+    status_nilai = models.BooleanField(default=False)
     
     class Meta:
         constraints = (
@@ -210,16 +202,6 @@ class PesertaMataKuliah(models.Model):
             **self.kelas_mk_semester.mk_semester.get_kwargs,
             'peserta_id': self.pk
         }
-    
-    def get_empty_komponen_clo(self):
-        list_clo = self.kelas_mk_semester.mk_semester.get_all_clo()
-        list_komponen_clo = []
-
-        for clo in list_clo:
-            for komponen_clo in clo.get_komponen_clo():
-                list_komponen_clo.append(komponen_clo)
-        
-        return list_komponen_clo
 
     def get_all_nilai_komponen_clo_peserta(self):
         return self.nilaikomponenclopeserta_set.filter(
@@ -230,28 +212,6 @@ class PesertaMataKuliah(models.Model):
         return self.nilaikomponenclopeserta_set.filter(
             komponen_clo=komponen_clo
         )
-    
-    @property
-    def status_nilai(self) -> bool:
-        """Status nilai peserta
-
-        Returns:
-            bool: Returns true if all nilai komponen are complete, else returns False
-        """
-
-        list_komponen_clo = self.get_empty_komponen_clo()
-        list_nilai_komponen_clo_peserta = self.get_all_nilai_komponen_clo_peserta()
-        
-        # If there are no komponen CLO or Nilai, return False
-        if len(list_komponen_clo) == 0 or len(list_nilai_komponen_clo_peserta) == 0:
-            return False 
-        
-        # If there are komponen CLO and nilai and their length match each other, return True
-        if len(list_komponen_clo) == list_nilai_komponen_clo_peserta.count():
-            return True
-        
-        # Return False if the length doesn't match
-        return False
     
     def get_hx_nilai_komponen_clo_peserta_edit_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:hx-nilai-komponen-peserta-edit', self.get_kwargs)

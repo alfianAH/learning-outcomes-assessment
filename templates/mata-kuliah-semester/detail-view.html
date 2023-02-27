@@ -350,171 +350,129 @@
 {% block script %}
 <script>
     {% comment %} Capaian per CLO {% endcomment %}
-    $.ajax({
-        method: "GET",
-        url: '{{ single_object.get_capaian_per_clo_graph_url }}',
-        success: function(data) {
-            let canvas = document.getElementById('capaian-per-clo');
-            let ctx = canvas.getContext("2d");
-
-            let chartConfig = {
-                type: 'pie',
-                data: {
-                    labels: data.labels,
-                    datasets: [{
-                        data: data.datasets.data,
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                        }
-                    }
+    let pencapaianPerCloData = {{ pencapaian_per_clo_graph|safe }};
+    let pencapaianPerCloChartConfig = {
+        type: 'pie',
+        data: {
+            labels: pencapaianPerCloData.labels,
+            datasets: [{
+                data: pencapaianPerCloData.datasets.data,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    position: 'right',
                 }
-            };
-
-            createChart('capaian-per-clo', chartConfig);
-        },
-        error: function(error_data) {
-            console.error(error_data);
+            }
         }
-    });
+    };
 
-    {% comment %} Capaian CLO rata-rata {% endcomment %}
-    $.ajax({
-        method: "GET",
-        url: '{{ single_object.get_clo_rerata_graph_url }}',
-        success: function(data) {
-            let canvas = document.getElementById('capaian-clo-rata-rata');
-            let ctx = canvas.getContext("2d");
+    createChart('capaian-per-clo', pencapaianPerCloChartConfig);
 
-            let chartConfig = {
-                type: 'doughnut',
-                data: {
-                    labels: data.labels,
-                    datasets: [{
-                        data: data.datasets.data,
-                        backgroundColor: data.datasets.backgroundColor,
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    plugins: {
-                        legend: {
-                            display: false,
-                        },
-                        customPercentage: {
-                            content: {{ single_object.average_clo_achievement|floatformat:2 }},
-                        },
-                    }
-                },
-                plugins: [
-                    {
-                        id:'customPercentage',
-                        afterDraw: (chart, args, options) => {
-                            let cx = chart.width / 2;
-                            let cy = chart.height / 2;
-        
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'middle';
-                            ctx.font = "bold 18px Inter";
-                            ctx.fillStyle = "#10b981";
-                            ctx.fillText(options.content, cx, cy);
-                        }
-                    }
-                ]
-            };
-
-            createChart('capaian-clo-rata-rata', chartConfig);
+    {% comment %} Pencapaian CLO rata-rata {% endcomment %}
+    let pencapaianCloRerataData = {{ pencapaian_clo_rerata_graph|safe }};
+    let pencapaianCloRerataChartConfig = {
+        type: 'doughnut',
+        data: {
+            labels: pencapaianCloRerataData.labels,
+            datasets: [{
+                data: pencapaianCloRerataData.datasets.data,
+                backgroundColor: pencapaianCloRerataData.datasets.backgroundColor,
+                hoverOffset: 4
+            }]
         },
-        error: function(error_data) {
-            console.error(error_data);
-        }
-    });
+        options: {
+            plugins: {
+                legend: {
+                    display: false,
+                },
+                customPercentage: {
+                    content: {{ single_object.average_clo_achievement|floatformat:2 }},
+                },
+            }
+        },
+        plugins: [
+            {
+                id:'customPercentage',
+                afterDraw: (chart, args, options) => {
+                    let ctx = chart.ctx;
+
+                    let cx = chart.width / 2;
+                    let cy = chart.height / 2;
+
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.font = "bold 18px Inter";
+                    ctx.fillStyle = "#10b981";
+                    ctx.fillText(options.content, cx, cy);
+                }
+            }
+        ]
+    };
+
+    createChart('capaian-clo-rata-rata', pencapaianCloRerataChartConfig);
 
     {% comment %} Distribusi nilai bar {% endcomment %}
-    $.ajax({
-        method: "GET",
-        url: '{{ single_object.get_nilai_huruf_graph_url }}',
-        success: function(data) {
-            let canvas = document.getElementById('distribusi-nilai-bar');
-            let ctx = canvas.getContext("2d");
+    let distribusiNilaiHurufData = {{ distribusi_nilai_huruf_graph|safe }};
 
-            let chartConfig = {
-                type: 'bar',
-                data: {
-                    labels: data.labels,
-                    datasets: [{
-                        data: data.datasets.data,
-                        hoverOffset: 4
-                    }]
+    let distribusiNilaiHurufBarChartConfig = {
+        type: 'bar',
+        data: {
+            labels: distribusiNilaiHurufData.labels,
+            datasets: [{
+                data: distribusiNilaiHurufData.datasets.data,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    display: false,
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Nilai',
+                    }
                 },
-                options: {
-                    plugins: {
-                        legend: {
-                            display: false,
-                        }
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Jumlah mahasiswa',
                     },
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Nilai',
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Jumlah mahasiswa',
-                            },
-                            ticks: {
-                                stepSize: 1,
-                            }
-                        }
+                    ticks: {
+                        stepSize: 1,
                     }
                 }
-            };
-
-            createChart('distribusi-nilai-bar', chartConfig);
-        },
-        error: function(error_data) {
-            console.error(error_data);
+            }
         }
-    });
+    };
+
+    createChart('distribusi-nilai-bar', distribusiNilaiHurufBarChartConfig);
 
     {% comment %} Distribusi nilai pie {% endcomment %}
-    $.ajax({
-        method: "GET",
-        url: '{{ single_object.get_nilai_huruf_graph_url }}',
-        success: function(data) {
-            let canvas = document.getElementById('distribusi-nilai-pie');
-            let ctx = canvas.getContext("2d");
-
-            let chartConfig = {
-                type: 'pie',
-                data: {
-                    labels: data.labels,
-                    datasets: [{
-                        data: data.datasets.data,
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                        }
-                    }
-                }
-            };
-
-            createChart('distribusi-nilai-pie', chartConfig);
+    let distribusiNilaiHurufPieChartConfig = {
+        type: 'pie',
+        data: {
+            labels: distribusiNilaiHurufData.labels,
+            datasets: [{
+                data: distribusiNilaiHurufData.datasets.data,
+                hoverOffset: 4
+            }]
         },
-        error: function(error_data) {
-            console.error(error_data);
+        options: {
+            plugins: {
+                legend: {
+                    position: 'right',
+                }
+            }
         }
-    });
+    };
+
+    createChart('distribusi-nilai-pie', distribusiNilaiHurufPieChartConfig);
 </script>
 {% endblock script %}
