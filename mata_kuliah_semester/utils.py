@@ -1,3 +1,4 @@
+import math
 import numpy as np
 from django.conf import settings
 from django.db.models import QuerySet
@@ -262,6 +263,10 @@ def calculate_nilai_per_clo_mk_semester(mk_semester: MataKuliahSemester):
 
             # Calculate average of list nilai komponen of all peserta
             average_assessment_form = np.average(list_nilai_komponen_all_peserta)
+            
+            # If average assessment form is NaN, set it to 0
+            if math.isnan(average_assessment_form):
+                average_assessment_form = 0
 
             clo_achievement_components.append({
                 'average_assessment_form': average_assessment_form,

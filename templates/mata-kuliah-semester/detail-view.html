@@ -122,7 +122,9 @@
         <div class="tab-title">
             <span class="truncate">Hasil</span>
 
+            {% if not single_object.status_nilai %}
             <div class="w-2 h-2 lg:w-2.5 lg:h-2.5 ml-2.5 badge-warning rounded-full"></div>
+            {% endif %}
         </div>
 
         <div class="tab-item-line"></div>
@@ -329,7 +331,6 @@
                     
                 </div>
             </div>
-        
         {% else %}
             <h2>Hasil</h2>
             <p>Hasil belum ada.</p>
