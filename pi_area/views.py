@@ -1,11 +1,13 @@
+from django.db.models import QuerySet
 from django.forms import BaseInlineFormSet
 from django.http import HttpRequest, HttpResponse
 from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect
-from django.views.generic.base import View
-from django.views.generic.edit import DeleteView, FormView
+from django.shortcuts import get_object_or_404
+from django.views.generic.base import RedirectView
+from django.views.generic.edit import DeleteView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
+from learning_outcomes_assessment.auth.mixins import ProgramStudiMixin
 from learning_outcomes_assessment.forms.edit import (
     ModelBulkDeleteView,
     DuplicateFormview,
@@ -25,7 +27,8 @@ from .forms import (
 )
 from .models import(
     AssessmentArea,
-    PerformanceIndicatorArea
+    PerformanceIndicatorArea,
+    PerformanceIndicator,
 )
 from .utils import(
     get_kurikulum_with_pi_area,
@@ -103,7 +106,7 @@ class PIAreaUpdateView(HtmxUpdateInlineFormsetView):
         self.kurikulum_obj: Kurikulum = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
 
         self.post_url = self.object.get_update_pi_area_url()
-        self.success_url = self.object.get_read_all_pi_area_url()
+        self.success_url = self.kurikulum_obj.read_all_pi_area_url()
 
 
 class PIAreaReadAllView(ListView):
@@ -142,7 +145,7 @@ class AssessmentAreaDeleteView(DeleteView):
     
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         assessment_area_obj: AssessmentArea = self.get_object()
-        self.success_url = assessment_area_obj.get_read_all_pi_area_url()
+        self.success_url = assessment_area_obj.kurikulum.read_all_pi_area_url()
         return self.post(request, *args, **kwargs)
 
     def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
@@ -232,3 +235,110 @@ class PIAreaDuplicateFormView(DuplicateFormview):
         duplicate_pi_area_from_kurikulum_id(kurikulum_id, self.kurikulum_obj)
         messages.success(self.request, 'Berhasil menduplikasi performance indicator ke kurikulum ini.')
         return super().form_valid(form)
+
+
+class PIAreaLockAndUnlockView(ProgramStudiMixin, RedirectView):
+    kurikulum_obj: Kurikulum = None
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        kurikulum_id = kwargs.get('kurikulum_id')
+        self.kurikulum_obj = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
+        self.program_studi_obj = self.kurikulum_obj.prodi_jenjang.program_studi
+
+    def get_redirect_url(self, *args, **kwargs):
+        self.url = self.kurikulum_obj.read_all_pi_area_url()
+        return super().get_redirect_url(*args, **kwargs)
+    
+    def lock_pi(self, assessment_area_qs: QuerySet[AssessmentArea]):
+        is_success = True
+        is_locking_success = True
+
+        for assessment_area_obj in assessment_area_qs:
+            pi_area_qs: QuerySet[PerformanceIndicatorArea] = assessment_area_obj.get_pi_area()
+
+            for pi_area_obj in pi_area_qs:
+                pi_qs: QuerySet[PerformanceIndicator] = pi_area_obj.get_performance_indicator()
+
+                for pi_obj in pi_qs:
+                    # Lock Performance Indicator
+                    is_locking_success = is_locking_success and pi_obj.lock_object(self.request.user)
+                    is_success = is_success and pi_obj.is_locked
+                    
+                # Lock Performance Indicator Area
+                is_locking_success = is_locking_success and pi_area_obj.lock_object(self.request.user)
+                is_success = is_success and pi_area_obj.is_locked
+
+            # Lock assessment area
+            is_locking_success = is_locking_success and assessment_area_obj.lock_object(self.request.user)
+            is_success = is_success and assessment_area_obj.is_locked
+
+        if is_success:
+            self.kurikulum_obj.is_assessmentarea_locked = True
+            self.kurikulum_obj.save()
+        
+        return is_success, is_locking_success
+
+    def unlock_pi(self, assessment_area_qs: QuerySet[AssessmentArea]):
+        is_success = True
+        is_unlocking_success = True
+
+        for assessment_area_obj in assessment_area_qs:
+            pi_area_qs: QuerySet[PerformanceIndicatorArea] = assessment_area_obj.get_pi_area()
+
+            for pi_area_obj in pi_area_qs:
+                pi_qs: QuerySet[PerformanceIndicator] = pi_area_obj.get_performance_indicator()
+
+                for pi_obj in pi_qs:
+                    # Unlock Performance Indicator
+                    is_unlocking_success = is_unlocking_success and pi_obj.unlock_object()
+                    is_success = is_success and not pi_obj.is_locked
+                    
+                # Unlock Performance Indicator Area
+                is_unlocking_success = is_unlocking_success and pi_area_obj.unlock_object()
+                is_success = is_success and not pi_area_obj.is_locked
+
+            # Unlock assessment area
+            is_unlocking_success = is_unlocking_success and assessment_area_obj.unlock_object()
+            is_success = is_success and not assessment_area_obj.is_locked
+
+        if is_success:
+            self.kurikulum_obj.is_assessmentarea_locked = False
+            self.kurikulum_obj.save()
+        
+        return is_success, is_unlocking_success
+
+
+class PIAreaLockView(PIAreaLockAndUnlockView):
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        assessment_area_qs: QuerySet[AssessmentArea] = self.kurikulum_obj.get_all_assessment_area()
+        is_success, is_locking_success = self.lock_pi(assessment_area_qs)
+
+        if not is_locking_success:
+            messages.info(request, 'Performance Indicator sudah terkunci.')
+            return super().get(request, *args, **kwargs)
+            
+        if is_success:
+            messages.success(request, 'Berhasil mengunci Performance Indicator.')
+        else:
+            self.unlock_pi(assessment_area_qs)
+            messages.error(request, 'Gagal mengunci Performance Indicator.')
+        return super().get(request, *args, **kwargs)
+
+
+class PIAreaUnlockView(PIAreaLockAndUnlockView):
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        assessment_area_qs: QuerySet[AssessmentArea] = self.kurikulum_obj.get_all_assessment_area()
+        is_success, is_unlocking_success = self.unlock_pi(assessment_area_qs)
+
+        if not is_unlocking_success:
+            messages.info(request, 'Performance Indicator sudah tidak terkunci.')
+            return super().get(request, *args, **kwargs)
+
+        if is_success:
+            messages.success(request, 'Berhasil membuka kunci Performance Indicator.')
+        else:
+            self.lock_pi(assessment_area_qs)
+            messages.error(request, 'Gagal membuka kunci Performance Indicator.')
+
+        return super().get(request, *args, **kwargs)

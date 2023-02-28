@@ -4,6 +4,8 @@ from .views import (
     PIAreaReadAllView,
     PIAreaUpdateView,
     PIAreaDuplicateFormView,
+    PIAreaLockView,
+    PIAreaUnlockView,
 
     AssessmentAreaDeleteView,
 
@@ -21,6 +23,8 @@ urlpatterns = [
     path('hx-create/', PIAreaCreateView.as_view(template_name='pi-area/partials/pi-area-form.html'), name='hx-create'),
     path('create/', PIAreaCreateView.as_view(template_name='pi-area/pi-area-create-view.html'), name='create'),
     path('duplicate/', PIAreaDuplicateFormView.as_view(), name='duplicate'),
+    path('lock/', PIAreaLockView.as_view(), name='lock'),
+    path('unlock/', PIAreaUnlockView.as_view(), name='unlock'),
 
     path('assessment-area/<int:assessment_area_id>/hx-update/', PIAreaUpdateView.as_view(template_name='pi-area/partials/pi-area-form.html'), name='hx-update'),
     path('assessment-area/<int:assessment_area_id>/update/', PIAreaUpdateView.as_view(template_name='pi-area/pi-area-update-view.html'), name='update'),

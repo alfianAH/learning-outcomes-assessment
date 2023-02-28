@@ -45,6 +45,9 @@ class Kurikulum(models.Model):
         return get_reverse_url('kurikulum:mata_kuliah_kurikulum:bulk-update', self.get_kwargs)
 
     # Performance Indicator Area
+    def get_all_assessment_area(self):
+        return self.assessmentarea_set.all()
+    
     def read_all_pi_area_url(self):
         return get_reverse_url('kurikulum:pi_area:read-all', self.get_kwargs)
 
@@ -59,6 +62,12 @@ class Kurikulum(models.Model):
 
     def get_duplicate_pi_area_url(self):
         return get_reverse_url('kurikulum:pi_area:duplicate', self.get_kwargs)
+    
+    def get_pi_area_lock_url(self):
+        return get_reverse_url('kurikulum:pi_area:lock', self.get_kwargs)
+    
+    def get_pi_area_unlock_url(self):
+        return get_reverse_url('kurikulum:pi_area:unlock', self.get_kwargs)
 
     # ILO
     def read_all_ilo_url(self):
