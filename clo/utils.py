@@ -22,7 +22,8 @@ def get_pi_area_by_kurikulum_choices(kurikulum_obj: Kurikulum):
     pi_area_choices = []
 
     for pi_area in pi_area_qs:
-        if pi_area.ilo is None:
+        # If PI Area doesn't have ILO, just print the code
+        if not hasattr(pi_area, 'ilo'):
             pi_area_choice = pi_area.pk, pi_area.pi_code
         else:
             pi_area_choice = pi_area.pk, '{} - {}'.format(pi_area.pi_code, pi_area.ilo.nama)

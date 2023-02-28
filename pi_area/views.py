@@ -325,6 +325,23 @@ class PIAreaLockAndUnlockView(ProgramStudiMixin, RedirectView):
 class PIAreaLockView(PIAreaLockAndUnlockView):
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         assessment_area_qs: QuerySet[AssessmentArea] = self.kurikulum_obj.get_all_assessment_area()
+        
+        # If there are no performance indicator in PI Area, give error message.
+        for assessment_area_obj in assessment_area_qs:
+            pi_area_qs: QuerySet[PerformanceIndicatorArea] = assessment_area_obj.get_pi_area()
+
+            for pi_area_obj in pi_area_qs:
+                # If PI Area doesn't have ILO, give error message
+                if not hasattr(pi_area_obj, 'ilo'):
+                    messages.error(request, 'Gagal mengunci performance indicator. Pastikan anda sudah membuat ILO dan memiliki hubungan/keterkaitan dengan masing-masing kode PI.')
+                    return super().get(request, *args, **kwargs)
+                
+                pi_qs: QuerySet[PerformanceIndicator] = pi_area_obj.get_performance_indicator()
+                # If PI Area doesn't have PI, give error message
+                if len(pi_qs) == 0:
+                    messages.error(request, 'Gagal mengunci performance indicator. Dikarenakan masih terdapat assessment area yang belum memiliki performance indicator.')
+                    return super().get(request, *args, **kwargs)
+
         is_success, is_locking_success = self.lock_pi(assessment_area_qs)
 
         if not is_locking_success:

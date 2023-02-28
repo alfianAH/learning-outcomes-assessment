@@ -189,10 +189,16 @@ class CloCreateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, MySession
         self.program_studi_obj =self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
     
     def get(self, request, *args, **kwargs):
+        kurikulum_obj = self.mk_semester_obj.mk_kurikulum.kurikulum
+        # If PI hasn't been locked, give error message
+        if not kurikulum_obj.is_assessmentarea_locked:
+            messages.error(request, 'Pastikan anda sudah mengunci performance indicator sebelum menambahkan CLO.')
+            return redirect(self.success_url)
+        
         total_persentase = self.mk_semester_obj.get_total_persentase_clo()
         # If total_persentase is 100, no need to add anymore
         if total_persentase >= 100:
-            messages.info(self.request, 'Sudah tidak bisa menambahkan CLO lagi, karena persentase CLO sudah {}%'.format(total_persentase))
+            messages.info(request, 'Sudah tidak bisa menambahkan CLO lagi, karena persentase CLO sudah {}%'.format(total_persentase))
             return redirect(self.success_url)
 
         return super().get(request, *args, **kwargs)
