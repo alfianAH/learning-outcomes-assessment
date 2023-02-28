@@ -25,6 +25,7 @@ from .forms import (
     PerformanceIndicatorAreaFormSet,
     PerformanceIndicatorFormSet
 )
+from .mixins import PILockedObjectPermissionMixin
 from .models import(
     AssessmentArea,
     PerformanceIndicatorArea,
@@ -38,7 +39,7 @@ from .utils import(
 
 # Create your views here.
 # PI Area and Assessment Area
-class PIAreaCreateView(HtmxCreateInlineFormsetView):
+class PIAreaCreateView(ProgramStudiMixin, PILockedObjectPermissionMixin, HtmxCreateInlineFormsetView):
     model = AssessmentArea
     form_class = AssessmentAreaForm
 
@@ -58,6 +59,7 @@ class PIAreaCreateView(HtmxCreateInlineFormsetView):
         kurikulum_id = kwargs.get('kurikulum_id')
         self.kurikulum_obj: Kurikulum = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
 
+        self.program_studi_obj = self.kurikulum_obj.prodi_jenjang.program_studi
         self.post_url = self.kurikulum_obj.get_create_pi_area_url()
         self.success_url = self.kurikulum_obj.read_all_pi_area_url()
 
@@ -83,7 +85,7 @@ class PIAreaCreateView(HtmxCreateInlineFormsetView):
         return super().form_valid(form)
 
 
-class PIAreaUpdateView(HtmxUpdateInlineFormsetView):
+class PIAreaUpdateView(ProgramStudiMixin, PILockedObjectPermissionMixin, HtmxUpdateInlineFormsetView):
     model = AssessmentArea
     pk_url_kwarg = 'assessment_area_id'
     form_class = AssessmentAreaForm
@@ -104,7 +106,8 @@ class PIAreaUpdateView(HtmxUpdateInlineFormsetView):
 
         kurikulum_id = kwargs.get('kurikulum_id')
         self.kurikulum_obj: Kurikulum = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
-
+        
+        self.program_studi_obj = self.kurikulum_obj.prodi_jenjang.program_studi
         self.post_url = self.object.get_update_pi_area_url()
         self.success_url = self.kurikulum_obj.read_all_pi_area_url()
 
@@ -139,13 +142,16 @@ class PIAreaReadAllView(ListView):
 
 
 # Assessment Area
-class AssessmentAreaDeleteView(DeleteView):
+class AssessmentAreaDeleteView(ProgramStudiMixin, PILockedObjectPermissionMixin, DeleteView):
     model = AssessmentArea
     pk_url_kwarg = 'assessment_area_id'
     
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         assessment_area_obj: AssessmentArea = self.get_object()
         self.success_url = assessment_area_obj.kurikulum.read_all_pi_area_url()
+
+        self.kurikulum_obj = assessment_area_obj.kurikulum
+        self.program_studi_obj = self.kurikulum_obj.prodi_jenjang.program_studi
         return self.post(request, *args, **kwargs)
 
     def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
@@ -160,7 +166,7 @@ class PerformanceIndicatorAreaReadView(DetailView):
     template_name = 'pi-area/pi-area-detail-view.html'
 
 
-class PerformanceIndicatorAreaBulkDeleteView(ModelBulkDeleteView):
+class PerformanceIndicatorAreaBulkDeleteView(ProgramStudiMixin, PILockedObjectPermissionMixin, ModelBulkDeleteView):
     model = PerformanceIndicatorArea
     success_msg = 'Berhasil menghapus PI Area'
     id_list_obj = 'id_pi_area'
@@ -168,8 +174,10 @@ class PerformanceIndicatorAreaBulkDeleteView(ModelBulkDeleteView):
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
         kurikulum_id = kwargs.get('kurikulum_id')
-        kurikulum_obj: Kurikulum = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
-        self.success_url = kurikulum_obj.read_all_pi_area_url()
+        self.kurikulum_obj: Kurikulum = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
+        
+        self.program_studi_obj = self.kurikulum_obj.prodi_jenjang.program_studi
+        self.success_url = self.kurikulum_obj.read_all_pi_area_url()
 
     def get_queryset(self):
         self.queryset = self.model.objects.filter(id__in=self.get_list_selected_obj())
@@ -177,7 +185,7 @@ class PerformanceIndicatorAreaBulkDeleteView(ModelBulkDeleteView):
 
 
 # PI Area and Performance Indicator
-class PerformanceIndicatorAreaUpdateView(UpdateInlineFormsetView):
+class PerformanceIndicatorAreaUpdateView(ProgramStudiMixin, PILockedObjectPermissionMixin, UpdateInlineFormsetView):
     model = PerformanceIndicatorArea
     pk_url_kwarg: str = 'pi_area_id'
     template_name = 'pi-area/peformance-indicator-area-update-view.html'
@@ -199,9 +207,12 @@ class PerformanceIndicatorAreaUpdateView(UpdateInlineFormsetView):
         
         self.success_url = self.object.read_detail_url()
 
+        self.kurikulum_obj = self.object.assessment_area.kurikulum
+        self.program_studi_obj = self.kurikulum_obj.prodi_jenjang.program_studi
+
 
 # Assessment area, PI Area, Performance Indicator
-class PIAreaDuplicateFormView(DuplicateFormview):
+class PIAreaDuplicateFormView(ProgramStudiMixin, PILockedObjectPermissionMixin, DuplicateFormview):
     form_class = PIAreaDuplicateForm
     kurikulum_obj: Kurikulum = None
     empty_choices_msg = 'Kurikulum lain belum mempunyai performance indicator.'
@@ -212,6 +223,8 @@ class PIAreaDuplicateFormView(DuplicateFormview):
 
         kurikulum_id = kwargs.get('kurikulum_id')
         self.kurikulum_obj = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
+
+        self.program_studi_obj = self.kurikulum_obj.prodi_jenjang.program_studi
         self.success_url = self.kurikulum_obj.read_all_pi_area_url()
         self.choices = get_kurikulum_with_pi_area(self.kurikulum_obj)
 
