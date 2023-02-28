@@ -257,6 +257,7 @@ def calculate_nilai_per_clo_mk_semester(mk_semester: MataKuliahSemester):
                 # Get nilai komponen CLO peserta
                 nilai_komponen_peserta: QuerySet[NilaiKomponenCloPeserta] = peserta.get_nilai_komponen_clo_peserta(komponen_clo_obj)
                 
+                if nilai_komponen_peserta.first() is None: continue
                 list_nilai_komponen_all_peserta.append(nilai_komponen_peserta.first().nilai)
 
             # Calculate average of list nilai komponen of all peserta
@@ -284,6 +285,12 @@ def calculate_nilai_per_clo_mk_semester(mk_semester: MataKuliahSemester):
         nilai_clo_mk_semester.save()
 
         # Sum all CLO Achievement
-        average_clo_achievement += clo_percentage * clo_achievement
+        average_clo_achievement += clo_percentage/100 * clo_achievement
     
-    return clo_achievement
+    if mk_semester.average_clo_achievement is None:
+        mk_semester.average_clo_achievement = average_clo_achievement
+        mk_semester.save()
+    else:
+        if mk_semester.average_clo_achievement != average_clo_achievement:
+            mk_semester.average_clo_achievement = average_clo_achievement
+            mk_semester.save()

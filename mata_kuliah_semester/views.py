@@ -617,6 +617,8 @@ class NilaiKomponenCloEditTemplateView(FormView):
     mk_semester_obj: MataKuliahSemester = None
     list_komponen_clo = None
     list_peserta_mk: list[PesertaMataKuliah] = []
+    success_msg = 'Proses mengedit nilai komponen CLO sudah selesai.'
+    error_msg: str = 'Gagal mengedit nilai. Pastikan data yang anda masukkan valid.'
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
@@ -688,17 +690,6 @@ class NilaiKomponenCloEditTemplateView(FormView):
         })
         return context
 
-
-class NilaiKomponenCloEditView(ProgramStudiMixin, NilaiKomponenCloEditTemplateView):
-    template_name = 'mata-kuliah-semester/nilai-komponen/edit-view.html'
-
-    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
-        mk_semester_id = kwargs.get('mk_semester_id')
-        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
-
-        self.list_peserta_mk = self.mk_semester_obj.get_all_peserta_mk_semester()
-        super().setup(request, *args, **kwargs)
-    
     def form_valid(self, form) -> HttpResponse:
         cleaned_data = form.cleaned_data
         
@@ -714,22 +705,30 @@ class NilaiKomponenCloEditView(ProgramStudiMixin, NilaiKomponenCloEditTemplateVi
             # If exists, then update the query
             if nilai_peserta_qs.exists():
                 nilai_peserta_qs.update(**nilai_komponen_clo_submit)
-                # Update status nilai
-                peserta_obj.status_nilai = True
-                peserta_obj.save()
             else:  # Else, create new one
                 # If form is empty, skip
                 if len(nilai_komponen_clo_submit.items()) == 0: continue
 
                 # Create new one
                 NilaiKomponenCloPeserta.objects.create(**nilai_komponen_clo_submit)
-
-                # Update status nilai
-                peserta_obj.status_nilai = True
-                peserta_obj.save()
-
-        messages.success(self.request, 'Proses mengedit nilai komponen CLO sudah selesai.')
+        
+        messages.success(self.request, self.success_msg)
         return super().form_valid(form)
+    
+    def form_invalid(self, form) -> HttpResponse:
+        messages.error(self.request, self.error_msg)
+        return super().form_invalid(form)
+
+
+class NilaiKomponenCloEditView(ProgramStudiMixin, NilaiKomponenCloEditTemplateView):
+    template_name = 'mata-kuliah-semester/nilai-komponen/edit-view.html'
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        mk_semester_id = kwargs.get('mk_semester_id')
+        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+
+        self.list_peserta_mk = self.mk_semester_obj.get_all_peserta_mk_semester()
+        super().setup(request, *args, **kwargs)
 
 
 class NilaiKomponenCloPesertaEditView(ProgramStudiMixin, NilaiKomponenCloEditTemplateView):
@@ -738,8 +737,6 @@ class NilaiKomponenCloPesertaEditView(ProgramStudiMixin, NilaiKomponenCloEditTem
     modal_title: str = 'Edit Nilai'
     modal_content_id: str = 'edit-nilai-modal-content'
     button_text: str = 'Submit'
-    success_msg: str = 'Proses mengedit nilai komponen CLO sudah selesai.'
-    error_msg: str = 'Gagal mengedit nilai. Pastikan data yang anda masukkan valid.'
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         peserta_id = kwargs.get('peserta_id')
@@ -748,14 +745,6 @@ class NilaiKomponenCloPesertaEditView(ProgramStudiMixin, NilaiKomponenCloEditTem
 
         self.list_peserta_mk = [self.peserta_mk_semester]
         super().setup(request, *args, **kwargs)
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs.update({
-            'list_peserta_mk': self.list_peserta_mk,
-            'list_komponen_clo': self.list_komponen_clo,
-        })
-        return kwargs
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -765,41 +754,6 @@ class NilaiKomponenCloPesertaEditView(ProgramStudiMixin, NilaiKomponenCloEditTem
             'peserta_obj': self.peserta_mk_semester,
         })
         return context
-
-    def form_valid(self, form) -> HttpResponse:
-        cleaned_data = form.cleaned_data
-        
-        for nilai_komponen_clo_submit in cleaned_data:
-            # Check query first
-            nilai_peserta_qs = NilaiKomponenCloPeserta.objects.filter(
-                peserta=self.peserta_mk_semester,
-                komponen_clo=nilai_komponen_clo_submit.get('komponen_clo')
-            )
-
-            # If exists, then update the query
-            if nilai_peserta_qs.exists():
-                nilai_peserta_qs.update(**nilai_komponen_clo_submit)
-                
-                # Update status nilai
-                self.peserta_mk_semester.status_nilai = True
-                self.peserta_mk_semester.save()
-            else:  # Else, create new one
-                # If form is empty, skip
-                if len(nilai_komponen_clo_submit.items()) == 0: continue
-
-                # Create new one
-                NilaiKomponenCloPeserta.objects.create(**nilai_komponen_clo_submit)
-
-                # Update status nilai
-                self.peserta_mk_semester.status_nilai = True
-                self.peserta_mk_semester.save()
-
-        messages.success(self.request, self.success_msg)
-        return super().form_valid(form)
-
-    def form_invalid(self, form) -> HttpResponse:
-        messages.error(self.request, self.error_msg)
-        return super().form_invalid(form)
 
 
 # Nilai average CLO achievement
@@ -818,20 +772,12 @@ class NilaiAverageCloAchievementCalculateView(ProgramStudiMixin, RedirectView):
         return super().get_redirect_url(*args, **kwargs)
     
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        # If CLO is not locked and status nilai is not True, give error message
-        if not self.mk_semester_obj.is_clo_locked and not self.mk_semester_obj.status_nilai:
+        # If CLO is not locked or status nilai is not True, give error message
+        if not self.mk_semester_obj.is_clo_locked or not self.mk_semester_obj.status_nilai:
             messages.error(request, 'Gagal menghitung capaian CLO rata-rata. Pastikan anda sudah melengkapi dan mengunci CLO serta melengkapi nilai peserta mata kuliah.')
             return super().get(request, *args, **kwargs)
         
-        average_clo_achievement = calculate_nilai_per_clo_mk_semester(self.mk_semester_obj)
-        
-        if self.mk_semester_obj.average_clo_achievement is None:
-            self.mk_semester_obj.average_clo_achievement = average_clo_achievement
-            self.mk_semester_obj.save()
-        else:
-            if self.mk_semester_obj.average_clo_achievement != average_clo_achievement:
-                self.mk_semester_obj.average_clo_achievement = average_clo_achievement
-                self.mk_semester_obj.save()
+        calculate_nilai_per_clo_mk_semester(self.mk_semester_obj)
         
         messages.success(request, 'Proses perhitungan capaian CLO rata-rata sudah selesai.')
         return super().get(request, *args, **kwargs)
