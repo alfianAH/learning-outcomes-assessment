@@ -3,6 +3,7 @@ from django.db.models.signals import (
     pre_save, 
     pre_delete,
     post_save,
+    post_delete,
 )
 from django.dispatch import receiver
 from clo.models import (
@@ -36,6 +37,14 @@ def prevent_lock_save(sender, instance, **kwargs):
 def prevent_delete_when_locked(sender, instance, **kwargs):
     if instance.lock and instance.lock.is_locked:
         raise Exception('Model {} (pk={}) is locked and cannot be deleted.'.format(sender.__name__, instance.pk))
+    
+
+@receiver(post_delete, sender=Clo)
+@receiver(post_delete, sender=KomponenClo)
+@receiver(post_delete, sender=PiClo)
+def delete_lock_object_when_deleted(sender, instance, **kwargs):
+    if instance.lock and not instance.lock.is_locked:
+        instance.lock.delete()
 
 
 @receiver(post_save, sender=NilaiKomponenCloPeserta)
