@@ -1,0 +1,130 @@
+{% extends 'home-view.html' %}
+
+{% block title %}
+Student Performance - 
+{% endblock title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'semester:read-all' %}" role="listitem">Semester</a></li>
+<li class="breadcrumb-item"><a href="{{ object.kelas_mk_semester.mk_semester.semester.read_detail_url }}" role="listitem">Detail</a></li>
+<li class="breadcrumb-item"><a href="{{ object.kelas_mk_semester.mk_semester.read_detail_url }}" role="listitem">Detail MK</a></li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">Student Performance</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<h1>Student Performance</h1>
+
+<div class="table-div">
+    <div class="tr-div">
+        <div class="min-w-32 md:min-w-40">Nama mahasiswa</div>
+        <div>:</div>
+        <div class="font-bold">{{ object.mahasiswa.nama }}</div>
+    </div>
+    {% with object.kelas_mk_semester.mk_semester as mk_semester %}
+    <div class="tr-div">
+        <div class="min-w-32 md:min-w-40">Mata kuliah</div>
+        <div>:</div>
+        <div>{{ mk_semester.mk_kurikulum.nama }}</div>
+    </div>
+    <div class="tr-div">
+        <div class="min-w-32 md:min-w-40">Semester</div>
+        <div>:</div>
+        <div>{{ mk_semester.semester.semester.nama }}</div>
+    </div>
+    <div class="tr-div">
+        <div class="min-w-32 md:min-w-40">Kode</div>
+        <div>:</div>
+        <div>{{ mk_semester.mk_kurikulum.kode }}</div>
+    </div>
+    <div class="tr-div">
+        <div class="min-w-32 md:min-w-40">SKS</div>
+        <div>:</div>
+        <div>{{ mk_semester.mk_kurikulum.sks }}</div>
+    </div>
+    {% endwith %}
+    <div class="tr-div">
+        <div class="min-w-32 md:min-w-40">Nilai akhir</div>
+        <div>:</div>
+        <div>{{ object.nilai_akhir|default_if_none:'-' }}</div>
+    </div>
+    <div class="tr-div">
+        <div class="min-w-32 md:min-w-40">Rata-rata capaian CLO</div>
+        <div>:</div>
+        <div>{{ object.average_clo_achievement|default_if_none:'-' }}</div>
+    </div>
+</div>
+
+<h2>Grafik Perolahan Nilai CLO</h2>
+<div>
+    {% comment %} Perolehan nilai CLO bar chart {% endcomment %}
+    <canvas id="perolehan-nilai-clo" class="w-full max-h-40 md:max-h-48 lg:max-h-52 xl:max-h-64"></canvas>
+</div>
+
+<div class="flex flex-row justify-between items-center space-x-4">
+    <h2>Grafik Perolahan Nilai ILO</h2>
+    <select class="form-control select-input-content">
+        <option value="perolehan-nilai-ilo-1" selected>Pie chart</option>
+        <option value="perolehan-nilai-ilo-2">List view</option>
+    </select>
+</div>
+
+<div>
+    {% comment %} Perolahan Nilai ILO Spider chart {% endcomment %}
+    <div class="select-content hidden" id="perolehan-nilai-ilo-1">
+        <div class="w-full mx-auto my-0">
+            <canvas id="perolehan-nilai-ilo" class="w-full max-h-40 md:max-h-48 lg:max-h-52 xl:max-h-64"></canvas>
+        </div>
+    </div>
+
+    {% comment %} Perolehan nilai ILO List view {% endcomment %}
+    <div class="select-content hidden" id="perolehan-nilai-ilo-2">
+        
+    </div>
+</div>
+{% endblock content %}
+
+{% block script %}
+<script>
+    {% comment %} Pencapaian nilai CLO bar graph {% endcomment %}
+    let perolehanNilaiCloData = {{ perolehan_nilai_clo_graph|safe }};
+    let perolehanNilaiCloGraphConfig = {
+        type: 'bar',
+        data : {
+            labels: perolehanNilaiCloData.labels,
+            datasets: [{
+                data: perolehanNilaiCloData.datasets.data,
+                hoverOffset: 4,
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            plugins: {
+                legend: {
+                    display: false,
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Nilai',
+                    },
+                    suggestedMax: 100,
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'CLO',
+                    },
+                }
+            }
+        }
+    };
+
+    createChart('perolehan-nilai-clo', perolehanNilaiCloGraphConfig);
+
+    // Update chart to dark mode
+    let isDarkMode = $('body').hasClass('dark');
+    chartDarkMode(isDarkMode);
+</script>
+{% endblock script %}

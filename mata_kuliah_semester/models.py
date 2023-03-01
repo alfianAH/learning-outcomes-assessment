@@ -187,12 +187,18 @@ class PesertaMataKuliah(models.Model):
         validators=[MinValueValidator(0.0), MaxValueValidator(100.0)])
     nilai_huruf = models.CharField(null=True, max_length=5)
     status_nilai = models.BooleanField(default=False)
+    average_clo_achievement = models.FloatField(null=True, 
+        validators=[MinValueValidator(0.0), MaxValueValidator(100.0)])
     
     class Meta:
         constraints = (
             CheckConstraint(
                 check=Q(nilai_akhir__gte=0.0) & Q(nilai_akhir__lte=100.0),
                 name='nilai_akhir_range'
+            ),
+            CheckConstraint(
+                check=Q(average_clo_achievement__gte=0.0) & Q(average_clo_achievement__lte=100.0),
+                name='average_clo_achievement_peserta_range'
             ),
         )
     
@@ -202,6 +208,9 @@ class PesertaMataKuliah(models.Model):
             **self.kelas_mk_semester.mk_semester.get_kwargs,
             'peserta_id': self.pk
         }
+
+    def get_student_performance_url(self):
+        return get_reverse_url('semester:mata_kuliah_semester:student-performance', self.get_kwargs)
 
     def get_all_nilai_komponen_clo_peserta(self):
         return self.nilaikomponenclopeserta_set.filter(

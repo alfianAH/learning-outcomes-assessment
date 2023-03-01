@@ -7,7 +7,10 @@ from clo.models import (
     Clo,
     NilaiKomponenCloPeserta,
 )
-from mata_kuliah_semester.utils import calculate_nilai_per_clo_mk_semester
+from mata_kuliah_semester.utils import (
+    calculate_nilai_per_clo_mk_semester,
+    calculate_nilai_per_clo_peserta,
+)
 
 
 @receiver(post_save, sender=NilaiKomponenCloPeserta)
@@ -38,3 +41,4 @@ def update_mk_semester_average_clo_achievement(sender, instance: NilaiKomponenCl
     if peserta_obj.status_nilai:
         mk_semester = peserta_obj.kelas_mk_semester.mk_semester
         calculate_nilai_per_clo_mk_semester(mk_semester)
+        calculate_nilai_per_clo_peserta(peserta_obj)

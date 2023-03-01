@@ -6,10 +6,10 @@
         {{ option.label.mahasiswa.nama }}
     </td>
     <td class="text-right">
-        {{ option.label.nilai_akhir|default:'-' }}
+        {{ option.label.nilai_akhir|default_if_none:'-' }}
     </td>
     <td class="text-right md:hidden xl:table-cell">
-        {{ option.label.nilai_huruf|default:'-' }}
+        {{ option.label.nilai_huruf|default_if_none:'-' }}
     </td>
 {% else %}
     {% comment %} NIM {% endcomment %}
@@ -22,7 +22,7 @@
     </td>
     {% comment %} Nilai angka {% endcomment %}
     <td class="text-right">
-        {{ option.nilai_akhir|default:'-' }}
+        {{ option.nilai_akhir|default_if_none:'-' }}
     </td>
     {% comment %} Status nilai CLO {% endcomment %}
     <td class="table-cell !align-middle">

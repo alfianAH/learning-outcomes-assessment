@@ -3831,6 +3831,14 @@ details.dropdown::marker {
   min-width: 9rem;
 }
 
+.min-w-24 {
+  min-width: 6rem;
+}
+
+.min-w-32 {
+  min-width: 8rem;
+}
+
 .max-w-\[18rem\] {
   max-width: 18rem;
 }
@@ -4945,6 +4953,10 @@ details.dropdown::marker {
 
   .md\:min-w-96 {
     min-width: 24rem;
+  }
+
+  .md\:min-w-40 {
+    min-width: 10rem;
   }
 
   .md\:max-w-\[12rem\] {

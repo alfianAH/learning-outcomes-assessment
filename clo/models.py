@@ -108,6 +108,22 @@ class NilaiKomponenCloPeserta(models.Model):
         )
 
 
+class NilaiCloPeserta(models.Model):
+    peserta = models.ForeignKey(PesertaMataKuliah, on_delete=models.CASCADE)
+    clo = models.ForeignKey(Clo, on_delete=models.CASCADE)
+
+    nilai = models.FloatField(null=True, validators=[MinValueValidator(0.0), MaxValueValidator(100.0)])
+
+    class Meta:
+        ordering = ['clo__nama']
+        constraints = (
+            CheckConstraint(
+                check=Q(nilai__gte=0.0) & Q(nilai__lte=100.0),
+                name='nilai_clo_peserta_range'
+            ),
+        )
+
+
 class NilaiCloMataKuliahSemester(models.Model):
     mk_semester = models.ForeignKey(MataKuliahSemester, on_delete=models.CASCADE)
     clo = models.ForeignKey(Clo, on_delete=models.CASCADE)

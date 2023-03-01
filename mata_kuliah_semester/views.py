@@ -2,11 +2,12 @@ import json
 from django.contrib.auth import authenticate
 from django.conf import settings
 from django.db.models import QuerySet
-from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.http import HttpRequest, HttpResponse
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic.base import View, RedirectView
 from django.views.generic.edit import FormView
+from django.views.generic.detail import DetailView
 from accounts.enums import RoleChoices
 from clo.models import KomponenClo
 from learning_outcomes_assessment.auth.mixins import ProgramStudiMixin
@@ -35,7 +36,8 @@ from mata_kuliah_kurikulum.models import(
 from clo.models import(
     Clo,
     NilaiCloMataKuliahSemester,
-    NilaiKomponenCloPeserta
+    NilaiKomponenCloPeserta,
+    NilaiCloPeserta,
 )
 from .models import (
     MataKuliahSemester,
@@ -609,6 +611,43 @@ class PesertaMataKuliahBulkDeleteView(ProgramStudiMixin, ModelBulkDeleteView):
     def get_queryset(self):
         self.queryset = self.model.objects.filter(id_neosia__in=self.get_list_selected_obj())
         return super().get_queryset()
+
+
+class StudentPerformanceReadView(ProgramStudiMixin, DetailView):
+    model = PesertaMataKuliah
+    pk_url_kwarg = 'peserta_id'
+    template_name = 'mata-kuliah-semester/peserta/student-performance.html'
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        self.object = self.get_object()
+        self.program_studi_obj = self.object.kelas_mk_semester.mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
+    
+    def get_object(self, queryset=None) -> PesertaMataKuliah:
+        return super().get_object(queryset)
+
+    def perolehan_nilai_clo_graph(self):
+        list_clo: QuerySet[Clo] = self.object.kelas_mk_semester.mk_semester.get_all_clo()
+        list_nilai_clo_peserta: QuerySet[NilaiCloPeserta] = NilaiCloPeserta.objects.filter(
+            clo__in=list_clo,
+            peserta=self.object,
+        )
+
+        json_response = {
+            'labels': [clo.nama for clo in list_clo],
+            'datasets': {
+                'data': [nilai_clo_peserta.nilai for nilai_clo_peserta in list_nilai_clo_peserta]
+            }
+        }
+
+        return json.dumps(json_response)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'perolehan_nilai_clo_graph': self.perolehan_nilai_clo_graph()
+        })
+        return context
 
 
 # Nilai Komponen CLO Peserta

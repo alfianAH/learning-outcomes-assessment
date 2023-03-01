@@ -1,4 +1,3 @@
-import math
 import numpy as np
 from django.conf import settings
 from django.db.models import QuerySet
@@ -13,6 +12,7 @@ from clo.models import (
     KomponenClo,
     NilaiKomponenCloPeserta,
     NilaiCloMataKuliahSemester,
+    NilaiCloPeserta,
 )
 from mata_kuliah_kurikulum.models import MataKuliahKurikulum
 
@@ -239,7 +239,6 @@ def get_update_peserta_mk_semester_choices(mk_semester: MataKuliahSemester):
 
 
 def calculate_nilai_per_clo_mk_semester(mk_semester: MataKuliahSemester):
-    list_peserta_mk: list[PesertaMataKuliah] = mk_semester.get_all_peserta_mk_semester()
     list_clo: QuerySet[Clo] = mk_semester.get_all_clo()
     
     average_clo_achievement = 0
@@ -247,38 +246,30 @@ def calculate_nilai_per_clo_mk_semester(mk_semester: MataKuliahSemester):
     # Loop through CLO
     for clo_obj in list_clo:
         list_komponen_clo: QuerySet[KomponenClo] = clo_obj.get_komponen_clo()
-        clo_achievement_components = []
+        list_assessment_form = np.zeros((1, len(list_komponen_clo)))
+        list_persentase_komponen = np.zeros((len(list_komponen_clo), 1))
 
         # Loop through komponen CLO
-        for komponen_clo_obj in list_komponen_clo:
-            list_nilai_komponen_all_peserta = []
-
-            # Loop through peserta MK Semester
-            for peserta in list_peserta_mk:
-                # Get nilai komponen CLO peserta
-                nilai_komponen_peserta: QuerySet[NilaiKomponenCloPeserta] = peserta.get_nilai_komponen_clo_peserta(komponen_clo_obj)
-                
-                if nilai_komponen_peserta.first() is None: continue
-                list_nilai_komponen_all_peserta.append(nilai_komponen_peserta.first().nilai)
+        for i, komponen_clo_obj in enumerate(list_komponen_clo):
+            nilai_komponen_all_peserta = NilaiKomponenCloPeserta.objects.filter(
+                komponen_clo=komponen_clo_obj
+            )
 
             # Calculate average of list nilai komponen of all peserta
-            average_assessment_form = np.average(list_nilai_komponen_all_peserta)
+            average_assessment_form = np.average([nilai_komponen_peserta.nilai for nilai_komponen_peserta in nilai_komponen_all_peserta])
             
             # If average assessment form is NaN, set it to 0
-            if math.isnan(average_assessment_form):
+            if np.isnan(average_assessment_form):
                 average_assessment_form = 0
 
-            clo_achievement_components.append({
-                'average_assessment_form': average_assessment_form,
-                'persentase_komponen': komponen_clo_obj.persentase
-            })
+            list_assessment_form[0][i] = average_assessment_form
+            list_persentase_komponen[i][0] = komponen_clo_obj.persentase
         
         # Loop through average assessment form to get clo achievement
         clo_achievement = 0
         clo_percentage = clo_obj.get_total_persentase_komponen()
-        for clo_achievement_component in clo_achievement_components:
-            # Calculate CLO achievement
-            clo_achievement += (100 / clo_percentage) * (clo_achievement_component['persentase_komponen']/100) * clo_achievement_component['average_assessment_form']
+        # Calculate CLO achievement
+        clo_achievement = 1/clo_percentage * np.dot(list_assessment_form, list_persentase_komponen).flatten()[0]
 
         # Save clo_achievement to database
         nilai_clo_mk_semester, _ = NilaiCloMataKuliahSemester.objects.get_or_create(
@@ -299,3 +290,52 @@ def calculate_nilai_per_clo_mk_semester(mk_semester: MataKuliahSemester):
         if mk_semester.average_clo_achievement != average_clo_achievement:
             mk_semester.average_clo_achievement = average_clo_achievement
             mk_semester.save()
+
+
+def calculate_nilai_per_clo_peserta(peserta: PesertaMataKuliah):
+    list_clo: QuerySet[Clo] = peserta.kelas_mk_semester.mk_semester.get_all_clo()
+    average_clo_achievement = 0
+
+    # Loop through CLO
+    for clo_obj in list_clo:
+        list_komponen_clo: QuerySet[KomponenClo] = clo_obj.get_komponen_clo()
+        list_assessment_form = np.zeros((1, len(list_komponen_clo)))
+        list_persentase_komponen = np.zeros((len(list_komponen_clo), 1))
+
+        # Loop through komponen CLO
+        for i, komponen_clo_obj in enumerate(list_komponen_clo):
+            # Get nilai komponen CLO peserta
+            nilai_komponen_peserta: QuerySet[NilaiKomponenCloPeserta] = peserta.get_nilai_komponen_clo_peserta(komponen_clo_obj)
+            
+            if nilai_komponen_peserta.first() is None: average_assessment_form = 0
+            else:
+                average_assessment_form = nilai_komponen_peserta.first().nilai
+
+            list_assessment_form[0][i] = average_assessment_form
+            list_persentase_komponen[i][0] = komponen_clo_obj.persentase
+        
+        # Loop through average assessment form to get clo achievement
+        clo_achievement = 0
+        clo_percentage = clo_obj.get_total_persentase_komponen()
+        # Calculate CLO achievement
+        clo_achievement = 1/clo_percentage * np.dot(list_assessment_form, list_persentase_komponen).flatten()[0]
+
+        # Save clo_achievement to database
+        nilai_clo_peserta, _ = NilaiCloPeserta.objects.get_or_create(
+            clo=clo_obj,
+            peserta=peserta,
+        )
+
+        nilai_clo_peserta.nilai = clo_achievement
+        nilai_clo_peserta.save()
+
+        # Sum all CLO Achievement
+        average_clo_achievement += clo_percentage/100 * clo_achievement
+
+        if peserta.average_clo_achievement is None:
+            peserta.average_clo_achievement = average_clo_achievement
+            peserta.save()
+        else:
+            if peserta.average_clo_achievement != average_clo_achievement:
+                peserta.average_clo_achievement = average_clo_achievement
+                peserta.save()

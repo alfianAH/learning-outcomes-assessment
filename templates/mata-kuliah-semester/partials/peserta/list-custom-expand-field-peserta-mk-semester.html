@@ -1,5 +1,10 @@
 <table class="w-full">
-<tbody class="flex flex-col space-y-1">
+    <tbody class="flex flex-col space-y-1">
+        <tr class="flex space-x-2.5">
+            <td class="w-full">Rata-rata CLO</td>
+            <td>{{ option.average_clo_achievement|floatformat:2|default_if_none:'-' }}</td>
+        </tr>
+
         {% for nilai in option.get_all_nilai_komponen_clo_peserta %}
             <tr class="flex space-x-2.5">
                 <td class="w-full">{{ nilai.komponen_clo.clo.nama }} - {{ nilai.komponen_clo.instrumen_penilaian }} ({{ nilai.komponen_clo.persentase }}%)</td>
@@ -14,7 +19,8 @@
             {% endfor %}
         {% endfor %}
         
+        
     </tbody>
 </table>
 
-<a href="#" class="btn btn-primary">Student Performance</a>
+<a href="{{ option.get_student_performance_url }}" class="btn btn-primary">Student Performance</a>
