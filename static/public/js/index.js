@@ -698,6 +698,61 @@ function tooltip() {
     });
 }
 
+
+function scrollHandler() {
+    const scrollingElement = (document.scrollingElement || document.body);
+    const scrollToTop = $('#scroll-to-top');
+    const scrollToBottom = $('#scroll-to-bottom');
+    
+    if (scrollToTop == null || scrollToBottom == null) return;
+
+    // Require jQuery
+    const scrollSmoothToBottom = () => {
+        $(scrollingElement).animate({
+            scrollTop: document.body.scrollHeight,
+        }, 500);
+    }
+    
+    // Require jQuery
+    const scrollSmoothToTop = () => {
+        $(scrollingElement).animate({
+            scrollTop: 0,
+        }, 500);
+    }
+    
+    scrollToTop.on('click', scrollSmoothToTop);
+    scrollToBottom.on('click', scrollSmoothToBottom);
+}
+
+var previousPosition = window.pageYOffset || document.documentElement.scrollTop;
+
+window.onscroll = () => {
+    const scrollToTop = $('#scroll-to-top');
+    const scrollToBottom = $('#scroll-to-bottom');
+    
+    let currentPosition = window.pageYOffset || document.documentElement.scrollTop;
+
+    if (previousPosition > currentPosition) {
+        // Scroll up
+        scrollToTop.removeClass('hidden');
+        scrollToBottom.addClass('hidden');
+    } else {
+        // Scroll down
+        scrollToTop.addClass('hidden');
+        scrollToBottom.removeClass('hidden');
+    }
+
+    previousPosition = currentPosition;
+    
+    if (window.scrollY == 0) {
+        // If user is on top of the page
+        scrollToTop.addClass('hidden');
+    } else if (window.scrollY - (document.documentElement.scrollHeight - window.innerHeight) > -1) {
+        // If user is on bottom of the page
+        scrollToBottom.addClass('hidden');
+    }
+}
+
 var transitionEvent = whichTransitionEvent();
 console.log(transitionEvent);
 
@@ -717,4 +772,5 @@ passwordHandler();
 tabElement();
 toastHandler();
 tooltip();
+scrollHandler();
 selectInputContent();
