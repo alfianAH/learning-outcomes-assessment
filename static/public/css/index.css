@@ -3806,6 +3806,14 @@ details.dropdown::marker {
   border-width: 1px;
 }
 
+.\!border-8 {
+  border-width: 8px !important;
+}
+
+.\!border {
+  border-width: 1px !important;
+}
+
 .border-b-\[1px\] {
   border-bottom-width: 1px;
 }
@@ -3825,6 +3833,11 @@ details.dropdown::marker {
 .border-slate-300 {
   --tw-border-opacity: 1;
   border-color: rgb(203 213 225 / var(--tw-border-opacity));
+}
+
+.\!border-neutral-100 {
+  --tw-border-opacity: 1 !important;
+  border-color: rgb(245 245 245 / var(--tw-border-opacity)) !important;
 }
 
 .border-b-slate-800 {
