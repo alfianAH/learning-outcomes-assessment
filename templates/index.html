@@ -2151,7 +2151,7 @@
                 </div>
             </div>
 
-            <div class="form-wizard-buttons">
+            <div class="form-buttons">
                 <button class="btn btn-secondary btn-icon-start hidden" type="button" role="button" id="prev-btn" data-target="">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-chevron-left" focusable="False" role="img" aria-label="previous" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
@@ -2175,27 +2175,27 @@
             </div>
         </form>
 
-        <hr class="my-12">
+        <div>
+            <div id="scroll-to-parent" class="fixed w-10 h-10 bottom-0 right-0 mx-8 my-6">
+                <button id="scroll-to-top" class="absolute btn btn-secondary w-10 h-10 border-solid !border !border-neutral-100 rounded-full m-auto bottom-0 right-0 left-0 select-none hidden" title="Ke atas">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-up-short" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
+                    </svg>
+                </button>
 
-        <div class="fixed w-10 h-10 bottom-0 right-0 mx-8 my-6">
-            <button id="scroll-to-top" class="absolute btn btn-secondary w-10 h-10 border-solid !border !border-neutral-100 rounded-full m-auto bottom-0 right-0 left-0 select-none hidden" title="Ke atas">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-up-short" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
-                </svg>
-            </button>
+                <button id="scroll-to-bottom" class="absolute btn btn-secondary w-10 h-10 border-solid !border !border-neutral-100 rounded-full m-auto bottom-0 right-0 left-0 select-none hidden" title="Ke bawah">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-short" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5A.5.5 0 0 1 8 4z"/>
+                    </svg>
+                </button>
 
-            <button id="scroll-to-bottom" class="absolute btn btn-secondary w-10 h-10 border-solid !border !border-neutral-100 rounded-full m-auto bottom-0 right-0 left-0 select-none hidden" title="Ke bawah">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-short" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5A.5.5 0 0 1 8 4z"/>
-                </svg>
-            </button>
-
-            <!-- <input type="checkbox" id="dark-mode-toggle" class="hidden" role="checkbox" aria-labelledby="dark-mode-toggle-label">
-            <label for="dark-mode-toggle" id="dark-mode-toggle-label">
-                <div class="absolute w-10 h-10 bg-cyan-500 rounded-full z-10 cursor-pointer text-slate-100 text-center text-lg m-auto bottom-0 right-0 left-0 select-none">
-                    +
-                <div>
-            </label> -->
+                <!-- <input type="checkbox" id="dark-mode-toggle" class="hidden" role="checkbox" aria-labelledby="dark-mode-toggle-label">
+                <label for="dark-mode-toggle" id="dark-mode-toggle-label">
+                    <div class="absolute w-10 h-10 bg-cyan-500 rounded-full z-10 cursor-pointer text-slate-100 text-center text-lg m-auto bottom-0 right-0 left-0 select-none">
+                        +
+                    <div>
+                </label> -->
+            </div>
         </div>
     </main>
 

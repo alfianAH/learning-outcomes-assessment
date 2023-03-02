@@ -561,15 +561,18 @@ var previousPosition = window.pageYOffset || document.documentElement.scrollTop;
 window.onscroll = () => {
     const scrollToTop = $('#scroll-to-top');
     const scrollToBottom = $('#scroll-to-bottom');
+    const scrollToParent = $('#scroll-to-parent');
     
     let currentPosition = window.pageYOffset || document.documentElement.scrollTop;
 
     if (previousPosition > currentPosition) {
         // Scroll up
+        scrollToParent.removeClass('hidden');
         scrollToTop.removeClass('hidden');
         scrollToBottom.addClass('hidden');
     } else {
         // Scroll down
+        scrollToParent.removeClass('hidden');
         scrollToTop.addClass('hidden');
         scrollToBottom.removeClass('hidden');
     }
@@ -579,11 +582,13 @@ window.onscroll = () => {
     if (window.scrollY == 0) {
         // If user is on top of the page
         scrollToTop.addClass('hidden');
+        scrollToParent.addClass('hidden');
     } else if (window.scrollY - (document.documentElement.scrollHeight - window.innerHeight) > -1) {
         // If user is on bottom of the page
         scrollToBottom.addClass('hidden');
+        scrollToParent.addClass('hidden');
     }
-}
+};
 
 var transitionEvent = whichTransitionEvent();
 console.log(transitionEvent);

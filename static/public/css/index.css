@@ -1657,6 +1657,18 @@ details.dropdown::marker {
   }
 }
 
+.form-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.form-buttons > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 0;
+  margin-right: calc(0.625rem * var(--tw-space-x-reverse));
+  margin-left: calc(0.625rem * calc(1 - var(--tw-space-x-reverse)));
+}
+
 .form-wizard-page {
   position: relative;
   margin-right: 8rem;
