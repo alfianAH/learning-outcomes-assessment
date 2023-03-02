@@ -11,6 +11,7 @@ from .views import (
     PesertaMataKuliahBulkUpdateView,
     PesertaMataKuliahBulkDeleteView,
     StudentPerformanceReadView,
+    StudentPerformanceCalculateView,
 
     NilaiKomponenCloEditView,
     NilaiKomponenCloPesertaEditView,
@@ -31,6 +32,7 @@ urlpatterns = [
     
     # Peserta Mata Kuliah
     path('<int:mk_semester_id>/peserta/<int:peserta_id>/', StudentPerformanceReadView.as_view(), name='student-performance'),
+    path('<int:mk_semester_id>/peserta/<int:peserta_id>/calculate/', StudentPerformanceCalculateView.as_view(), name='calculate-student-performance'),
     path('<int:mk_semester_id>/peserta/create/', PesertaMataKuliahSemesterCreateView.as_view(), name='peserta-create'),
     path('<int:mk_semester_id>/peserta/bulk-delete/', PesertaMataKuliahBulkDeleteView.as_view(), name='peserta-bulk-delete'),
     path('<int:mk_semester_id>/peserta/bulk-update/', PesertaMataKuliahBulkUpdateView.as_view(), name='peserta-bulk-update'),

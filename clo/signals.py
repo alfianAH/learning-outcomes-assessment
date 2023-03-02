@@ -10,6 +10,7 @@ from clo.models import (
 from mata_kuliah_semester.utils import (
     calculate_nilai_per_clo_mk_semester,
     calculate_nilai_per_clo_peserta,
+    calculate_nilai_per_ilo_mahasiswa,
 )
 
 
@@ -42,3 +43,4 @@ def update_mk_semester_average_clo_achievement(sender, instance: NilaiKomponenCl
         mk_semester = peserta_obj.kelas_mk_semester.mk_semester
         calculate_nilai_per_clo_mk_semester(mk_semester)
         calculate_nilai_per_clo_peserta(peserta_obj)
+        calculate_nilai_per_ilo_mahasiswa(peserta_obj)

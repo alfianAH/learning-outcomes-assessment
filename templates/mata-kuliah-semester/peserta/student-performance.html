@@ -12,7 +12,16 @@ Student Performance -
 {% endblock breadcrumb %}
 
 {% block content %}
-<h1>Student Performance</h1>
+<div class="h-icon">
+    <h1>Student Performance</h1>
+    <a href="{{ object.get_calculate_student_performance_url }}" class="btn btn-primary btn-icon-start max-w-min">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" focusable="False" aria-label="sync">
+            <path d="M.01 0h24v24h-24V0z" fill="none"/>
+            <path d="M12 4V2.21c0-.45-.54-.67-.85-.35l-2.8 2.79c-.2.2-.2.51 0 .71l2.79 2.79c.32.31.86.09.86-.36V6c3.31 0 6 2.69 6 6 0 .79-.15 1.56-.44 2.25-.15.36-.04.77.23 1.04.51.51 1.37.33 1.64-.34.37-.91.57-1.91.57-2.95 0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-.79.15-1.56.44-2.25.15-.36.04-.77-.23-1.04-.51-.51-1.37-.33-1.64.34C4.2 9.96 4 10.96 4 12c0 4.42 3.58 8 8 8v1.79c0 .45.54.67.85.35l2.79-2.79c.2-.2.2-.51 0-.71l-2.79-2.79c-.31-.31-.85-.09-.85.36V18z"/>
+        </svg>
+        <span>Hitung performa</span>
+    </a>
+</div>
 
 <div class="table-div">
     <div class="tr-div">
@@ -58,7 +67,7 @@ Student Performance -
 <div class="flex flex-row justify-between items-center space-x-4">
     <h2>Grafik Perolahan Nilai ILO</h2>
     <select class="form-control select-input-content">
-        <option value="perolehan-nilai-ilo-1" selected>Pie chart</option>
+        <option value="perolehan-nilai-ilo-1" selected>Chart</option>
         <option value="perolehan-nilai-ilo-2">List view</option>
     </select>
 </div>
@@ -117,6 +126,29 @@ Student Performance -
     };
 
     createChart('perolehan-nilai-clo', perolehanNilaiCloGraphConfig);
+
+    {% comment %} Pencapaian nilai ILO radar graph {% endcomment %}
+    let perolehanNilaiIloData = {{ perolehan_nilai_ilo_graph|safe }};
+    {% if is_radar_chart %}
+    let perolehanNilaiIloGraphConfig = {
+        type: 'radar',
+        data: perolehanNilaiIloData,
+        options: {
+            scales: {
+                r: {
+                    suggestedMax: 100,
+                }
+            }
+        }
+    };
+    {% else %}
+    let perolehanNilaiIloGraphConfig = {
+        type: 'bar',
+        data: perolehanNilaiIloData,
+    };
+    {% endif %}
+
+    createChart('perolehan-nilai-ilo', perolehanNilaiIloGraphConfig);
 
     // Update chart to dark mode
     let isDarkMode = $('body').hasClass('dark');

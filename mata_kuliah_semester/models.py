@@ -205,6 +205,9 @@ class PesertaMataKuliah(models.Model):
 
     def get_student_performance_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:student-performance', self.get_kwargs)
+    
+    def get_calculate_student_performance_url(self):
+        return get_reverse_url('semester:mata_kuliah_semester:calculate-student-performance', self.get_kwargs)
 
     # Komponen CLO
     def get_all_nilai_komponen_clo_peserta(self):
@@ -236,7 +239,7 @@ class DosenMataKuliah(models.Model):
 class NilaiMataKuliahIloMahasiswa(models.Model):
     peserta = models.ForeignKey(PesertaMataKuliah, on_delete=models.CASCADE)
     ilo = models.ForeignKey(Ilo, on_delete=models.CASCADE)
-    nilai_ilo = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(100.0)])
+    nilai_ilo = models.FloatField(null=True, validators=[MinValueValidator(0.0), MaxValueValidator(100.0)])
 
     class Meta:
         ordering = ['ilo__nama']

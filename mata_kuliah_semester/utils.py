@@ -6,6 +6,7 @@ from .models import (
     KelasMataKuliahSemester,
     MataKuliahSemester,
     PesertaMataKuliah,
+    NilaiMataKuliahIloMahasiswa,
 )
 from clo.models import (
     Clo,
@@ -367,10 +368,39 @@ def calculate_nilai_per_ilo_mahasiswa(peserta: PesertaMataKuliah):
             peserta=peserta,
             clo__in=list_clo_ilo,
         ).values_list('nilai')
-        list_nilai_clo_peserta = np.array(nilai_clo_peserta_qs)
+        list_nilai_clo_peserta = np.array(nilai_clo_peserta_qs).flatten()
+        
+        # Use try to prevent miss shape
+        try:
+            konversi_clo_to_ilo = bobot_mk * (list_persentase_clo * list_bobot_pi_ilo) * nilai_max
+        except ValueError:
+            if settings.DEBUG:
+                print('Shape array tidak sama. Persentase CLO: {}, Bobot PI ILO: {}, Nilai CLO Peserta: {}'.format(
+                    list_persentase_clo.shape, list_bobot_pi_ilo.shape, list_nilai_clo_peserta.shape))
+            continue
+        
+        persentase_konversi = konversi_clo_to_ilo / np.sum(konversi_clo_to_ilo)
+        
+        # Use try to prevent miss shape
+        try:
+            persentase_capaian_ilo = persentase_konversi * list_nilai_clo_peserta
+        except ValueError:
+            if settings.DEBUG:
+                print('Shape array tidak sama. Persentase Konversi: {}, Nilai CLO Peserta: {}'.format(
+                    persentase_konversi.shape, list_nilai_clo_peserta.shape))
+            continue
 
-        print('% CLO: {}'.format(list_persentase_clo))
-        print('Bobot PI ILO: {}'.format(list_bobot_pi_ilo))
-        print('Nilai CLO: {}'.format(list_nilai_clo_peserta))
+        persentase_capaian_ilo = np.sum(persentase_capaian_ilo)
 
+        nilai_ilo_mhs_obj, _ = NilaiMataKuliahIloMahasiswa.objects.get_or_create(
+            peserta=peserta,
+            ilo=ilo
+        )
 
+        if nilai_ilo_mhs_obj.nilai_ilo is None:
+            nilai_ilo_mhs_obj.nilai_ilo = persentase_capaian_ilo
+            nilai_ilo_mhs_obj.save()
+        else:
+            if nilai_ilo_mhs_obj.nilai_ilo != persentase_capaian_ilo:
+                nilai_ilo_mhs_obj.nilai_ilo = persentase_capaian_ilo
+                nilai_ilo_mhs_obj.save()

@@ -55,6 +55,8 @@ from .utils import(
     get_peserta_kelas_mk_semester_choices,
     get_update_peserta_mk_semester_choices,
     calculate_nilai_per_clo_mk_semester,
+    calculate_nilai_per_clo_peserta,
+    calculate_nilai_per_ilo_mahasiswa,
 )
 
 
@@ -645,29 +647,63 @@ class StudentPerformanceReadView(ProgramStudiMixin, DetailView):
     
     def perolehan_nilai_ilo_graph(self):
         list_nilai_ilo: QuerySet[NilaiMataKuliahIloMahasiswa] = self.object.get_nilai_ilo()
+        is_radar_chart = True
 
+        if list_nilai_ilo.count() <= 2:
+            is_radar_chart = False
+        
         json_response = {
             'labels': [nilai_ilo.ilo.nama for nilai_ilo in list_nilai_ilo],
             'datasets': [
                 {
                     'label': 'Satisfactory Level',
-                    'data': [nilai_ilo.ilo.satisfactory_level for nilai_ilo in list_nilai_ilo]
+                    'data': [nilai_ilo.ilo.satisfactory_level for nilai_ilo in list_nilai_ilo],
                 },
                 {
                     'label': 'Nilai mahasiswa',
-                    'data': [nilai_ilo.nilai_ilo for nilai_ilo in list_nilai_ilo]
+                    'data': [nilai_ilo.nilai_ilo for nilai_ilo in list_nilai_ilo],
                 }
             ]
         }
 
-        return json.dumps(json_response)
+        return is_radar_chart, json.dumps(json_response)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        is_radar_chart, perolehan_nilai_ilo_graph = self.perolehan_nilai_ilo_graph()
+
         context.update({
-            'perolehan_nilai_clo_graph': self.perolehan_nilai_clo_graph()
+            'perolehan_nilai_clo_graph': self.perolehan_nilai_clo_graph(),
+            'perolehan_nilai_ilo_graph': perolehan_nilai_ilo_graph,
+            'is_radar_chart': is_radar_chart,
         })
         return context
+    
+
+class StudentPerformanceCalculateView(ProgramStudiMixin, RedirectView):
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        peserta_id = kwargs.get('peserta_id')
+        self.peserta_mk = get_object_or_404(PesertaMataKuliah, id_neosia=peserta_id)
+        self.program_studi_obj = self.peserta_mk.kelas_mk_semester.mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
+
+    def get_redirect_url(self, *args, **kwargs):
+        self.url = self.peserta_mk.get_student_performance_url()
+        return super().get_redirect_url(*args, **kwargs)
+    
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        mk_semester_obj = self.peserta_mk.kelas_mk_semester.mk_semester
+
+        # If CLO is not locked or status nilai is not True, give error message
+        if not mk_semester_obj.is_clo_locked or not mk_semester_obj.status_nilai:
+            messages.error(request, 'Gagal menghitung student performance. Pastikan anda sudah melengkapi dan mengunci CLO serta melengkapi nilai peserta mata kuliah.')
+            return super().get(request, *args, **kwargs)
+        
+        calculate_nilai_per_clo_peserta(self.peserta_mk)
+        calculate_nilai_per_ilo_mahasiswa(self.peserta_mk)
+
+        messages.success(request, 'Proses perhitungan student performance sudah selesai.')
+        return super().get(request, *args, **kwargs)
 
 
 # Nilai Komponen CLO Peserta
