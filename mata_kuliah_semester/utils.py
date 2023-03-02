@@ -14,6 +14,8 @@ from clo.models import (
     NilaiCloMataKuliahSemester,
     NilaiCloPeserta,
 )
+from pi_area.models import PerformanceIndicator
+from ilo.models import Ilo
 from mata_kuliah_kurikulum.models import MataKuliahKurikulum
 
 
@@ -327,3 +329,48 @@ def calculate_nilai_per_clo_peserta(peserta: PesertaMataKuliah):
 
         nilai_clo_peserta.nilai = clo_achievement
         nilai_clo_peserta.save()
+
+
+def calculate_nilai_per_ilo_mahasiswa(peserta: PesertaMataKuliah):
+    mk_semester = peserta.kelas_mk_semester.mk_semester
+    list_ilo: QuerySet[Ilo] = Ilo.objects.filter(
+        pi_area__performanceindicator__piclo__clo__mk_semester=mk_semester
+    ).distinct()
+
+    # Calculate all needed components
+    max_sks_prodi = mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.total_sks_lulus
+    bobot_mk = mk_semester.mk_kurikulum.sks / max_sks_prodi
+    nilai_max = 100
+
+    # Loop through ILO
+    for ilo in list_ilo:
+        list_clo_ilo = Clo.objects.filter(
+            mk_semester=mk_semester,
+            piclo__performance_indicator__pi_area__ilo=ilo,
+        ).distinct()
+
+        # Get list persentase CLO
+        list_persentase_clo = np.array([
+            clo.get_total_persentase_komponen()/100 for clo in list_clo_ilo
+        ])
+
+        # Get list bobot PI
+        list_pi_ilo = PerformanceIndicator.objects.filter(
+            pi_area__ilo=ilo
+        )
+        list_bobot_pi_ilo = np.array([
+            clo.get_pi_clo().count() / list_pi_ilo.count() for clo in list_clo_ilo
+        ])
+
+        # Get list nilai CLO peserta
+        nilai_clo_peserta_qs = NilaiCloPeserta.objects.filter(
+            peserta=peserta,
+            clo__in=list_clo_ilo,
+        ).values_list('nilai')
+        list_nilai_clo_peserta = np.array(nilai_clo_peserta_qs)
+
+        print('% CLO: {}'.format(list_persentase_clo))
+        print('Bobot PI ILO: {}'.format(list_bobot_pi_ilo))
+        print('Nilai CLO: {}'.format(list_nilai_clo_peserta))
+
+

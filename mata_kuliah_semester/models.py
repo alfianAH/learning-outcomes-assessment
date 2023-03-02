@@ -206,6 +206,7 @@ class PesertaMataKuliah(models.Model):
     def get_student_performance_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:student-performance', self.get_kwargs)
 
+    # Komponen CLO
     def get_all_nilai_komponen_clo_peserta(self):
         return self.nilaikomponenclopeserta_set.filter(
             komponen_clo__clo__in=self.kelas_mk_semester.mk_semester.get_all_clo()
@@ -221,6 +222,10 @@ class PesertaMataKuliah(models.Model):
     
     def get_nilai_komponen_clo_peserta_edit_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:nilai-komponen-peserta-edit', self.get_kwargs)
+    
+    # Nilai ILO
+    def get_nilai_ilo(self):
+        return self.nilaimatakuliahilomahasiswa_set.all()
 
 
 class DosenMataKuliah(models.Model):
@@ -234,6 +239,7 @@ class NilaiMataKuliahIloMahasiswa(models.Model):
     nilai_ilo = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(100.0)])
 
     class Meta:
+        ordering = ['ilo__nama']
         constraints = (
             CheckConstraint(
                 check=Q(nilai_ilo__gte=0.0) & Q(nilai_ilo__lte=100.0),

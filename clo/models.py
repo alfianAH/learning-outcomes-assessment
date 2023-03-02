@@ -39,10 +39,10 @@ class Clo(LockableMixin, models.Model):
         return self.piclo_set.all()
     
     def get_ilo(self):
-        list_pi_clo = self.get_pi_clo()
-        if not list_pi_clo.exists(): return None
+        pi_clo = self.piclo_set.first()
+        if pi_clo is None: return None
 
-        pi_obj: PerformanceIndicator = list_pi_clo.first().performance_indicator
+        pi_obj: PerformanceIndicator = pi_clo.performance_indicator
         ilo_obj: Ilo = pi_obj.pi_area.ilo
         return ilo_obj
     

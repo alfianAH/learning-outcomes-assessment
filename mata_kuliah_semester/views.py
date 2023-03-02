@@ -44,6 +44,7 @@ from .models import (
     KelasMataKuliahSemester,
     DosenMataKuliah,
     PesertaMataKuliah,
+    NilaiMataKuliahIloMahasiswa,
 )
 from .utils import(
     get_kelas_mk_semester,
@@ -638,6 +639,25 @@ class StudentPerformanceReadView(ProgramStudiMixin, DetailView):
             'datasets': {
                 'data': [nilai_clo_peserta.nilai for nilai_clo_peserta in list_nilai_clo_peserta]
             }
+        }
+
+        return json.dumps(json_response)
+    
+    def perolehan_nilai_ilo_graph(self):
+        list_nilai_ilo: QuerySet[NilaiMataKuliahIloMahasiswa] = self.object.get_nilai_ilo()
+
+        json_response = {
+            'labels': [nilai_ilo.ilo.nama for nilai_ilo in list_nilai_ilo],
+            'datasets': [
+                {
+                    'label': 'Satisfactory Level',
+                    'data': [nilai_ilo.ilo.satisfactory_level for nilai_ilo in list_nilai_ilo]
+                },
+                {
+                    'label': 'Nilai mahasiswa',
+                    'data': [nilai_ilo.nilai_ilo for nilai_ilo in list_nilai_ilo]
+                }
+            ]
         }
 
         return json.dumps(json_response)
