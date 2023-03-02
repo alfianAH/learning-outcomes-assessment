@@ -269,7 +269,7 @@ def calculate_nilai_per_clo_mk_semester(mk_semester: MataKuliahSemester):
         clo_achievement = 0
         clo_percentage = clo_obj.get_total_persentase_komponen()
         # Calculate CLO achievement
-        clo_achievement = 1/clo_percentage * np.dot(list_assessment_form, list_persentase_komponen).flatten()[0]
+        clo_achievement = 1/clo_percentage * (list_assessment_form @ list_persentase_komponen).flatten()[0]
 
         # Save clo_achievement to database
         nilai_clo_mk_semester, _ = NilaiCloMataKuliahSemester.objects.get_or_create(
@@ -294,7 +294,6 @@ def calculate_nilai_per_clo_mk_semester(mk_semester: MataKuliahSemester):
 
 def calculate_nilai_per_clo_peserta(peserta: PesertaMataKuliah):
     list_clo: QuerySet[Clo] = peserta.kelas_mk_semester.mk_semester.get_all_clo()
-    average_clo_achievement = 0
 
     # Loop through CLO
     for clo_obj in list_clo:
@@ -318,7 +317,7 @@ def calculate_nilai_per_clo_peserta(peserta: PesertaMataKuliah):
         clo_achievement = 0
         clo_percentage = clo_obj.get_total_persentase_komponen()
         # Calculate CLO achievement
-        clo_achievement = 1/clo_percentage * np.dot(list_assessment_form, list_persentase_komponen).flatten()[0]
+        clo_achievement = 1/clo_percentage * (list_assessment_form @ list_persentase_komponen).flatten()[0]
 
         # Save clo_achievement to database
         nilai_clo_peserta, _ = NilaiCloPeserta.objects.get_or_create(
@@ -328,14 +327,3 @@ def calculate_nilai_per_clo_peserta(peserta: PesertaMataKuliah):
 
         nilai_clo_peserta.nilai = clo_achievement
         nilai_clo_peserta.save()
-
-        # Sum all CLO Achievement
-        average_clo_achievement += clo_percentage/100 * clo_achievement
-
-        if peserta.average_clo_achievement is None:
-            peserta.average_clo_achievement = average_clo_achievement
-            peserta.save()
-        else:
-            if peserta.average_clo_achievement != average_clo_achievement:
-                peserta.average_clo_achievement = average_clo_achievement
-                peserta.save()
