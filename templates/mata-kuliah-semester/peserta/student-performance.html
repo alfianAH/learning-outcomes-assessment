@@ -61,7 +61,7 @@ Student Performance -
 <h2>Grafik Perolahan Nilai CLO</h2>
 <div>
     {% comment %} Perolehan nilai CLO bar chart {% endcomment %}
-    <canvas id="perolehan-nilai-clo" class="w-full max-h-40 md:max-h-48 lg:max-h-52 xl:max-h-64"></canvas>
+    <canvas id="perolehan-nilai-clo" class="w-full {% if is_bar_chart_max_h_60 %} max-h-60 {% else %} max-h-80 {% endif %}"></canvas>
 </div>
 
 <div class="flex flex-row justify-between items-center space-x-4">
@@ -76,13 +76,43 @@ Student Performance -
     {% comment %} Perolahan Nilai ILO Spider chart {% endcomment %}
     <div class="select-content hidden" id="perolehan-nilai-ilo-1">
         <div class="w-full mx-auto my-0">
-            <canvas id="perolehan-nilai-ilo" class="w-full max-h-40 md:max-h-48 lg:max-h-52 xl:max-h-64"></canvas>
+            <canvas id="perolehan-nilai-ilo" class="w-full max-h-60 sm:max-h-64 lg:max-h-72 xl:max-h-80"></canvas>
         </div>
     </div>
 
     {% comment %} Perolehan nilai ILO List view {% endcomment %}
     <div class="select-content hidden" id="perolehan-nilai-ilo-2">
-        
+        <ul class="w-full grid sm:grid-cols-2 gap-4" role="list">
+            {% for nilai_ilo in list_nilai_ilo %}
+            <li class="list-item-model-e" role="listitem">
+                <table class="w-full">
+                    <tbody class="flex flex-col space-y-2.5 md:space-y-3 xl:space-y-4">
+                        <tr class="flex space-x-2 5">
+                            <th class="w-full">{{ nilai_ilo.ilo.nama}}</th>
+                        </tr>
+                        <tr class="flex space-x-2.5">
+                            <th scope="row" class="w-full">Nilai</th>
+                            <td class="text-right whitespace-nowrap">{{ nilai_ilo.nilai_ilo|floatformat:2 }}</td>
+                        </tr>
+                        <tr class="flex space-x-2.5">
+                            <th scope="row" class="w-full">Satisfactory Level</th>
+                            <td class="text-right whitespace-nowrap">{{ nilai_ilo.ilo.satisfactory_level|floatformat:2 }}</td>
+                        </tr>
+                        <tr class="flex space-x-2.5">
+                            <th scope="row" class="w-full">Hasil</th>
+                            <td class="text-right">
+                                {% if nilai_ilo.nilai_ilo > nilai_ilo.ilo.satisfactory_level %}
+                                    <div class="badge badge-success">Lulus</div>
+                                {% else %}
+                                    <div class="badge badge-danger">Tidak Lulus</div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </li>
+            {% endfor %}
+        </ul>
     </div>
 </div>
 {% endblock content %}
@@ -136,6 +166,7 @@ Student Performance -
         options: {
             scales: {
                 r: {
+                    beginAtZero: true,
                     suggestedMax: 100,
                 }
             }

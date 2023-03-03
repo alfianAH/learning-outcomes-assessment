@@ -33,6 +33,26 @@ function checkForStorage() {
     return typeof(Storage) !== "undefined"
 }
 
+function updateChartColor(axisOption, textColor, borderColor) {
+    if (axisOption == null) return;
+
+    // Ticks
+    axisOption.ticks.color = textColor;
+    // Titles
+    axisOption.title.color = textColor;
+    // Grid line
+    axisOption.grid.color = borderColor;
+}
+
+function updateRadarChartColor(axisOption, textColor, borderColor) {
+    if (axisOption == null) return;
+
+    // Titles
+    axisOption.pointLabels.color = textColor;
+    // Grid line
+    axisOption.grid.color = borderColor;
+}
+
 function chartDarkMode(isDarkMode) {
     let canvases = document.getElementsByTagName('canvas');
 
@@ -44,41 +64,25 @@ function chartDarkMode(isDarkMode) {
         if (isDarkMode) {
             // Dark (Neutral 100)
             let textNeutral100 = 'rgba(245, 245, 245, 0.8)';
-            let borderNeutral100 = 'rgba(245, 245, 245, 0.2)';
+            let borderNeutral100 = 'rgba(245, 245, 245, 0.3)';
 
             chart.options.color = textNeutral100;
             chart.options.borderColor = borderNeutral100; 
 
-            if (chart.options.scales.x != null){
-                // Ticks
-                chart.options.scales.x.ticks.color = textNeutral100;
-                chart.options.scales.y.ticks.color = textNeutral100;
-                // Titles
-                chart.options.scales.x.title.color = textNeutral100;
-                chart.options.scales.y.title.color = textNeutral100;
-                // Grid line
-                chart.options.scales.x.grid.color = borderNeutral100;
-                chart.options.scales.y.grid.color = borderNeutral100;
-            }
+            updateChartColor(chart.options.scales.x, textNeutral100, borderNeutral100);
+            updateChartColor(chart.options.scales.y, textNeutral100, borderNeutral100);
+            updateRadarChartColor(chart.options.scales.r, textNeutral100, borderNeutral100);
         } else {
             // Light (Slate 800)
             let textSlate800 = 'rgba(30, 41, 59, 0.8)';
-            let borderSlate800 = 'rgba(30, 41, 59, 0.2)';
+            let borderSlate800 = 'rgba(30, 41, 59, 0.3)';
 
             chart.options.color = textSlate800;
             chart.options.borderColor = borderSlate800;
             
-            if (chart.options.scales.x != null){
-                // Ticks
-                chart.options.scales.x.ticks.color = textSlate800;
-                chart.options.scales.y.ticks.color = textSlate800;
-                // Titles
-                chart.options.scales.x.title.color = textSlate800;
-                chart.options.scales.y.title.color = textSlate800;
-                // Grid line
-                chart.options.scales.x.grid.color = borderSlate800;
-                chart.options.scales.y.grid.color = borderSlate800;
-            }
+            updateChartColor(chart.options.scales.x, textSlate800, borderSlate800);
+            updateChartColor(chart.options.scales.y, textSlate800, borderSlate800);
+            updateRadarChartColor(chart.options.scales.r, textSlate800, borderSlate800);
         }
 
         chart.update();

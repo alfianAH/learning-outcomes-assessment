@@ -630,14 +630,14 @@ class StudentPerformanceReadView(ProgramStudiMixin, DetailView):
         return super().get_object(queryset)
 
     def perolehan_nilai_clo_graph(self):
-        list_clo: QuerySet[Clo] = self.object.kelas_mk_semester.mk_semester.get_all_clo()
+        self.list_clo: QuerySet[Clo] = self.object.kelas_mk_semester.mk_semester.get_all_clo()
         list_nilai_clo_peserta: QuerySet[NilaiCloPeserta] = NilaiCloPeserta.objects.filter(
-            clo__in=list_clo,
+            clo__in=self.list_clo,
             peserta=self.object,
         )
 
         json_response = {
-            'labels': [clo.nama for clo in list_clo],
+            'labels': [clo.nama for clo in self.list_clo],
             'datasets': {
                 'data': [nilai_clo_peserta.nilai for nilai_clo_peserta in list_nilai_clo_peserta]
             }
@@ -646,22 +646,24 @@ class StudentPerformanceReadView(ProgramStudiMixin, DetailView):
         return json.dumps(json_response)
     
     def perolehan_nilai_ilo_graph(self):
-        list_nilai_ilo: QuerySet[NilaiMataKuliahIloMahasiswa] = self.object.get_nilai_ilo()
+        self.list_nilai_ilo: QuerySet[NilaiMataKuliahIloMahasiswa] = self.object.get_nilai_ilo()
         is_radar_chart = True
 
-        if list_nilai_ilo.count() <= 2:
+        if self.list_nilai_ilo.count() <= 2:
             is_radar_chart = False
         
         json_response = {
-            'labels': [nilai_ilo.ilo.nama for nilai_ilo in list_nilai_ilo],
+            'labels': [nilai_ilo.ilo.nama for nilai_ilo in self.list_nilai_ilo],
             'datasets': [
                 {
                     'label': 'Satisfactory Level',
-                    'data': [nilai_ilo.ilo.satisfactory_level for nilai_ilo in list_nilai_ilo],
+                    'data': [nilai_ilo.ilo.satisfactory_level for nilai_ilo in self.list_nilai_ilo],
+                    'fill': False,
                 },
                 {
                     'label': 'Nilai mahasiswa',
-                    'data': [nilai_ilo.nilai_ilo for nilai_ilo in list_nilai_ilo],
+                    'data': [nilai_ilo.nilai_ilo for nilai_ilo in self.list_nilai_ilo],
+                    'fill': False,
                 }
             ]
         }
@@ -671,11 +673,15 @@ class StudentPerformanceReadView(ProgramStudiMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         is_radar_chart, perolehan_nilai_ilo_graph = self.perolehan_nilai_ilo_graph()
+        perolehan_nilai_clo_graph = self.perolehan_nilai_clo_graph()
+        is_bar_chart_max_h_60 = self.list_clo.count() <= 5
 
         context.update({
-            'perolehan_nilai_clo_graph': self.perolehan_nilai_clo_graph(),
+            'perolehan_nilai_clo_graph': perolehan_nilai_clo_graph,
             'perolehan_nilai_ilo_graph': perolehan_nilai_ilo_graph,
             'is_radar_chart': is_radar_chart,
+            'is_bar_chart_max_h_60': is_bar_chart_max_h_60,
+            'list_nilai_ilo': self.list_nilai_ilo,
         })
         return context
     

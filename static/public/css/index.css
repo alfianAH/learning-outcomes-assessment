@@ -793,6 +793,16 @@ th {
   background-color: rgb(6 95 70 / var(--tw-bg-opacity));
 }
 
+.badge-danger {
+  --tw-bg-opacity: 1;
+  background-color: rgb(244 63 94 / var(--tw-bg-opacity));
+}
+
+.dark .badge-danger {
+  --tw-bg-opacity: 1;
+  background-color: rgb(159 18 57 / var(--tw-bg-opacity));
+}
+
 .badge-warning {
   --tw-bg-opacity: 1;
   background-color: rgb(245 158 11 / var(--tw-bg-opacity));
@@ -3705,6 +3715,22 @@ details.dropdown::marker {
   max-height: 16rem;
 }
 
+.max-h-60 {
+  max-height: 15rem;
+}
+
+.max-h-7 {
+  max-height: 1.75rem;
+}
+
+.max-h-72 {
+  max-height: 18rem;
+}
+
+.max-h-80 {
+  max-height: 20rem;
+}
+
 .min-h-screen {
   min-height: 100vh;
 }
@@ -3926,6 +3952,10 @@ details.dropdown::marker {
   grid-template-columns: repeat(1, minmax(0, 1fr));
 }
 
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .flex-row {
   flex-direction: row;
 }
@@ -3964,6 +3994,10 @@ details.dropdown::marker {
 
 .gap-1 {
   gap: 0.25rem;
+}
+
+.gap-4 {
+  gap: 1rem;
 }
 
 .space-y-5 > :not([hidden]) ~ :not([hidden]) {
@@ -4779,6 +4813,14 @@ details.dropdown::marker {
     display: grid;
   }
 
+  .sm\:max-h-64 {
+    max-height: 16rem;
+  }
+
+  .sm\:max-h-6 {
+    max-height: 1.5rem;
+  }
+
   .sm\:w-80 {
     width: 20rem;
   }
@@ -5084,6 +5126,10 @@ details.dropdown::marker {
     max-height: 13rem;
   }
 
+  .lg\:max-h-72 {
+    max-height: 18rem;
+  }
+
   .lg\:w-\[480px\] {
     width: 480px;
   }
@@ -5236,6 +5282,10 @@ details.dropdown::marker {
 
   .xl\:max-h-64 {
     max-height: 16rem;
+  }
+
+  .xl\:max-h-80 {
+    max-height: 20rem;
   }
 
   .xl\:w-6 {
