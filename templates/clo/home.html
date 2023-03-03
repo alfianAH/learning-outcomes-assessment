@@ -42,17 +42,17 @@ CLO -
 
     <div class="table-div">
         <div class="tr-div">
-            <div class="w-24 md:w-40">Semester</div>
+            <div class="min-w-24 md:min-w-40">Semester</div>
             <div>:</div>
             <div>{{ mk_semester_obj.semester.semester.nama }}</div>
         </div>
         <div class="tr-div">
-            <div class="w-24 md:w-40">Mata kuliah</div>
+            <div class="min-w-24 md:min-w-40">Mata kuliah</div>
             <div>:</div>
             <div>{{ mk_semester_obj.mk_kurikulum.nama }}</div>
         </div>
         <div class="tr-div !items-center">
-            <div class="w-24 md:w-40">Status</div>
+            <div class="min-w-24 md:min-w-40">Status</div>
             <div>:</div>
             {% if mk_semester_obj.is_clo_locked %}
             <div class="badge badge-success">
@@ -82,17 +82,17 @@ CLO -
     <h1>Course Learning Outcomes</h1>
     <div class="table-div">
         <div class="tr-div">
-            <div class="w-24 md:w-40">Semester</div>
+            <div class="min-w-24 md:min-w-40">Semester</div>
             <div>:</div>
             <div>{{ mk_semester_obj.semester.semester.nama }}</div>
         </div>
         <div class="tr-div">
-            <div class="w-24 md:w-40">Mata kuliah</div>
+            <div class="min-w-24 md:min-w-40">Mata kuliah</div>
             <div>:</div>
             <div>{{ mk_semester_obj.mk_kurikulum.nama }}</div>
         </div>
         <div class="tr-div !items-center">
-            <div class="w-24 md:w-40">Status</div>
+            <div class="min-w-24 md:min-w-40">Status</div>
             <div>:</div>
             <div class="badge badge-warning">
                 Belum dikunci
