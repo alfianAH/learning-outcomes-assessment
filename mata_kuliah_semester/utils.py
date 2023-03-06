@@ -1,4 +1,10 @@
 import numpy as np
+import openpyxl
+from io import BytesIO
+from openpyxl.styles import (
+    Font, Alignment, Border, Side, Protection
+)
+from openpyxl.worksheet.worksheet import Worksheet
 from django.conf import settings
 from django.db.models import QuerySet
 from learning_outcomes_assessment.utils import request_data_to_neosia
@@ -404,3 +410,270 @@ def calculate_nilai_per_ilo_mahasiswa(peserta: PesertaMataKuliah):
             if nilai_ilo_mhs_obj.nilai_ilo != persentase_capaian_ilo:
                 nilai_ilo_mhs_obj.nilai_ilo = persentase_capaian_ilo
                 nilai_ilo_mhs_obj.save()
+
+
+def alphabet_to_number(alphabet):
+    """
+    Change alphabet to number
+    >>> alphabe_to_number('z')
+    26
+    """
+    list_alphabet = list('abcdefghijklmnopqrstuvwxyz')
+    return [i for i, huruf in enumerate(list_alphabet) if huruf == alphabet.lower()][0] + 1
+
+
+def number_to_alphabet(number):
+    """
+    Change number to alphabet
+    >>> number_to_alphabet(26)
+    'z'
+    """
+    list_alphabet = list('abcdefghijklmnopqrstuvwxyz')
+    return list_alphabet[number-1]
+
+
+def add_border_to_merged_cells(merged_cells, border):
+    """Add border to merged cells
+
+    Args:
+        merged_cells (_type_): Merged cells
+        border (Border): Border to apply
+    """
+    
+    for cells in merged_cells:
+        for cell in cells:
+            cell.border = border
+
+
+def make_cell_title_style(cell):
+    """Make cell style with title style, Boild and center alignment
+
+    Args:
+        cell (Cell): Target cell
+    """
+
+    bold_font = Font(bold=True)
+    center_align = Alignment(horizontal='center', vertical='center')
+
+    cell.font = bold_font
+    cell.alignment = center_align
+
+
+def stretch_cell_width(worksheet, column, column_letter):
+    """Stretch cell width according to max width
+
+    Args:
+        worksheet (WorkSheet): Worksheet
+        column (Column): Worksheet column
+        column_letter (str): Column letter
+    """
+
+    max_width = 10
+
+    for cell in column:
+        if not cell.value: continue
+        max_width = max((max_width, len(str(cell.value))))
+
+    worksheet.column_dimensions[column_letter].width = max_width + 2
+
+
+def lock_or_unlock_cells(cells_by_row, protection):
+    """Lock or unlock cells
+
+    Args:
+        cells_by_row (list): Range Cells
+        protection (Protection): Protection
+    """
+    
+    for cells in cells_by_row:
+        for cell in cells:
+            cell.protection = protection
+
+
+def generate_template_nilai_mk_semester(mk_semester: MataKuliahSemester, list_peserta_mk: QuerySet[PesertaMataKuliah]):
+    workbook = openpyxl.Workbook()
+    worksheet: Worksheet  = workbook.active
+
+    # Worksheet properties
+    all_side_border = Border(
+        left=Side(style='thin'), 
+        right=Side(style='thin'), 
+        top=Side(style='thin'), 
+        bottom=Side(style='thin')
+    )
+    center_align = Alignment(horizontal='center', vertical='center')
+
+    title = 'UNIVERSITAS HASANUDDIN'
+    DETAIL = {
+        'Fakultas': mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi.fakultas.nama,
+        'Program Studi': mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi.nama,
+        'Jenjang Prodi': mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.jenjang_studi.kode,
+        'Semester': mk_semester.semester.semester.nama,
+        'Kode Mata Kuliah': mk_semester.mk_kurikulum.kode,
+        'Nama Mata Kuliah': mk_semester.mk_kurikulum.nama,
+        'Unique ID': '{}/{}'.format(mk_semester.semester.pk, mk_semester.pk)
+    }
+
+    # Title
+    worksheet.merge_cells('B1:H1')
+    title_cell = worksheet['B1']
+    
+    title_cell.value = title
+    make_cell_title_style(title_cell)
+
+    # Height and width
+    # 50 = 100px
+    worksheet.row_dimensions[1].height = 50
+    # 2 because it is what it is
+    worksheet.column_dimensions['B'].width = len(title) + 2
+    
+    # Detail
+    start_col = 'B'
+    start_row_clo = 3
+    for key, value in DETAIL.items():
+        # Merge cells
+        merged_cells = 'C{0}:H{0}'.format(start_row_clo)
+        worksheet.merge_cells(merged_cells)
+
+        # Column B
+        cell = '{}{}'.format(start_col, start_row_clo)
+        worksheet[cell] = key
+        worksheet[cell].border = all_side_border
+
+        # Column C
+        cell = '{}{}'.format('C', start_row_clo)
+        worksheet[cell] = value
+        # Add border to merged cell
+        add_border_to_merged_cells(worksheet[merged_cells], all_side_border)
+
+        start_row_clo += 1
+    
+    # Catatan
+    CATATAN = (
+        '*User hanya bisa menambah, mengubah, dan menghapus nilai per Komponen dalam Sheet ini.',
+        '*Disarankan untuk tidak mengubah "Unique ID" untuk meminimalisir kesalahan baca oleh sistem.',
+        '*Disarankan untuk tidak membuka kunci Sheet untuk meminimalisir kesalahan baca oleh sistem.',
+        '*Jika ingin menambah, menghapus, atau mengubah peserta, disarankan untuk mengubah dari sistemnya.',
+    )
+    start_col = 'B'
+    end_col = 'H'
+    start_col_num = alphabet_to_number(start_col)
+    start_row = 11
+
+    for i, note in enumerate(CATATAN, 1):
+        merged_cells = '{0}{1}:{2}{1}'.format(start_col, start_row, end_col)
+        worksheet.merge_cells(merged_cells)
+
+        worksheet['{}{}'.format(start_col, start_row)] = note
+        # +1 is next row
+        start_row += 1
+
+    # List mahasiswa dan nilai
+    # Header
+    HEADER_TITLES = ('No.', 'NIM', 'Nama')
+    start_col = 'A'
+    start_col_num = alphabet_to_number(start_col)
+    start_row = 16
+    end_row = 18
+
+    for i, title in enumerate(HEADER_TITLES, 1):
+        merged_cells = '{0}{1}:{0}{2}'.format(start_col, start_row, end_row)
+        worksheet.merge_cells(merged_cells)
+
+        # Title
+        title_cell = '{}{}'.format(start_col, start_row)
+        worksheet[title_cell] = title
+        make_cell_title_style(worksheet[title_cell])
+        add_border_to_merged_cells(worksheet[merged_cells], all_side_border)
+
+        start_col = number_to_alphabet(start_col_num + i)
+
+    # List CLO
+    start_col = 'D'
+    start_row_clo = 16
+    start_row_komponen = 17
+    start_row_persentase = 18
+
+    list_clo: QuerySet[Clo] = mk_semester.get_all_clo()
+
+    for clo in list_clo:
+        start_col_num = alphabet_to_number(start_col)
+        list_komponen: QuerySet[KomponenClo] = clo.get_komponen_clo()
+
+        # Nama CLO
+        # Merged cells
+        if list_komponen.count() > 1:
+            # -1 is start column itself
+            end_col_num = start_col_num + len(list_komponen) - 1
+            end_col = number_to_alphabet(end_col_num)
+            
+            merged_cells = '{0}{1}:{2}{1}'.format(start_col, start_row_clo, end_col)
+            worksheet.merge_cells(merged_cells)
+            add_border_to_merged_cells(worksheet[merged_cells], all_side_border)
+        
+        # Nama CLO
+        cell = '{}{}'.format(start_col, start_row_clo)
+        worksheet[cell] = clo.nama
+        worksheet[cell].border = all_side_border
+        make_cell_title_style(worksheet[cell])
+
+        # Komponen CLO
+        for komponen in list_komponen:
+            column = number_to_alphabet(start_col_num)
+
+            # Nama Komponen
+            cell = '{}{}'.format(column, start_row_komponen)
+            worksheet[cell] = komponen.instrumen_penilaian
+            worksheet[cell].border = all_side_border
+            make_cell_title_style(worksheet[cell])
+
+            # Persentase Komponen
+            cell = '{}{}'.format(column, start_row_persentase) 
+            worksheet[cell] = komponen.persentase/100
+            worksheet[cell].style = 'Percent'
+            worksheet[cell].border = all_side_border
+            make_cell_title_style(worksheet[cell])
+
+            stretch_cell_width(worksheet, worksheet[column], column)
+
+            # +1 is next column
+            start_col_num += 1
+        
+        start_col = number_to_alphabet(start_col_num)
+
+    # Set end column to add border
+    end_col = column
+
+    # List Mahasiswa
+    start_row = 19
+
+    for i, peserta_mk in enumerate(list_peserta_mk, 1):
+        # Nomor
+        cell = 'A{}'.format(start_row)
+        worksheet[cell] = i
+        worksheet[cell].alignment = center_align
+
+        # NIM
+        worksheet['B{}'.format(start_row)] = peserta_mk.mahasiswa.username
+        # Nama
+        worksheet['C{}'.format(start_row)] = peserta_mk.mahasiswa.nama
+
+        start_row += 1
+
+    end_row = start_row - 1
+    add_border_to_merged_cells(worksheet['A19:{}{}'.format(end_col, end_row)], all_side_border)
+    stretch_cell_width(worksheet, worksheet['C'], 'C')
+
+    # Lock cells
+    nilai_protection = Protection(locked=False, hidden=False)
+    nilai_cells = 'D14:{}{}'.format(end_col, end_row)
+    lock_or_unlock_cells(worksheet[nilai_cells], nilai_protection)
+    worksheet.protection.enable()
+    
+    # Save the workbook to a BytesIO object
+    file_stream = BytesIO()
+    workbook.save(file_stream)
+
+    file_stream.seek(0)
+
+    return file_stream

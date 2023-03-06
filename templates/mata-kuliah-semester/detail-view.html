@@ -177,6 +177,7 @@
                             </summary>
 
                             <div class="dropdown-menu dark:border dark:border-neutral-100 mt-1 z-10" role="menu">
+                                {% comment %} Edit nilai {% endcomment %}
                                 <a href="{{ single_object.get_nilai_komponen_edit_url }}" class="dropdown-item space-x-2 flex xl:hidden" role="menuitem link">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" focusable="False" class="w-4 h-4 fill-slate-100">
                                         <path d="M0 0h24v24H0V0z" fill="none"/>
@@ -184,6 +185,8 @@
                                     </svg>
                                     <span>Edit nilai</span>
                                 </a>
+
+                                {% comment %} Import nilai {% endcomment %}
                                 <a href="javascript:void(0);" class="dropdown-item space-x-2" role="menuitem link">
                                     <svg xmlns="http://www.w3.org/2000/svg" focusable="False" class="bi bi-upload w-4 h-4 fill-slate-100"viewBox="0 0 16 16">
                                         <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
@@ -191,13 +194,17 @@
                                     </svg>
                                     <span>Import nilai</span>
                                 </a>
-                                <a href="javascript:void(0);" class="dropdown-item space-x-2" role="menuitem link">
+
+                                {% comment %} Download template nilai {% endcomment %}
+                                <a href="javascript:void(0);" id="download-template" data-url="{{ single_object.read_detail_url }}?download_template=true" class="dropdown-item space-x-2" role="menuitem link">
                                     <svg xmlns="http://www.w3.org/2000/svg" focusable="False" fill="currentColor" class="bi bi-file-earmark-excel w-4 h-4 fill-slate-100" viewBox="0 0 16 16">
                                         <path d="M5.884 6.68a.5.5 0 1 0-.768.64L7.349 10l-2.233 2.68a.5.5 0 0 0 .768.64L8 10.781l2.116 2.54a.5.5 0 0 0 .768-.641L8.651 10l2.233-2.68a.5.5 0 0 0-.768-.64L8 9.219l-2.116-2.54z"/>
                                         <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
                                     </svg>
                                     <span>Download template nilai</span>
                                 </a>
+
+                                {% comment %} Download nilai {% endcomment %}
                                 <a href="javascript:void(0);" class="dropdown-item space-x-2" role="menuitem link">
                                     <svg xmlns="http://www.w3.org/2000/svg" focusable="False" fill="currentColor" class="bi bi-file-earmark-pdf w-4 h-4 fill-slate-100" viewBox="0 0 16 16">
                                         <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
@@ -352,6 +359,35 @@
 
 {% block script %}
 <script>
+    $('#download-template').on('click', function(){
+        event.preventDefault();  // Prevent the link from changing the URL
+        let targetUrl = $(this).attr('data-url');
+        
+        // Send an AJAX request to the server to download the file
+        $.ajax({
+            url: targetUrl,
+            method: "GET",
+            xhrFields: {
+                responseType: "blob"  // Set the response type to blob
+            },
+            success: function(response) {
+                // Create a temporary URL for the downloaded file
+                let url = window.URL.createObjectURL(response);
+
+                // Create a link to trigger the download
+                let link = document.createElement("a");
+                link.href = url;
+                link.download = "{{ template_file_name }}";
+                document.body.appendChild(link);
+
+                // Trigger the download and clean up
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+            }
+        });
+    });
+
     {% comment %} Capaian per CLO {% endcomment %}
     let pencapaianPerCloData = {{ pencapaian_per_clo_graph|safe }};
     let pencapaianPerCloChartConfig = {

@@ -1,6 +1,7 @@
 import json
 from django.contrib.auth import authenticate
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.contrib import messages
@@ -57,6 +58,7 @@ from .utils import(
     calculate_nilai_per_clo_mk_semester,
     calculate_nilai_per_clo_peserta,
     calculate_nilai_per_ilo_mahasiswa,
+    generate_template_nilai_mk_semester,
 )
 
 
@@ -185,8 +187,14 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, DetailWithListViewModelD):
         self.bulk_delete_url = self.single_object.get_peserta_mk_semester_bulk_delete_url()
         self.reset_url = self.single_object.read_detail_url()
 
-    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        self.filename = '{}-{}.xlsx'.format(self.single_object.mk_kurikulum.nama, self.single_object.semester.semester.nama)
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:     
         self.peserta_mk_semester_qs = self.get_queryset()
+
+        if 'download_template' in request.GET:
+            if not request.is_ajax(): raise PermissionDenied
+            return self.download_template_nilai()
 
         if self.peserta_mk_semester_qs.exists():
             filter_data = {
@@ -335,6 +343,13 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, DetailWithListViewModelD):
 
         return json.dumps(json_response)
     
+    def download_template_nilai(self) -> HttpResponse:
+        generated_template_file = generate_template_nilai_mk_semester(self.single_object, self.peserta_mk_semester_qs)
+        response = HttpResponse(generated_template_file, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename={}'.format(self.filename)
+
+        return response
+
     def get_empty_komponen_clo(self):
         list_clo: QuerySet[Clo] = self.single_object.get_all_clo()
         list_komponen_clo = []
@@ -370,6 +385,7 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, DetailWithListViewModelD):
             'pencapaian_per_clo_graph': self.pencapaian_per_clo_graph(),
             'pencapaian_clo_rerata_graph': self.pencapaian_clo_rerata_graph(),
             'distribusi_nilai_huruf_graph': self.distribusi_nilai_huruf_graph(),
+            'template_file_name': self.filename,
         })
         
         get_request = self.request.GET
