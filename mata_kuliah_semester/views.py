@@ -45,6 +45,7 @@ from clo.models import(
 )
 from .models import (
     MataKuliahSemester,
+    NilaiExcelMataKuliahSemester,
     KelasMataKuliahSemester,
     DosenMataKuliah,
     PesertaMataKuliah,
@@ -62,6 +63,7 @@ from .utils import(
     calculate_nilai_per_clo_peserta,
     calculate_nilai_per_ilo_mahasiswa,
     generate_template_nilai_mk_semester,
+    process_excel_file,
 )
 
 
@@ -774,7 +776,7 @@ class NilaiKomponenCloEditTemplateView(FormView):
         kwargs.update({
             'list_peserta_mk': self.list_peserta_mk,
             'list_komponen_clo': self.list_komponen_clo,
-            'is_generate': self.request.GET.get('generate'),
+            'is_generate': self.request.GET.get('generate', '') == 'true',
         })
         return kwargs
 
@@ -884,8 +886,9 @@ class ImportNilaiMataKuliahSemesterView(ProgramStudiMixin, FormView):
         super().setup(request, *args, **kwargs)
         mk_semester_id = kwargs.get('mk_semester_id')
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+
         self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
-        self.success_url = self.mk_semester_obj.read_detail_url()
+        self.success_url = self.mk_semester_obj.get_nilai_komponen_import_result_url()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -901,26 +904,61 @@ class ImportNilaiMataKuliahSemesterView(ProgramStudiMixin, FormView):
     def form_valid(self, form) -> HttpResponse:
         excel_file = form.cleaned_data.get('excel_file')
         
-        # Rename file
-        filename, extension = os.path.splitext(excel_file.name)
-        new_filename = '{}{}'.format(uuid.uuid1(), extension)
-        
-        # Save file
-        file_path = os.path.join(settings.MEDIA_ROOT, new_filename)
-        with open(file_path, 'wb') as f:
-            for chunk in excel_file.chunks():
-                f.write(chunk)
-            
-        # Change permission
-        os.chmod(file_path, 0o600)
+        nilai_excel_obj, _ = NilaiExcelMataKuliahSemester.objects.get_or_create(
+            mk_semester=self.mk_semester_obj
+        )
 
-        # Process
-        print(file_path)
-        
-        # Delete file
-        os.remove(file_path)
+        nilai_excel_obj.file = excel_file
+        # Change permission
+        os.chmod(nilai_excel_obj.file, 0o600)
+        # Save
+        nilai_excel_obj.save()
 
         return super().form_valid(form)
+    
+
+class ImportNilaiResultView(ProgramStudiMixin, FormView):
+    template_name = ''
+    form_class = NilaiKomponenCloPesertaFormset
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        mk_semester_id = kwargs.get('mk_semester_id')
+        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+        
+        self.list_peserta_mk = self.mk_semester_obj.get_all_peserta_mk_semester()
+        self.list_komponen_clo = KomponenClo.objects.filter(
+            clo__mk_semester=self.mk_semester_obj
+        ).order_by('clo__nama', 'instrumen_penilaian')
+        
+        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
+        self.success_url = '{}?active_tab=peserta'.format(self.mk_semester_obj.read_detail_url())
+
+        # Process
+        self.is_import_success, self.import_result = process_excel_file(self.mk_semester_obj, self.list_peserta_mk, self.list_komponen_clo)
+    
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        # If process is not success, return error message
+
+        if not self.mk_semester_obj.is_clo_locked:
+            messages.warning(request, 'Pastikan anda sudah mengunci CLO terlebih dahulu sebelum memasukkan nilai.')
+            return redirect(self.success_url)
+        
+        if len(self.get_form().forms) == 0:
+            messages.warning(self.request, 'Edit nilai belum bisa dilakukan. Pastikan anda sudah melengkapi CLO dan komponen penilaiannya.')
+            return redirect(self.success_url)
+         
+        return super().get(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'list_peserta_mk': self.list_peserta_mk,
+            'list_komponen_clo': self.list_komponen_clo,
+            'is_import': self.is_import_success,
+            'import_result': self.import_result,
+        })
+        return kwargs
 
 
 # Nilai average CLO achievement

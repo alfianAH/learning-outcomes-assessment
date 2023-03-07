@@ -1,4 +1,5 @@
 import os
+import uuid
 from django.urls import reverse
 import requests
 from django.conf import settings
@@ -133,3 +134,11 @@ def get_reverse_url(viewname: str, kwargs):
     """
     
     return reverse(viewname, kwargs=kwargs)
+
+
+def nilai_excel_upload_handler(instance, filename):
+    _, extension = os.path.splitext(filename)
+    new_filename = '{}{}'.format(uuid.uuid1(), extension)
+    
+    file_path = os.path.join(settings.MEDIA_ROOT, 'mk-semester', 'nilai', new_filename)
+    return file_path 

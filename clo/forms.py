@@ -23,6 +23,7 @@ from .models import (
     KomponenClo,
     NilaiKomponenCloPeserta,
 )
+from mata_kuliah_semester.utils import process_excel_file
 from .utils import (
     get_pi_area_by_kurikulum_choices,
     get_pi_by_pi_area_choices,
@@ -206,11 +207,12 @@ class NilaiKomponenCloPesertaForm(forms.ModelForm):
 
 
 class NilaiKomponenCloPesertaFormsetClass(forms.BaseFormSet):
-    def __init__(self, *args, **kwargs):
-        self.list_peserta_mk: list[PesertaMataKuliah] = kwargs.pop('list_peserta_mk')
-        self.list_komponen_clo: QuerySet[KomponenClo] = kwargs.pop('list_komponen_clo')
-        self.is_generate = kwargs.pop('is_generate') == 'true'
+    def __init__(self, list_peserta_mk, list_komponen_clo, is_generate=False, is_import=False, import_result=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        self.list_peserta_mk: list[PesertaMataKuliah] = list_peserta_mk
+        self.list_komponen_clo: QuerySet[KomponenClo] = list_komponen_clo
+        self.is_generate = is_generate
 
         # List persentase for each komponen CLO
         list_persentase_komponen_clo = [komponen_clo.persentase for komponen_clo in self.list_komponen_clo]
@@ -229,17 +231,24 @@ class NilaiKomponenCloPesertaFormsetClass(forms.BaseFormSet):
                     'komponen_clo': komponen_clo
                 })
 
-                nilai_peserta_qs = NilaiKomponenCloPeserta.objects.filter(
-                    peserta=peserta,
-                    komponen_clo=komponen_clo,
-                )
-                
-                if nilai_peserta_qs.exists():
+                # Nilai Initial for import file
+                if is_import and import_result is not None:
                     self.forms[form_index].initial.update({
-                        'nilai': nilai_peserta_qs.first().nilai
+                        'nilai': import_result[i][j]
                     })
+                # Nilai Initial for manual input
                 else:
-                    can_generate = True
+                    nilai_peserta_qs = NilaiKomponenCloPeserta.objects.filter(
+                        peserta=peserta,
+                        komponen_clo=komponen_clo,
+                    )
+
+                    if nilai_peserta_qs.exists():
+                        self.forms[form_index].initial.update({
+                            'nilai': nilai_peserta_qs.first().nilai
+                        })
+                    else:
+                        can_generate = True
 
                 self.forms[form_index].fields['nilai'].label = '{} - {} ({}%)'.format(komponen_clo.clo.nama, komponen_clo.instrumen_penilaian, komponen_clo.persentase)
             

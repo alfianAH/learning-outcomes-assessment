@@ -6,6 +6,7 @@ from learning_outcomes_assessment.utils import get_reverse_url
 from ilo.models import Ilo
 from mata_kuliah_kurikulum.models import MataKuliahKurikulum
 from semester.models import SemesterProdi
+from learning_outcomes_assessment.utils import nilai_excel_upload_handler
 
 User = settings.AUTH_USER_MODEL
 
@@ -148,12 +149,20 @@ class MataKuliahSemester(MataKuliahSemesterLock):
     def get_nilai_komponen_import_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:nilai-komponen-import', self.get_kwargs)
     
+    def get_nilai_komponen_import_result_url(self):
+        return get_reverse_url('semester:mata_kuliah_semester:nilai-komponen-import-result', self.get_kwargs)
+    
     # Nilai Average CLO Achivement
     def get_nilai_clo_mk_semester(self):
         return self.nilaiclomatakuliahsemester_set.all()
     
     def get_nilai_average_calculate_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:nilai-avg-calculate', self.get_kwargs)
+    
+
+class NilaiExcelMataKuliahSemester(models.Model):
+    mk_semester = models.OneToOneField(MataKuliahSemester, on_delete=models.CASCADE)
+    file = models.FileField(null=True, upload_to=nilai_excel_upload_handler)
     
 
 class KelasMataKuliahSemester(models.Model):

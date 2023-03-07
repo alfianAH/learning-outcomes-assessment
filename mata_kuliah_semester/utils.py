@@ -677,3 +677,14 @@ def generate_template_nilai_mk_semester(mk_semester: MataKuliahSemester, list_pe
     file_stream.seek(0)
 
     return file_stream
+
+
+def process_excel_file(
+    mk_semester: MataKuliahSemester, 
+    list_peserta_mk: list[PesertaMataKuliah], 
+    list_komponen_clo: QuerySet[KomponenClo]
+):
+    # Validate MK Semester
+    # Validate Komponen CLO
+    # Validate peserta
+    pass
