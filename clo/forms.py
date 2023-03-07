@@ -12,6 +12,7 @@ from learning_outcomes_assessment.widgets import(
     MyTextareaInput,
     MyRadioInput,
 )
+from learning_outcomes_assessment.validators import validate_excel_file
 from kurikulum.models import Kurikulum
 from mata_kuliah_semester.models import (
     MataKuliahSemester,
@@ -310,3 +311,27 @@ NilaiKomponenCloPesertaFormset = formset_factory(
     extra=0,
     can_delete=False
 )
+
+
+class ImportNilaiUploadForm(forms.Form):
+    excel_file = forms.FileField(
+        allow_empty_file=False, 
+        validators=[validate_excel_file], 
+        widget=forms.ClearableFileInput(attrs={
+            'accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'
+        }),
+        label='File Nilai (Excel)',
+        help_text='Disarankan mengupload file excel dari template yang sudah disediakan.'
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        excel_file = cleaned_data.get('excel_file')
+
+        if excel_file is None:
+            raise forms.ValidationError('File tidak boleh kosong dan harus dalam format Excel (.xlsx, .xls).')
+
+        if not excel_file.name.endswith('.xlsx'):
+            raise forms.ValidationError('File harus dalam format Excel (.xlsx, .xls).')
+        return cleaned_data 
+

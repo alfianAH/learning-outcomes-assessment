@@ -1,5 +1,5 @@
 <form action="{{ post_url|default:'.' }}" method="post"
-    class="modal-content" id="{{ modal_content_id }}">
+    class="modal-content" id="{{ modal_content_id }}" {% if is_upload_file %}enctype="multipart/form-data"{% endif %}>
     {% csrf_token %}
     <div class="modal-header">
         <h3>{{ modal_title }}</h3>

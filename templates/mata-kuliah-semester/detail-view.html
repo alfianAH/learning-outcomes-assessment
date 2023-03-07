@@ -187,7 +187,7 @@
                                 </a>
 
                                 {% comment %} Import nilai {% endcomment %}
-                                <button class="dropdown-item space-x-2 w-full" role="menuitem" onclick="openModalByButton(this)" data-target="#import-nilai-modal">
+                                <button class="dropdown-item space-x-2 w-full" role="menuitem" onclick="openModalByButton(this)" data-target="#import-nilai-modal" hx-get="{{ import_nilai_url }}" hx-target="#import-nilai-modal-content" hx-swap="outerHTML" hx-trigger="click">
                                     <svg xmlns="http://www.w3.org/2000/svg" focusable="False" class="bi bi-upload w-4 h-4 fill-slate-100"viewBox="0 0 16 16">
                                         <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
                                         <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
@@ -355,30 +355,7 @@
 <div>
     {% include 'components/modal/htmx-modal.html' with modal_id='edit-nilai-modal' modal_content_id='edit-nilai-modal-content' is_modal_scrollable=True %}
 
-    <div class="modal" id="import-nilai-modal" role="dialog">
-        <div class="modal-dialog">
-            <form class="modal-content" action="" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="modal-header">
-                    <h3>Import Nilai</h3>
-                    <button class="btn border-none" type="button" data-dismiss="modal" onclick="closeModalByButton(this)">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
-                            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-                        </svg>
-                    </button>
-                </div>
-
-                <div class="modal-body">
-                    <input id="fileSelect" type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
-                </div>
-
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal" onclick="closeModalByButton(this)">Tutup</button>
-                    <button class="btn btn-primary loading-trigger" type="submit">Submit</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    {% include 'components/modal/htmx-modal.html' with modal_id='import-nilai-modal' modal_content_id='import-nilai-modal-content' is_modal_scrollable=True %}
 </div>
 {% endblock content %}
 

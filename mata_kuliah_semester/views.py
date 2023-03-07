@@ -1,4 +1,6 @@
 import json
+import os
+import uuid
 from django.contrib.auth import authenticate
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
@@ -24,6 +26,7 @@ from .filters import (
 )
 from clo.forms import (
     NilaiKomponenCloPesertaFormset,
+    ImportNilaiUploadForm,
 )
 from .forms import (
     MataKuliahSemesterCreateForm,
@@ -386,6 +389,7 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, DetailWithListViewModelD):
             'pencapaian_clo_rerata_graph': self.pencapaian_clo_rerata_graph(),
             'distribusi_nilai_huruf_graph': self.distribusi_nilai_huruf_graph(),
             'template_file_name': self.filename,
+            'import_nilai_url': self.single_object.get_hx_nilai_komponen_import_url(),
         })
         
         get_request = self.request.GET
@@ -871,6 +875,52 @@ class NilaiKomponenCloPesertaEditView(ProgramStudiMixin, NilaiKomponenCloEditTem
             'peserta_obj': self.peserta_mk_semester,
         })
         return context
+
+
+class ImportNilaiMataKuliahSemesterView(ProgramStudiMixin, FormView):
+    form_class = ImportNilaiUploadForm
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        mk_semester_id = kwargs.get('mk_semester_id')
+        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
+        self.success_url = self.mk_semester_obj.read_detail_url()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'mk_semester_obj': self.mk_semester_obj,
+            'button_text': 'Import',
+            'modal_title': 'Import Nilai',
+            'modal_content_id': 'import-nilai-modal-content',
+            'is_upload_file': True
+        })
+        return context
+    
+    def form_valid(self, form) -> HttpResponse:
+        excel_file = form.cleaned_data.get('excel_file')
+        
+        # Rename file
+        filename, extension = os.path.splitext(excel_file.name)
+        new_filename = '{}{}'.format(uuid.uuid1(), extension)
+        
+        # Save file
+        file_path = os.path.join(settings.MEDIA_ROOT, new_filename)
+        with open(file_path, 'wb') as f:
+            for chunk in excel_file.chunks():
+                f.write(chunk)
+            
+        # Change permission
+        os.chmod(file_path, 0o600)
+
+        # Process
+        print(file_path)
+        
+        # Delete file
+        os.remove(file_path)
+
+        return super().form_valid(form)
 
 
 # Nilai average CLO achievement

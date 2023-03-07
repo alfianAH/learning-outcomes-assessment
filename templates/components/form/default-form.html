@@ -1,4 +1,4 @@
-<form action="{{ post_url|default:'.' }}" method="post">
+<form action="{{ post_url|default:'.' }}" method="post" {% if is_upload_file %}enctype="multipart/form-data"{% endif %}>
     {% csrf_token %}
     {% include form_fields|default:'components/form/form-fields.html' %}
 
