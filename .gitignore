@@ -3,6 +3,7 @@
 
 # My files
 config/test.py
+staticfiles-cdn/
 
 ### Django ###
 *.log
