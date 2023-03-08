@@ -43,7 +43,7 @@ class CloReadAllView(ProgramStudiMixin, ListViewModelA):
     filter_form = None
     sort_form = None
     sort_form_ordering_by_key: str = 'odering_by'
-    ordering = 'nama'
+    ordering = ['char', 'number', 'nama']
 
     bulk_delete_url: str = ''
     reset_url: str = ''

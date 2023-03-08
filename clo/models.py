@@ -1,5 +1,8 @@
 from django.db import models
-from django.db.models import CheckConstraint, Q
+from django.db.models import F, Q, CheckConstraint, Value, IntegerField, TextField
+from django.contrib.postgres.fields import ArrayField
+from django.db.models.expressions import Func
+from django.db.models.functions import Cast
 from django.core.validators import MinValueValidator, MaxValueValidator
 from learning_outcomes_assessment.utils import get_reverse_url
 from lock_model.models import LockableMixin
@@ -12,7 +15,28 @@ from mata_kuliah_semester.models import (
 
 
 # Create your models here.
+class CloModelManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().annotate(
+            number = Cast(
+                Func(
+                    F('nama'),
+                    Value(r'\d+'),  # Not digit
+                    function='regexp_matches',
+                ),
+                output_field=ArrayField(IntegerField())
+            ),
+            char = Func(
+                F('nama'),
+                Value(r'\D+'),  # Digit
+                function='regexp_matches',
+                output_field=ArrayField(TextField())
+            ),
+        ).order_by('char', 'number')
+
+
 class Clo(LockableMixin, models.Model):
+    objects = CloModelManager()
     mk_semester = models.ForeignKey(MataKuliahSemester, on_delete=models.CASCADE)
 
     nama = models.CharField(max_length=255, null=False, blank=False)
