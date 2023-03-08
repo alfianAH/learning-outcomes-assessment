@@ -41,9 +41,6 @@ class Clo(LockableMixin, models.Model):
 
     nama = models.CharField(max_length=255, null=False, blank=False)
     deskripsi = models.TextField(null=False)
-
-    class Meta:
-        ordering = ['nama']
     
     @property
     def get_kwargs(self):
