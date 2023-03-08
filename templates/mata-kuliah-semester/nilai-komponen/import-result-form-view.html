@@ -1,0 +1,47 @@
+{% extends 'home-view.html' %}
+
+{% block title %}
+Hasil Import - 
+{% endblock title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'semester:read-all' %}" role="listitem">Semester</a></li>
+<li class="breadcrumb-item"><a href="{{ mk_semester_obj.semester.read_detail_url }}" role="listitem">Detail</a></li>
+<li class="breadcrumb-item"><a href="{{ mk_semester_obj.read_detail_url }}" role="listitem">Detail MK</a></li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">Hasil Import</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+{% if request.user.role == 'a' %}
+<div class="h-icon">
+    <h1>Hasil Import Nilai dari File Excel</h1>
+</div>
+{% else %}
+<h1>Edit Nilai</h1>
+{% endif %}
+<div class="table-div">
+    <div class="tr-div">
+        <div class="min-w-24 md:min-w-40">Mata kuliah</div>
+        <div>:</div>
+        <div>{{ mk_semester_obj.mk_kurikulum.nama }}</div>
+    </div>
+    <div class="tr-div">
+        <div class="min-w-24 md:min-w-40">Semester</div>
+        <div>:</div>
+        <div>{{ mk_semester_obj.semester.semester.nama }}</div>
+    </div>
+    <div class="tr-div">
+        <div class="min-w-24 md:min-w-40">Kode</div>
+        <div>:</div>
+        <div>{{ mk_semester_obj.mk_kurikulum.kode }}</div>
+    </div>
+    <div class="tr-div">
+        <div class="min-w-24 md:min-w-40">SKS</div>
+        <div>:</div>
+        <div>{{ mk_semester_obj.mk_kurikulum.sks }}</div>
+    </div>
+</div>
+
+<h3>Peserta</h3>
+{% include 'mata-kuliah-semester/partials/nilai-komponen/nilai-komponen-clo-form.html' %}
+{% endblock content %}

@@ -207,7 +207,7 @@ class NilaiKomponenCloPesertaForm(forms.ModelForm):
 
 
 class NilaiKomponenCloPesertaFormsetClass(forms.BaseFormSet):
-    def __init__(self, list_peserta_mk, list_komponen_clo, is_generate=False, is_import=False, import_result=None, *args, **kwargs):
+    def __init__(self, list_peserta_mk, list_komponen_clo, is_generate=False, is_import=False, import_result:dict=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
         self.list_peserta_mk: list[PesertaMataKuliah] = list_peserta_mk
@@ -233,8 +233,13 @@ class NilaiKomponenCloPesertaFormsetClass(forms.BaseFormSet):
 
                 # Nilai Initial for import file
                 if is_import and import_result is not None:
+                    nim = peserta.mahasiswa.username
+
+                    # Skip if there is no import result
+                    if import_result.get(nim) is None: continue
+
                     self.forms[form_index].initial.update({
-                        'nilai': import_result[i][j]
+                        'nilai': import_result[nim][j]
                     })
                 # Nilai Initial for manual input
                 else:

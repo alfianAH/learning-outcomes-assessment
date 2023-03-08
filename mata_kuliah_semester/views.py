@@ -742,6 +742,7 @@ class NilaiKomponenCloEditTemplateView(FormView):
     list_peserta_mk: list[PesertaMataKuliah] = []
     success_msg = 'Proses mengedit nilai komponen CLO sudah selesai.'
     error_msg: str = 'Gagal mengedit nilai. Pastikan data yang anda masukkan valid.'
+    can_generate = True
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
@@ -753,7 +754,7 @@ class NilaiKomponenCloEditTemplateView(FormView):
 
         self.list_komponen_clo = KomponenClo.objects.filter(
             clo__mk_semester=self.mk_semester_obj
-        ).order_by('clo__nama', 'instrumen_penilaian')
+        )
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         if not self.mk_semester_obj.is_clo_locked:
@@ -764,7 +765,7 @@ class NilaiKomponenCloEditTemplateView(FormView):
             messages.warning(self.request, 'Edit nilai belum bisa dilakukan. Pastikan anda sudah melengkapi CLO dan komponen penilaiannya.')
             return redirect(self.success_url)
 
-        if request.user.role == 'a':
+        if request.user.role == 'a' and self.can_generate:
             if request.GET.get('generate') == 'true':
                 messages.info(request, 'Proses generate sudah selesai. Generate nilai hanya berlaku untuk peserta yang belum memiliki nilai di semua komponen CLO.')
         
@@ -776,13 +777,14 @@ class NilaiKomponenCloEditTemplateView(FormView):
         kwargs.update({
             'list_peserta_mk': self.list_peserta_mk,
             'list_komponen_clo': self.list_komponen_clo,
-            'is_generate': self.request.GET.get('generate', '') == 'true',
+            'is_generate': self.request.GET.get('generate', '') == 'true' and self.can_generate,
         })
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
+        # Get form if unvalid
         list_form_dict = []
         form = kwargs.get('form')
         if form is None: form = self.get_form()
@@ -815,13 +817,11 @@ class NilaiKomponenCloEditTemplateView(FormView):
 
     def form_valid(self, form) -> HttpResponse:
         cleaned_data = form.cleaned_data
-        
+        print(cleaned_data)
         for nilai_komponen_clo_submit in cleaned_data:
-            peserta_obj: PesertaMataKuliah = nilai_komponen_clo_submit.get('peserta')
-
             # Check query first
             nilai_peserta_qs = NilaiKomponenCloPeserta.objects.filter(
-                peserta=peserta_obj,
+                peserta=nilai_komponen_clo_submit.get('peserta'),
                 komponen_clo=nilai_komponen_clo_submit.get('komponen_clo')
             )
 
@@ -904,48 +904,45 @@ class ImportNilaiMataKuliahSemesterView(ProgramStudiMixin, FormView):
     def form_valid(self, form) -> HttpResponse:
         excel_file = form.cleaned_data.get('excel_file')
         
-        nilai_excel_obj, _ = NilaiExcelMataKuliahSemester.objects.get_or_create(
+        nilai_excel_obj, is_created = NilaiExcelMataKuliahSemester.objects.get_or_create(
             mk_semester=self.mk_semester_obj
         )
 
+        if not is_created:
+            # If not created for the first time, remove the file first
+            os.remove(nilai_excel_obj.file.path)
+            nilai_excel_obj.file.delete()
+        
+        # Set the file
         nilai_excel_obj.file = excel_file
-        # Change permission
-        os.chmod(nilai_excel_obj.file, 0o600)
         # Save
         nilai_excel_obj.save()
+        # Change permission
+        os.chmod(nilai_excel_obj.file.path, 0o600)
 
         return super().form_valid(form)
     
 
-class ImportNilaiResultView(ProgramStudiMixin, FormView):
-    template_name = ''
-    form_class = NilaiKomponenCloPesertaFormset
+class ImportNilaiResultView(ProgramStudiMixin, NilaiKomponenCloEditTemplateView):
+    template_name = 'mata-kuliah-semester/nilai-komponen/import-result-form-view.html'
+    can_generate = False
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
-        super().setup(request, *args, **kwargs)
         mk_semester_id = kwargs.get('mk_semester_id')
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
-        
         self.list_peserta_mk = self.mk_semester_obj.get_all_peserta_mk_semester()
-        self.list_komponen_clo = KomponenClo.objects.filter(
-            clo__mk_semester=self.mk_semester_obj
-        ).order_by('clo__nama', 'instrumen_penilaian')
-        
-        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
-        self.success_url = '{}?active_tab=peserta'.format(self.mk_semester_obj.read_detail_url())
+
+        super().setup(request, *args, **kwargs)
 
         # Process
-        self.is_import_success, self.import_result = process_excel_file(self.mk_semester_obj, self.list_peserta_mk, self.list_komponen_clo)
+        self.is_import_success, self.message, self.import_result = process_excel_file(
+            self.mk_semester_obj, self.list_komponen_clo)
+            
     
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         # If process is not success, return error message
-
-        if not self.mk_semester_obj.is_clo_locked:
-            messages.warning(request, 'Pastikan anda sudah mengunci CLO terlebih dahulu sebelum memasukkan nilai.')
-            return redirect(self.success_url)
-        
-        if len(self.get_form().forms) == 0:
-            messages.warning(self.request, 'Edit nilai belum bisa dilakukan. Pastikan anda sudah melengkapi CLO dan komponen penilaiannya.')
+        if not self.is_import_success:
+            messages.error(request, self.message)
             return redirect(self.success_url)
          
         return super().get(request, *args, **kwargs)
@@ -953,8 +950,6 @@ class ImportNilaiResultView(ProgramStudiMixin, FormView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs.update({
-            'list_peserta_mk': self.list_peserta_mk,
-            'list_komponen_clo': self.list_komponen_clo,
             'is_import': self.is_import_success,
             'import_result': self.import_result,
         })

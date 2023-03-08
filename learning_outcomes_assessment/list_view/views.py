@@ -1,6 +1,5 @@
 from django.forms import BaseForm
 from django.http import Http404, HttpRequest
-from django.db import models
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext as _
 from .list import MyListView

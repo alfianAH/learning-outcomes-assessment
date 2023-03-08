@@ -142,3 +142,12 @@ def nilai_excel_upload_handler(instance, filename):
     
     file_path = os.path.join(settings.MEDIA_ROOT, 'mk-semester', 'nilai', new_filename)
     return file_path 
+
+def _iter_cols(self, min_col=None, max_col=None, min_row=None,
+               max_row=None, values_only=False):
+    """Iter cols for load workbook with read_only=True
+    """
+    yield from zip(*self.iter_rows(
+        min_row=min_row, max_row=max_row,
+        min_col=min_col, max_col=max_col, values_only=values_only))
+    
