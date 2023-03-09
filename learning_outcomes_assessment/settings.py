@@ -59,6 +59,8 @@ INSTALLED_APPS = [
     'kurikulum',
     'mata_kuliah_kurikulum',
     'mata_kuliah_semester',
+    'mata_kuliah_semester.management',
+    'mata_kuliah_semester.management.commands',
     'pi_area',
     'semester',
     'ilo',

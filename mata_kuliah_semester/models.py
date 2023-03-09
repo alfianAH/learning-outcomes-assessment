@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models import CheckConstraint, Q
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.conf import settings
+from django.utils import timezone
 from learning_outcomes_assessment.utils import get_reverse_url
 from ilo.models import Ilo
 from mata_kuliah_kurikulum.models import MataKuliahKurikulum
@@ -160,6 +161,7 @@ class MataKuliahSemester(MataKuliahSemesterLock):
 class NilaiExcelMataKuliahSemester(models.Model):
     mk_semester = models.OneToOneField(MataKuliahSemester, on_delete=models.CASCADE)
     file = models.FileField(null=True, upload_to=nilai_excel_upload_handler)
+    created_at = models.DateTimeField(auto_now_add=True)
     
 
 class KelasMataKuliahSemester(models.Model):
