@@ -231,6 +231,9 @@ class NilaiKomponenCloPesertaFormsetClass(forms.BaseFormSet):
                     'komponen_clo': komponen_clo
                 })
 
+                # Set label
+                self.forms[form_index].fields['nilai'].label = '{} - {} ({}%)'.format(komponen_clo.clo.nama, komponen_clo.instrumen_penilaian, komponen_clo.persentase)
+
                 # Nilai Initial for import file
                 if is_import and import_result is not None:
                     nim = peserta.mahasiswa.username
@@ -254,8 +257,6 @@ class NilaiKomponenCloPesertaFormsetClass(forms.BaseFormSet):
                         })
                     else:
                         can_generate = True
-
-                self.forms[form_index].fields['nilai'].label = '{} - {} ({}%)'.format(komponen_clo.clo.nama, komponen_clo.instrumen_penilaian, komponen_clo.persentase)
             
             # Generate nilai
             if self.is_generate and can_generate:

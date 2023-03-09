@@ -704,16 +704,19 @@ def process_excel_file(
         message = 'File excel tidak dapat ditemukan'
         return (is_import_success, message, import_result)
     
-    workbook: Workbook = openpyxl.load_workbook(nilai_excel_obj.file, read_only=True)
+    with open(nilai_excel_obj.file.path, 'rb') as excel_file:
+        excel_in_memory_file = BytesIO(excel_file.read())
+    
+    workbook: Workbook = openpyxl.load_workbook(excel_in_memory_file, read_only=True)
     worksheet: Worksheet = workbook.active
     worksheet.iter_cols = types.MethodType(_iter_cols, worksheet)
-
+    
     # Validate MK Semester
     unique_id: str = worksheet['C9'].value
     semester_prodi_id, mk_semester_id = unique_id.split('/')
     
     if mk_semester_id != str(mk_semester.pk) or semester_prodi_id != str(mk_semester.semester.id_neosia):
-        message = 'Unique ID tidak sesuai. Ekspektasi: {}/{}, Excel: {}/{}'.format(mk_semester.pk, mk_semester.semester.id_neosia, mk_semester_id, semester_prodi_id)
+        message = 'Unique ID tidak sesuai. Ekspektasi: {}/{}, Excel: {}/{}'.format(mk_semester.semester.id_neosia, mk_semester.pk, semester_prodi_id, mk_semester_id)
         if settings.DEBUG: print(message)
         return (is_import_success, message, import_result)
 
@@ -757,7 +760,7 @@ def process_excel_file(
 
         # Check length
         if len(list_komponen_clo_excel) != komponen_qs.count():
-            message = 'Banyak komponen {} tidak sama. Ekspektasi: {}, file excel: {}'.format(clo_excel, komponen_qs.count(), len(list_komponen_clo_excel))
+            message = 'Banyak komponen "{}" tidak sama. Ekspektasi: {}, file excel: {}'.format(clo_excel, komponen_qs.count(), len(list_komponen_clo_excel))
             if settings.DEBUG: print(message)
             return (is_import_success, message, import_result)
 

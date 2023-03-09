@@ -16,7 +16,6 @@ from .views import (
     NilaiKomponenCloEditView,
     NilaiKomponenCloPesertaEditView,
     ImportNilaiMataKuliahSemesterView,
-    ImportNilaiResultView,
 
     NilaiAverageCloAchievementCalculateView,
 )
@@ -45,8 +44,6 @@ urlpatterns = [
     path('<int:mk_semester_id>/nilai/<int:peserta_id>/edit/', NilaiKomponenCloPesertaEditView.as_view(template_name='mata-kuliah-semester/nilai-komponen/edit-view.html'), name='nilai-komponen-peserta-edit'),
     path('<int:mk_semester_id>/nilai/hx-import/', ImportNilaiMataKuliahSemesterView.as_view(template_name='mata-kuliah-semester/partials/nilai-komponen/import-form-modal.html'), name='hx-nilai-komponen-import'),
     path('<int:mk_semester_id>/nilai/import/', ImportNilaiMataKuliahSemesterView.as_view(template_name='mata-kuliah-semester/nilai-komponen/import-form-view.html'), name='nilai-komponen-import'),
-
-    path('<int:mk_semester_id>/nilai/import/result/', ImportNilaiResultView.as_view(), name='nilai-komponen-import-result'),
 
     # Nilai Average CLO Achivement
     path('<int:mk_semester_id>/results/nilai-avg-calculate/', NilaiAverageCloAchievementCalculateView.as_view(), name='nilai-avg-calculate'),

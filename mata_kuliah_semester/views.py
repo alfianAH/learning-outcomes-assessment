@@ -807,6 +807,7 @@ class NilaiKomponenCloEditTemplateView(FormView):
             list_form_dict.append(peserta_dict)
         
         context.update({
+            'can_generate': self.can_generate,
             'mk_semester_obj': self.mk_semester_obj,
             'back_url': self.success_url,
             'list_peserta_mk': self.list_peserta_mk,
@@ -817,7 +818,7 @@ class NilaiKomponenCloEditTemplateView(FormView):
 
     def form_valid(self, form) -> HttpResponse:
         cleaned_data = form.cleaned_data
-        print(cleaned_data)
+        
         for nilai_komponen_clo_submit in cleaned_data:
             # Check query first
             nilai_peserta_qs = NilaiKomponenCloPeserta.objects.filter(
@@ -845,6 +846,9 @@ class NilaiKomponenCloEditTemplateView(FormView):
 
 class NilaiKomponenCloEditView(ProgramStudiMixin, NilaiKomponenCloEditTemplateView):
     template_name = 'mata-kuliah-semester/nilai-komponen/edit-view.html'
+    is_import_success = False
+    message = ''
+    import_result = {}
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         mk_semester_id = kwargs.get('mk_semester_id')
@@ -852,6 +856,43 @@ class NilaiKomponenCloEditView(ProgramStudiMixin, NilaiKomponenCloEditTemplateVi
 
         self.list_peserta_mk = self.mk_semester_obj.get_all_peserta_mk_semester()
         super().setup(request, *args, **kwargs)
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if request.GET.get('is_import') == 'true':
+            self.can_generate = False
+            # Process
+            self.is_import_success, self.message, self.import_result = process_excel_file(
+                self.mk_semester_obj, self.list_komponen_clo)
+
+            if not self.is_import_success:
+                messages.error(request, self.message)
+                return redirect(self.success_url)
+            
+        return super().get(request, *args, **kwargs)
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'is_import': self.is_import_success,
+            'import_result': self.import_result,
+        })
+        return kwargs
+    
+    def form_valid(self, form) -> HttpResponse:
+        # If import is success, delete from database and storage
+        nilai_excel_qs = NilaiExcelMataKuliahSemester.objects.filter(
+            mk_semester=self.mk_semester_obj
+        )
+        
+        if nilai_excel_qs.exists():
+            if nilai_excel_qs.count() > 1:
+                for nilai_excel_obj in nilai_excel_qs:
+                    os.remove(nilai_excel_obj.file.path)
+            else:
+                os.remove(nilai_excel_qs.first().file.path)
+            nilai_excel_qs.delete()
+        
+        return super().form_valid(form)
 
 
 class NilaiKomponenCloPesertaEditView(ProgramStudiMixin, NilaiKomponenCloEditTemplateView):
@@ -888,7 +929,7 @@ class ImportNilaiMataKuliahSemesterView(ProgramStudiMixin, FormView):
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
 
         self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
-        self.success_url = self.mk_semester_obj.get_nilai_komponen_import_result_url()
+        self.success_url = '{}?is_import=true'.format(self.mk_semester_obj.get_nilai_komponen_edit_url())
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -921,39 +962,6 @@ class ImportNilaiMataKuliahSemesterView(ProgramStudiMixin, FormView):
         os.chmod(nilai_excel_obj.file.path, 0o600)
 
         return super().form_valid(form)
-    
-
-class ImportNilaiResultView(ProgramStudiMixin, NilaiKomponenCloEditTemplateView):
-    template_name = 'mata-kuliah-semester/nilai-komponen/import-result-form-view.html'
-    can_generate = False
-
-    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
-        mk_semester_id = kwargs.get('mk_semester_id')
-        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
-        self.list_peserta_mk = self.mk_semester_obj.get_all_peserta_mk_semester()
-
-        super().setup(request, *args, **kwargs)
-
-        # Process
-        self.is_import_success, self.message, self.import_result = process_excel_file(
-            self.mk_semester_obj, self.list_komponen_clo)
-            
-    
-    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        # If process is not success, return error message
-        if not self.is_import_success:
-            messages.error(request, self.message)
-            return redirect(self.success_url)
-         
-        return super().get(request, *args, **kwargs)
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs.update({
-            'is_import': self.is_import_success,
-            'import_result': self.import_result,
-        })
-        return kwargs
 
 
 # Nilai average CLO achievement
