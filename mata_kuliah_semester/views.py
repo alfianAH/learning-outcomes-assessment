@@ -866,6 +866,7 @@ class NilaiKomponenCloEditView(ProgramStudiMixin, NilaiKomponenCloEditTemplateVi
 
             if not self.is_import_success:
                 messages.error(request, self.message)
+                messages.warning(request, 'Pastikan anda mengunduh template nilai terbaru untuk meminimalisir error.')
                 return redirect(self.success_url)
             
         return super().get(request, *args, **kwargs)

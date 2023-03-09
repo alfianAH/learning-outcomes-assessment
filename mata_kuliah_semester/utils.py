@@ -701,7 +701,7 @@ def process_excel_file(
     except (NilaiExcelMataKuliahSemester.DoesNotExist, NilaiExcelMataKuliahSemester.MultipleObjectsReturned):
         if settings.DEBUG:
             print('Nilai Excel object for MK Semester (id={}) not found'.format(mk_semester.pk))
-        message = 'File excel tidak dapat ditemukan'
+        message = 'File excel tidak dapat ditemukan.'
         return (is_import_success, message, import_result)
     
     with open(nilai_excel_obj.file.path, 'rb') as excel_file:
@@ -732,7 +732,7 @@ def process_excel_file(
     for cell in worksheet[clo_row][3:]:
         komponen = worksheet['{}{}'.format(cell.column_letter, komponen_clo_row)].value
         persentase = worksheet['{}{}'.format(cell.column_letter, persentase_komponen_row)].value
-
+        
         # Add new komponen in current CLO
         if cell.value is None:
             list_clo_excel[current_clo].append({
@@ -743,17 +743,29 @@ def process_excel_file(
         
         # Add new CLO and its komponen
         current_clo = cell.value
-        list_clo_excel[current_clo] = [
-            {
-                'komponen': komponen,
-                'persentase': persentase
-            }
-        ]
+        list_clo_excel[current_clo] = []
+        
+        if komponen is None or persentase is None: continue
+
+        list_clo_excel[current_clo].append({
+            'komponen': komponen,
+            'persentase': persentase
+        })
+
+    komponen_index = 0
 
     # Check excel values
     for clo_excel in list_clo_excel.keys():
         list_komponen_clo_excel = list_clo_excel[clo_excel]
 
+        # Check CLO order
+        current_clo = list_komponen_clo[komponen_index].clo.nama
+        if current_clo != clo_excel:
+            message = 'Urutan CLO tidak sesuai. Ekspektasi: {}, file excel:{}'.format(
+                current_clo, clo_excel)
+            if settings.DEBUG: print(message)
+            return (is_import_success, message, import_result)
+            
         komponen_qs = list_komponen_clo.filter(
             clo__nama=clo_excel,
         )
@@ -768,6 +780,20 @@ def process_excel_file(
         for komponen_clo_excel in list_komponen_clo_excel:
             nama_komponen = komponen_clo_excel['komponen']
             persentase_komponen = komponen_clo_excel['persentase']
+            
+            # Check komponen order
+            current_instrumen_penilaian = list_komponen_clo[komponen_index].instrumen_penilaian
+            current_persentase_komponen = list_komponen_clo[komponen_index].persentase / 100
+
+            if current_instrumen_penilaian != nama_komponen:
+                message = 'Urutan komponen tidak sesuai. Ekspektasi: {}, file excel: {}'.format(current_instrumen_penilaian, nama_komponen)
+                if settings.DEBUG: print(message)
+                return (is_import_success, message, import_result)
+            
+            if current_persentase_komponen != persentase_komponen:
+                message = 'Urutan persentase komponen tidak sesuai. Ekspektasi: {}, file excel: {}'.format(current_persentase_komponen, persentase_komponen)
+                if settings.DEBUG: print(message)
+                return (is_import_success, message, import_result)
 
             qs = list_komponen_clo.filter(
                 clo__nama=clo_excel,
@@ -779,6 +805,8 @@ def process_excel_file(
                 message = 'CLO, komponen, dan persentasenya tidak sesuai (case sensitive). File excel: CLO: {}, Komponen CLO: {}, Persentase: {}'.format(clo_excel, nama_komponen, persentase_komponen)
                 if settings.DEBUG: print(message)
                 return (is_import_success, message, import_result)
+            
+            komponen_index += 1
  
     # Validate peserta
     list_peserta_mk = PesertaMataKuliah.objects.filter(
