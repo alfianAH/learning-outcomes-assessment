@@ -13,6 +13,8 @@
         {% endif %}
     </td>
     <td class="text-left">{{ option.mk_kurikulum.sks }}</td>
+
+    {% if user_role != 'm' %}
     <td class="text-left hidden xl:table-cell !align-middle">
         {% if option.status_nilai %}
         <div class="w-5 h-5 rounded-full badge-success" title="Sudah lengkap"></div>
@@ -20,11 +22,12 @@
         <div class="w-5 h-5 rounded-full badge-warning" title="Belum lengkap"></div>
         {% endif %}
     </td>
+    {% endif %}
     <td class="text-left hidden xl:table-cell !align-middle">
         {% if option.status_pedoman %}
-        <div class="w-5 h-5 rounded-full badge-success" title="Sudah dikunci"></div>
+        <div class="w-5 h-5 rounded-full badge-success" title="{% if user_role == 'm' %} Sudah lengkap {% else %} Sudah dikunci {% endif %}"></div>
         {% else %}
-        <div class="w-5 h-5 rounded-full badge-warning" title="Belum dikunci"></div>
+        <div class="w-5 h-5 rounded-full badge-warning" title="{% if user_role == 'm' %} Belum lengkap {% else %} Belum dikunci {% endif %}"></div>
         {% endif %}
     </td>
 {% endif %}

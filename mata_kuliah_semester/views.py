@@ -191,10 +191,11 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, DetailWithListViewModelD):
         self.program_studi_obj = self.single_object.semester.tahun_ajaran_prodi.prodi_jenjang.program_studi
         self.bulk_delete_url = self.single_object.get_peserta_mk_semester_bulk_delete_url()
         self.reset_url = self.single_object.read_detail_url()
+        self.user = request.user
 
         self.filename = '{}-{}.xlsx'.format(self.single_object.mk_kurikulum.nama, self.single_object.semester.semester.nama)
 
-    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:     
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         self.peserta_mk_semester_qs = self.get_queryset()
 
         if 'download_template' in request.GET:
@@ -221,22 +222,32 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, DetailWithListViewModelD):
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self) -> QuerySet[PesertaMataKuliah]:
-        self.queryset = self.model.objects.filter(
-            kelas_mk_semester__mk_semester=self.single_object
-        )
+        if self.user.role == 'm':
+            self.queryset = self.model.objects.filter(
+                mahasiswa=self.user,
+                kelas_mk_semester__mk_semester=self.single_object
+            )
+        else:
+            self.queryset = self.model.objects.filter(
+                kelas_mk_semester__mk_semester=self.single_object
+            )
         return super().get_queryset()
 
     def update_status_pedoman(self, status_pedoman: bool, pedoman_objects_dict: dict):
+        badge_type = ''
+        badge_text = ''
+
         if status_pedoman:
-            pedoman_objects_dict.update({
-                'badge_type': 'badge-success',
-                'badge_text': 'Sudah dikunci',
-            })
+            badge_type = 'badge-success'
+            badge_text = 'Sudah lengkap' if self.user.role == 'm' else 'Sudah dikunci'
         else:
-            pedoman_objects_dict.update({
-                'badge_type': 'badge-warning',
-                'badge_text': 'Belum dikunci',
-            })
+            badge_type = 'badge-warning'
+            badge_text = 'Belum lengkap' if self.user.role == 'm' else 'Belum dikunci'
+        
+        pedoman_objects_dict.update({
+            'badge_type': badge_type,
+            'badge_text': badge_text,
+        })
     
     def pencapaian_per_clo_graph(self):
         list_nilai_clo: QuerySet[NilaiCloMataKuliahSemester] = self.single_object.get_nilai_clo_mk_semester()
@@ -387,12 +398,17 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, DetailWithListViewModelD):
             'colspan_length': 8,
             'pedoman_objects': pedoman_objects,
             'empty_komponen_clo': self.get_empty_komponen_clo(),
-            'pencapaian_per_clo_graph': self.pencapaian_per_clo_graph(),
-            'pencapaian_clo_rerata_graph': self.pencapaian_clo_rerata_graph(),
-            'distribusi_nilai_huruf_graph': self.distribusi_nilai_huruf_graph(),
             'template_file_name': self.filename,
             'import_nilai_url': self.single_object.get_hx_nilai_komponen_import_url(),
         })
+
+        # Show graph for admin and dosen role
+        if self.user.role != 'm':
+            context.update({
+                'pencapaian_per_clo_graph': self.pencapaian_per_clo_graph(),
+                'pencapaian_clo_rerata_graph': self.pencapaian_clo_rerata_graph(),
+                'distribusi_nilai_huruf_graph': self.distribusi_nilai_huruf_graph(),
+            })
         
         get_request = self.request.GET
         if get_request.get('active_tab') == 'hasil':

@@ -14,6 +14,7 @@
 {% block content %}
 <div class="h-icon">
     <h1>{{ single_object.mk_kurikulum.nama }}</h1>
+    {% if user_role != 'm' %}
     <a href="{{ single_object.get_kelas_mk_semester_update_url }}" title="Update data mata kuliah semester" type="button" class="btn btn-primary">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" focusable="False" aria-label="sync">
             <path d="M.01 0h24v24h-24V0z" fill="none"/>
@@ -21,6 +22,7 @@
         </svg>
         <span class="hidden sm:block">Update</span>
     </a>
+    {% endif %}
 </div>
 
 <div class="table-div">
@@ -39,6 +41,14 @@
         <div>:</div>
         <div>{{ single_object.mk_kurikulum.sks }}</div>
     </div>
+    
+    {% if user_role == 'm' %}
+    <div class="tr-div">
+        <div class="w-32 md:w-36">Nilai akhir</div>
+        <div>:</div>
+        <div>{{ object_list.first.nilai_akhir }}</div>
+    </div>
+    {% else %}
     <div class="tr-div !items-center">
         <div class="w-32 md:w-36">Status nilai</div>
         <div>:</div>
@@ -48,16 +58,31 @@
         <div class="badge badge-warning">Belum lengkap</div>
         {% endif %}
     </div>
+    {% endif %}
+
     <div class="tr-div !items-center">
         <div class="w-32 md:w-36">Status pedoman</div>
         <div>:</div>
         {% if single_object.status_pedoman %}
-        <div class="badge badge-success">Sudah dikunci</div>
+        <div class="badge badge-success">
+            {% if user_role == 'm' %}
+            Sudah lengkap
+            {% else %}
+            Sudah dikunci
+            {% endif %}
+        </div>
         {% else %}
-        <div class="badge badge-warning">Belum dikunci</div>
+        <div class="badge badge-warning">
+            {% if user_role == 'm' %}
+            Belum lengkap
+            {% else %}
+            Belum dikunci
+            {% endif %}
+        </div>
         {% endif %}
-        
     </div>
+
+    {% if user_role != 'm' %}
     <div class="tr-div">
         <div>List Kelas</div>
         <div>:</div>
@@ -91,6 +116,7 @@
             {% endfor %}
         </ol>
     </div>
+    {% endif %}
 </div>
 
 <ul class="tab" role="tablist">
@@ -106,6 +132,7 @@
         <div class="tab-item-line"></div>
     </li>
 
+    {% if user_role != 'm' %}
     <li class="tab-item w-40 {% if not is_peserta_pane %}disabled{% endif %}" id="tab-2" data-target="#tab-peserta-pane" role="presentation">
         <div class="tab-title">
             <span class="truncate">{{ object_list|length }} Peserta</span>
@@ -129,6 +156,15 @@
 
         <div class="tab-item-line"></div>
     </li>
+    {% else %}
+    <li class="tab-item w-40 disabled" id="tab-4" data-target="#tab-hasil-mahasiswa-pane" role="presentation">
+        <div class="tab-title">
+            <span class="truncate">Hasil</span>
+        </div>
+
+        <div class="tab-item-line"></div>
+    </li>
+    {% endif %}
 </ul>
 
 <div class="tab-content">
@@ -137,6 +173,7 @@
         {% include 'components/list-table-view/model-b/list-view-model-b.html' with objects=pedoman_objects use_checkbox=False id=None %}
     </div>
 
+    {% if user_role != 'm' %}
     {% comment %} Peserta {% endcomment %}
     <div class="tab-pane fade min-h-screen {% if is_peserta_pane %}show active{% endif %}" role="tabpanel" id="tab-peserta-pane" aria-labelledby="tab-2">
         {% if object_list or data_exist %}
@@ -350,17 +387,49 @@
             </a>
         {% endif %}
     </div>
+    {% else %}
+    {% comment %} Hasil (mahasiswa) {% endcomment %}
+    <div class="tab-pane fade min-h-screen" id="tab-hasil-mahasiswa-pane" role="tabpanel" aria-labelledby="tab-4">
+        <h2>Hasil</h2>
+        {% with object_list.first as mahasiswa %}
+        
+        <p><a href="{{ mahasiswa.get_student_performance_url }}">Student Performance</a></p>
+
+        <ul class="w-full grid grid-cols-2 gap-4" role="list">
+            {% for nilai_komponen_clo in mahasiswa.get_all_nilai_komponen_clo_peserta %}
+            <li class="list-item-model-e" role="listitem">
+                <table class="w-full">
+                    <tbody class="flex flex-col space-y-2.5 md:space-y-3 xl:space-y-4">
+                        <tr class="flex space-x-2.5">
+                            <th scope="row" class="w-full">CLO</th>
+                            <td scope="row" class="text-right whitespace-nowrap">{{ nilai_komponen_clo.komponen_clo.clo.nama }}</th>
+                        </tr>
+                        <tr class="flex space-x-2.5">
+                            <th scope="row" class="w-full">{{ nilai_komponen_clo.komponen_clo.instrumen_penilaian }} ({{ nilai_komponen_clo.komponen_clo.persentase }}%)</th>
+                            <td class="text-right  whitespace-nowrap">{{ nilai_komponen_clo.nilai|floatformat:2 }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endwith %}
+    </div>
+    {% endif %}
 </div>
 
+{% if user_role != 'm' %}
 <div>
     {% include 'components/modal/htmx-modal.html' with modal_id='edit-nilai-modal' modal_content_id='edit-nilai-modal-content' is_modal_scrollable=True %}
 
     {% include 'components/modal/htmx-modal.html' with modal_id='import-nilai-modal' modal_content_id='import-nilai-modal-content' is_modal_scrollable=True %}
 </div>
+{% endif %}
 {% endblock content %}
 
 {% block script %}
 <script>
+    {% if user_role != 'm' %}
     $('#download-template').on('click', function(){
         event.preventDefault();  // Prevent the link from changing the URL
         let targetUrl = $(this).attr('data-url');
@@ -516,6 +585,7 @@
     };
 
     createChart('distribusi-nilai-pie', distribusiNilaiHurufPieChartConfig);
+    {% endif %}
 
     // Update chart to dark mode
     let isDarkMode = $('body').hasClass('dark');

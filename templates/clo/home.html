@@ -15,7 +15,8 @@ CLO -
 {% if object_list or data_exist %}
     <div class="h-icon">
         <h1>Course Learning Outcomes</h1>
-
+        
+        {% if user_role != 'm' %}
         {% if mk_semester_obj.is_clo_locked %}
         <a href={{ mk_semester_obj.get_clo_unlock_url }} class="btn btn-primary" type="button">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-unlock" viewBox="0 0 16 16">
@@ -38,6 +39,7 @@ CLO -
             <span class="hidden sm:block sm:ml-2.5">Kunci</span>
         </a>
         {% endif %}
+        {% endif %}
     </div>
 
     <div class="table-div">
@@ -56,11 +58,19 @@ CLO -
             <div>:</div>
             {% if mk_semester_obj.is_clo_locked %}
             <div class="badge badge-success">
+                {% if user_role == 'm' %}
+                Sudah lengkap
+                {% else %}
                 Sudah dikunci
+                {% endif %}
             </div>
             {% else %}
             <div class="badge badge-warning">
+                {% if user_role == 'm' %}
+                Belum lengkap
+                {% else %}
                 Belum dikunci
+                {% endif %}
             </div>
             {% endif %}
         </div>
@@ -95,17 +105,25 @@ CLO -
             <div class="min-w-24 md:min-w-40">Status</div>
             <div>:</div>
             <div class="badge badge-warning">
+                {% if user_role == 'm' %}
+                Belum lengkap
+                {% else %}
                 Belum dikunci
+                {% endif %}
             </div>
         </div>
     </div>
 
+    {% if user_role == 'm' %}
+    <p>CLO belum dibuat.</p>
+    {% else %}
     <a href="{{ mk_semester_obj.get_clo_create_url }}" title="Tambah CLO" type="button" class="btn btn-primary max-w-min loading-trigger">
         <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
             <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
         </svg>
         <span class="hidden sm:block">Tambah CLO</span>
     </a>
+    {% endif %}
 {% endif %}
 {% endblock content %}
 

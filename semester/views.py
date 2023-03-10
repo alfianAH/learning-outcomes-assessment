@@ -89,11 +89,17 @@ class SemesterReadAllView(ListViewModelA):
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        prodi_id = self.request.user.prodi.id_neosia
+        user = self.request.user
+        prodi_id = user.prodi.id_neosia
         
-        self.queryset = self.model.objects.filter(
-            tahun_ajaran_prodi__prodi_jenjang__program_studi__id_neosia=prodi_id
-        )
+        if user.role == 'm':
+            self.queryset = self.model.objects.filter(
+                matakuliahsemester__kelasmatakuliahsemester__pesertamatakuliah__mahasiswa=user
+            ).distinct()
+        else:
+            self.queryset = self.model.objects.filter(
+                tahun_ajaran_prodi__prodi_jenjang__program_studi__id_neosia=prodi_id
+            )
         return super().get_queryset()
 
 
@@ -334,9 +340,17 @@ class SemesterReadView(ProgramStudiMixin, DetailWithListViewModelA):
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        self.queryset = self.model.objects.filter(
-            semester=self.single_object.pk
-        )
+        user = self.request.user
+
+        if user.role == 'm':
+            self.queryset = self.model.objects.filter(
+                semester=self.single_object.pk,
+                kelasmatakuliahsemester__pesertamatakuliah__mahasiswa=user
+            ).distinct()
+        else:
+            self.queryset = self.model.objects.filter(
+                semester=self.single_object.pk
+            )
         return super().get_queryset()
 
 

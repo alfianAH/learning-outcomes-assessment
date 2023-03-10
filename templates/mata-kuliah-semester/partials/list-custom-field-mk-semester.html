@@ -20,7 +20,8 @@
                 <div class="whitespace-nowrap font-bold">SKS</div>
                 <div>{{ option.mk_kurikulum.sks }}</div>
             </div>
-
+            
+            {% if user_role != 'm' %}
             <div class="flex px-3 py-1 space-x-2.5 justify-between">
                 <div class="whitespace-nowrap font-bold">Status Nilai</div>
                 <div>
@@ -31,14 +32,27 @@
                     {% endif %}
                 </div>
             </div>
+            {% endif %}
 
             <div class="flex px-3 py-1 space-x-2.5 justify-between items-center">
                 <div class="whitespace-nowrap font-bold">Status Pedoman</div>
                 <div>
                     {% if option.status_pedoman %}
-                    <div class="badge badge-success">Sudah dikunci</div>
+                    <div class="badge badge-success">
+                        {% if user_role == 'm' %}
+                        Sudah lengkap
+                        {% else %}
+                        Sudah dikunci
+                        {% endif %}
+                    </div>
                     {% else %}
-                    <div class="badge badge-warning">Belum dikunci</div>
+                    <div class="badge badge-warning">
+                        {% if user_role == 'm' %}
+                        Belum lengkap
+                        {% else %}
+                        Belum dikunci
+                        {% endif %}
+                    </div>
                     {% endif %}
                 </div>
             </div>

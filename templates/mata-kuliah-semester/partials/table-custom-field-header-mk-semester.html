@@ -2,6 +2,8 @@
 <th scope="col" class="text-left" title="Mata Kuliah">Mata Kuliah</th>
 <th scope="col" class="text-left" title="SKS">SKS</th>
 {% if not option.wrap_label %}
+{% if user_role != 'm' %}
 <th scope="col" class="text-left hidden xl:table-cell" title="Status Nilai">Stat. Nilai</th>
+{% endif %}
 <th scope="col" class="text-left hidden xl:table-cell" title="Status Pedoman">Stat. Pedoman</th>
 {% endif %}
