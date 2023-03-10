@@ -1,6 +1,5 @@
 import json
 import os
-import uuid
 from django.contrib.auth import authenticate
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
@@ -13,7 +12,10 @@ from django.views.generic.edit import FormView
 from django.views.generic.detail import DetailView
 from accounts.enums import RoleChoices
 from clo.models import KomponenClo
-from learning_outcomes_assessment.auth.mixins import ProgramStudiMixin
+from learning_outcomes_assessment.auth.mixins import (
+    ProgramStudiMixin,
+    MahasiswaMixin
+)
 from learning_outcomes_assessment.list_view.views import DetailWithListViewModelD
 from learning_outcomes_assessment.forms.edit import (
     ModelBulkUpdateView,
@@ -654,7 +656,7 @@ class PesertaMataKuliahBulkDeleteView(ProgramStudiMixin, ModelBulkDeleteView):
         return super().get_queryset()
 
 
-class StudentPerformanceReadView(ProgramStudiMixin, DetailView):
+class StudentPerformanceReadView(ProgramStudiMixin, MahasiswaMixin, DetailView):
     model = PesertaMataKuliah
     pk_url_kwarg = 'peserta_id'
     template_name = 'mata-kuliah-semester/peserta/student-performance.html'
@@ -662,6 +664,8 @@ class StudentPerformanceReadView(ProgramStudiMixin, DetailView):
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
         self.object = self.get_object()
+        
+        self.peserta_mk = self.object
         self.program_studi_obj = self.object.kelas_mk_semester.mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
     
     def get_object(self, queryset=None) -> PesertaMataKuliah:
@@ -724,7 +728,7 @@ class StudentPerformanceReadView(ProgramStudiMixin, DetailView):
         return context
     
 
-class StudentPerformanceCalculateView(ProgramStudiMixin, RedirectView):
+class StudentPerformanceCalculateView(ProgramStudiMixin, MahasiswaMixin, RedirectView):
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
         peserta_id = kwargs.get('peserta_id')
