@@ -273,7 +273,7 @@ class KurikulumReadAllView(ListViewModelA):
     sort_template: str = 'kurikulum/partials/kurikulum-sort-form.html'
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        kurikulum_qs = self.model.objects.filter(prodi_jenjang__program_studi=request.user.prodi)
+        kurikulum_qs = self.get_queryset()
 
         if kurikulum_qs.exists():
             filter_data = {
@@ -295,7 +295,14 @@ class KurikulumReadAllView(ListViewModelA):
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        self.queryset = self.model.objects.filter(prodi_jenjang__program_studi=self.request.user.prodi)
+        user = self.request.user
+        if user.role == 'm':
+            self.queryset = self.model.objects.filter(
+                prodi_jenjang__program_studi=user.prodi,
+                matakuliahkurikulum__matakuliahsemester__kelasmatakuliahsemester__pesertamatakuliah__mahasiswa=user
+            ).distinct()
+        else:
+            self.queryset = self.model.objects.filter(prodi_jenjang__program_studi=user.prodi)
 
         return super().get_queryset()
 

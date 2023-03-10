@@ -14,7 +14,8 @@ Performance Indicators -
 {% if object_list or data_exist %}
     <div class="h-icon justify-between">
         <h1>Performance Indicators</h1>
-
+        
+        {% if user_role != 'm' %}
         <div class="flex flex-row space-x-2.5 xl:space-x-3">
             {% if kurikulum_obj.is_assessmentarea_locked %}
             <a href={{ kurikulum_obj.get_pi_area_unlock_url }} class="btn btn-primary" type="button">
@@ -47,6 +48,7 @@ Performance Indicators -
                 <span class="hidden sm:block sm:ml-2.5">Download</span>
             </button>
         </div>
+        {% endif %}
     </div>
 
     <p>{{ kurikulum_obj.nama }}</p>
@@ -85,6 +87,7 @@ Performance Indicators -
 {% else %}
 <h1>Performance Indicators</h1>
 <p>{{ kurikulum_obj.nama }}</p>
+{% if user_role != 'm' %}
 <button class="btn btn-primary" data-target="#create-modal" onclick="openModalByButton(this)" hx-get="{{ kurikulum_obj.get_hx_create_pi_area_url }}" hx-target="#create-modal-content" hx-swap="outerHTML" hx-trigger="click">
     <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
         <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
@@ -92,6 +95,9 @@ Performance Indicators -
     <span class="hidden sm:block sm:ml-2.5">Tambah Performance Indicator</span>
 </button>
 {% endif %}
+{% endif %}
+
+{% if user_role != 'm' %}
 <div>
     {% if not kurikulum_obj.is_assessmentarea_locked %}
         {% include 'components/modal/htmx-modal.html' with modal_id='update-modal' modal_content_id='update-modal-content' is_modal_scrollable=True %}
@@ -99,6 +105,7 @@ Performance Indicators -
         {% include 'components/modal/htmx-modal.html' with modal_id='create-modal' modal_content_id='create-modal-content' is_modal_scrollable=True %}
     {% endif %}
 </div>
+{% endif %}
 
 {% endblock content %}
 

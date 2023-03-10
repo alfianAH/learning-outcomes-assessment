@@ -14,6 +14,7 @@ Detail Performance Indicators -
 {% block content %}
 <div class="h-icon">
     <h1>Detail Performance Indicator</h1>
+    {% if user_role != 'm' %}
     {% if not object.assessment_area.kurikulum.is_assessmentarea_locked %}
         <a href="{{ object.get_pi_area_update_url }}" class="btn btn-success loading-trigger" title="Update">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -21,6 +22,7 @@ Detail Performance Indicators -
                 <path d="M3 17.46v3.04c0 .28.22.5.5.5h3.04c.13 0 .26-.05.35-.15L17.81 9.94l-3.75-3.75L3.15 17.1c-.1.1-.15.22-.15.36zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
             </svg>
         </a>
+    {% endif %}
     {% endif %}
 </div>
 
@@ -59,6 +61,7 @@ Detail Performance Indicators -
 
 {% if object.get_performance_indicator %}
 <h2>Performance Indicator</h2>
+{% comment %} List Performance indicator {% endcomment %}
 <ul class="list-disc ml-5">
 {% for performance_indicator in object.get_performance_indicator %}
     <li>{{ performance_indicator.deskripsi }}</li>
