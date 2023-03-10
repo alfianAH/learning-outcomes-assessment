@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.db.models import QuerySet
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, Http404
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic.base import View, RedirectView
@@ -14,7 +14,8 @@ from accounts.enums import RoleChoices
 from clo.models import KomponenClo
 from learning_outcomes_assessment.auth.mixins import (
     ProgramStudiMixin,
-    MahasiswaMixin
+    MahasiswaAsPesertaMixin,
+    MahasiswaAndMKSemesterMixin,
 )
 from learning_outcomes_assessment.list_view.views import DetailWithListViewModelD
 from learning_outcomes_assessment.forms.edit import (
@@ -158,7 +159,7 @@ class MataKuliahSemesterCreateView(ProgramStudiMixin, FormView):
         return super().form_valid(form)
 
 
-class MataKuliahSemesterReadView(ProgramStudiMixin, DetailWithListViewModelD):
+class MataKuliahSemesterReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin, DetailWithListViewModelD):
     single_model = MataKuliahSemester
     single_pk_url_kwarg = 'mk_semester_id'
     single_object: MataKuliahSemester = None
@@ -195,11 +196,11 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, DetailWithListViewModelD):
         self.reset_url = self.single_object.read_detail_url()
         self.user = request.user
 
+        self.peserta_mk_semester_qs = self.get_queryset()
+
         self.filename = '{}-{}.xlsx'.format(self.single_object.mk_kurikulum.nama, self.single_object.semester.semester.nama)
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        self.peserta_mk_semester_qs = self.get_queryset()
-
         if 'download_template' in request.GET:
             if not request.is_ajax(): raise PermissionDenied
             return self.download_template_nilai()
@@ -656,7 +657,7 @@ class PesertaMataKuliahBulkDeleteView(ProgramStudiMixin, ModelBulkDeleteView):
         return super().get_queryset()
 
 
-class StudentPerformanceReadView(ProgramStudiMixin, MahasiswaMixin, DetailView):
+class StudentPerformanceReadView(ProgramStudiMixin, MahasiswaAsPesertaMixin, DetailView):
     model = PesertaMataKuliah
     pk_url_kwarg = 'peserta_id'
     template_name = 'mata-kuliah-semester/peserta/student-performance.html'
@@ -664,7 +665,7 @@ class StudentPerformanceReadView(ProgramStudiMixin, MahasiswaMixin, DetailView):
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
         self.object = self.get_object()
-        
+
         self.peserta_mk = self.object
         self.program_studi_obj = self.object.kelas_mk_semester.mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
     
@@ -728,7 +729,7 @@ class StudentPerformanceReadView(ProgramStudiMixin, MahasiswaMixin, DetailView):
         return context
     
 
-class StudentPerformanceCalculateView(ProgramStudiMixin, MahasiswaMixin, RedirectView):
+class StudentPerformanceCalculateView(ProgramStudiMixin, MahasiswaAsPesertaMixin, RedirectView):
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
         peserta_id = kwargs.get('peserta_id')

@@ -5,7 +5,10 @@ from django.conf import settings
 from django.contrib import messages
 from django.views.generic.base import View, RedirectView
 from django.views.generic.edit import FormView
-from learning_outcomes_assessment.auth.mixins import ProgramStudiMixin
+from learning_outcomes_assessment.auth.mixins import (
+    ProgramStudiMixin,
+    MahasiswaAndMKSemesterMixin,
+)
 from learning_outcomes_assessment.list_view.views import (
     ListViewModelA, 
     DetailWithListViewModelA
@@ -37,7 +40,7 @@ from .utils import (
 
 
 # Create your views here.
-class CloReadAllView(ProgramStudiMixin, ListViewModelA):
+class CloReadAllView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin, ListViewModelA):
     template_name = 'clo/home.html'
     model = Clo
     filter_form = None
@@ -142,7 +145,7 @@ class CloReadAllGraphJsonResponse(ProgramStudiMixin, View):
         return JsonResponse(json_response)
     
 
-class CloReadView(ProgramStudiMixin, DetailWithListViewModelA):
+class CloReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin, DetailWithListViewModelA):
     single_model = Clo
     single_pk_url_kwarg = 'clo_id'
     single_object: Clo = None
@@ -165,6 +168,7 @@ class CloReadView(ProgramStudiMixin, DetailWithListViewModelA):
         super().setup(request, *args, **kwargs)
         self.bulk_delete_url = self.single_object.get_komponen_clo_bulk_delete_url()
 
+        self.mk_semester_obj = self.single_object.mk_semester
         self.program_studi_obj = self.single_object.mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
 
     def get_queryset(self):
