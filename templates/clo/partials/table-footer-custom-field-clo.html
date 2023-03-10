@@ -1,4 +1,4 @@
-<td colspan="5" class="font-bold text-right">
+<td colspan="{% if user_role == 'm' %}4{% else %}5{% endif %}" class="font-bold text-right">
     Total
 </td>
 <td class="text-right">{{ mk_semester_obj.get_total_persentase_clo }}</td>

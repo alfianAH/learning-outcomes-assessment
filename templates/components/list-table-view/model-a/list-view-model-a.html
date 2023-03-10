@@ -28,9 +28,11 @@
             <li class="list-item-model-a active:active transition-all" role="listitem">
                 <div class="flex space-x-2.5 items-center">
                     <label class="w-full flex space-x-2.5 items-center">
+                        {% if user_role != 'm' %}
                         {% comment %} Checkbox {% endcomment %}
                         <input type="checkbox" name="{{ input_name }}" {% if option.id_neosia %}value="{{ option.id_neosia }}" id="{{ prefix_id }}{{ option.id_neosia }}" {% else %}value="{{ option.id }}" id="{{ prefix_id }}{{ option.id }}" {% endif %}>
-                        
+                        {% endif %}
+
                         {% comment %} Number and name {% endcomment %}
                         {% with page_obj.start_index|add:forloop.counter|add:-1 as number %}
                             {% include list_item_name|default:'components/list-table-view/model-a/list-item-name.html' %}
@@ -61,10 +63,13 @@
     role="list">
     <thead>
         <tr>
+            {% if user_role != 'm' %}
             {% comment %} Checkbox {% endcomment %}
             <th scope="col" class="text-center checkbox">
                 <input type="checkbox" name="table-checkbox" id="table-checkbox">
             </th>
+            {% endif %}
+
             {% comment %} Number {% endcomment %}
             <th scope="col" class="text-center number">No.</th>
             
@@ -90,12 +95,15 @@
             {% for group, options, index in widget.optgroups %}
                 {% for option in options %}
                     <tr>
+                        {% if user_role != 'm' %}
                         {% comment %} Checkbox {% endcomment %}
                         <th scope="col" class="text-center checkbox">
                             {% if option.template_name %}
                                 {% include option.template_name with widget=option use_label=False %}
                             {% endif %}
                         </th>
+                        {% endif %}
+
                         {% comment %} Number {% endcomment %}
                         <th scope="col" class="text-center number"></th>
                         
@@ -109,10 +117,12 @@
         {% else %}
             {% for option in options %}
                 <tr class="{% if open_button and option.read_detail_url %} group {% endif %}">
+                    {% if user_role != 'm' %}
                     {% comment %} Checkbox {% endcomment %}
                     <th class="text-center checkbox">
                         <input type="checkbox" name="{{ input_name }}" {% if option.id_neosia %}value="{{ option.id_neosia }}" id="{{ prefix_id }}{{ option.id_neosia }}" {% else %}value="{{ option.id }}" id="{{ prefix_id }}{{ option.id }}" {% endif %}>
                     </th>
+                    {% endif %}
                     {% comment %} Number {% endcomment %}
                     <th class="text-center {% if not page_obj.start_index %}number{% endif %}">
                         {% if page_obj.start_index %}

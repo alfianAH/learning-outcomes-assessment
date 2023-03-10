@@ -1,11 +1,13 @@
 <ol {% if id %}id="{{ id }}"{% endif %} class="flex flex-col sm:grid sm:grid-cols-2 xl:grid-cols-3" role="list">
     {% for object in objects %}
         <li class="list-item-model-b" role="listitem">
+            {% if user_role != 'm' %}
             {% comment %} Checkbox {% endcomment %}
             {% if use_checkbox %}
             <input type="checkbox" name="{{ input_name }}" 
                 value="{{ object.id }}" id="{{ prefix_id }}{{ object.id }}"
                 class="mr-2 mt-1 md:mr-2.5 xl:mr-3 w-4 h-4 md:w-5 md:h-5">
+            {% endif %}
             {% endif %}
             
             <div class="flex flex-row items-center space-x-2.5 md:space-x-3 w-full">

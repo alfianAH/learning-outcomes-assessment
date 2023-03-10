@@ -1,4 +1,4 @@
-<td colspan="4" class="font-bold text-right">
+<td colspan="{% if user_role == 'm' %}3{% else %}4{% endif %}" class="font-bold text-right">
     Total
 </td>
 <td class="text-right">{{ single_object.get_total_persentase_komponen }}</td>
