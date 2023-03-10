@@ -96,6 +96,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+
+                'learning_outcomes_assessment.context_processor.add_role_to_context'
             ],
         },
     },

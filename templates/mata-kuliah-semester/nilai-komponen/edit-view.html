@@ -12,7 +12,7 @@ Edit Nilai -
 {% endblock breadcrumb %}
 
 {% block content %}
-{% if request.user.role == 'a' and can_generate %}
+{% if user_role == 'a' and can_generate %}
 <div class="h-icon">
     <h1>Edit Nilai</h1>
     <a href="?generate=true" class="btn btn-primary btn-icon-start max-w-min loading-trigger">

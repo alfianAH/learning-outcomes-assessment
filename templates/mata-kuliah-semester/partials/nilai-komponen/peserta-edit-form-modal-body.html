@@ -1,4 +1,4 @@
-{% if request.user.role == 'a' %}
+{% if user_role == 'a' %}
 <p>Untuk melakukan generate nilai peserta, klik <a href="{{ peserta_obj.get_nilai_komponen_clo_peserta_edit_url }}">di sini</a>.</p>
 {% endif %}
 
