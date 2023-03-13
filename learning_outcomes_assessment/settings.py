@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'ilo',
     'clo',
     'lock_model',
+    'laporan_cpl',
 ]
 
 MIDDLEWARE = [

@@ -23,4 +23,5 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('kurikulum/', include('kurikulum.urls')),
     path('semester/', include('semester.urls')),
+    path('laporan-cpl/', include('laporan_cpl.urls'))
 ]
