@@ -1,0 +1,88 @@
+{% extends 'home-view.html' %}
+
+
+{% block title %}
+Laporan CPL - 
+{% endblock title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page" role="listitem">Laporan CPL</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<h1>Laporan Capaian Pembelajaran Lulusan</h1>
+
+<form action="." method="post" class="space-y-3">
+    {% csrf_token %}
+    
+    {% include 'components/form/form-fields.html' %}
+
+    <div id="formset-fields">
+        {% include 'components/form/formset.html' %}
+    </div>
+    
+    <div class="form-buttons !justify-start">
+        <button type="submit" class="btn btn-success">Submit</button>
+        <button type="reset" class="btn btn-secondary">Reset</button>
+    </div>
+</form>
+{% endblock content %}
+
+{% block script %}
+<script>
+    addMoreForm('#{{ formset.management_form.TOTAL_FORMS.id_for_label }}', false);
+    // Kurikulum on change
+    $('#id_kurikulum').on('change', function(){
+        let selectedKurikulumId = $(this).val();
+        $.ajax({
+            url: '{% url 'laporan_cpl:formset-tahun-ajaran-choices' %}',
+            data: {
+                'kurikulum_id': selectedKurikulumId
+            },
+            dataType: 'json',
+            success: function(data) {
+                // Get tahun ajaran data
+                let options = '';
+                $.each(data.choices, function(index, choice) {
+                    options += '<option value="' + choice[0] + '">' + choice[1] + '</option>';
+                });
+
+                // Get all tahun ajaran elements
+                let tahunAjaranElements = $('#formset-fields').find('.tahun-ajaran')
+                tahunAjaranElements.each((index, elem) => {
+                    $(elem).html(options).prop('disabled', false).trigger('change');
+                    
+                    // Tahun ajaran on change
+                    $(elem).on('change', function(){
+                        let selectedTahunAjaranId = $(this).val();
+                        $.ajax({
+                            url: '{% url 'laporan_cpl:formset-semester-choices' %}',
+                            data: {
+                                'tahun_ajaran_id': selectedTahunAjaranId
+                            },
+                            dataType: 'json',
+                            success: function(data) {
+                                // Get semester data
+                                let options = '';
+                                $.each(data.choices, function(index, choice) {
+                                    options += '<option value="' + choice[0] + '">' + choice[1] + '</option>';
+                                });
+                                
+                                // Get semester element
+                                let semesterSelectElem = $(elem).parent().parent().siblings().children('div').children('.semester');
+                                semesterSelectElem.html(options).prop('disabled', false);
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Error:', error);
+                            }
+                        });
+                    });
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
+            }
+        });
+    });
+</script>
+{% endblock script %}

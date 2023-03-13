@@ -3972,6 +3972,14 @@ details.dropdown::marker {
   align-items: center !important;
 }
 
+.\!justify-start {
+  justify-content: flex-start !important;
+}
+
+.justify-start {
+  justify-content: flex-start;
+}
+
 .justify-center {
   justify-content: center;
 }

@@ -1,4 +1,4 @@
-function addMoreForm(totalFormId) {
+function addMoreForm(totalFormId, isRequired=true) {
     $('#add-form').on('click', function(){
         const currentFormCount = $('.added-form').length; // + 1
         const copyEmptyFormEl = $('#empty-form').clone(true);
@@ -7,7 +7,9 @@ function addMoreForm(totalFormId) {
         copyEmptyFormEl.removeAttr('id');
         $(copyEmptyFormEl.children()[0]).attr('id', `form-${currentFormCount}`);
         
-        copyEmptyFormEl.find('.form-control').attr('required', 'true');
+        if(isRequired){
+            copyEmptyFormEl.find('.form-control').attr('required', 'true');
+        }
         
         const regex = new RegExp('__prefix__', 'g');
         copyEmptyFormEl.html(copyEmptyFormEl.html().replace(regex, currentFormCount));

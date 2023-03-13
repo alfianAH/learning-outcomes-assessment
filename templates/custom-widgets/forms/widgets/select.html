@@ -1,5 +1,5 @@
 <select name="{{ widget.name }}" 
-    class="form-control invalid:border-rose-500 dark:invalid:border-rose-600 peer"
+    class="form-control invalid:border-rose-500 dark:invalid:border-rose-600 peer {{ widget.attrs.class }}"
     {% include "django/forms/widgets/attrs.html" %}>
 
     {% for group_name, group_choices, group_index in widget.optgroups %}
