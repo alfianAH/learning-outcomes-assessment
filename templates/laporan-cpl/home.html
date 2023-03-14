@@ -17,7 +17,7 @@ Laporan CPL -
     
     {% include 'components/form/form-fields.html' %}
 
-    <div id="formset-fields">
+    <div id="formset-fields" class="max-h-60 overflow-y-auto">
         {% include 'components/form/formset.html' %}
     </div>
     
@@ -48,41 +48,43 @@ Laporan CPL -
                 });
 
                 // Get all tahun ajaran elements
-                let tahunAjaranElements = $('#formset-fields').find('.tahun-ajaran')
+                let tahunAjaranElements = $('#formset-fields').find('.tahun-ajaran');
                 tahunAjaranElements.each((index, elem) => {
-                    $(elem).html(options).prop('disabled', false).trigger('change');
-                    
-                    // Tahun ajaran on change
-                    $(elem).on('change', function(){
-                        let selectedTahunAjaranId = $(this).val();
-                        $.ajax({
-                            url: '{% url 'laporan_cpl:formset-semester-choices' %}',
-                            data: {
-                                'tahun_ajaran_id': selectedTahunAjaranId
-                            },
-                            dataType: 'json',
-                            success: function(data) {
-                                // Get semester data
-                                let options = '';
-                                $.each(data.choices, function(index, choice) {
-                                    options += '<option value="' + choice[0] + '">' + choice[1] + '</option>';
-                                });
-                                
-                                // Get semester element
-                                let semesterSelectElem = $(elem).parent().parent().siblings().children('div').children('.semester');
-                                semesterSelectElem.html(options).prop('disabled', false);
-                            },
-                            error: function(xhr, status, error) {
-                                console.error('Error:', error);
-                            }
-                        });
-                    });
+                    $(elem).html(options).prop('disabled', false);
                 });
             },
             error: function(xhr, status, error) {
                 console.error('Error:', error);
             }
         });
-    });
+    }).trigger('change');
+
+    // Tahun ajaran on change
+    $('.tahun-ajaran').on('change', function(){
+        let tahunAjaranElem = $(this)
+        let selectedTahunAjaranId = $(this).val();
+        $.ajax({
+            url: '{% url 'laporan_cpl:formset-semester-choices' %}',
+            data: {
+                'tahun_ajaran_id': selectedTahunAjaranId
+            },
+            dataType: 'json',
+            success: function(data) {
+                // Get semester data
+                let options = '';
+                $.each(data.choices, function(index, choice) {
+                    options += '<option value="' + choice[0] + '">' + choice[1] + '</option>';
+                });
+                
+                // Get semester element
+                let semesterSelectElem = $(tahunAjaranElem).parent().parent().siblings().children('div').children('.semester');
+                
+                semesterSelectElem.html(options).prop('disabled', false);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
+            }
+        });
+    }).trigger('change');
 </script>
 {% endblock script %}

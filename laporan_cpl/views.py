@@ -73,7 +73,6 @@ class LaporanCapaianPembelajaranView(FormView):
     def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         form = self.get_form()
         formset = self.get_formset()
-        print(formset.is_valid())
 
         if all([form.is_valid(), formset.is_valid()]):
             return self.form_valid(form, formset)
