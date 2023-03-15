@@ -3723,22 +3723,6 @@ details.dropdown::marker {
   max-height: 20rem;
 }
 
-.max-h-72 {
-  max-height: 18rem;
-}
-
-.max-h-8 {
-  max-height: 2rem;
-}
-
-.max-h-9 {
-  max-height: 2.25rem;
-}
-
-.max-h-96 {
-  max-height: 24rem;
-}
-
 .min-h-screen {
   min-height: 100vh;
 }
@@ -4078,10 +4062,6 @@ details.dropdown::marker {
 
 .overflow-y-auto {
   overflow-y: auto;
-}
-
-.overflow-y-scroll {
-  overflow-y: scroll;
 }
 
 .truncate {

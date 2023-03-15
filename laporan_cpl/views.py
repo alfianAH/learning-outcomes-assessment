@@ -60,7 +60,7 @@ class LaporanCapaianPembelajaranView(FormView):
     def get_formset(self, formset_class=None) -> BaseFormSet:
         if formset_class is None:
             formset_class = self.get_formset_class()
-
+        
         return formset_class(self.request.POST or None)
 
     def get_form_kwargs(self):
@@ -81,7 +81,7 @@ class LaporanCapaianPembelajaranView(FormView):
         
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if 'formset' not in context:
+        if 'formset' not in kwargs:
             context['formset'] = self.get_formset()
         
         return context
@@ -89,15 +89,13 @@ class LaporanCapaianPembelajaranView(FormView):
     def form_valid(self, form, formset) -> HttpResponse:
         return self.render_to_response(
             self.get_context_data(
-                form=form,
-                formset=formset
+                form=form, formset=formset
             )
         )
     
     def form_invalid(self, form, formset) -> HttpResponse:
         return self.render_to_response(
             self.get_context_data(
-                form=form,
-                formset=formset
+                form=form, formset=formset
             )
         )

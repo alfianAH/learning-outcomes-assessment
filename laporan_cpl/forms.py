@@ -26,6 +26,14 @@ class KurikulumChoiceForm(forms.Form):
             prodi_jenjang__program_studi=prodi
         )
 
+    def clean(self):
+        cleaned_data = super().clean()
+        kurikulum = cleaned_data.get('kurikulum')
+        
+        if kurikulum is None:
+            self.add_error('kurikulum', 'Harus memilih kurikulum sebelum melakukan filter.')
+        return cleaned_data
+
 
 class TahunAjaranSemesterChoiceForm(forms.Form):
     tahun_ajaran = forms.ChoiceField(
@@ -59,7 +67,8 @@ class TahunAjaranSemesterFormsetClass(CanDeleteBaseFormSet):
         self.kurikulum_id = data.get('kurikulum')
         # Return if kurikulum id is blank
         if not self.kurikulum_id.strip(): return
-        print(self.kurikulum_id)
+        
+        print(args, kwargs)
 
         tahun_ajaran_prodi_qs = TahunAjaranProdi.objects.filter(
             semesterprodi__matakuliahsemester__mk_kurikulum__kurikulum__id_neosia=self.kurikulum_id
@@ -83,9 +92,22 @@ class TahunAjaranSemesterFormsetClass(CanDeleteBaseFormSet):
     def clean(self):
         super().clean()
 
-        for form in self.forms:
+        is_semester_included = False
+
+        for i, form in enumerate(self.forms):
             if self._should_delete_form(form): continue
-            print(form.cleaned_data)
+            cleaned_data = form.cleaned_data
+            semester: str = cleaned_data.get('semester')
+            
+            # If semester is not empty, semester is included
+            if i == 0 and semester.strip():
+                is_semester_included = True
+
+            # If semester is included and semester is empty, ...
+            if is_semester_included and not semester.strip():
+                form.add_error('semester', 'Filter form hanya menerima memilih "tahun ajaran" saja atau memilih "tahun ajaran dan semester". Form pertama: memilih "tahun ajaran dan semester".')
+            elif not is_semester_included and semester.strip():
+                form.add_error('semester', 'Filter form hanya menerima memilih "tahun ajaran" saja atau memilih "tahun ajaran dan semester". Form pertama: memilih "tahun ajaran" saja.')
 
 
 TahunAjaranSemesterFormset = formset_factory(

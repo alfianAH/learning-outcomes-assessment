@@ -60,7 +60,7 @@ Laporan CPL -
     }).trigger('change');
 
     // Tahun ajaran on change
-    $('.tahun-ajaran').on('change', function(){
+    $('#formset-fields').on('change', '.tahun-ajaran',function(){
         let tahunAjaranElem = $(this)
         let selectedTahunAjaranId = $(this).val();
         $.ajax({
