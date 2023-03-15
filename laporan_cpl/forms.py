@@ -73,12 +73,27 @@ class TahunAjaranSemesterFormsetClass(CanDeleteBaseFormSet):
         semester_prodi_qs = SemesterProdi.objects.filter(
             tahun_ajaran_prodi__in=tahun_ajaran_prodi_qs
         )
-        tahun_ajaran_choices = [(tahun_ajaran_prodi.pk, str(tahun_ajaran_prodi.tahun_ajaran)) for tahun_ajaran_prodi in tahun_ajaran_prodi_qs]
-        semester_choices = [(semester_prodi.pk, semester_prodi.semester.nama) for semester_prodi in semester_prodi_qs]
+        self.tahun_ajaran_choices = [(tahun_ajaran_prodi.pk, str(tahun_ajaran_prodi.tahun_ajaran)) for tahun_ajaran_prodi in tahun_ajaran_prodi_qs]
+        self.semester_choices = [(semester_prodi.pk, semester_prodi.semester.nama) for semester_prodi in semester_prodi_qs]
         
+        # Add choices to form
         for form in self.forms:
-            form.fields['tahun_ajaran'].choices += tahun_ajaran_choices
-            form.fields['semester'].choices += semester_choices
+            form.fields['tahun_ajaran'].choices += self.tahun_ajaran_choices
+            form.fields['semester'].choices += self.semester_choices
+    
+    @property
+    def empty_form(self):
+        empty_form = super().empty_form
+
+        # If it is init, return normal empty form
+        # Init doesn't have data so, it doesn't have this attrs
+        if not hasattr(self, 'tahun_ajaran_choices') or not hasattr(self, 'semester_choices'): return empty_form
+
+        # Add choices to empty form
+        empty_form.fields['tahun_ajaran'].choices += self.tahun_ajaran_choices
+        empty_form.fields['semester'].choices += self.semester_choices
+
+        return empty_form
 
     def clean(self):
         super().clean()
@@ -89,9 +104,13 @@ class TahunAjaranSemesterFormsetClass(CanDeleteBaseFormSet):
             # If form is deleted, skip
             if self._should_delete_form(form): continue
             cleaned_data = form.cleaned_data
+
+            print(cleaned_data)
+            tahun_ajaran: str = cleaned_data.get('tahun_ajaran', '')
+            if not tahun_ajaran.strip():
+                form.add_error('tahun_ajaran', 'Tahun ajaran harus dipilih atau anda bisa menghapus filter ini.')
             
-            semester: str = cleaned_data.get('semester')
-            if semester is None: continue
+            semester: str = cleaned_data.get('semester', '')
 
             # If semester is not empty, semester is included
             if i == 0 and semester.strip():
