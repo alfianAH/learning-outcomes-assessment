@@ -48,7 +48,7 @@ Laporan CPL -
                 });
 
                 // Get all tahun ajaran elements
-                let tahunAjaranElements = $('#formset-fields').find('.tahun-ajaran');
+                let tahunAjaranElements = $('.tahun-ajaran');
                 tahunAjaranElements.each((index, elem) => {
                     $(elem).html(options).prop('disabled', false);
                 });
@@ -57,7 +57,7 @@ Laporan CPL -
                 console.error('Error:', error);
             }
         });
-    }).trigger('change');
+    });
 
     // Tahun ajaran on change
     $('#formset-fields').on('change', '.tahun-ajaran',function(){

@@ -43,7 +43,7 @@ class TahunAjaranSemesterChoiceForm(forms.Form):
             }
         ),
         required=False,
-        choices=(('', '---------'),)
+        choices=[('', '---------'),]
     )
     semester = forms.ChoiceField(
         widget=MySelectInput(
@@ -52,7 +52,7 @@ class TahunAjaranSemesterChoiceForm(forms.Form):
             }
         ),
         required=False,
-        choices=(('', '---------'),)
+        choices=[('', '---------'),]
     )
 
 
@@ -60,15 +60,12 @@ class TahunAjaranSemesterFormsetClass(CanDeleteBaseFormSet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-        if len(args) > 1: return
-        data = args[0]
+        data = kwargs.get('data')
         if data is None: return
         
         self.kurikulum_id = data.get('kurikulum')
         # Return if kurikulum id is blank
         if not self.kurikulum_id.strip(): return
-        
-        print(args, kwargs)
 
         tahun_ajaran_prodi_qs = TahunAjaranProdi.objects.filter(
             semesterprodi__matakuliahsemester__mk_kurikulum__kurikulum__id_neosia=self.kurikulum_id
@@ -79,26 +76,23 @@ class TahunAjaranSemesterFormsetClass(CanDeleteBaseFormSet):
         tahun_ajaran_choices = [(tahun_ajaran_prodi.pk, str(tahun_ajaran_prodi.tahun_ajaran)) for tahun_ajaran_prodi in tahun_ajaran_prodi_qs]
         semester_choices = [(semester_prodi.pk, semester_prodi.semester.nama) for semester_prodi in semester_prodi_qs]
         
-        self.initial_choices = {}
         for form in self.forms:
             form.fields['tahun_ajaran'].choices += tahun_ajaran_choices
             form.fields['semester'].choices += semester_choices
 
-            self.initial_choices[form.prefix] = {
-                'tahun_ajaran': form.fields['tahun_ajaran'].choices,
-                'semester': form.fields['semester'].choices,
-            }
-    
     def clean(self):
         super().clean()
 
         is_semester_included = False
 
         for i, form in enumerate(self.forms):
+            # If form is deleted, skip
             if self._should_delete_form(form): continue
             cleaned_data = form.cleaned_data
-            semester: str = cleaned_data.get('semester')
             
+            semester: str = cleaned_data.get('semester')
+            if semester is None: continue
+
             # If semester is not empty, semester is included
             if i == 0 and semester.strip():
                 is_semester_included = True
@@ -106,6 +100,7 @@ class TahunAjaranSemesterFormsetClass(CanDeleteBaseFormSet):
             # If semester is included and semester is empty, ...
             if is_semester_included and not semester.strip():
                 form.add_error('semester', 'Filter form hanya menerima memilih "tahun ajaran" saja atau memilih "tahun ajaran dan semester". Form pertama: memilih "tahun ajaran dan semester".')
+            # If semester is not included and semester is not empty, ...
             elif not is_semester_included and semester.strip():
                 form.add_error('semester', 'Filter form hanya menerima memilih "tahun ajaran" saja atau memilih "tahun ajaran dan semester". Form pertama: memilih "tahun ajaran" saja.')
 

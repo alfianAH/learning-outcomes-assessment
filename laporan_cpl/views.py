@@ -57,11 +57,19 @@ class LaporanCapaianPembelajaranView(FormView):
     def get_formset_class(self):
         return self.formset_class
 
+    def get_formset_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'prefix': self.get_formset_class().get_default_prefix()
+        })
+        
+        return kwargs
+    
     def get_formset(self, formset_class=None) -> BaseFormSet:
         if formset_class is None:
             formset_class = self.get_formset_class()
         
-        return formset_class(self.request.POST or None)
+        return formset_class(**self.get_formset_kwargs())
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
