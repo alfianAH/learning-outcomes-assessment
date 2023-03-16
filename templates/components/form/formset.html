@@ -5,7 +5,7 @@
         {% for form in formset %}
             <div class="added-form mb-3">
                 <div id="form-{{ forloop.counter0 }}" class="{% if form.DELETE.value == True %} hidden {% endif %} mb-3 flex flex-row justify-between space-x-3 max-w-xl border-b">
-                    <div>
+                    <div {% if is_formset_row %}class="flex flex-row space-x-3"{% endif %}>
                         {% include 'components/form/formset-fields.html' %}
                     </div>
                     
@@ -30,7 +30,7 @@
     {% if can_add_form is None %}
     <div id="empty-form" class="hidden">
         <div class="mb-3 flex flex-row justify-between space-x-3 max-w-xl border-b">
-            <div>
+            <div {% if is_formset_row %}class="flex flex-row space-x-3"{% endif %}>
                 {% include 'components/form/formset-fields.html' with form=formset.empty_form %}
             </div>
 

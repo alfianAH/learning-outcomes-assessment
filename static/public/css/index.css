@@ -3707,16 +3707,16 @@ details.dropdown::marker {
   max-height: 18rem;
 }
 
+.max-h-60 {
+  max-height: 15rem;
+}
+
 .max-h-40 {
   max-height: 10rem;
 }
 
 .max-h-64 {
   max-height: 16rem;
-}
-
-.max-h-60 {
-  max-height: 15rem;
 }
 
 .max-h-80 {
@@ -3819,6 +3819,14 @@ details.dropdown::marker {
 
 .w-\[85\%\] {
   width: 85%;
+}
+
+.min-w-36 {
+  min-width: 9rem;
+}
+
+.min-w-72 {
+  min-width: 18rem;
 }
 
 .min-w-20 {
@@ -4119,6 +4127,11 @@ details.dropdown::marker {
 .border-slate-300 {
   --tw-border-opacity: 1;
   border-color: rgb(203 213 225 / var(--tw-border-opacity));
+}
+
+.border-slate-100 {
+  --tw-border-opacity: 1;
+  border-color: rgb(241 245 249 / var(--tw-border-opacity));
 }
 
 .border-b-slate-800 {
