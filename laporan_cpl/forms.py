@@ -81,8 +81,9 @@ class TahunAjaranSemesterFormsetClass(CanDeleteBaseFormSet):
             form.fields['tahun_ajaran'].choices += self.tahun_ajaran_choices
 
             # Get tahun ajaran
-            tahun_ajaran_id = data.get('{}-tahun_ajaran'.format(form.prefix))
-            if tahun_ajaran_id is None: continue
+            tahun_ajaran_id: str = data.get('{}-tahun_ajaran'.format(form.prefix), '')
+            # If tahun_ajaran id is empty, skip
+            if not tahun_ajaran_id.strip(): continue
             
             # Get semester
             semester_prodi_qs = SemesterProdi.objects.filter(

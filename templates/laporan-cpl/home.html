@@ -26,6 +26,16 @@ Laporan CPL -
         <button type="reset" class="btn btn-secondary">Reset</button>
     </div>
 </form>
+
+{% if perolehan_nilai_ilo_graph %}
+<h2>Hasil</h2>
+
+{% comment %} Perolahan Nilai ILO Spider chart {% endcomment %}
+<div class="w-full mx-auto my-0">
+    <canvas id="perolehan-nilai-ilo" class="w-full max-h-60 sm:max-h-64 lg:max-h-72 xl:max-h-80"></canvas>
+</div>
+{% endif %}
+
 {% endblock content %}
 
 {% block script %}
@@ -86,5 +96,28 @@ Laporan CPL -
             }
         });
     }).trigger('change');
+
+    {% comment %} Perolehan Nilai ILO {% endcomment %}
+    {% if perolehan_nilai_ilo_graph %}
+    let perolehanNilaiIloData = {{ perolehan_nilai_ilo_graph|safe }};
+    let perolehanNilaiIloGraphConfig = {
+        type: perolehanNilaiIloData.chart_type,
+        data: perolehanNilaiIloData,
+        options: {
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    suggestedMax: 100,
+                }
+            }
+        }
+    };
+
+    createChart('perolehan-nilai-ilo', perolehanNilaiIloGraphConfig);
+
+    // Update chart to dark mode
+    let isDarkMode = $('body').hasClass('dark');
+    chartDarkMode(isDarkMode);
+    {% endif %}
 </script>
 {% endblock script %}
