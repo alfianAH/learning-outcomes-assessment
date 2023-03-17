@@ -3761,12 +3761,12 @@ details.dropdown::marker {
   width: 12rem;
 }
 
-.w-32 {
-  width: 8rem;
-}
-
 .w-40 {
   width: 10rem;
+}
+
+.w-32 {
+  width: 8rem;
 }
 
 .w-2 {
@@ -3819,6 +3819,10 @@ details.dropdown::marker {
 
 .w-\[85\%\] {
   width: 85%;
+}
+
+.w-56 {
+  width: 14rem;
 }
 
 .min-w-36 {
@@ -4127,11 +4131,6 @@ details.dropdown::marker {
 .border-slate-300 {
   --tw-border-opacity: 1;
   border-color: rgb(203 213 225 / var(--tw-border-opacity));
-}
-
-.border-slate-100 {
-  --tw-border-opacity: 1;
-  border-color: rgb(241 245 249 / var(--tw-border-opacity));
 }
 
 .border-b-slate-800 {
@@ -5131,12 +5130,12 @@ details.dropdown::marker {
     height: 1.75rem;
   }
 
-  .lg\:max-h-52 {
-    max-height: 13rem;
-  }
-
   .lg\:max-h-72 {
     max-height: 18rem;
+  }
+
+  .lg\:max-h-52 {
+    max-height: 13rem;
   }
 
   .lg\:w-\[480px\] {
@@ -5293,12 +5292,12 @@ details.dropdown::marker {
     height: 1.5rem;
   }
 
-  .xl\:max-h-64 {
-    max-height: 16rem;
-  }
-
   .xl\:max-h-80 {
     max-height: 20rem;
+  }
+
+  .xl\:max-h-64 {
+    max-height: 16rem;
   }
 
   .xl\:w-6 {

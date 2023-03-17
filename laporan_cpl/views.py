@@ -173,14 +173,21 @@ class LaporanCapaianPembelajaranView(FormView):
         # If is multiple result, use line chart, else, use radar chart
         is_multiple_result = len(filter_dict.keys()) > 1
 
-        is_success, message, result = process_filter_laporan_cpl(list_ilo, max_sks_prodi, is_semester_included, filter_dict)
+        result = process_filter_laporan_cpl(list_ilo, max_sks_prodi, is_semester_included, filter_dict)
+        prodi_result = result['prodi']
+        mahasiswa_result = result['mahasiswa']
 
-        perolehan_nilai_ilo_graph = self.perolehan_nilai_ilo_graph(list_ilo, is_multiple_result, result)
+        perolehan_nilai_ilo_graph = self.perolehan_nilai_ilo_graph(list_ilo, is_multiple_result, prodi_result['result'])
 
-        if is_success:
-            messages.success(self.request, message)
+        if prodi_result['is_success']:
+            messages.success(self.request, prodi_result['message'])
         else:
-            messages.error(self.request, message)
+            messages.error(self.request, prodi_result['message'])
+
+        if mahasiswa_result['is_success']:
+            messages.success(self.request, mahasiswa_result['message'])
+        else:
+            messages.error(self.request, mahasiswa_result['message'])
 
         return self.render_to_response(
             self.get_context_data(
