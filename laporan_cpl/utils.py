@@ -1,5 +1,6 @@
 import numpy as np
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db.models import QuerySet
 from kurikulum.models import Kurikulum
 from semester.models import(
@@ -8,11 +9,17 @@ from semester.models import(
 )
 from ilo.models import Ilo
 from pi_area.models import PerformanceIndicator
-from clo.models import Clo, NilaiCloMataKuliahSemester
+from clo.models import (
+    Clo, NilaiCloMataKuliahSemester,
+    NilaiCloPeserta,
+)
 from mata_kuliah_semester.models import (
     MataKuliahSemester,
     PesertaMataKuliah,
 )
+
+
+User = get_user_model()
 
 
 def calculate_ilo_prodi(list_ilo: QuerySet[Ilo], 
@@ -145,10 +152,139 @@ def calculate_ilo_prodi(list_ilo: QuerySet[Ilo],
 def calculate_ilo_mahasiswa(list_ilo: QuerySet[Ilo], 
                             list_peserta_mk: QuerySet[PesertaMataKuliah], 
                             max_sks_prodi: int, nilai_max: int):
-    is_success = True
-    message = 'test'
-    result = {}
-    calculated_mk_semester = []
+    is_success = False
+    message = ''
+    result: list[dict] = []
+    calculated_peserta = []
+
+    list_mahasiswa = User.objects.filter(
+        pesertamatakuliah__in=list_peserta_mk
+    ).distinct()
+
+    for mahasiswa in list_mahasiswa:
+        # Get mahasiswa's mata kuliah participation
+        list_mahasiswa_as_peserta_mk = list_peserta_mk.filter(
+            mahasiswa=mahasiswa
+        )
+
+        result_mahasiswa = {
+            'nim': mahasiswa.username,
+            'nama': mahasiswa.nama,
+            'result': []
+        }
+
+        # Loop through ILO
+        for ilo in list_ilo:
+            list_peserta_mk_ilo = list_mahasiswa_as_peserta_mk.filter(
+                kelas_mk_semester__mk_semester__clo__piclo__performance_indicator__pi_area__ilo=ilo
+            ).distinct()
+
+            list_bobot_mk = []
+            list_persentase_clo = []
+            list_bobot_pi_ilo = []
+            list_nilai_clo_peserta = []
+
+            # Loop through MK Semester (peserta)
+            for peserta_mk in list_peserta_mk_ilo:
+                mk_semester = peserta_mk.kelas_mk_semester.mk_semester
+
+                # Check status nilai
+                if not peserta_mk.status_nilai:
+                    message = 'Harap melengkapi nilai dari {} di mata kuliah ({}, {}) terlebih dahulu'.format(
+                        mahasiswa.nama, 
+                        mk_semester.mk_kurikulum.nama,
+                        mk_semester.semester)
+                    return (is_success, message, result)
+
+                if peserta_mk not in calculated_peserta:
+                    calculated_peserta.append(peserta_mk)
+
+                list_clo_ilo = Clo.objects.filter(
+                    mk_semester=mk_semester,
+                    piclo__performance_indicator__pi_area__ilo=ilo,
+                ).distinct()
+
+                # Get bobot MK
+                list_bobot_mk += [mk_semester.mk_kurikulum.sks / max_sks_prodi for _ in range(list_clo_ilo.count())]
+
+                # Get list persentase CLO
+                list_persentase_clo += [
+                    clo.get_total_persentase_komponen()/100 for clo in list_clo_ilo
+                ]
+
+                # Get list bobot PI
+                list_pi_ilo = PerformanceIndicator.objects.filter(
+                    pi_area__ilo=ilo
+                )
+                list_bobot_pi_ilo += [
+                    clo.get_pi_clo().count() / list_pi_ilo.count() for clo in list_clo_ilo
+                ]
+
+                # Get nilai CLO peserta
+                nilai_clo_peserta_qs = NilaiCloPeserta.objects.filter(
+                    peserta=peserta_mk,
+                    clo__in=list_clo_ilo
+                ).values_list('nilai')
+
+                if nilai_clo_peserta_qs.exists():
+                    list_nilai_clo_peserta += [nilai_clo[0] for nilai_clo in nilai_clo_peserta_qs]
+                else:
+                    message = 'Peserta: {} di Mata Kuliah: {}, {}, belum mempunyai Nilai CLO.'.format(mahasiswa.nama, mk_semester.mk_kurikulum.nama, mk_semester.semester.semester)
+                    return (is_success, message, result)
+
+            list_bobot_mk = np.array(list_bobot_mk)
+            list_persentase_clo = np.array(list_persentase_clo)
+            list_bobot_pi_ilo = np.array(list_bobot_pi_ilo)
+            list_nilai_clo_peserta = np.array(list_nilai_clo_peserta)
+
+             # Use try to prevent miss shape
+            try:
+                konversi_clo_to_ilo = (list_bobot_mk * list_persentase_clo * list_bobot_pi_ilo) * nilai_max
+            except ValueError:
+                message = 'Shape array tidak sama. Bobot MK: {} Persentase CLO: {}, Bobot PI ILO: {}.'.format(
+                    list_bobot_mk.shape, list_persentase_clo.shape, list_bobot_pi_ilo.shape)
+                if settings.DEBUG: print(message)
+                continue
+            
+            # If mahasiswa doesn't have the ILO, just skip it
+            if konversi_clo_to_ilo.shape[0] != 0:
+                persentase_konversi = konversi_clo_to_ilo / np.sum(konversi_clo_to_ilo)
+            else:
+                result_mahasiswa['result'].append({
+                    'nama': ilo.nama,
+                    'nilai': None,
+                    'satisfactory_level': ilo.satisfactory_level,
+                })
+                continue
+
+            # Use try to prevent miss shape
+            try:
+                persentase_capaian_ilo = persentase_konversi * list_nilai_clo_peserta
+            except ValueError:
+                message = 'Shape array tidak sama. Persentase Konversi: {}, Nilai CLO Peserta: {}.'.format(
+                    persentase_konversi.shape, list_nilai_clo_peserta.shape)
+                if settings.DEBUG: print(message)
+                continue
+
+            persentase_capaian_ilo = np.sum(persentase_capaian_ilo)
+
+            result_mahasiswa['result'].append({
+                'nama': ilo.nama,
+                'nilai': persentase_capaian_ilo,
+                'satisfactory_level': ilo.satisfactory_level,
+            })
+
+        if len(result_mahasiswa['result']) != list_ilo.count():
+            message = 'Banyak List ILO dan hasil tidak sesuai. List ILO: {}, Hasil: {}.'.format(list_ilo.count(), len(result.keys()))
+        
+        result.append(result_mahasiswa)
+    
+    expected_len_peserta_mk = list_peserta_mk.count()
+    # If calculated peserta is not the same as in query, return
+    if len(calculated_peserta) != expected_len_peserta_mk:
+        remaining_len_peserta = expected_len_peserta_mk - len(calculated_peserta)
+
+        message = 'Terdapat {} peserta mata kuliah yang belum dihitung. Ekspektasi: {}'.format(remaining_len_peserta, expected_len_peserta_mk)
 
     return (is_success, message, result)
 
@@ -280,7 +416,7 @@ def process_filter_laporan_cpl(list_ilo: QuerySet[Ilo], max_sks_prodi: int,
             list_peserta_mk = PesertaMataKuliah.objects.filter(
                 kelas_mk_semester__mk_semester__semester__tahun_ajaran_prodi=tahun_ajaran_prodi_obj
             )
-            
+
             # Calculate ILO Prodi
             is_success, message, prodi_calculation_result = calculate_ilo_prodi(list_ilo, list_mk_semester, max_sks_prodi, nilai_max)
             

@@ -179,6 +179,8 @@ class LaporanCapaianPembelajaranView(FormView):
 
         perolehan_nilai_ilo_graph = self.perolehan_nilai_ilo_graph(list_ilo, is_multiple_result, prodi_result['result'])
 
+        print(json.dumps(mahasiswa_result['result']))
+
         if prodi_result['is_success']:
             messages.success(self.request, prodi_result['message'])
         else:
