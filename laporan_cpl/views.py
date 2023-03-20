@@ -1,4 +1,5 @@
 import json
+from django.conf import settings
 from django.db.models import QuerySet
 from django.contrib import messages
 from django.forms import BaseFormSet
@@ -17,7 +18,8 @@ from .forms import (
 )
 from .utils import (
     get_ilo_and_sks_from_kurikulum,
-    process_filter_laporan_cpl
+    process_ilo_prodi,
+    process_ilo_mahasiswa,
 )
 
 
@@ -139,6 +141,12 @@ class LaporanCapaianPembelajaranView(FormView):
             })
 
         return json.dumps(json_response)
+    
+    def show_result_messages(self, is_success: bool, message: str):
+        if is_success:
+            messages.success(self.request, message)
+        else:
+            messages.error(self.request, message)
 
     def form_valid(self, form, formset) -> HttpResponse:
         kurikulum_obj = form.cleaned_data.get('kurikulum')
@@ -170,31 +178,63 @@ class LaporanCapaianPembelajaranView(FormView):
                 semester_prodi_id = clean_data['semester']
                 filter_dict[tahun_ajaran_prodi_id].append(semester_prodi_id)
         
+        filter = []
+        if is_semester_included:
+            # Semester filters
+            for tahun_ajaran_prodi_id, list_semester_prodi_id in filter_dict.items():
+                for semester_prodi_id in list_semester_prodi_id:
+                    try:
+                        semester_prodi_obj = SemesterProdi.objects.get(
+                            id_neosia=semester_prodi_id
+                        )
+                    except SemesterProdi.DoesNotExist:
+                        message = 'Semester Prodi (ID={}) tidak ada di database.'.format(semester_prodi_id)
+                        if settings.DEBUG: print(message)
+                        continue
+                    except SemesterProdi.MultipleObjectsReturned:
+                        message = 'Semester Prodi (ID={}) mengembalikan multiple object.'.format(semester_prodi_id)
+                        if settings.DEBUG: print(message)
+                        continue
+                    
+                    filter.append(str(semester_prodi_obj.semester))
+        else:
+            # Tahun ajaran filters
+            for tahun_ajaran_prodi_id in filter_dict.keys():
+                try:
+                    tahun_ajaran_prodi_obj = TahunAjaranProdi.objects.get(
+                        id=tahun_ajaran_prodi_id
+                    )
+                except TahunAjaranProdi.DoesNotExist:
+                    message = 'TahunAjaranProdi (ID={}) tidak ada di database.'.format(tahun_ajaran_prodi_id)
+                    if settings.DEBUG: print(message)
+                    continue
+                except TahunAjaranProdi.MultipleObjectsReturned:
+                    message = 'TahunAjaranProdi (ID={}) mengembalikan multiple object.'.format(tahun_ajaran_prodi_id)
+                    if settings.DEBUG: print(message)
+                    continue
+                
+                filter.append(str(tahun_ajaran_prodi_obj.tahun_ajaran))
+
         # If is multiple result, use line chart, else, use radar chart
         is_multiple_result = len(filter_dict.keys()) > 1
 
-        result = process_filter_laporan_cpl(list_ilo, max_sks_prodi, is_semester_included, filter_dict)
-        prodi_result = result['prodi']
-        mahasiswa_result = result['mahasiswa']
+        # Process
+        prodi_is_success, prodi_message, prodi_result = process_ilo_prodi(list_ilo, max_sks_prodi, is_semester_included, filter_dict)
+        mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa(list_ilo, max_sks_prodi, is_semester_included, filter_dict)
 
-        perolehan_nilai_ilo_graph = self.perolehan_nilai_ilo_graph(list_ilo, is_multiple_result, prodi_result['result'])
+        perolehan_nilai_ilo_graph = self.perolehan_nilai_ilo_graph(list_ilo, is_multiple_result, prodi_result)
 
-        print(json.dumps(mahasiswa_result['result']))
-
-        if prodi_result['is_success']:
-            messages.success(self.request, prodi_result['message'])
-        else:
-            messages.error(self.request, prodi_result['message'])
-
-        if mahasiswa_result['is_success']:
-            messages.success(self.request, mahasiswa_result['message'])
-        else:
-            messages.error(self.request, mahasiswa_result['message'])
+        # Success and Error messages
+        self.show_result_messages(prodi_is_success, prodi_message)
+        self.show_result_messages(mahasiswa_is_success, mahasiswa_message)
 
         return self.render_to_response(
             self.get_context_data(
                 form=form, formset=formset,
                 perolehan_nilai_ilo_graph=perolehan_nilai_ilo_graph,
+                object_list=mahasiswa_result,
+                list_ilo=list_ilo,
+                list_filter=filter,
             )
         )
     
