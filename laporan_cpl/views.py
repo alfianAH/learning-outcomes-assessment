@@ -190,13 +190,15 @@ class LaporanCapaianPembelajaranView(FormView):
                     except SemesterProdi.DoesNotExist:
                         message = 'Semester Prodi (ID={}) tidak ada di database.'.format(semester_prodi_id)
                         if settings.DEBUG: print(message)
+                        messages.error(self.request, message)
                         continue
                     except SemesterProdi.MultipleObjectsReturned:
                         message = 'Semester Prodi (ID={}) mengembalikan multiple object.'.format(semester_prodi_id)
                         if settings.DEBUG: print(message)
+                        messages.error(self.request, message)
                         continue
                     
-                    filter.append(str(semester_prodi_obj.semester))
+                    filter.append((semester_prodi_obj, str(semester_prodi_obj.semester)))
         else:
             # Tahun ajaran filters
             for tahun_ajaran_prodi_id in filter_dict.keys():
@@ -213,14 +215,14 @@ class LaporanCapaianPembelajaranView(FormView):
                     if settings.DEBUG: print(message)
                     continue
                 
-                filter.append(str(tahun_ajaran_prodi_obj.tahun_ajaran))
+                filter.append((tahun_ajaran_prodi_obj, str(tahun_ajaran_prodi_obj.tahun_ajaran)))
 
         # If is multiple result, use line chart, else, use radar chart
-        is_multiple_result = len(filter_dict.keys()) > 1
+        is_multiple_result = len(filter) > 1
 
         # Process
-        prodi_is_success, prodi_message, prodi_result = process_ilo_prodi(list_ilo, max_sks_prodi, is_semester_included, filter_dict)
-        mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa(list_ilo, max_sks_prodi, is_semester_included, filter_dict)
+        prodi_is_success, prodi_message, prodi_result = process_ilo_prodi(list_ilo, max_sks_prodi, is_semester_included, filter)
+        mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa(list_ilo, max_sks_prodi, is_semester_included, filter)
 
         perolehan_nilai_ilo_graph = self.perolehan_nilai_ilo_graph(list_ilo, is_multiple_result, prodi_result)
 
