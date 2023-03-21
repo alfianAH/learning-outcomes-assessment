@@ -78,7 +78,6 @@ class TahunAjaranSemesterFormsetClass(CanDeleteBaseFormSet):
         
         self.tahun_ajaran_choices = [(tahun_ajaran_prodi.pk, str(tahun_ajaran_prodi.tahun_ajaran)) for tahun_ajaran_prodi in tahun_ajaran_prodi_qs]
         
-        print(len(self.forms))
         # Add choices to form
         for form in self.forms:
             form.fields['tahun_ajaran'].choices += self.tahun_ajaran_choices

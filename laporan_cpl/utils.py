@@ -3,10 +3,6 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import QuerySet
 from kurikulum.models import Kurikulum
-from semester.models import(
-    TahunAjaranProdi, 
-    SemesterProdi
-)
 from ilo.models import Ilo
 from pi_area.models import PerformanceIndicator
 from clo.models import (

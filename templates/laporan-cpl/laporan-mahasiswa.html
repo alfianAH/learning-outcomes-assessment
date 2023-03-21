@@ -1,11 +1,12 @@
 {% extends 'home-view.html' %}
 
 {% block title %}
-Laporan CPL - 
+{{ user.username }} - Laporan CPL -
 {% endblock title %}
 
 {% block breadcrumb %}
-<li class="breadcrumb-item active" aria-current="page" role="listitem">Laporan CPL</li>
+<li class="breadcrumb-item"><a href="{% url 'laporan_cpl:home' %}" role="listitem">Laporan CPL</a></li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">Mahasiswa</li>
 {% endblock breadcrumb %}
 
 {% block content %}
@@ -25,41 +26,6 @@ Laporan CPL -
         <a href="." class="btn btn-secondary">Reset</a>
     </div>
 </form>
-
-{% if perolehan_nilai_ilo_graph %}
-<h2>Hasil</h2>
-
-<ul class="tab" role="tablist">
-    <li class="tab-item w-40 disabled" id="tab-1" data-target="#tab-grafik-pane" role="presentation">
-        <div class="tab-title">
-            <span class="truncate">Grafik</span>
-        </div>
-
-        <div class="tab-item-line"></div>
-    </li>
-
-    <li class="tab-item w-56" id="tab-1" data-target="#tab-nilai-pane" role="presentation">
-        <div class="tab-title">
-            <span class="truncate">Nilai mahasiswa</span>
-        </div>
-
-        <div class="tab-item-line"></div>
-    </li>
-</ul>
-
-<div class="tab-content">
-    <div class="tab-pane fade min-h-screen" id="tab-grafik-pane" role="tabpanel" aria-labelledby="tab-1">
-        {% comment %} Perolahan Nilai ILO Spider chart {% endcomment %}
-        <div class="w-full mx-auto my-0">
-            <canvas id="perolehan-nilai-ilo" class="w-full max-h-60 sm:max-h-64 lg:max-h-72 xl:max-h-80"></canvas>
-        </div>
-    </div>
-    <div class="tab-pane fade min-h-screen show active" id="tab-nilai-pane" role="tabpanel" aria-labelledby="tab-1">
-        {% include 'components/list-table-view/model-e/table-view-model-e.html' %}
-    </div>
-</div>
-{% endif %}
-
 {% endblock content %}
 
 {% block script %}

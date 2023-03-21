@@ -1,5 +1,7 @@
 import json
 from django.conf import settings
+from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
 from django.db.models import QuerySet
 from django.contrib import messages
 from django.forms import BaseFormSet
@@ -21,6 +23,9 @@ from .utils import (
     process_ilo_prodi,
     process_ilo_mahasiswa,
 )
+
+
+User = get_user_model()
 
 
 # Create your views here.
@@ -58,11 +63,8 @@ class GetSemesterJsonResponse(TemplateView):
         return JsonResponse({'choices': semester_choices})
 
 
-class LaporanCapaianPembelajaranView(FormView):
-    template_name = 'laporan-cpl/home.html'
-    form_class = KurikulumChoiceForm
-    formset_class = TahunAjaranSemesterFormset
-    success_url = reverse_lazy('laporan_cpl:home')
+class LaporanCapaianPembelajaranTemplateView(FormView):
+    formset_class = None
 
     def get_formset_class(self):
         return self.formset_class
@@ -80,7 +82,7 @@ class LaporanCapaianPembelajaranView(FormView):
             formset_class = self.get_formset_class()
         
         return formset_class(**self.get_formset_kwargs())
-
+    
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs.update({
@@ -106,6 +108,19 @@ class LaporanCapaianPembelajaranView(FormView):
             context['formset'] = self.get_formset()
         
         return context
+    
+    def form_invalid(self, form, formset) -> HttpResponse:
+        return self.render_to_response(
+            self.get_context_data(
+                form=form, formset=formset
+            )
+        )
+    
+    def show_result_messages(self, is_success: bool, message: str):
+        if is_success:
+            messages.success(self.request, message)
+        else:
+            messages.error(self.request, message)
     
     def perolehan_nilai_ilo_graph(self, list_ilo: QuerySet[Ilo], is_multiple_result: bool, calculation_result: dict):
         json_response = {
@@ -141,12 +156,13 @@ class LaporanCapaianPembelajaranView(FormView):
             })
 
         return json.dumps(json_response)
-    
-    def show_result_messages(self, is_success: bool, message: str):
-        if is_success:
-            messages.success(self.request, message)
-        else:
-            messages.error(self.request, message)
+
+
+class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
+    template_name = 'laporan-cpl/home.html'
+    form_class = KurikulumChoiceForm
+    formset_class = TahunAjaranSemesterFormset
+    success_url = reverse_lazy('laporan_cpl:home')
 
     def form_valid(self, form, formset) -> HttpResponse:
         kurikulum_obj = form.cleaned_data.get('kurikulum')
@@ -243,10 +259,23 @@ class LaporanCapaianPembelajaranView(FormView):
                 list_filter=filter,
             )
         )
-    
-    def form_invalid(self, form, formset) -> HttpResponse:
-        return self.render_to_response(
-            self.get_context_data(
-                form=form, formset=formset
-            )
-        )
+
+
+class LaporanCapaianPembelajaranMahasiswaView(LaporanCapaianPembelajaranTemplateView):
+    template_name = 'laporan-cpl/laporan-mahasiswa.html'
+    form_class = KurikulumChoiceForm
+    formset_class = TahunAjaranSemesterFormset
+
+    user: User = None
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        username = kwargs.get('username')
+        self.user = get_object_or_404(User, username=username)
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'user': self.user,
+        })
+        return context
