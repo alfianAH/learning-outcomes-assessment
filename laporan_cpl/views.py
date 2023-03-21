@@ -168,7 +168,7 @@ class LaporanCapaianPembelajaranView(FormView):
         is_semester_included = len(formset_cleaned_data[0].get('semester', '').strip()) != 0
 
         # Separate tahun ajaran and semester
-        for clean_data in formset.cleaned_data:
+        for clean_data in formset_cleaned_data:
             tahun_ajaran_prodi_id = clean_data['tahun_ajaran']
 
             if tahun_ajaran_prodi_id not in filter_dict.keys():
@@ -183,6 +183,8 @@ class LaporanCapaianPembelajaranView(FormView):
             # Semester filters
             for tahun_ajaran_prodi_id, list_semester_prodi_id in filter_dict.items():
                 for semester_prodi_id in list_semester_prodi_id:
+                    if not semester_prodi_id.strip(): continue
+
                     try:
                         semester_prodi_obj = SemesterProdi.objects.get(
                             id_neosia=semester_prodi_id
@@ -202,6 +204,8 @@ class LaporanCapaianPembelajaranView(FormView):
         else:
             # Tahun ajaran filters
             for tahun_ajaran_prodi_id in filter_dict.keys():
+                if not tahun_ajaran_prodi_id.strip(): continue
+
                 try:
                     tahun_ajaran_prodi_obj = TahunAjaranProdi.objects.get(
                         id=tahun_ajaran_prodi_id

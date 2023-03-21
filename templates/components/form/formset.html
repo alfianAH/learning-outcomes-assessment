@@ -23,7 +23,9 @@
                 {% endif %}
             </div>
         {% endfor %}
+    </div>
 
+    <div class="mb-3">
         {% include 'components/form/form-errors.html' with errors=formset.non_form_errors %}
     </div>
     

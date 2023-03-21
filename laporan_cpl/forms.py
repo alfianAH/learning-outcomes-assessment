@@ -1,8 +1,9 @@
+from django.utils.functional import cached_property
 from django import forms
 from django.forms import (
     formset_factory,
-    BaseFormSet
 )
+from django.core.exceptions import ValidationError
 from learning_outcomes_assessment.forms.formset import CanDeleteBaseFormSet
 from learning_outcomes_assessment.widgets import MySelectInput
 from kurikulum.models import Kurikulum
@@ -62,6 +63,7 @@ class TahunAjaranSemesterChoiceForm(forms.Form):
 class TahunAjaranSemesterFormsetClass(CanDeleteBaseFormSet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.forms_to_delete = []
         
         data = kwargs.get('data')
         if data is None: return
@@ -76,6 +78,7 @@ class TahunAjaranSemesterFormsetClass(CanDeleteBaseFormSet):
         
         self.tahun_ajaran_choices = [(tahun_ajaran_prodi.pk, str(tahun_ajaran_prodi.tahun_ajaran)) for tahun_ajaran_prodi in tahun_ajaran_prodi_qs]
         
+        print(len(self.forms))
         # Add choices to form
         for form in self.forms:
             form.fields['tahun_ajaran'].choices += self.tahun_ajaran_choices
@@ -106,6 +109,22 @@ class TahunAjaranSemesterFormsetClass(CanDeleteBaseFormSet):
         empty_form.fields['semester'].choices += self.semester_choices
 
         return empty_form
+    
+    def non_form_errors(self):
+        errors = super().non_form_errors()
+        
+        if self.is_bound:
+            # Get valid forms that is not deleted
+            forms_valid = [
+                form for form in self.forms
+                if not (self.can_delete and self._should_delete_form(form))
+            ]
+
+            # Minimum valid form is 1
+            if len(forms_valid) < 1:
+                errors.append('Minimal 1 filter yang diterapkan')
+        
+        return errors
 
     def clean(self):
         super().clean()
@@ -114,7 +133,7 @@ class TahunAjaranSemesterFormsetClass(CanDeleteBaseFormSet):
         forms_to_delete = []
         for i, form in enumerate(self.forms):
             # If form is deleted, skip
-            if self._should_delete_form(form): 
+            if self._should_delete_form(form):
                 forms_to_delete.append(form)
                 continue
             
@@ -146,6 +165,5 @@ TahunAjaranSemesterFormset = formset_factory(
     formset=TahunAjaranSemesterFormsetClass,
     extra=0,
     can_delete=True,
-    validate_max=False,
     min_num=1,
 )
