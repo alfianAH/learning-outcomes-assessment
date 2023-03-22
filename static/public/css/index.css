@@ -3077,7 +3077,7 @@ details.dropdown::marker {
 
 .table-css > :not(caption) > * > * {
   border-bottom-width: 1px;
-  border-left-width: 1px;
+  border-right-width: 1px;
   --tw-border-opacity: 1;
   border-color: rgb(148 163 184 / var(--tw-border-opacity));
   background-clip: padding-box;
@@ -3090,12 +3090,12 @@ details.dropdown::marker {
   line-height: 1.25rem;
 }
 
-.table-css > :not(caption) > * > *:first-child {
-  border-left-color: transparent;
+.table-css > :not(caption) > * > *:last-child {
+  border-right-color: transparent;
 }
 
-.dark .table-css > :not(caption) > * > *:first-child {
-  border-left-color: transparent;
+.dark .table-css > :not(caption) > * > *:last-child {
+  border-right-color: transparent;
 }
 
 @media (min-width: 768px) {
@@ -3513,10 +3513,6 @@ details.dropdown::marker {
   position: relative;
 }
 
-.sticky {
-  position: sticky;
-}
-
 .top-28 {
   top: 7rem;
 }
@@ -3543,14 +3539,6 @@ details.dropdown::marker {
 
 .top-1\/2 {
   top: 50%;
-}
-
-.top-0 {
-  top: 0px;
-}
-
-.top-12 {
-  top: 3rem;
 }
 
 .z-40 {
@@ -4907,12 +4895,12 @@ details.dropdown::marker {
     min-width: 11rem;
   }
 
-  .sm\:min-w-32 {
-    min-width: 8rem;
-  }
-
   .sm\:min-w-40 {
     min-width: 10rem;
+  }
+
+  .sm\:min-w-32 {
+    min-width: 8rem;
   }
 
   .sm\:grid-cols-2 {
@@ -4991,10 +4979,6 @@ details.dropdown::marker {
 }
 
 @media (min-width: 768px) {
-  .md\:top-14 {
-    top: 3.5rem;
-  }
-
   .md\:mt-2\.5 {
     margin-top: 0.625rem;
   }
@@ -5192,10 +5176,6 @@ details.dropdown::marker {
 }
 
 @media (min-width: 1024px) {
-  .lg\:top-16 {
-    top: 4rem;
-  }
-
   .lg\:ml-80 {
     margin-left: 20rem;
   }
@@ -5418,6 +5398,10 @@ details.dropdown::marker {
     width: 20rem;
   }
 
+  .xl\:min-w-44 {
+    min-width: 11rem;
+  }
+
   .xl\:min-w-48 {
     min-width: 12rem;
   }
@@ -5432,10 +5416,6 @@ details.dropdown::marker {
 
   .xl\:min-w-\[15rem\] {
     min-width: 15rem;
-  }
-
-  .xl\:min-w-44 {
-    min-width: 11rem;
   }
 
   .xl\:max-w-\[16rem\] {

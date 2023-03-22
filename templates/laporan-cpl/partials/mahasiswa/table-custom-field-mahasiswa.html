@@ -1,0 +1,11 @@
+{% with option.kelas_mk_semester.mk_semester.mk_kurikulum as mk_kurikulum  %}
+<td class="text-left truncate">
+    {{ mk_kurikulum.kode }}
+</td>
+<td class="text-left truncate field-nama max-w-sm lg:max-w-xs" title="{{ mk_kurikulum.nama }}">
+    {{ mk_kurikulum.nama }}
+</td>
+<td class="text-right">{{ mk_kurikulum.sks }}</td>
+{% endwith %}
+<td class="text-right">{{ option.nilai_akhir }}</td>
+<td class="text-right">{{ option.nilai_huruf }}</td>

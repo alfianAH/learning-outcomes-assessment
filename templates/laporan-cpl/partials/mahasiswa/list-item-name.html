@@ -1,0 +1,5 @@
+{% with option.kelas_mk_semester.mk_semester.mk_kurikulum as mk_kurikulum %}
+<span class="list-item-title" title="{{ mk_kurikulum.nama }}">
+    {% if number %}{{ number }}. {% endif %}{{ mk_kurikulum.nama }}
+</span>
+{% endwith %}

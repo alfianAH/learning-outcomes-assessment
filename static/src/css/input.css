@@ -704,7 +704,7 @@
     }
 
     .table-css > :not(caption) > * > *{
-        @apply border-b border-l border-slate-400 first:border-l-transparent  dark:first:border-l-transparent px-1 py-2 md:px-2.5 md:py-2.5 xl:px-3 xl:py-3 text-sm md:text-base xl:text-lg align-top bg-clip-padding;
+        @apply border-b border-r border-slate-400 last:border-r-transparent dark:last:border-r-transparent px-1 py-2 md:px-2.5 md:py-2.5 xl:px-3 xl:py-3 text-sm md:text-base xl:text-lg align-top bg-clip-padding;
     }
 
     .table-css > :not(caption) > * > *.checkbox{

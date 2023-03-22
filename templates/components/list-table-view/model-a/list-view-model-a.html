@@ -62,6 +62,9 @@
     {% if id %}id="{{ id }}"{% endif %}
     role="list">
     <thead>
+        {% if is_custom_header %}
+            {% include table_custom_field_header_template %}
+        {% else %}
         <tr>
             {% if user_role != 'm' %}
             {% comment %} Checkbox {% endcomment %}
@@ -88,6 +91,7 @@
                 {% endif %}
             {% endif %}
         </tr>
+        {% endif %}
     </thead>
 
     <tbody>
@@ -117,7 +121,7 @@
         {% else %}
             {% for option in options %}
                 <tr class="{% if open_button and option.read_detail_url %} group {% endif %}">
-                    {% if user_role != 'm' %}
+                    {% if user_role != 'm' and not not_use_checkbox %}
                     {% comment %} Checkbox {% endcomment %}
                     <th class="text-center checkbox">
                         <input type="checkbox" name="{{ input_name }}" {% if option.id_neosia %}value="{{ option.id_neosia }}" id="{{ prefix_id }}{{ option.id_neosia }}" {% else %}value="{{ option.id }}" id="{{ prefix_id }}{{ option.id }}" {% endif %}>

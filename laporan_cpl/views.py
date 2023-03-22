@@ -66,10 +66,6 @@ class GetSemesterJsonResponse(TemplateView):
 
 class LaporanCapaianPembelajaranTemplateView(FormView):
     formset_class = None
-    table_scroll_head_header: str = ''
-    table_scroll_head_body: str = ''
-    table_scroll_data_header: str = ''
-    table_scroll_data_body: str = ''
 
     def get_formset_class(self):
         return self.formset_class
@@ -108,10 +104,6 @@ class LaporanCapaianPembelajaranTemplateView(FormView):
         context = super().get_context_data(**kwargs)
         context.update({
             'is_formset_row': True,
-            'table_scroll_head_header': self.table_scroll_head_header,
-            'table_scroll_head_body': self.table_scroll_head_body,
-            'table_scroll_data_header': self.table_scroll_data_header,
-            'table_scroll_data_body': self.table_scroll_data_body,
         })
         if 'formset' not in kwargs:
             context['formset'] = self.get_formset()
@@ -185,6 +177,17 @@ class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
             })
 
         return json.dumps(json_response)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'table_scroll_head_header': self.table_scroll_head_header,
+            'table_scroll_head_body': self.table_scroll_head_body,
+            'table_scroll_data_header': self.table_scroll_data_header,
+            'table_scroll_data_body': self.table_scroll_data_body,
+        })
+        
+        return context
 
     def form_valid(self, form, formset) -> HttpResponse:
         kurikulum_obj = form.cleaned_data.get('kurikulum')
@@ -300,14 +303,14 @@ class LaporanCapaianPembelajaranMahasiswaView(LaporanCapaianPembelajaranTemplate
 
     user: User = None
     
-    table_scroll_head_header: str = 'laporan-cpl/partials/mahasiswa/table-scroll-head-header-mahasiswa.html'
-    table_scroll_head_body: str = 'laporan-cpl/partials/mahasiswa/table-scroll-head-body-mahasiswa.html'
-    table_scroll_data_header: str = 'laporan-cpl/partials/mahasiswa/table-scroll-data-header-mahasiswa.html'
-    table_scroll_data_body: str = 'laporan-cpl/partials/mahasiswa/table-scroll-data-body-mahasiswa.html'
+    list_item_name: str = 'laporan-cpl/partials/mahasiswa/list-item-name.html'
+    list_custom_field_template: str = 'laporan-cpl/partials/mahasiswa/list-custom-field-mahasiswa.html'
+    table_custom_field_header_template: str = 'laporan-cpl/partials/mahasiswa/table-custom-field-header-mahasiswa.html'
+    table_custom_field_template: str = 'laporan-cpl/partials/mahasiswa/table-custom-field-mahasiswa.html'
 
     def setup(self, request: HttpRequest, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        
+
         username = kwargs.get('username')
         self.user = get_object_or_404(User, username=username)
 
@@ -315,6 +318,10 @@ class LaporanCapaianPembelajaranMahasiswaView(LaporanCapaianPembelajaranTemplate
         context = super().get_context_data(**kwargs)
         context.update({
             'user': self.user,
+            'list_item_name': self.list_item_name,
+            'list_custom_field_template': self.list_custom_field_template,
+            'table_custom_field_header_template': self.table_custom_field_header_template,
+            'table_custom_field_template': self.table_custom_field_template,
         })
         return context
     
@@ -434,5 +441,6 @@ class LaporanCapaianPembelajaranMahasiswaView(LaporanCapaianPembelajaranTemplate
             self.get_context_data(
                 form=form, formset=formset,
                 perolehan_nilai_ilo_graph=perolehan_nilai_ilo_graph,
+                options=list_peserta_mk,
             )
         )
