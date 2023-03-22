@@ -1,83 +1,23 @@
-{% load mathfilters %}
 <div>
     <table class="table-css table-hover table-numbered table-scroll-header  w-40 sm:w-72 md:w-96 xl:w-[28rem]">
         <thead>
-            <tr>
-                <th scope="col" class="text-center number !border-b-0">No.</th>
-                <th scope="col" class="text-center hidden sm:table-cell w-24 md:w-32 !border-b-0">NIM</th>
-                <th scope="col" class="text-center w-[7.5rem] md:w-40 xl:w-64 !border-b-0">Nama</th>
-            </tr>
-            <tr>
-                <th>
-                    <span class="invisible">a</span>
-                </th>
-                <th class="text-left hidden sm:table-cell">
-                    <span class="invisible">a</span>
-                </th>
-                <th>
-                    <span class="invisible">a</span>
-                </th>
-            </tr>
+            {% include table_scroll_head_header %}
         </thead>
 
         <tbody>
-            {% for nim, value in object_list.items %}
-            <tr>
-                <td class="text-center number"></td>
-                <td class="text-left truncate hidden sm:table-cell" title="{{ value.nim }}">{{ value.nim }}</td>
-                <td class="text-left field-nama truncate" title="{{ value.nama }}">{{ value.nama }}</td>
-            </tr>
-            {% endfor %}
+            {% include table_scroll_head_body %}
         </tbody>
     </table>
 
     <div class="table-scroll-data -ml-1 md:-ml-1.5 w-[calc(100%-11.5rem)] sm:w-[calc(100%-18rem)] md:w-[calc(100%-24rem)] xl:w-[calc(100%-28rem)]">
-        {% with list_ilo|length as len_ilo %}
         <table class="table-css table-hover">
             <thead>
-                {% comment %} List FIlter {% endcomment %}
-                <tr>
-                    {% for filter in list_filter %}
-                    <th colspan="{{ len_ilo }}">{{ filter.1 }}</th>
-                    {% endfor %}
-                </tr>
-                
-                {% comment %} List ILO {% endcomment %}
-                <tr>
-                    {% for _ in list_filter %}
-                        {% for ilo in list_ilo %}
-                        <th scope="col" class="text-center">{{ ilo.nama }}</th>
-                        {% endfor %}
-                    {% endfor %}
-                </tr>
+                {% include table_scroll_data_header %}
             </thead>
 
             <tbody>
-                {% for nim, value in object_list.items %}
-                <tr>
-                    {% for filter in value.result %}
-                        {% if filter.result|length == 0 %}
-                            {% comment %} Dump {% endcomment %}
-                            {% for _ in list_ilo %}
-                            <td class="text-right">-</td>
-                            {% endfor %}
-                        {% else %}
-                            {% comment %} Data {% endcomment %}
-                            {% for ilo_result in filter.result %}
-                            <td class="text-right {% if ilo_result.nilai < ilo_result.satisfactory_level %}text-danger{% endif %}">
-                                {% if ilo_result.nilai %}
-                                    {{ ilo_result.nilai|floatformat:"1" }}
-                                {% else %}
-                                    -
-                                {% endif %}
-                            </td>
-                            {% endfor %}
-                        {% endif %}
-                    {% endfor %}
-                </tr>
-                {% endfor %}
+                {% include table_scroll_data_body %}
             </tbody>
         </table>
-        {% endwith %}
     </div>
 </div>

@@ -1,0 +1,15 @@
+{% comment %} List FIlter {% endcomment %}
+<tr>
+    {% for filter in list_filter %}
+    <th colspan="{{ list_ilo|length }}">{{ filter.1 }}</th>
+    {% endfor %}
+</tr>
+
+{% comment %} List ILO {% endcomment %}
+<tr>
+    {% for _ in list_filter %}
+        {% for ilo in list_ilo %}
+        <th scope="col" class="text-center">{{ ilo.nama }}</th>
+        {% endfor %}
+    {% endfor %}
+</tr>

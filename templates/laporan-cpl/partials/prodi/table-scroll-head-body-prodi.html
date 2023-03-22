@@ -1,0 +1,7 @@
+{% for nim, value in object_list.items %}
+<tr>
+    <td class="text-center number"></td>
+    <td class="text-left truncate hidden sm:table-cell" title="{{ value.nim }}">{{ value.nim }}</td>
+    <td class="text-left field-nama truncate" title="{{ value.nama }}">{{ value.nama }}</td>
+</tr>
+{% endfor %}

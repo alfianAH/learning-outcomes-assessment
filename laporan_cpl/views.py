@@ -65,6 +65,10 @@ class GetSemesterJsonResponse(TemplateView):
 
 class LaporanCapaianPembelajaranTemplateView(FormView):
     formset_class = None
+    table_scroll_head_header: str = ''
+    table_scroll_head_body: str = ''
+    table_scroll_data_header: str = ''
+    table_scroll_data_body: str = ''
 
     def get_formset_class(self):
         return self.formset_class
@@ -103,6 +107,10 @@ class LaporanCapaianPembelajaranTemplateView(FormView):
         context = super().get_context_data(**kwargs)
         context.update({
             'is_formset_row': True,
+            'table_scroll_head_header': self.table_scroll_head_header,
+            'table_scroll_head_body': self.table_scroll_head_body,
+            'table_scroll_data_header': self.table_scroll_data_header,
+            'table_scroll_data_body': self.table_scroll_data_body,
         })
         if 'formset' not in kwargs:
             context['formset'] = self.get_formset()
@@ -163,6 +171,11 @@ class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
     form_class = KurikulumChoiceForm
     formset_class = TahunAjaranSemesterFormset
     success_url = reverse_lazy('laporan_cpl:home')
+
+    table_scroll_head_header: str = 'laporan-cpl/partials/prodi/table-scroll-head-header-prodi.html'
+    table_scroll_head_body: str = 'laporan-cpl/partials/prodi/table-scroll-head-body-prodi.html'
+    table_scroll_data_header: str = 'laporan-cpl/partials/prodi/table-scroll-data-header-prodi.html'
+    table_scroll_data_body: str = 'laporan-cpl/partials/prodi/table-scroll-data-body-prodi.html'
 
     def form_valid(self, form, formset) -> HttpResponse:
         kurikulum_obj = form.cleaned_data.get('kurikulum')
@@ -267,6 +280,11 @@ class LaporanCapaianPembelajaranMahasiswaView(LaporanCapaianPembelajaranTemplate
     formset_class = TahunAjaranSemesterFormset
 
     user: User = None
+    
+    table_scroll_head_header: str = 'laporan-cpl/partials/mahasiswa/table-scroll-head-header-mahasiswa.html'
+    table_scroll_head_body: str = 'laporan-cpl/partials/mahasiswa/table-scroll-head-body-mahasiswa.html'
+    table_scroll_data_header: str = 'laporan-cpl/partials/mahasiswa/table-scroll-data-header-mahasiswa.html'
+    table_scroll_data_body: str = 'laporan-cpl/partials/mahasiswa/table-scroll-data-body-mahasiswa.html'
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         username = kwargs.get('username')

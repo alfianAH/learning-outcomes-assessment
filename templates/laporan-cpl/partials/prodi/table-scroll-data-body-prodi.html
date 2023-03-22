@@ -1,0 +1,23 @@
+{% for nim, value in object_list.items %}
+<tr>
+    {% for filter in value.result %}
+        {% if filter.result|length == 0 %}
+            {% comment %} Dump {% endcomment %}
+            {% for _ in list_ilo %}
+            <td class="text-right">-</td>
+            {% endfor %}
+        {% else %}
+            {% comment %} Data {% endcomment %}
+            {% for ilo_result in filter.result %}
+            <td class="text-right {% if ilo_result.nilai < ilo_result.satisfactory_level %}text-danger{% endif %}">
+                {% if ilo_result.nilai %}
+                    {{ ilo_result.nilai|floatformat:"1" }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+</tr>
+{% endfor %}
