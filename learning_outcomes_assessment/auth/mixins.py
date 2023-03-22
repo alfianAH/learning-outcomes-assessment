@@ -27,9 +27,10 @@ class MahasiswaAsPesertaMixin:
     """Raise PermissionDenied if mahasiswa access other mahasiswa's URLs
     """
 
-    peserta_mk: PesertaMataKuliah = None
+    user = None
 
     def dispatch(self, request: HttpRequest, *args, **kwargs):
+        print('dis')
         user = request.user
         if user.is_anonymous :
             return redirect(reverse('accounts:login'))
@@ -38,10 +39,11 @@ class MahasiswaAsPesertaMixin:
         if user.role != 'm':
             return super().dispatch(request, *args, **kwargs)
         
-        if self.peserta_mk.mahasiswa == user:
-            return super().dispatch(request, *args, **kwargs)
-        else:
+        if self.user != user:
+            print('tidak sama') 
             raise PermissionDenied
+        
+        return super().dispatch(request, *args, **kwargs)
 
 
 class MahasiswaAndMKSemesterMixin:

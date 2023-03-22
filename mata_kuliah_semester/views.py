@@ -666,7 +666,7 @@ class StudentPerformanceReadView(ProgramStudiMixin, MahasiswaAsPesertaMixin, Det
         super().setup(request, *args, **kwargs)
         self.object = self.get_object()
 
-        self.peserta_mk = self.object
+        self.user = self.object.mahasiswa
         self.program_studi_obj = self.object.kelas_mk_semester.mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
     
     def get_object(self, queryset=None) -> PesertaMataKuliah:
@@ -734,6 +734,7 @@ class StudentPerformanceCalculateView(ProgramStudiMixin, MahasiswaAsPesertaMixin
         super().setup(request, *args, **kwargs)
         peserta_id = kwargs.get('peserta_id')
         self.peserta_mk = get_object_or_404(PesertaMataKuliah, id_neosia=peserta_id)
+        self.user = self.peserta_mk.mahasiswa
         self.program_studi_obj = self.peserta_mk.kelas_mk_semester.mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
 
     def get_redirect_url(self, *args, **kwargs):

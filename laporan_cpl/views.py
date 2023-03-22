@@ -1,6 +1,6 @@
 import json
 from django.conf import settings
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth import get_user_model
 from django.db.models import QuerySet
 from django.contrib import messages
@@ -10,6 +10,9 @@ from django.urls import reverse_lazy
 from django.views.generic.edit import FormView
 from django.views.generic.base import TemplateView
 from mata_kuliah_semester.models import PesertaMataKuliah
+from learning_outcomes_assessment.auth.mixins import(
+    MahasiswaAsPesertaMixin,
+)
 from semester.models import (
     TahunAjaranProdi,
     SemesterProdi,
@@ -39,9 +42,16 @@ class GetTahunAjaranJsonResponse(TemplateView):
         if not selected_kurikulum_id.strip() or not request.is_ajax(): 
             return JsonResponse({'choices': tahun_ajaran_choices})
         
-        tahun_ajaran_prodi_qs = TahunAjaranProdi.objects.filter(
-            semesterprodi__matakuliahsemester__mk_kurikulum__kurikulum__id_neosia=selected_kurikulum_id
-        ).distinct()
+        if request.user.role != 'm':
+            tahun_ajaran_prodi_qs = TahunAjaranProdi.objects.filter(
+                semesterprodi__matakuliahsemester__mk_kurikulum__kurikulum__id_neosia=selected_kurikulum_id
+            ).distinct()
+        else:
+            tahun_ajaran_prodi_qs = TahunAjaranProdi.objects.filter(
+                semesterprodi__matakuliahsemester__mk_kurikulum__kurikulum__id_neosia=selected_kurikulum_id,
+                semesterprodi__matakuliahsemester__kelasmatakuliahsemester__pesertamatakuliah__mahasiswa=request.user
+            ).distinct()
+        
         tahun_ajaran_choices += [(tahun_ajaran_prodi.pk, str(tahun_ajaran_prodi.tahun_ajaran)) for tahun_ajaran_prodi in tahun_ajaran_prodi_qs]
 
         return JsonResponse({'choices': tahun_ajaran_choices})
@@ -56,9 +66,16 @@ class GetSemesterJsonResponse(TemplateView):
         if not selected_tahun_ajaran_id.strip() or not request.is_ajax(): 
             return JsonResponse({'choices': semester_choices})
         
-        semester_prodi_qs = SemesterProdi.objects.filter(
-            tahun_ajaran_prodi=selected_tahun_ajaran_id
-        )
+        if request.user.role != 'm':
+            semester_prodi_qs = SemesterProdi.objects.filter(
+                tahun_ajaran_prodi=selected_tahun_ajaran_id
+            )
+        else:
+            semester_prodi_qs = SemesterProdi.objects.filter(
+                tahun_ajaran_prodi=selected_tahun_ajaran_id,
+                matakuliahsemester__kelasmatakuliahsemester__pesertamatakuliah__mahasiswa=request.user
+            ).distinct()
+        
         semester_choices += [(semester_prodi.pk, str(semester_prodi.semester.nama)) for semester_prodi in semester_prodi_qs]
 
         return JsonResponse({'choices': semester_choices})
@@ -165,6 +182,11 @@ class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
     table_scroll_head_body: str = 'laporan-cpl/partials/prodi/table-scroll-head-body-prodi.html'
     table_scroll_data_header: str = 'laporan-cpl/partials/prodi/table-scroll-data-header-prodi.html'
     table_scroll_data_body: str = 'laporan-cpl/partials/prodi/table-scroll-data-body-prodi.html'
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if request.user.role == 'm':
+            return redirect(request.user.get_laporan_cpl_url())
+        return super().get(request, *args, **kwargs)
 
     def perolehan_nilai_ilo_graph(self, list_ilo: QuerySet[Ilo], is_multiple_result: bool, calculation_result: dict):
         json_response = super().perolehan_nilai_ilo_graph(list_ilo, is_multiple_result, calculation_result)
@@ -296,12 +318,10 @@ class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
         )
 
 
-class LaporanCapaianPembelajaranMahasiswaView(LaporanCapaianPembelajaranTemplateView):
+class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCapaianPembelajaranTemplateView):
     template_name = 'laporan-cpl/laporan-mahasiswa.html'
     form_class = KurikulumChoiceForm
     formset_class = TahunAjaranSemesterFormset
-
-    user: User = None
     
     list_item_name: str = 'laporan-cpl/partials/mahasiswa/list-item-name.html'
     list_custom_field_template: str = 'laporan-cpl/partials/mahasiswa/list-custom-field-mahasiswa.html'
@@ -313,6 +333,23 @@ class LaporanCapaianPembelajaranMahasiswaView(LaporanCapaianPembelajaranTemplate
 
         username = kwargs.get('username')
         self.user = get_object_or_404(User, username=username)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        if self.user.role == 'm':
+            kwargs.update({
+                'user': self.user
+            })
+        return kwargs
+    
+    def get_formset_kwargs(self):
+        kwargs = super().get_formset_kwargs()
+        if self.user.role == 'm':
+            kwargs.update({
+                'user': self.user
+            })
+        return kwargs
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

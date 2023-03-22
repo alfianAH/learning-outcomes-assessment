@@ -22,11 +22,18 @@ class KurikulumChoiceForm(forms.Form):
     )
 
     def __init__(self, prodi, *args, **kwargs):
+        user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
 
-        self.fields['kurikulum'].queryset = Kurikulum.objects.filter(
-            prodi_jenjang__program_studi=prodi
-        )
+        if user is None:
+            self.fields['kurikulum'].queryset = Kurikulum.objects.filter(
+                prodi_jenjang__program_studi=prodi
+            )
+        else:
+            self.fields['kurikulum'].queryset = Kurikulum.objects.filter(
+                prodi_jenjang__program_studi=prodi,
+                matakuliahkurikulum__matakuliahsemester__kelasmatakuliahsemester__pesertamatakuliah__mahasiswa=user
+            ).distinct()
 
     def clean(self):
         cleaned_data = super().clean()
@@ -62,6 +69,7 @@ class TahunAjaranSemesterChoiceForm(forms.Form):
 
 class TahunAjaranSemesterFormsetClass(CanDeleteBaseFormSet):
     def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         self.forms_to_delete = []
         
@@ -72,9 +80,15 @@ class TahunAjaranSemesterFormsetClass(CanDeleteBaseFormSet):
         # Return if kurikulum id is blank
         if not self.kurikulum_id.strip(): return
 
-        tahun_ajaran_prodi_qs = TahunAjaranProdi.objects.filter(
-            semesterprodi__matakuliahsemester__mk_kurikulum__kurikulum__id_neosia=self.kurikulum_id
-        ).distinct()
+        if user is None:
+            tahun_ajaran_prodi_qs = TahunAjaranProdi.objects.filter(
+                semesterprodi__matakuliahsemester__mk_kurikulum__kurikulum__id_neosia=self.kurikulum_id
+            ).distinct()
+        else:
+            tahun_ajaran_prodi_qs = TahunAjaranProdi.objects.filter(
+                semesterprodi__matakuliahsemester__mk_kurikulum__kurikulum__id_neosia=self.kurikulum_id,
+                semesterprodi__matakuliahsemester__kelasmatakuliahsemester__pesertamatakuliah__mahasiswa=user
+            ).distinct()
         
         self.tahun_ajaran_choices = [(tahun_ajaran_prodi.pk, str(tahun_ajaran_prodi.tahun_ajaran)) for tahun_ajaran_prodi in tahun_ajaran_prodi_qs]
         
@@ -88,9 +102,15 @@ class TahunAjaranSemesterFormsetClass(CanDeleteBaseFormSet):
             if not tahun_ajaran_id.strip(): continue
             
             # Get semester
-            semester_prodi_qs = SemesterProdi.objects.filter(
-                tahun_ajaran_prodi=tahun_ajaran_id
-            )
+            if user is None:
+                semester_prodi_qs = SemesterProdi.objects.filter(
+                    tahun_ajaran_prodi=tahun_ajaran_id
+                )
+            else:
+                semester_prodi_qs = SemesterProdi.objects.filter(
+                    tahun_ajaran_prodi=tahun_ajaran_id,
+                    matakuliahsemester__kelasmatakuliahsemester__pesertamatakuliah__mahasiswa=user
+                ).distinct()
             self.semester_choices = [(semester_prodi.pk, semester_prodi.semester.nama) for semester_prodi in semester_prodi_qs]
 
             form.fields['semester'].choices += self.semester_choices

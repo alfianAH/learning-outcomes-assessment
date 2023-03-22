@@ -5,8 +5,12 @@
 {% endblock title %}
 
 {% block breadcrumb %}
+{% if user_role == 'm' %}
+<li class="breadcrumb-item active" aria-current="page" role="listitem">Laporan CPL</li>
+{% else %}
 <li class="breadcrumb-item"><a href="{% url 'laporan_cpl:home' %}" role="listitem">Laporan CPL</a></li>
 <li class="breadcrumb-item active" aria-current="page" role="listitem">Mahasiswa</li>
+{% endif %}
 {% endblock breadcrumb %}
 
 {% block content %}
