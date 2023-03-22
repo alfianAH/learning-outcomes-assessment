@@ -112,7 +112,8 @@
         $.ajax({
             url: '{% url 'laporan_cpl:formset-tahun-ajaran-choices' %}',
             data: {
-                'kurikulum_id': selectedKurikulumId
+                'kurikulum_id': selectedKurikulumId,
+                'username': '{{ user.username }}',
             },
             dataType: 'json',
             success: function(data) {
@@ -141,7 +142,8 @@
         $.ajax({
             url: '{% url 'laporan_cpl:formset-semester-choices' %}',
             data: {
-                'tahun_ajaran_id': selectedTahunAjaranId
+                'tahun_ajaran_id': selectedTahunAjaranId,
+                'username': '{{ user.username }}',
             },
             dataType: 'json',
             success: function(data) {

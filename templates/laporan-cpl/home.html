@@ -30,7 +30,7 @@ Laporan CPL -
 <h2>Hasil</h2>
 
 <ul class="tab" role="tablist">
-    <li class="tab-item w-40 disabled" id="tab-1" data-target="#tab-grafik-pane" role="presentation">
+    <li class="tab-item w-40" id="tab-1" data-target="#tab-grafik-pane" role="presentation">
         <div class="tab-title">
             <span class="truncate">Grafik</span>
         </div>
@@ -38,7 +38,7 @@ Laporan CPL -
         <div class="tab-item-line"></div>
     </li>
 
-    <li class="tab-item w-56" id="tab-1" data-target="#tab-nilai-pane" role="presentation">
+    <li class="tab-item w-56 disabled" id="tab-1" data-target="#tab-nilai-pane" role="presentation">
         <div class="tab-title">
             <span class="truncate">Nilai mahasiswa</span>
         </div>
@@ -48,13 +48,13 @@ Laporan CPL -
 </ul>
 
 <div class="tab-content">
-    <div class="tab-pane fade min-h-screen" id="tab-grafik-pane" role="tabpanel" aria-labelledby="tab-1">
+    <div class="tab-pane fade min-h-screen show active" id="tab-grafik-pane" role="tabpanel" aria-labelledby="tab-1">
         {% comment %} Perolahan Nilai ILO Spider chart {% endcomment %}
         <div class="w-full mx-auto my-0">
             <canvas id="perolehan-nilai-ilo" class="w-full max-h-60 sm:max-h-64 lg:max-h-72 xl:max-h-80"></canvas>
         </div>
     </div>
-    <div class="tab-pane fade min-h-screen show active" id="tab-nilai-pane" role="tabpanel" aria-labelledby="tab-1">
+    <div class="tab-pane fade min-h-screen" id="tab-nilai-pane" role="tabpanel" aria-labelledby="tab-1">
         {% include 'components/list-table-view/model-e/table-view-model-e.html' %}
     </div>
 </div>

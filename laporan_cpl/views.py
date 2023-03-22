@@ -36,6 +36,7 @@ User = get_user_model()
 class GetTahunAjaranJsonResponse(TemplateView):
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         selected_kurikulum_id = request.GET.get('kurikulum_id', '')
+        username = request.GET.get('username', None)
         tahun_ajaran_choices = [('', '---------')]
 
         # If kurikulum_id is empty str or request is not AJAX, return
@@ -43,9 +44,15 @@ class GetTahunAjaranJsonResponse(TemplateView):
             return JsonResponse({'choices': tahun_ajaran_choices})
         
         if request.user.role != 'm':
-            tahun_ajaran_prodi_qs = TahunAjaranProdi.objects.filter(
-                semesterprodi__matakuliahsemester__mk_kurikulum__kurikulum__id_neosia=selected_kurikulum_id
-            ).distinct()
+            if username is None:
+                tahun_ajaran_prodi_qs = TahunAjaranProdi.objects.filter(
+                    semesterprodi__matakuliahsemester__mk_kurikulum__kurikulum__id_neosia=selected_kurikulum_id
+                ).distinct()
+            else:
+                tahun_ajaran_prodi_qs = TahunAjaranProdi.objects.filter(
+                    semesterprodi__matakuliahsemester__mk_kurikulum__kurikulum__id_neosia=selected_kurikulum_id,
+                    semesterprodi__matakuliahsemester__kelasmatakuliahsemester__pesertamatakuliah__mahasiswa__username=username
+                ).distinct()
         else:
             tahun_ajaran_prodi_qs = TahunAjaranProdi.objects.filter(
                 semesterprodi__matakuliahsemester__mk_kurikulum__kurikulum__id_neosia=selected_kurikulum_id,
@@ -60,6 +67,7 @@ class GetTahunAjaranJsonResponse(TemplateView):
 class GetSemesterJsonResponse(TemplateView):
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         selected_tahun_ajaran_id: str = request.GET.get('tahun_ajaran_id', '')
+        username = request.GET.get('username', None)
         semester_choices = [('', '---------')]
 
         # If tahun_ajaran_id is empty str or request is not AJAX, return
@@ -67,9 +75,15 @@ class GetSemesterJsonResponse(TemplateView):
             return JsonResponse({'choices': semester_choices})
         
         if request.user.role != 'm':
-            semester_prodi_qs = SemesterProdi.objects.filter(
-                tahun_ajaran_prodi=selected_tahun_ajaran_id
-            )
+            if username is None:
+                semester_prodi_qs = SemesterProdi.objects.filter(
+                    tahun_ajaran_prodi=selected_tahun_ajaran_id
+                )
+            else:
+                semester_prodi_qs = SemesterProdi.objects.filter(
+                    tahun_ajaran_prodi=selected_tahun_ajaran_id,
+                    matakuliahsemester__kelasmatakuliahsemester__pesertamatakuliah__mahasiswa__username=username
+                )
         else:
             semester_prodi_qs = SemesterProdi.objects.filter(
                 tahun_ajaran_prodi=selected_tahun_ajaran_id,

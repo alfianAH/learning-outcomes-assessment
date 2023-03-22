@@ -30,7 +30,6 @@ class MahasiswaAsPesertaMixin:
     user = None
 
     def dispatch(self, request: HttpRequest, *args, **kwargs):
-        print('dis')
         user = request.user
         if user.is_anonymous :
             return redirect(reverse('accounts:login'))
