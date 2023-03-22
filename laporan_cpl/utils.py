@@ -311,6 +311,7 @@ def calculate_ilo_mahasiswa(list_ilo: QuerySet[Ilo],
 
 
 def process_ilo_mahasiswa(list_ilo: QuerySet[Ilo], max_sks_prodi: int,
+                          list_peserta_mk: QuerySet[PesertaMataKuliah],
                           is_semester_included: bool,
                           filter: list):
     """Calculate ILO All Mahasiswa in Kurikulum according to tahun ajaran and semester filter
@@ -350,15 +351,6 @@ def process_ilo_mahasiswa(list_ilo: QuerySet[Ilo], max_sks_prodi: int,
     result: dict = {}
     nilai_max = 100
 
-    if is_semester_included:
-        list_peserta_mk = PesertaMataKuliah.objects.filter(
-            kelas_mk_semester__mk_semester__semester__in=[semester_prodi_obj for semester_prodi_obj, _ in filter]
-        )
-    else:
-        list_peserta_mk = PesertaMataKuliah.objects.filter(
-            kelas_mk_semester__mk_semester__semester__tahun_ajaran_prodi__in=[tahun_ajaran_prodi_obj for tahun_ajaran_prodi_obj, _ in filter]
-        )
-
     list_mahasiswa = User.objects.filter(
         pesertamatakuliah__in=list_peserta_mk
     ).distinct().order_by('-username')
@@ -367,6 +359,7 @@ def process_ilo_mahasiswa(list_ilo: QuerySet[Ilo], max_sks_prodi: int,
         result_mahasiswa = {
             'nim': mahasiswa.username,
             'nama': mahasiswa.nama,
+            'read_detail_url': mahasiswa.get_laporan_cpl_url(),
             'result': []
         }
 

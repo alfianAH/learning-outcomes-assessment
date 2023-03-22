@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, UserManager
 from django.urls import reverse
+from learning_outcomes_assessment.utils import get_reverse_url
 from .enums import RoleChoices
 
 
@@ -134,3 +135,8 @@ class MyUser(AbstractUser):
 
     def __str__(self) -> str:
         return self.username
+    
+    def get_laporan_cpl_url(self):
+        return get_reverse_url('laporan_cpl:laporan-mahasiswa', {
+            'username': self.username,
+        })

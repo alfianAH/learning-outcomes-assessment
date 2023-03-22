@@ -3513,6 +3513,10 @@ details.dropdown::marker {
   position: relative;
 }
 
+.sticky {
+  position: sticky;
+}
+
 .top-28 {
   top: 7rem;
 }
@@ -3539,6 +3543,14 @@ details.dropdown::marker {
 
 .top-1\/2 {
   top: 50%;
+}
+
+.top-0 {
+  top: 0px;
+}
+
+.top-12 {
+  top: 3rem;
 }
 
 .z-40 {
@@ -3827,14 +3839,6 @@ details.dropdown::marker {
   width: calc(100% - 62px - 10px);
 }
 
-.w-24 {
-  width: 6rem;
-}
-
-.w-\[7\.5rem\] {
-  width: 7.5rem;
-}
-
 .w-\[calc\(100\%-11\.5rem\)\] {
   width: calc(100% - 11.5rem);
 }
@@ -3845,6 +3849,14 @@ details.dropdown::marker {
 
 .w-\[calc\(\(100\%-8px-10px\*2\)\/2\)\] {
   width: calc((100% - 8px - 10px * 2) / 2);
+}
+
+.w-24 {
+  width: 6rem;
+}
+
+.w-\[7\.5rem\] {
+  width: 7.5rem;
 }
 
 .w-2\.5 {
@@ -4899,6 +4911,10 @@ details.dropdown::marker {
     min-width: 8rem;
   }
 
+  .sm\:min-w-40 {
+    min-width: 10rem;
+  }
+
   .sm\:grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -4975,6 +4991,10 @@ details.dropdown::marker {
 }
 
 @media (min-width: 768px) {
+  .md\:top-14 {
+    top: 3.5rem;
+  }
+
   .md\:mt-2\.5 {
     margin-top: 0.625rem;
   }
@@ -5051,12 +5071,12 @@ details.dropdown::marker {
     width: 24rem;
   }
 
-  .md\:w-40 {
-    width: 10rem;
-  }
-
   .md\:w-\[calc\(100\%-24rem\)\] {
     width: calc(100% - 24rem);
+  }
+
+  .md\:w-40 {
+    width: 10rem;
   }
 
   .md\:min-w-32 {
@@ -5172,6 +5192,10 @@ details.dropdown::marker {
 }
 
 @media (min-width: 1024px) {
+  .lg\:top-16 {
+    top: 4rem;
+  }
+
   .lg\:ml-80 {
     margin-left: 20rem;
   }
@@ -5382,12 +5406,12 @@ details.dropdown::marker {
     width: 28rem;
   }
 
-  .xl\:w-64 {
-    width: 16rem;
-  }
-
   .xl\:w-\[calc\(100\%-28rem\)\] {
     width: calc(100% - 28rem);
+  }
+
+  .xl\:w-64 {
+    width: 16rem;
   }
 
   .xl\:w-80 {
@@ -5408,6 +5432,10 @@ details.dropdown::marker {
 
   .xl\:min-w-\[15rem\] {
     min-width: 15rem;
+  }
+
+  .xl\:min-w-44 {
+    min-width: 11rem;
   }
 
   .xl\:max-w-\[16rem\] {
