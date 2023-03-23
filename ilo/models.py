@@ -2,10 +2,12 @@ from django.db import models
 from django.db.models import CheckConstraint, Q
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.urls import reverse
+from learning_outcomes_assessment.model_manager.models import TextNumberModelManager
 from pi_area.models import PerformanceIndicatorArea
 
 # Create your models here.
 class Ilo(models.Model):
+    objects = TextNumberModelManager()
     pi_area = models.OneToOneField(PerformanceIndicatorArea, on_delete=models.CASCADE)
 
     nama = models.CharField(max_length=255, null=False)

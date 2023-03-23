@@ -23,7 +23,6 @@ class IloReadAllView(ListViewModelA):
     model = Ilo
     paginate_by: int = 10
     template_name: str = 'ilo/home.html'
-    ordering: str = 'nama'
     sort_form_ordering_by_key: str = 'ordering_by'
     kurikulum_obj: Kurikulum = None
 
