@@ -2,7 +2,6 @@ from django.db import models
 from django.db.models import CheckConstraint, Q
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.conf import settings
-from django.utils import timezone
 from learning_outcomes_assessment.utils import get_reverse_url
 from ilo.models import Ilo
 from mata_kuliah_kurikulum.models import MataKuliahKurikulum

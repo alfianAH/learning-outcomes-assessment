@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     'clo',
     'lock_model',
     'laporan_cpl',
+    'rps',
 ]
 
 MIDDLEWARE = [
