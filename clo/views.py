@@ -484,7 +484,6 @@ class CloDuplicateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, Duplic
         if current_total_persentase > 100:
             messages.warning(self.request, 'Total persentase saat ini: {}. Diharap untuk mengubah komponen CLO agar mencukupi 100%'.format(current_total_persentase))
 
-        print(self.mk_semester_obj.get_total_persentase_clo())
         return super().form_valid(form)
 
 

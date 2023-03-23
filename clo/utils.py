@@ -53,7 +53,11 @@ def get_semester_choices_clo_duplicate(mk_semester: MataKuliahSemester):
     for mk_semester_obj in list_mk_semester:
         # Skip the same semester
         if mk_semester_obj.pk is mk_semester.pk: continue
-
+        
+        list_clo_mk_semester: QuerySet[Clo] = mk_semester_obj.get_all_clo()
+        # If mk semester doesn't have CLO, skip
+        if not list_clo_mk_semester.exists(): continue
+        
         semester_choice = mk_semester_obj.semester.id_neosia, '{}. <a href="{}" target="_blank">Lihat CLO di sini</a>'.format(mk_semester_obj.semester.semester.nama, mk_semester_obj.get_clo_read_all_url())
 
         semester_choices.append(semester_choice)
@@ -80,7 +84,6 @@ def duplicate_clo(semester_prodi_id: int, new_mk_semester: MataKuliahSemester):
         return 
     
     list_clo: QuerySet[Clo] = mk_semester_obj.get_all_clo()
-    print(list_clo.count())
 
     for clo in list_clo:
         # Get komponen CLO
