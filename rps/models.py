@@ -80,11 +80,18 @@ class PembelajaranPertemuanRPS(models.Model):
     metode_pembelajaran = models.TextField(null=False, blank=False)
 
 
+class TipeDurasi(models.TextChoices):
+    TATAP_MUKA = 'TM', 'Tatap Muka'
+    PENUGASAN_TERSTRUKTUR = 'PT', 'Penugasan Terstruktur'
+    BELAJAR_MANDIRI = 'BM', 'Belajar Mandiri'
+    VIDEO_CONFERENCE = 'VC', 'Video Conference'
+
+
 class DurasiPertemuanRPS(models.Model):
     pertemuan_rps = models.OneToOneField(PertemuanRPS, on_delete=models.CASCADE)
 
     jenis_pertemuan = models.CharField(max_length=3, null=False, blank=False, choices=JenisPertemuan.choices)
-    tipe_durasi = models.CharField(max_length=255, null=False, blank=False)
+    tipe_durasi = models.CharField(max_length=100, null=False, blank=False)
     pengali_durasi = models.SmallIntegerField(null=False, blank=False)
     durasi_menit = models.SmallIntegerField(null=False, blank=False, validators=[MinValueValidator(0.0), MaxValueValidator(60.0)])
 
