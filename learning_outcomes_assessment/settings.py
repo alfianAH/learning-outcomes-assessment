@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'django_htmx',
     'formtools',
     'mathfilters',
+    'markdown_deux',
 
     # Internal
     'accounts',

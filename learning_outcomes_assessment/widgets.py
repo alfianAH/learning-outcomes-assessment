@@ -153,7 +153,6 @@ class MyCheckboxInput(CheckboxSelectMultiple):
     option_template_name: str = 'custom-widgets/forms/widgets/checkbox-option.html'
 
 
-
 class PagedownWidget(forms.Textarea):
     """Pagedown Widget
     Copyright (c) 2019, Timmy O'Mahony

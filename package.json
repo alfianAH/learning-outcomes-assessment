@@ -11,6 +11,7 @@
     "chart.js": "^4.2.0",
     "htmx.org": "^1.8.4",
     "jquery": "^3.6.0",
-    "masonry-layout": "^4.2.2"
+    "masonry-layout": "^4.2.2",
+    "select2": "^4.1.0-rc.0"
   }
 }
