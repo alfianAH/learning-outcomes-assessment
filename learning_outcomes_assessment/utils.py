@@ -1,8 +1,13 @@
+import json
 import os
 import uuid
-from django.urls import reverse
 import requests
+from django.urls import reverse
 from django.conf import settings
+from requests import Session
+from requests.auth import HTTPBasicAuth
+from zeep import Client
+from zeep.transports import Transport
 
 
 def extract_tahun_ajaran(tahun_ajaran: str) -> dict:
@@ -150,4 +155,40 @@ def _iter_cols(self, min_col=None, max_col=None, min_row=None,
     yield from zip(*self.iter_rows(
         min_row=min_row, max_row=max_row,
         min_col=min_col, max_col=max_col, values_only=values_only))
+
+
+def request_nusoap(search_text: str) -> dict:
+    """Request dosen search by NuSoap
+
+    Args:
+        search_text (str): Search name
+
+    Returns:
+        dict: Formatted JSON Response
+            json_response = {
+                'results':[
+                    {
+                        'id': nip,
+                        'text', nama_dosen
+                    }
+                ]
+            }
+    """
     
+    session = Session()
+    session.auth = HTTPBasicAuth(
+        os.environ.get('NUSOAP_USERNAME', ''), 
+        os.environ.get('NUSOAP_PASSWORD', '')
+    )
+    client = Client('http://apps.unhas.ac.id/nusoap/serviceApps.php?wsdl', transport=Transport(session=session))
+    results = json.loads(client.service['getUser'](search_text))
+
+    json_response = {'results': []}
+
+    for result in results['data']:
+        json_response['results'].append({
+            'id': result['pegNip'],
+            'text': result['pegNamaGelar'],
+        })
+
+    return json_response

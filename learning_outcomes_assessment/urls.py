@@ -15,7 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from .views import home_view
+from .views import home_view, dosen_json_response
+
 
 urlpatterns = [
     path('', home_view),
@@ -23,5 +24,6 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('kurikulum/', include('kurikulum.urls')),
     path('semester/', include('semester.urls')),
-    path('laporan-cpl/', include('laporan_cpl.urls'))
+    path('laporan-cpl/', include('laporan_cpl.urls')),
+    path('dosen-search/', dosen_json_response, name='dosen-search'),
 ]
