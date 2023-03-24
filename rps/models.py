@@ -67,9 +67,15 @@ class PertemuanRPS(models.Model):
         )
 
 
+class JenisPertemuan(models.TextChoices):
+    ONLINE = 'on', 'Online'
+    OFFLINE = 'off', 'Offline'
+
+
 class PembelajaranPertemuanRPS(models.Model):
     pertemuan_rps = models.OneToOneField(PertemuanRPS, on_delete=models.CASCADE)
 
+    jenis_pertemuan = models.CharField(max_length=3, null=False, blank=False, choices=JenisPertemuan.choices)
     bentuk_pembelajaran = models.TextField(null=False, blank=False)
     metode_pembelajaran = models.TextField(null=False, blank=False)
 
@@ -77,6 +83,7 @@ class PembelajaranPertemuanRPS(models.Model):
 class DurasiPertemuanRPS(models.Model):
     pertemuan_rps = models.OneToOneField(PertemuanRPS, on_delete=models.CASCADE)
 
+    jenis_pertemuan = models.CharField(max_length=3, null=False, blank=False, choices=JenisPertemuan.choices)
     tipe_durasi = models.CharField(max_length=255, null=False, blank=False)
     pengali_durasi = models.SmallIntegerField(null=False, blank=False)
     durasi_menit = models.SmallIntegerField(null=False, blank=False, validators=[MinValueValidator(0.0), MaxValueValidator(60.0)])

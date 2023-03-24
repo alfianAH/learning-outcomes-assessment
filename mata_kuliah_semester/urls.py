@@ -50,4 +50,7 @@ urlpatterns = [
     
     # CLO
     path('<int:mk_semester_id>/clo/', include('clo.urls')),
+
+    # RPS
+    path('<int:mk_semester_id>/rps/', include('rps.urls')),
 ]
