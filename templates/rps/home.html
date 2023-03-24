@@ -1,0 +1,95 @@
+{% extends 'home-view.html' %}
+
+{% block title %}
+RPS - 
+{% endblock title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'semester:read-all' %}" role="listitem">Semester</a></li>
+<li class="breadcrumb-item"><a href="{{ mk_semester_obj.semester.read_detail_url }}" role="listitem">Detail</a></li>
+<li class="breadcrumb-item"><a href="{{ mk_semester_obj.read_detail_url }}" role="listitem">Detail MK</a></li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">RPS</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="h-icon">
+    <h1>Rencana Pembelajaran Semester</h1>
+</div>
+
+<div class="table-div">
+    <div class="tr-div">
+        <div class="w-32 md:w-36">Semester</div>
+        <div>:</div>
+        <div>{{ mk_semester_obj.semester.semester }}</div>
+    </div>
+    <div class="tr-div">
+        <div class="w-32 md:w-36">Mata kuliah</div>
+        <div>:</div>
+        <div>{{ mk_semester_obj.mk_kurikulum.nama }}</div>
+    </div>
+    <div class="tr-div !items-center">
+        <div class="w-32 md:w-36">Status</div>
+        <div>:</div>
+        
+        <div class="badge badge-warning">
+            {% if user_role == 'm' %}
+            Belum lengkap
+            {% else %}
+            Belum dikunci
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<ul class="tab" role="tablist">
+    <li class="tab-item w-40 {% if is_pertemuan_tab %}disabled{% endif %}" id="tab-1" data-target="#tab-rincian-pane" role="presentation">
+        <div class="tab-title">
+            <span class="truncate">Rincian</span>
+
+            {% if not mk_semester_obj.status_rincian|default:False %}
+            <div class="w-2 h-2 lg:w-2.5 lg:h-2.5 ml-2.5 badge-warning rounded-full"></div>
+            {% endif %}
+        </div>
+
+        <div class="tab-item-line"></div>
+    </li>
+    
+    <li class="tab-item w-40 sm:w-64 {% if is_pertemuan_tab or is_rincian_tab %}disabled{% endif %}" id="tab-2" data-target="#tab-capaian-pane" role="presentation">
+        <div class="tab-title">
+            <span class="truncate">Capaian Pembelajaran</span>
+        </div>
+
+        <div class="tab-item-line"></div>
+    </li>
+
+    <li class="tab-item w-40 {% if is_rincian_tab %}disabled{% endif %}" id="tab-3" data-target="#tab-pertemuan-pane" role="presentation">
+        <div class="tab-title">
+            <span class="truncate">Pertemuan</span>
+
+            {% if not mk_semester_obj.status_pertemuan|default:False %}
+            <div class="w-2 h-2 lg:w-2.5 lg:h-2.5 ml-2.5 badge-warning rounded-full"></div>
+            {% endif %}
+        </div>
+
+        <div class="tab-item-line"></div>
+    </li>
+</ul>
+
+<div class="tab-content">
+    {% comment %} Rincian {% endcomment %}
+    <div class="tab-pane fade min-h-screen {% if is_rincian_tab %}show active{% endif %}" id="tab-rincian-pane" role="tabpanel" aria-labelledby="tab-1">
+        <h2>Rincian RPS</h2>
+    </div>
+
+    {% comment %} Capaian Pembelajaran {% endcomment %}
+    <div class="tab-pane fade min-h-screen" id="tab-capaian-pane" role="tabpanel" aria-labelledby="tab-2">
+        <h2>Intended Learning Outcomes (ILO)</h2>
+        <h2>Course Learning Outcomes (CLO)</h2>
+    </div>
+
+    {% comment %} Pertemuan {% endcomment %}
+    <div class="tab-pane fade min-h-screen {% if is_pertemuan_tab %}show active{% endif %}" id="tab-pertemuan-pane" role="tabpanel" aria-labelledby="tab-3">
+        <h2>Pertemuan</h2>
+    </div>
+</div>
+{% endblock content %}

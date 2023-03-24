@@ -387,7 +387,8 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin,
                 'read_detail_url': self.single_object.get_clo_read_all_url()
             },
             {
-                'title': 'Rencana Pembelajaran Semester (RPS)'
+                'title': 'Rencana Pembelajaran Semester (RPS)',
+                'read_detail_url': self.single_object.get_rps_home_url  ()
             }
         ]
         
@@ -403,6 +404,7 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin,
             'empty_komponen_clo': self.get_empty_komponen_clo(),
             'template_file_name': self.filename,
             'import_nilai_url': self.single_object.get_hx_nilai_komponen_import_url(),
+            'is_not_cols_3': True,
         })
 
         # Show graph for admin and dosen role

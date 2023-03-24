@@ -722,6 +722,40 @@ th {
   --tw-backdrop-sepia:  ;
 }
 
+.container {
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1536px;
+  }
+}
+
 /* Backdrop */
 
 .backdrop {
@@ -3489,6 +3523,10 @@ details.dropdown::marker {
   }
 }
 
+.visible {
+  visibility: visible;
+}
+
 .invisible {
   visibility: hidden;
 }
@@ -3657,6 +3695,10 @@ details.dropdown::marker {
   display: inline-block;
 }
 
+.inline {
+  display: inline;
+}
+
 .flex {
   display: flex;
 }
@@ -3715,6 +3757,10 @@ details.dropdown::marker {
 
 .h-2\.5 {
   height: 0.625rem;
+}
+
+.h-full {
+  height: 100%;
 }
 
 .max-h-10 {
@@ -4361,6 +4407,14 @@ details.dropdown::marker {
   font-weight: 200;
 }
 
+.uppercase {
+  text-transform: uppercase;
+}
+
+.italic {
+  font-style: italic;
+}
+
 .text-rose-500 {
   --tw-text-opacity: 1;
   color: rgb(244 63 94 / var(--tw-text-opacity));
@@ -4388,6 +4442,10 @@ details.dropdown::marker {
 .text-slate-800 {
   --tw-text-opacity: 1;
   color: rgb(30 41 59 / var(--tw-text-opacity));
+}
+
+.underline {
+  text-decoration-line: underline;
 }
 
 .opacity-25 {
@@ -4873,6 +4931,10 @@ details.dropdown::marker {
 
   .sm\:w-80 {
     width: 20rem;
+  }
+
+  .sm\:w-64 {
+    width: 16rem;
   }
 
   .sm\:w-\[calc\(50\%-0\.75rem\/2\)\] {

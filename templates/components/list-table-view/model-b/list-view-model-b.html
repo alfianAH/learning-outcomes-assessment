@@ -1,4 +1,4 @@
-<ol {% if id %}id="{{ id }}"{% endif %} class="flex flex-col sm:grid sm:grid-cols-2 xl:grid-cols-3" role="list">
+<ol {% if id %}id="{{ id }}"{% endif %} class="flex flex-col sm:grid sm:grid-cols-2 {% if not is_not_cols_3 %} xl:grid-cols-3 {% endif %}" role="list">
     {% for object in objects %}
         <li class="list-item-model-b" role="listitem">
             {% if user_role != 'm' %}

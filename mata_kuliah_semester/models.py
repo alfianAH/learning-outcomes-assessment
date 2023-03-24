@@ -156,6 +156,13 @@ class MataKuliahSemester(MataKuliahSemesterLock):
     def get_nilai_average_calculate_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:nilai-avg-calculate', self.get_kwargs)
     
+    # RPS
+    def get_rps_home_url(self):
+        return get_reverse_url('semester:mata_kuliah_semester:rps:home', self.get_kwargs)
+    
+    def get_rps_create_url(self):
+        return get_reverse_url('semester:mata_kuliah_semester:rps:create', self.get_kwargs)
+    
 
 class NilaiExcelMataKuliahSemester(models.Model):
     mk_semester = models.OneToOneField(MataKuliahSemester, on_delete=models.CASCADE)
