@@ -470,13 +470,13 @@ function tableAccordion(element) {
 
 function tabElement() {
     $(".tab-item").on("click", function () {
-        let activeTab = $('.tab').find(".tab-item:not(.disabled)");
+        let activeTab = $(this).siblings(".tab-item:not(.disabled)");
 
         if ($(activeTab).is($(this))) return;
 
         let clickedTab = $(this);
-        let activeTabContent = $('.tab-content').find(".show.active");
         let clickedTabContent = $(clickedTab.attr('data-target'));
+        let activeTabContent = $(clickedTabContent).siblings(".show.active");
 
         // Tabs classes
         activeTab.addClass("disabled");
