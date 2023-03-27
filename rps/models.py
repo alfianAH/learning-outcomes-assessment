@@ -10,7 +10,7 @@ User = settings.AUTH_USER_MODEL
 
 # Create your models here.
 class RencanaPembelajaranSemester(models.Model):
-    mk_semester = models.ForeignKey(MataKuliahSemester, on_delete=models.CASCADE)
+    mk_semester = models.OneToOneField(MataKuliahSemester, on_delete=models.CASCADE)
     kaprodi = models.ForeignKey(User, on_delete=models.CASCADE)
 
     semester = models.PositiveSmallIntegerField(null=False, blank=False)

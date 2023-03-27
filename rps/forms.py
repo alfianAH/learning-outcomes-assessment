@@ -36,59 +36,66 @@ class RencanaPembelajaranSemesterForm(forms.ModelForm):
         }
         widgets = {
             'kaprodi': MySelectInput(attrs={
-                'class': 'single-select-search',
+                'class': 'select-search-dosen',
             }),
             'semester': MyNumberInput(attrs={
                 'min': 0,
+                'placeholder': '1, 2, 3, ...'
             }),
             'deskripsi': MyTextareaInput(attrs={
                 'placeholder': 'Masukkan deskripsi singkat mata kuliah',
-                'row': 3,
+                'rows': 3,
             }),
             'clo_details': MyTextareaInput(attrs={
                 'placeholder': 'Masukkan capaian pembelajaran dari mata kuliah',
-                'row': 3,
+                'rows': 3,
             }),
             'materi_pembelajaran': PagedownWidget(attrs={
-                'row': 3,
+                'rows': 3,
             }),
             'pustaka_utama': PagedownWidget(attrs={
-                'row': 3,
+                'rows': 3,
             }),
             'pustaka_pendukung': PagedownWidget(attrs={
-                'row': 3,
+                'rows': 3,
             }),
         }
+    
 
-
-class DosenRPSForm(forms.Form):
-    dosen = forms.Field(
+class PengembangRPSForm(forms.Form):
+    dosen_pengembang = forms.Field(
         widget=forms.SelectMultiple(attrs={
-            'class': 'multi-select-search',
+            'class': 'select-search-dosen',
             'multiple': 'multiple'
         }),
+        label='Pengembang RPS'
     )
 
 
-class PengembangRPSForm(DosenRPSForm):
-    def __init__(self, *args, **kwargs):
-        self.fields['dosen'].label = 'Pengembang RPS'
-
-
-class KoordinatorRPSForm(DosenRPSForm):
-    def __init__(self, *args, **kwargs):
-        self.fields['dosen'].label = 'Koordinator Mata Kuliah'
-
-
-class DosenPengampuRPSForm(DosenRPSForm):
-    def __init__(self, *args, **kwargs):
-        self.fields['dosen'].label = 'Dosen pengampu'
-
-
-class MataKuliahSyaratRPSForm(forms.ModelForm):
-    mk_semester = forms.ChoiceField(
+class KoordinatorRPSForm(forms.Form):
+    dosen_koordinator = forms.Field(
         widget=forms.SelectMultiple(attrs={
-            'class': 'multi-select-search',
+            'class': 'select-search-dosen',
+            'multiple': 'multiple'
+        }),
+        label='Koordinator Mata Kuliah'
+    )
+
+
+class DosenPengampuRPSForm(forms.Form):
+    dosen_pengampu = forms.Field(
+        widget=forms.SelectMultiple(attrs={
+            'class': 'select-search-dosen',
+            'multiple': 'multiple'
+        }),
+        label='Dosen pengampu'
+    )
+
+
+class MataKuliahSyaratRPSForm(forms.Form):
+    mk_semester_syarat = forms.ChoiceField(
+        widget=forms.SelectMultiple(attrs={
+            'class': 'multi-select-search-mk-semester',
             'multiple': 'multiple'
         }),
     )
@@ -131,17 +138,17 @@ class PertemuanRPSForm(forms.ModelForm):
                 'min': 0,
             }),
             'learning_outcome': MyTextareaInput(attrs={
-                'row': 3,
+                'rows': 3,
                 'placeholder': 'Masukkan kemampuan akhir tiap tahapan pembelajaran.'
             }),
             'indikator': PagedownWidget(attrs={
-                'row': 3,
+                'rows': 3,
             }),
             'bentuk_kriteria': PagedownWidget(attrs={
-                'row': 3,
+                'rows': 3,
             }),
             'materi_pembelajaran': PagedownWidget(attrs={
-                'row': 3,
+                'rows': 3,
             }),
         }
 
@@ -165,10 +172,10 @@ class PembelajaranPertemuanRPSForm(forms.ModelForm):
         exclude = ['pertemuan_rps']
         widget = {
             'bentuk_pembelajaran': PagedownWidget(attrs={
-                'row': 3,
+                'rows': 3,
             }),
             'metode_pembelajaran': PagedownWidget(attrs={
-                'row': 3,
+                'rows': 3,
             }),
         }
 
