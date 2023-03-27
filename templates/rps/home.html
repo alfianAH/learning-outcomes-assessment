@@ -84,7 +84,81 @@ RPS -
     {% comment %} Capaian Pembelajaran {% endcomment %}
     <div class="tab-pane fade min-h-screen" id="tab-capaian-pane" role="tabpanel" aria-labelledby="tab-2">
         <h2>Intended Learning Outcomes (ILO)</h2>
+        <ul class="flex flex-col masonry mt-2.5">
+            {% for ilo in ilo_object_list %}
+            <li class="list-item-model-f">
+                <div class="flex flex-row items-center">
+                    <span class="font-bold w-full">{{ ilo.nama }}</span>
+
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" focusable="False" role="img" aria-label="chevron-down"class="bi bi-chevron-down list-item-collapse w-4 h-4 xl:w-6 xl:h-6" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                    </svg>
+                </div>
+
+                <div class="list-item-model-f-details">
+                    <table class="block p-2.5">
+                        <tbody class="flex flex-col">
+                            <tr class="mt-2.5 md:mt-3">
+                                <th scope="row" class="w-full">Satisfactory Level</th>
+                                <td class="whitespace-nowrap">{{ ilo.satisfactory_level }}%</td>
+                            </tr>
+
+                            <tr class="mt-2.5 md:mt-3">
+                                <th scope="col" colspan="2" class="w-full">Deskripsi</th>
+                            </tr>
+
+                            <tr class="mt-1 md:mt-2">
+                                <td colspan="2"  class="w-full">
+                                    {{ ilo.deskripsi }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        
+
         <h2>Course Learning Outcomes (CLO)</h2>
+        <ul class="flex flex-col masonry mt-2.5">
+            {% for clo in mk_semester_obj.get_all_clo %}
+            <li class="list-item-model-f">
+                <div class="flex flex-row items-center">
+                    <span class="font-bold w-full">{{ clo.nama }}</span>
+
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" focusable="False" role="img" aria-label="chevron-down"class="bi bi-chevron-down list-item-collapse w-4 h-4 xl:w-6 xl:h-6" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                    </svg>
+                </div>
+
+                <div class="list-item-model-f-details">
+                    <table class="block p-2.5">
+                        <tbody class="flex flex-col">
+                            <tr>
+                                <th scope="row" class="w-full">ILO</th>
+                                <td class="whitespace-nowrap">{{ clo.get_ilo.nama }}</td>
+                            </tr>
+                            <tr class="mt-2.5 md:mt-3">
+                                <th scope="row" class="w-full">Persentase</th>
+                                <td class="whitespace-nowrap">{{ clo.get_total_persentase_komponen }}%</td>
+                            </tr>
+
+                            <tr class="mt-2.5 md:mt-3">
+                                <th scope="col" colspan="2" class="w-full">Deskripsi</th>
+                            </tr>
+
+                            <tr class="mt-1 md:mt-2">
+                                <td colspan="2"  class="w-full">
+                                    {{ clo.deskripsi }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
     </div>
 
     {% comment %} Pertemuan {% endcomment %}

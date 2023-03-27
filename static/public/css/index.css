@@ -2418,6 +2418,18 @@ details.dropdown::marker {
   }
 }
 
+.list-item-model-f-details {
+  display: none;
+  border-top-width: 1px;
+  --tw-border-opacity: 1;
+  border-top-color: rgb(30 41 59 / var(--tw-border-opacity));
+}
+
+.dark .list-item-model-f-details {
+  --tw-border-opacity: 1;
+  border-top-color: rgb(241 245 249 / var(--tw-border-opacity));
+}
+
 .list-item-model-f.open > .list-item-model-f-details {
   display: block;
 }
@@ -3759,10 +3771,6 @@ details.dropdown::marker {
   height: 0.625rem;
 }
 
-.h-full {
-  height: 100%;
-}
-
 .max-h-10 {
   max-height: 2.5rem;
 }
@@ -4314,6 +4322,10 @@ details.dropdown::marker {
 
 .p-4 {
   padding: 1rem;
+}
+
+.p-2\.5 {
+  padding: 0.625rem;
 }
 
 .px-3 {
@@ -5067,6 +5079,10 @@ details.dropdown::marker {
 
   .md\:-ml-1 {
     margin-left: -0.25rem;
+  }
+
+  .md\:mt-3 {
+    margin-top: 0.75rem;
   }
 
   .md\:block {
