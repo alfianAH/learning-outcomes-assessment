@@ -625,27 +625,25 @@ function hideTooltop(tooltipIndicatorElement) {
 }
 
 function selectInputContent() {
-    window.onload = function () {
-        // Reset select input content selected option
-        $('.select-input-content').each(function () {
-            // Get default selected option and its index
-            const select = $(this);
-            const defaultSelect = select.find('option').filter('[selected]').first();
-            const defaultIndex = defaultSelect.index();
-            
-            select.prop('selectedIndex', defaultIndex).val(defaultSelect.val());
-        });
+    // Reset select input content selected option
+    $('.select-input-content').each(function () {
+        // Get default selected option and its index
+        const select = $(this);
+        const defaultSelect = select.find('option').filter('[selected]').first();
+        const defaultIndex = defaultSelect.index();
         
-        // Event trigger on change
-        $('.select-input-content').on('change', function () {
-            let selectContentId = $(this).val();
-            let targetContent = $(`#${selectContentId}`);
+        select.prop('selectedIndex', defaultIndex).val(defaultSelect.val());
+    });
+    
+    // Event trigger on change
+    $('.select-input-content').on('change', function () {
+        let selectContentId = $(this).val();
+        let targetContent = $(`#${selectContentId}`);
 
-            // Get select content siblings
-            targetContent.siblings('.select-content').fadeOut();
-            targetContent.fadeIn();
-        }).trigger('change');
-    }
+        // Get select content siblings
+        targetContent.siblings('.select-content').fadeOut();
+        targetContent.fadeIn();
+    }).trigger('change');
 }
 
 function createChart(canvasId, chartConfig) {
@@ -782,4 +780,4 @@ tabElement();
 toastHandler();
 tooltip();
 scrollHandler();
-selectInputContent();
+$(selectInputContent);
