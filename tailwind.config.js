@@ -7,7 +7,8 @@ module.exports = {
     "./static/**/*.js",
     "./pi_area/models.py",
     './mata_kuliah_semester/forms.py',
-    './laporan_cpl/forms.py'
+    './laporan_cpl/forms.py',
+    './staticfiles-cdn/select2/dist/js/select2.min.js'
   ],
   darkMode: 'class',
   theme: {
