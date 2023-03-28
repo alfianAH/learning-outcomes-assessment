@@ -157,6 +157,9 @@ class MataKuliahSemester(MataKuliahSemesterLock):
         return get_reverse_url('semester:mata_kuliah_semester:nilai-avg-calculate', self.get_kwargs)
     
     # RPS
+    def get_syarat_mata_kuliah_rps(self):
+        return self.matakuliahsyaratrps_set.all()
+    
     def get_rps_home_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:rps:home', self.get_kwargs)
     

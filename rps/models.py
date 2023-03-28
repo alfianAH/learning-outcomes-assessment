@@ -22,6 +22,18 @@ class RencanaPembelajaranSemester(models.Model):
 
     created_date = models.DateField(auto_now_add=True)
 
+    def get_pengembang_rps(self):
+        return self.pengembangrps_set.all()
+    
+    def get_koordinator_rps(self):
+        return self.koordinatorrps_set.all()
+    
+    def get_dosen_pengampu_rps(self):
+        return self.dosenpengampurps_set.all()
+    
+    def get_mata_kuliah_syarat_rps(self):
+        return self.matakuliahsyaratrps_set.all()
+
 
 class PengembangRPS(models.Model):
     rps = models.ForeignKey(RencanaPembelajaranSemester, on_delete=models.CASCADE)

@@ -1,5 +1,13 @@
 from django import forms
+from django.db.models import QuerySet
 from django.forms import inlineformset_factory
+from learning_outcomes_assessment.widgets import (
+    MySelectInput,
+    PagedownWidget,
+    MyNumberInput,
+    MyTextareaInput,
+)
+from mata_kuliah_semester.models import MataKuliahSemester
 from .models import(
     RencanaPembelajaranSemester,
     PertemuanRPS,
@@ -8,21 +16,24 @@ from .models import(
     JenisPertemuan,
     TipeDurasi,
 )
-from learning_outcomes_assessment.widgets import (
-    MySelectInput,
-    PagedownWidget,
-    MyNumberInput,
-    MyTextareaInput,
-)
+
+
+class KaprodiRPSForm(forms.Form):
+    kaprodi = forms.Field(
+        widget=MySelectInput(attrs={
+            'class': 'select-search-dosen',
+        }),
+        label='Kepala Program Studi',
+        help_text='Pilih Kepala Program Studi saat ini'
+    )
 
 
 class RencanaPembelajaranSemesterForm(forms.ModelForm):
     class Meta:
         model = RencanaPembelajaranSemester
         fields = '__all__'
-        exclude = ['mk_semester', 'created_date']
+        exclude = ['mk_semester', 'created_date', 'kaprodi']
         labels = {
-            'kaprodi': 'Kepala Program Studi',
             'semester': 'Semester',
             'deskripsi': 'Deskripsi singkat mata kuliah',
             'clo_details': 'Capaian Pembelajaran Mata Kuliah',
@@ -31,13 +42,9 @@ class RencanaPembelajaranSemesterForm(forms.ModelForm):
             'pustaka_pendukung': 'Pustaka pendukung',
         }
         help_texts = {
-            'kaprodi': 'Pilih Kepala Program Studi saat ini',
             'semester': 'Semester di mana mata kuliah berada. Contoh: Semester 1, 2.',
         }
         widgets = {
-            'kaprodi': MySelectInput(attrs={
-                'class': 'select-search-dosen',
-            }),
             'semester': MyNumberInput(attrs={
                 'min': 0,
                 'placeholder': '1, 2, 3, ...'
@@ -93,12 +100,24 @@ class DosenPengampuRPSForm(forms.Form):
 
 
 class MataKuliahSyaratRPSForm(forms.Form):
-    mk_semester_syarat = forms.ChoiceField(
+    mk_semester_syarat = forms.MultipleChoiceField(
         widget=forms.SelectMultiple(attrs={
             'class': 'multi-select-search-mk-semester',
             'multiple': 'multiple'
         }),
+        label='Mata Kuliah Syarat'
     )
+
+    def __init__(self, current_mk_semester: MataKuliahSemester, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        choices = []
+        list_mk_semester: QuerySet[MataKuliahSemester] = current_mk_semester.semester.get_mk_semester()
+        
+        for mk_semester in list_mk_semester:
+            if mk_semester == current_mk_semester: continue
+            choices.append((mk_semester.pk, mk_semester.mk_kurikulum.nama))
+
+        self.fields['mk_semester_syarat'].choices = choices
 
 
 class PertemuanRPSForm(forms.ModelForm):
