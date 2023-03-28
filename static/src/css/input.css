@@ -322,31 +322,6 @@
         @apply inline-block;
     }
 
-    /* Markdown pagedown */
-    .wmd-input {
-        @apply rounded-t-none rounded-b-md;
-    }
-
-    .wmd-panel {
-        @apply w-full m-0;
-    }
-
-    .wmd-button-row {
-        @apply m-0;
-    }
-
-    .wmd-button-bar {
-        @apply bg-slate-400 dark:bg-zinc-500 border-b border-slate-600 dark:border-zinc-300 rounded-t-md p-2;
-    }
-
-    .wmd-button > span {
-        @apply rounded-sm hover:bg-slate-500 active:bg-slate-600 dark:hover:bg-zinc-200 dark:active:bg-zinc-400 p-2 transition-colors;
-    }
-
-    .wmd-preview{
-        @apply w-full max-h-96 overflow-y-auto px-3 py-3 mt-5 bg-slate-300 dark:bg-zinc-600 border border-slate-200 focus:outline-none focus:border-slate-800 dark:border-zinc-600 dark:focus:border-slate-100;
-    }
-
     .form-label{
         @apply inline-block mb-1.5 md:mb-2.5 mr-2.5 md:mr-3 xl:mr-4;
     }
@@ -856,6 +831,39 @@
     /* Tooltip */
     .tooltip{
         @apply absolute top-0 bg-gray-700 text-white text-xs md:text-sm rounded p-2 max-w-fit sm:max-w-[256px] xl:max-w-xs mx-4 pointer-events-none hidden;
+    }
+
+    /* Markdown pagedown */
+    .wmd-input {
+        @apply rounded-t-none rounded-b-md;
+    }
+
+    .wmd-button-row {
+        @apply m-0;
+    }
+
+    .wmd-button-bar {
+        @apply bg-slate-400 dark:bg-zinc-500 border-b border-slate-600 dark:border-zinc-300 rounded-t-md p-2 overflow-x-auto;
+    }
+
+    .wmd-button > span {
+        @apply rounded-sm hover:bg-slate-500 active:bg-slate-600 dark:hover:bg-zinc-200 dark:active:bg-zinc-400 p-2 transition-colors;
+    }
+
+    .wmd-preview{
+        @apply w-full max-h-96 overflow-y-auto px-3 py-3 mt-5 bg-slate-300 dark:bg-zinc-600 border border-slate-200 focus:outline-none focus:border-slate-800 dark:border-zinc-600 dark:focus:border-slate-100;
+    }
+
+    .wmd-prompt-dialog{
+        @apply bg-slate-100 dark:bg-neutral-800 rounded-md p-4;
+    }
+
+    .wmd-wrapper, .wmd-panel {
+        @apply min-w-full m-0;
+    }
+
+    .wmd-preview {
+        @apply m-0 min-h-[19rem];
     }
 }
 
