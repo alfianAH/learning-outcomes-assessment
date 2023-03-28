@@ -27,6 +27,14 @@ class KaprodiRPSForm(forms.Form):
         help_text='Pilih Kepala Program Studi saat ini'
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        kaprodi = kwargs.get('initial', {}).get('kaprodi')
+        if kaprodi is None: return
+
+        self.fields['kaprodi'].widget.choices = [(kaprodi.username, kaprodi.nama)]
+
 
 class RencanaPembelajaranSemesterForm(forms.ModelForm):
     class Meta:
@@ -78,6 +86,15 @@ class PengembangRPSForm(forms.Form):
         label='Pengembang RPS'
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        list_dosen_pengembang = kwargs.get('initial', {}).get('dosen_pengembang')
+        if list_dosen_pengembang is None: return
+
+        self.fields['dosen_pengembang'].widget.choices = [(dosen.username, dosen.nama) for dosen in list_dosen_pengembang]
+        self.fields['dosen_pengembang'].initial = [dosen.username for dosen in list_dosen_pengembang]
+
 
 class KoordinatorRPSForm(forms.Form):
     dosen_koordinator = forms.Field(
@@ -87,6 +104,15 @@ class KoordinatorRPSForm(forms.Form):
         }),
         label='Koordinator Mata Kuliah'
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        list_dosen_koordinator = kwargs.get('initial', {}).get('dosen_koordinator')
+        if list_dosen_koordinator is None: return
+
+        self.fields['dosen_koordinator'].widget.choices = [(dosen.username, dosen.nama) for dosen in list_dosen_koordinator]
+        self.fields['dosen_koordinator'].initial = [dosen.username for dosen in list_dosen_koordinator]
 
 
 class DosenPengampuRPSForm(forms.Form):
@@ -98,9 +124,18 @@ class DosenPengampuRPSForm(forms.Form):
         label='Dosen pengampu'
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        list_dosen_pengampu = kwargs.get('initial', {}).get('dosen_pengampu')
+        if list_dosen_pengampu is None: return
+
+        self.fields['dosen_pengampu'].widget.choices = [(dosen.username, dosen.nama) for dosen in list_dosen_pengampu]
+        self.fields['dosen_pengampu'].initial = [dosen.username for dosen in list_dosen_pengampu]
+
 
 class MataKuliahSyaratRPSForm(forms.Form):
-    mk_semester_syarat = forms.MultipleChoiceField(
+    mk_semester_syarat = forms.Field(
         widget=forms.SelectMultiple(attrs={
             'class': 'multi-select-search-mk-semester',
             'multiple': 'multiple'
@@ -117,7 +152,12 @@ class MataKuliahSyaratRPSForm(forms.Form):
             if mk_semester == current_mk_semester: continue
             choices.append((mk_semester.pk, mk_semester.mk_kurikulum.nama))
 
-        self.fields['mk_semester_syarat'].choices = choices
+        self.fields['mk_semester_syarat'].widget.choices = choices
+        
+        list_mk_syarat = kwargs.get('initial', {}).get('mk_semester_syarat')
+        if list_mk_syarat is None: return
+        
+        self.fields['mk_semester_syarat'].initial = [str(mk_semester.pk) for mk_semester in list_mk_syarat]
 
 
 class PertemuanRPSForm(forms.ModelForm):

@@ -1,3 +1,5 @@
+import json
+from django.db.models import QuerySet
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 from django.contrib.auth import authenticate
@@ -67,9 +69,9 @@ class RPSHomeView(TemplateView):
             'rps': rps,
         })
         return context
+    
 
-
-class RPSCreateView(MultiFormView):
+class RPSFormView(MultiFormView):
     form_classes = {
         'kaprodi_rps_form': KaprodiRPSForm,
         'rps_form': RencanaPembelajaranSemesterForm,
@@ -78,7 +80,6 @@ class RPSCreateView(MultiFormView):
         'dosen_pengampu_rps_form': DosenPengampuRPSForm,
         'mata_kuliah_syarat_rps_form': MataKuliahSyaratRPSForm,
     }
-    template_name = 'rps/create-view.html'
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
@@ -86,20 +87,13 @@ class RPSCreateView(MultiFormView):
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
         self.success_url = self.mk_semester_obj.get_rps_home_url()
 
-    def dispatch(self, request, *args, **kwargs):
-        if hasattr(self.mk_semester_obj, 'rencanapembelajaransemester'):
-            messages.warning(request, 'Rencana Pembelajaran Semester untuk mata kuliah ini sudah ada.')
-            return redirect(self.success_url)
-        
-        return super().dispatch(request, *args, **kwargs)
-
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['mata_kuliah_syarat_rps_form'].update({
             'current_mk_semester': self.mk_semester_obj
         })
         return kwargs
-
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
@@ -123,8 +117,19 @@ class RPSCreateView(MultiFormView):
 
             list_dosen_profile.append(dosen_user_profile)
         return list_dosen_profile
+
+
+class RPSCreateView(RPSFormView):
+    template_name = 'rps/create-view.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if hasattr(self.mk_semester_obj, 'rencanapembelajaransemester'):
+            messages.warning(request, 'Rencana Pembelajaran Semester untuk mata kuliah ini sudah ada.')
+            return redirect(self.success_url)
+        
+        return super().dispatch(request, *args, **kwargs)
     
-    def save_dosen_rps_form(self, model, form_cleaned_data, field_key: str, rps_obj: RencanaPembelajaranSemester):
+    def create_dosen_rps_form(self, model, form_cleaned_data, field_key: str, rps_obj: RencanaPembelajaranSemester):
         list_dosen_profile = self.get_dosen_profile(form_cleaned_data[field_key])
         for dosen_profile in list_dosen_profile:
             dosen_user = authenticate(self.request, user=dosen_profile, role=RoleChoices.DOSEN)
@@ -161,15 +166,15 @@ class RPSCreateView(MultiFormView):
 
         # Dosen pengembang RPS
         pengembang_rps_form = cleaned_data['pengembang_rps_form']
-        self.save_dosen_rps_form(PengembangRPS, pengembang_rps_form, 'dosen_pengembang', rps_obj)
+        self.create_dosen_rps_form(PengembangRPS, pengembang_rps_form, 'dosen_pengembang', rps_obj)
 
         # Dosen Koordinator RPS
         koordinator_rps_form = cleaned_data['koordinator_rps_form']
-        self.save_dosen_rps_form(KoordinatorRPS, koordinator_rps_form, 'dosen_koordinator', rps_obj)
+        self.create_dosen_rps_form(KoordinatorRPS, koordinator_rps_form, 'dosen_koordinator', rps_obj)
 
         # Dosen Pengampu RPS
         dosen_pengampu_rps_form = cleaned_data['dosen_pengampu_rps_form']
-        self.save_dosen_rps_form(DosenPengampuRPS, dosen_pengampu_rps_form, 'dosen_pengampu', rps_obj)
+        self.create_dosen_rps_form(DosenPengampuRPS, dosen_pengampu_rps_form, 'dosen_pengampu', rps_obj)
 
         # Mata Kuliah Syarat
         mata_kuliah_syarat_rps_form = cleaned_data['mata_kuliah_syarat_rps_form']
@@ -191,3 +196,57 @@ class RPSCreateView(MultiFormView):
         messages.success(self.request, 'Proses penambahan rincian RPS sudah selesai.')
         
         return super().form_valid(forms)
+
+from django.views.generic.edit import UpdateView
+class RPSUpdateView(RPSFormView):
+    template_name = 'rps/update-view.html'
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        self.rps_obj: RencanaPembelajaranSemester = self.mk_semester_obj.rencanapembelajaransemester
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        
+        kwargs['rps_form'].update({
+            'instance': self.rps_obj
+        })
+
+        return kwargs
+
+    def get_initial(self):
+        initial = super().get_initial()
+        
+        # Kaprodi
+        initial['kaprodi_rps_form'].update({
+            'kaprodi': self.rps_obj.kaprodi
+        })
+
+        # Pengembang RPS
+        list_dosen_pengembang_rps: QuerySet[PengembangRPS] = self.rps_obj.get_pengembang_rps()
+
+        initial['pengembang_rps_form'].update({
+            'dosen_pengembang': [dosen.dosen for dosen in list_dosen_pengembang_rps]
+        })
+
+        # Koordinator RPS
+        list_dosen_koordinator_rps: QuerySet[KoordinatorRPS] = self.rps_obj.get_koordinator_rps()
+
+        initial['koordinator_rps_form'].update({
+            'dosen_koordinator': [dosen.dosen for dosen in list_dosen_koordinator_rps]
+        })
+
+        # Dosen Pengampu RPS
+        list_dosen_pengampu_rps: QuerySet[DosenPengampuRPS] = self.rps_obj.get_dosen_pengampu_rps()
+
+        initial['dosen_pengampu_rps_form'].update({
+            'dosen_pengampu': [dosen.dosen for dosen in list_dosen_pengampu_rps]
+        })
+
+        # MK Syarat RPS
+        list_mata_kuliah_syarat_rps: QuerySet[MataKuliahSyaratRPS] = self.rps_obj.get_mata_kuliah_syarat_rps()
+
+        initial['mata_kuliah_syarat_rps_form'].update({
+            'mk_semester_syarat': [mk_syarat.mk_semester for mk_syarat in list_mata_kuliah_syarat_rps]
+        })
+        return initial

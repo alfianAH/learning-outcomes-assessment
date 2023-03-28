@@ -7,7 +7,7 @@
 {% endblock form_media %}
 
 {% block title %}
-Tambah rincian RPS - 
+Edit rincian RPS - 
 {% endblock title %}
 
 {% block breadcrumb %}
@@ -15,11 +15,11 @@ Tambah rincian RPS -
 <li class="breadcrumb-item"><a href="{{ mk_semester_obj.semester.read_detail_url }}" role="listitem">Detail</a></li>
 <li class="breadcrumb-item"><a href="{{ mk_semester_obj.read_detail_url }}" role="listitem">Detail MK</a></li>
 <li class="breadcrumb-item"><a href="{{ mk_semester_obj.get_rps_home_url }}" role="listitem">RPS</a></li>
-<li class="breadcrumb-item active" aria-current="page" role="listitem">Tambah rincian RPS</li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">Edit rincian RPS</li>
 {% endblock breadcrumb %}
 
 {% block content %}
-<h1>Tambah Rincian RPS</h1>
+<h1>Edit Rincian RPS</h1>
 
 {% include 'components/form/default-form.html' with form_fields='rps/partials/rincian-rps-form-fields.html' %}
 {% endblock content %}
@@ -49,7 +49,9 @@ Tambah rincian RPS -
     });
 
     $('.multi-select-search-mk-semester').select2({
-        width: '256px'
+        width: '256px', 
     });
+
+    {% comment %} $('#id_mk_semester_syarat').val(['251', '163']).trigger('change'); {% endcomment %}
 </script>
 {% endblock script %}

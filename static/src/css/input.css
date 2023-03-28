@@ -877,7 +877,7 @@
     }
 
     .wmd-preview{
-        @apply w-full max-h-96 overflow-y-auto px-3 py-3 mt-5 bg-slate-300 dark:bg-zinc-600 border border-slate-200 focus:outline-none focus:border-slate-800 dark:border-zinc-600 dark:focus:border-slate-100;
+        @apply w-full max-h-96 overflow-y-auto px-3 py-3 bg-slate-300 dark:bg-zinc-600 border border-slate-200 focus:outline-none focus:border-slate-800 dark:border-zinc-600 dark:focus:border-slate-100  m-0 min-h-[19rem];
     }
 
     .wmd-prompt-dialog{
@@ -886,10 +886,6 @@
 
     .wmd-wrapper, .wmd-panel {
         @apply min-w-full m-0;
-    }
-
-    .wmd-preview {
-        @apply m-0 min-h-[19rem];
     }
 }
 
