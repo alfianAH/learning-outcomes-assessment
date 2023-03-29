@@ -169,6 +169,9 @@ class MataKuliahSemester(MataKuliahSemesterLock):
     def get_rps_update_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:rps:update', self.get_kwargs)
     
+    def get_rps_delete_url(self):
+        return get_reverse_url('semester:mata_kuliah_semester:rps:delete', self.get_kwargs)
+    
 
 class NilaiExcelMataKuliahSemester(models.Model):
     mk_semester = models.OneToOneField(MataKuliahSemester, on_delete=models.CASCADE)

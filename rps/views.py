@@ -6,6 +6,7 @@ from django.contrib.auth import authenticate
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic.base import TemplateView
+from django.views.generic.edit import DeleteView
 from accounts.enums import RoleChoices
 from learning_outcomes_assessment.forms.edit import MultiFormView
 from ilo.models import Ilo
@@ -373,3 +374,20 @@ class RPSUpdateView(RPSFormView):
         queryset_with_mk.delete()
 
         return super().forms_valid(forms)
+
+
+class RPSDeleteView(DeleteView):
+    model = RencanaPembelajaranSemester
+
+    def setup(self, request: HttpRequest, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        mk_semester_id = kwargs.get('mk_semester_id')
+        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+        self.success_url = self.mk_semester_obj.get_rps_home_url()
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        return self.delete(request, *args, **kwargs)
+    
+    def get_object(self, queryset = None):
+        obj = self.mk_semester_obj.rencanapembelajaransemester
+        return obj
