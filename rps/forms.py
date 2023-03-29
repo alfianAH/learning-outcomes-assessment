@@ -8,6 +8,7 @@ from learning_outcomes_assessment.widgets import (
     MyTextareaInput,
 )
 from mata_kuliah_semester.models import MataKuliahSemester
+from mata_kuliah_kurikulum.models import MataKuliahKurikulum
 from .models import(
     RencanaPembelajaranSemester,
     PertemuanRPS,
@@ -34,6 +35,43 @@ class KaprodiRPSForm(forms.Form):
         if kaprodi is None: return
 
         self.fields['kaprodi'].widget.choices = [(kaprodi.username, kaprodi.nama)]
+
+
+class SKSForm(forms.Form):
+    teori_sks = forms.IntegerField(
+        min_value=0,
+        required=True,
+        widget=MyNumberInput(attrs={
+            'placeholder': 2
+        }),
+        label='Teori',
+    )
+    praktik_sks = forms.IntegerField(
+        min_value=0,
+        required=True,
+        widget=MyNumberInput(attrs={
+            'placeholder': 1
+        }),
+        label='Praktik',
+    )
+
+    def __init__(self, mk_kurikulum: MataKuliahKurikulum, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.mk_kurikulum = mk_kurikulum
+
+        self.fields['teori_sks'].help_text = 'SKS untuk Teori. SKS MK: {}'.format(self.mk_kurikulum.sks)
+        self.fields['praktik_sks'].help_text = 'SKS untuk Praktik. SKS MK: {}'.format(self.mk_kurikulum.sks)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        teori_sks = cleaned_data['teori_sks']
+        praktik_sks = cleaned_data['praktik_sks']
+
+        total_sks = teori_sks + praktik_sks
+        if total_sks > self.mk_kurikulum.sks:
+            self.add_error('teori_sks', 'Total SKS teori dan praktik tidak sesuai dengan jumlah SKS di database. Input: {}, Ekspektasi: {}'.format(total_sks, self.mk_kurikulum.sks))
+        
+        return cleaned_data
 
 
 class RencanaPembelajaranSemesterForm(forms.ModelForm):
@@ -140,7 +178,8 @@ class MataKuliahSyaratRPSForm(forms.Form):
             'class': 'multi-select-search-mk-semester',
             'multiple': 'multiple'
         }),
-        label='Mata Kuliah Syarat'
+        label='Mata Kuliah Syarat',
+        required=False,
     )
 
     def __init__(self, current_mk_semester: MataKuliahSemester, *args, **kwargs):

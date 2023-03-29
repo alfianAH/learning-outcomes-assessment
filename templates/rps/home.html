@@ -114,7 +114,7 @@ RPS -
             <div class="tr-div">
                 <div class="font-bold min-w-24 md:min-w-40">SKS</div>
                 <div>:</div>
-                <div>{{ mk_kurikulum.sks }} ()</div>
+                <div>{{ mk_kurikulum.sks }} (T = {{ mk_kurikulum.teori_sks|default_if_none:'-' }}, P = {{ mk_kurikulum.praktik_sks|default_if_none:'-' }})</div>
             </div>
             {% endwith %}
             
@@ -212,11 +212,15 @@ RPS -
             </div>
             <div class="tr-div">
                 <div>
+                    {% if rps.get_mata_kuliah_syarat_rps %}
                     <ol class="list-decimal ml-8">
                         {% for mk_syarat in rps.get_mata_kuliah_syarat_rps %}
                             <li>{{ mk_syarat.mk_semester.mk_kurikulum.nama }}</li>
                         {% endfor %}
                     </ol>
+                    {% else %}
+                    -
+                    {% endif %}
                 </div>
             </div>
 

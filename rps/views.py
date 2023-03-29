@@ -26,6 +26,7 @@ from .models import (
     TipeDurasi,
 )
 from .forms import (
+    SKSForm,
     KaprodiRPSForm,
     RencanaPembelajaranSemesterForm,
     PengembangRPSForm,
@@ -74,6 +75,7 @@ class RPSHomeView(TemplateView):
 
 class RPSFormView(MultiFormView):
     form_classes = {
+        'sks_form': SKSForm,
         'kaprodi_rps_form': KaprodiRPSForm,
         'rps_form': RencanaPembelajaranSemesterForm,
         'pengembang_rps_form': PengembangRPSForm,
@@ -92,6 +94,9 @@ class RPSFormView(MultiFormView):
         kwargs = super().get_form_kwargs()
         kwargs['mata_kuliah_syarat_rps_form'].update({
             'current_mk_semester': self.mk_semester_obj
+        })
+        kwargs['sks_form'].update({
+            'mk_kurikulum': self.mk_semester_obj.mk_kurikulum
         })
         return kwargs
     
@@ -144,6 +149,12 @@ class RPSCreateView(RPSFormView):
 
         for key, form in forms.items():
             cleaned_data[key] = form.cleaned_data
+
+        # SKS
+        sks_form = cleaned_data['sks_form']
+        self.mk_semester_obj.mk_kurikulum.teori_sks = sks_form['teori_sks']
+        self.mk_semester_obj.mk_kurikulum.praktik_sks = sks_form['praktik_sks']
+        self.mk_semester_obj.mk_kurikulum.save()
 
         # Kaprodi
         kaprodi_rps_form = cleaned_data['kaprodi_rps_form']
@@ -217,6 +228,12 @@ class RPSUpdateView(RPSFormView):
 
     def get_initial(self):
         initial = super().get_initial()
+
+        # SKS
+        initial['sks_form'].update({
+            'teori_sks': self.mk_semester_obj.mk_kurikulum.teori_sks,
+            'praktik_sks': self.mk_semester_obj.mk_kurikulum.praktik_sks,
+        })
         
         # Kaprodi
         initial['kaprodi_rps_form'].update({
@@ -296,6 +313,12 @@ class RPSUpdateView(RPSFormView):
 
         for key, form in forms.items():
             cleaned_data[key] = form.cleaned_data
+        
+        # SKS
+        sks_form = cleaned_data['sks_form']
+        self.mk_semester_obj.mk_kurikulum.teori_sks = sks_form['teori_sks']
+        self.mk_semester_obj.mk_kurikulum.praktik_sks = sks_form['praktik_sks']
+        self.mk_semester_obj.mk_kurikulum.save()
 
         # Kaprodi
         kaprodi_rps_form = cleaned_data['kaprodi_rps_form']

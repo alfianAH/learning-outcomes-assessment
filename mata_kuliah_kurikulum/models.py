@@ -10,6 +10,8 @@ class MataKuliahKurikulum(models.Model):
     kode = models.CharField(max_length=100, null=False)
     nama = models.CharField(max_length=255, null=False)
     sks = models.PositiveSmallIntegerField(null=False)
+    teori_sks = models.PositiveSmallIntegerField(null=True)
+    praktik_sks = models.PositiveSmallIntegerField(null=True)
 
     def __str__(self) -> str:
         return self.nama
