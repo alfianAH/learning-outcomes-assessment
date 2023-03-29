@@ -20,6 +20,9 @@ class Clo(LockableMixin, models.Model):
     nama = models.CharField(max_length=255, null=False, blank=False)
     deskripsi = models.TextField(null=False)
     
+    def __str__(self) -> str:
+        return self.nama
+    
     @property
     def get_kwargs(self):
         return {

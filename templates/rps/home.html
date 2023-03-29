@@ -47,7 +47,7 @@ RPS -
         <div class="tab-title">
             <span class="truncate">Rincian</span>
 
-            {% if not mk_semester_obj.status_rincian|default:False %}
+            {% if not mk_semester_obj.status_rincian %}
             <div class="w-2 h-2 lg:w-2.5 lg:h-2.5 ml-2.5 badge-warning rounded-full"></div>
             {% endif %}
         </div>
@@ -335,7 +335,15 @@ RPS -
 
     {% comment %} Pertemuan {% endcomment %}
     <div class="tab-pane fade min-h-screen {% if is_pertemuan_tab %}show active{% endif %}" id="tab-pertemuan-pane" role="tabpanel" aria-labelledby="tab-3">
-        <h2>Pertemuan</h2>
+        <div class="h-icon">
+            <h2>Pertemuan</h2>
+            <a href="{{ mk_semester_obj.get_pertemuan_rps_create_url }}" class="btn btn-primary loading-trigger max-w-min">
+                <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                </svg>
+                <span class="hidden sm:block">Tambah</span>
+            </a>
+        </div>
     </div>
 </div>
 {% endblock content %}

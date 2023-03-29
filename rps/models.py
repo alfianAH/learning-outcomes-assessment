@@ -56,7 +56,7 @@ class MataKuliahSyaratRPS(models.Model):
 
 
 class PertemuanRPS(models.Model):
-    rps = models.ForeignKey(RencanaPembelajaranSemester, on_delete=models.CASCADE)
+    mk_semester = models.ForeignKey(MataKuliahSemester, on_delete=models.CASCADE)
     clo = models.ForeignKey(Clo, on_delete=models.CASCADE)
     
     pertemuan_awal = models.PositiveSmallIntegerField(null=False, blank=False)

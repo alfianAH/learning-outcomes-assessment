@@ -157,6 +157,14 @@ class MataKuliahSemester(MataKuliahSemesterLock):
         return get_reverse_url('semester:mata_kuliah_semester:nilai-avg-calculate', self.get_kwargs)
     
     # RPS
+    @property
+    def status_rincian(self):
+        if not hasattr(self, 'rencanapembelajaransemester'): 
+            status = False
+        else:
+            status = True
+        return status
+
     def get_syarat_mata_kuliah_rps(self):
         return self.matakuliahsyaratrps_set.all()
     
@@ -171,6 +179,18 @@ class MataKuliahSemester(MataKuliahSemesterLock):
     
     def get_rps_delete_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:rps:delete', self.get_kwargs)
+    
+    # Pertemuan RPS
+    @property
+    def status_pertemuan(self):
+        if not hasattr(self, 'pertemuanrps'): 
+            status = False
+        else:
+            status = True
+        return status
+    
+    def get_pertemuan_rps_create_url(self):
+        return get_reverse_url('semester:mata_kuliah_semester:rps:pertemuan-create', self.get_kwargs)
     
 
 class NilaiExcelMataKuliahSemester(models.Model):

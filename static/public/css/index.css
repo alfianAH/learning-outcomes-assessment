@@ -4596,6 +4596,12 @@ details.dropdown::marker {
   min-width: 18rem;
 }
 
+.min-w-min {
+  min-width: -webkit-min-content;
+  min-width: -moz-min-content;
+  min-width: min-content;
+}
+
 .min-w-20 {
   min-width: 5rem;
 }
@@ -4670,6 +4676,10 @@ details.dropdown::marker {
   max-width: 100%;
 }
 
+.flex-1 {
+  flex: 1 1 0%;
+}
+
 .-translate-x-1\/2 {
   --tw-translate-x: -50%;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
@@ -4725,6 +4735,10 @@ details.dropdown::marker {
 
 .grid-cols-2 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.grid-cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .flex-row {

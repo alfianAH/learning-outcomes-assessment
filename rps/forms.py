@@ -9,6 +9,7 @@ from learning_outcomes_assessment.widgets import (
 )
 from mata_kuliah_semester.models import MataKuliahSemester
 from mata_kuliah_kurikulum.models import MataKuliahKurikulum
+from clo.models import Clo
 from .models import(
     RencanaPembelajaranSemester,
     PertemuanRPS,
@@ -103,15 +104,9 @@ class RencanaPembelajaranSemesterForm(forms.ModelForm):
                 'placeholder': 'Masukkan capaian pembelajaran dari mata kuliah',
                 'rows': 3,
             }),
-            'materi_pembelajaran': PagedownWidget(attrs={
-                'rows': 3,
-            }),
-            'pustaka_utama': PagedownWidget(attrs={
-                'rows': 3,
-            }),
-            'pustaka_pendukung': PagedownWidget(attrs={
-                'rows': 3,
-            }),
+            'materi_pembelajaran': PagedownWidget(),
+            'pustaka_utama': PagedownWidget(),
+            'pustaka_pendukung': PagedownWidget(),
         }
     
 
@@ -203,7 +198,7 @@ class PertemuanRPSForm(forms.ModelForm):
     class Meta:
         model = PertemuanRPS
         fields = '__all__'
-        exclude = ['rps']
+        exclude = ['mk_semester']
         labels = {
             'clo': 'CLO',
             'bobot_penilaian': 'Bobot penilaian (%)',
@@ -239,28 +234,34 @@ class PertemuanRPSForm(forms.ModelForm):
                 'rows': 3,
                 'placeholder': 'Masukkan kemampuan akhir tiap tahapan pembelajaran.'
             }),
-            'indikator': PagedownWidget(attrs={
-                'rows': 3,
-            }),
-            'bentuk_kriteria': PagedownWidget(attrs={
-                'rows': 3,
-            }),
-            'materi_pembelajaran': PagedownWidget(attrs={
-                'rows': 3,
-            }),
+            'indikator': PagedownWidget(),
+            'bentuk_kriteria': PagedownWidget(),
+            'materi_pembelajaran': PagedownWidget(),
         }
+    
+    def __init__(self, clo_qs: QuerySet[Clo], *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['clo'].queryset = clo_qs
+
+    def clean(self):
+        cleaned_data = super().clean()
+        print(cleaned_data)
+        return cleaned_data
 
 
 class PertemuanLuringForm():
-    jenis_pertemuan = forms.HiddenInput(attrs={
-        'value': JenisPertemuan.OFFLINE
-    })
+    jenis_pertemuan = forms.Field(
+        widget=forms.HiddenInput(),
+        initial=JenisPertemuan.OFFLINE,
+    )
+
 
 
 class PertemuanDaringForm():
-    jenis_pertemuan = forms.HiddenInput(attrs={
-        'value': JenisPertemuan.ONLINE
-    })
+    jenis_pertemuan = forms.Field(
+        widget=forms.HiddenInput(),
+        initial=JenisPertemuan.ONLINE,
+    )
 
 
 class PembelajaranPertemuanRPSForm(forms.ModelForm):
@@ -268,22 +269,32 @@ class PembelajaranPertemuanRPSForm(forms.ModelForm):
         model = PembelajaranPertemuanRPS
         fields = '__all__'
         exclude = ['pertemuan_rps']
-        widget = {
-            'bentuk_pembelajaran': PagedownWidget(attrs={
-                'rows': 3,
-            }),
-            'metode_pembelajaran': PagedownWidget(attrs={
-                'rows': 3,
-            }),
+        widgets = {
+            'bentuk_pembelajaran': PagedownWidget(),
+            'metode_pembelajaran': PagedownWidget(),
         }
 
 
 class PembelajaranPertemuanLuringRPSForm(PertemuanLuringForm, PembelajaranPertemuanRPSForm):
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['jenis_pertemuan'].initial = JenisPertemuan.OFFLINE
+        self.fields['bentuk_pembelajaran'].label = 'Luring (offline)'
+        self.fields['metode_pembelajaran'].label = 'Luring (offline)'
+
+    def add_prefix(self, field_name: str) -> str:
+        return '{}_pembelajaran_luring'.format(super().add_prefix(field_name))
 
 
 class PembelajaranPertemuanDaringRPSForm(PertemuanDaringForm, PembelajaranPertemuanRPSForm):
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['jenis_pertemuan'].initial = JenisPertemuan.ONLINE
+        self.fields['bentuk_pembelajaran'].label = 'Daring (online)'
+        self.fields['metode_pembelajaran'].label = 'Daring (online)'
+    
+    def add_prefix(self, field_name: str) -> str:
+        return '{}_pembelajaran_daring'.format(super().add_prefix(field_name))
 
 
 class DurasiPertemuanRPSForm(forms.ModelForm):
@@ -307,18 +318,29 @@ class DurasiPertemuanRPSForm(forms.ModelForm):
             'pengali_durasi': MyNumberInput(attrs={
                 'placeholder': 2,
                 'min': 0,
+                'class': 'w-full',
             }),
             'durasi_menit': MyNumberInput(attrs={
                 'placeholder': 45,
                 'min': 0,
-                'max': 60,
+                'class': 'w-full',
             }),
         }
 
 
 class DurasiPertemuanLuringRPSForm(PertemuanLuringForm, DurasiPertemuanRPSForm):
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['jenis_pertemuan'].initial = JenisPertemuan.OFFLINE
+    
+    def add_prefix(self, field_name: str) -> str:
+        return '{}_durasi_luring'.format(super().add_prefix(field_name))
 
 
 class DurasiPertemuanDaringRPSForm(PertemuanDaringForm, DurasiPertemuanRPSForm):
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['jenis_pertemuan'].initial = JenisPertemuan.ONLINE
+    
+    def add_prefix(self, field_name: str) -> str:
+        return '{}_durasi_daring'.format(super().add_prefix(field_name))
