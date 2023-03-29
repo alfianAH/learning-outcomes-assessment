@@ -197,7 +197,7 @@ class RPSCreateView(RPSFormView):
         
         return super().form_valid(forms)
 
-from django.views.generic.edit import UpdateView
+
 class RPSUpdateView(RPSFormView):
     template_name = 'rps/update-view.html'
 
@@ -250,3 +250,126 @@ class RPSUpdateView(RPSFormView):
             'mk_semester_syarat': [mk_syarat.mk_semester for mk_syarat in list_mata_kuliah_syarat_rps]
         })
         return initial
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        mk_semester_syarat_initial = self.get_forms()['mata_kuliah_syarat_rps_form'].fields['mk_semester_syarat'].initial
+        mk_semester_syarat = json.dumps({'results': mk_semester_syarat_initial})
+
+        context.update({
+            'mk_semester_syarat': mk_semester_syarat,
+        })
+        return context
+    
+    def update_dosen_rps_form(self, model, form_cleaned_data, field_key: str, rps_obj: RencanaPembelajaranSemester, queryset: QuerySet):
+        list_dosen_profile = self.get_dosen_profile(form_cleaned_data[field_key])
+        list_dosen_user = []
+
+        for dosen_profile in list_dosen_profile:
+            dosen_user = authenticate(self.request, user=dosen_profile, role=RoleChoices.DOSEN)
+            list_dosen_user.append(dosen_user)
+            
+            queryset_with_dosen = queryset.filter(
+                dosen=dosen_user
+            )
+
+            # If query exists, don't need to update
+            if queryset_with_dosen.exists(): continue
+
+            # If query doesn't exist, create a new one
+            model.objects.create(
+                rps=rps_obj,
+                dosen=dosen_user
+            )
+        
+        # Search dosen that doesn't appear on list user but in database
+        queryset_with_dosen = queryset.exclude(
+            dosen__in=list_dosen_user
+        )
+        # Delete if not on clean_field
+        queryset_with_dosen.delete()
+
+    def forms_valid(self, forms: dict):
+        cleaned_data = {}
+
+        for key, form in forms.items():
+            cleaned_data[key] = form.cleaned_data
+
+        # Kaprodi
+        kaprodi_rps_form = cleaned_data['kaprodi_rps_form']
+        kaprodi_user_profile = self.get_dosen_profile(list_nip=[kaprodi_rps_form['kaprodi']])
+
+        if len(kaprodi_user_profile) > 0:
+            kaprodi_user_profile = kaprodi_user_profile[0]
+        else:
+            messages.error(self.request, 'Data Kepala Program Studi tidak bisa didapatkan.')
+            return redirect(self.success_url)
+        
+        kaprodi_user = authenticate(self.request, user=kaprodi_user_profile, role=RoleChoices.DOSEN)
+
+        # RPS
+        rps_form = cleaned_data['rps_form']
+        rps_obj = RencanaPembelajaranSemester.objects.filter(
+            id=self.rps_obj.pk,
+            mk_semester=self.mk_semester_obj,
+        )
+
+        rps_obj.update(
+            kaprodi=kaprodi_user,
+            **rps_form
+        )
+
+        # Dosen pengembang RPS
+        pengembang_rps_form = cleaned_data['pengembang_rps_form']
+        pengembang_rps_qs: QuerySet[PengembangRPS] = self.rps_obj.get_pengembang_rps()
+        self.update_dosen_rps_form(PengembangRPS, pengembang_rps_form, 'dosen_pengembang', self.rps_obj, pengembang_rps_qs)
+
+        # Dosen koordinator RPS
+        koordinator_rps_form = cleaned_data['koordinator_rps_form']
+        koordinator_rps_qs: QuerySet[KoordinatorRPS] = self.rps_obj.get_koordinator_rps()
+        self.update_dosen_rps_form(KoordinatorRPS, koordinator_rps_form, 'dosen_koordinator', self.rps_obj, koordinator_rps_qs)
+
+        # Dosen pengampu RPS
+        dosen_pengampu_rps_form = cleaned_data['dosen_pengampu_rps_form']
+        dosen_pengampu_rps_qs: QuerySet[DosenPengampuRPS] = self.rps_obj.get_dosen_pengampu_rps()
+        self.update_dosen_rps_form(DosenPengampuRPS, dosen_pengampu_rps_form, 'dosen_pengampu', self.rps_obj, dosen_pengampu_rps_qs)
+
+        # Mata Kuliah Syarat
+        mata_kuliah_syarat_rps_form = cleaned_data['mata_kuliah_syarat_rps_form']
+        mata_kuliah_syarat_rps_qs: QuerySet[MataKuliahSyaratRPS] = self.rps_obj.get_mata_kuliah_syarat_rps()
+        list_mk_semester_syarat = []
+
+        for mk_semester_id in mata_kuliah_syarat_rps_form['mk_semester_syarat']:
+            try:
+                mk_semester_obj = MataKuliahSemester.objects.get(id=mk_semester_id)
+            except (MataKuliahSemester.DoesNotExist, MataKuliahSemester.MultipleObjectsReturned):
+                message = 'Tidak bisa mendapatkan mata kuliah semester dengan ID: {}'.format(mk_semester_id)
+                if settings.DEBUG: print(message)
+                messages.error(self.request, message)
+
+                continue
+
+            list_mk_semester_syarat.append(mk_semester_obj)
+
+            queryset_with_mk = mata_kuliah_syarat_rps_qs.filter(
+                mk_semester=mk_semester_obj
+            )
+
+            # If query exists, don't need to update
+            if queryset_with_mk.exists(): continue
+
+            # If query doesn't exist, create a new one
+            MataKuliahSyaratRPS.objects.create(
+                rps=self.rps_obj,
+                mk_semester=mk_semester_obj,
+            )
+
+        # Search dosen that doesn't appear on list user but in database
+        queryset_with_mk = mata_kuliah_syarat_rps_qs.exclude(
+            mk_semester__in=list_mk_semester_syarat
+        )
+        # Delete if not on clean_field
+        queryset_with_mk.delete()
+
+        return super().forms_valid(forms)

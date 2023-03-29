@@ -52,6 +52,7 @@ Edit rincian RPS -
         width: '256px', 
     });
 
-    {% comment %} $('#id_mk_semester_syarat').val(['251', '163']).trigger('change'); {% endcomment %}
+    let mkSyarat = {{ mk_semester_syarat|safe }};
+    $('#id_mk_semester_syarat').val(mkSyarat.results).trigger('change');
 </script>
 {% endblock script %}
