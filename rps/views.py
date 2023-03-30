@@ -8,7 +8,10 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import DeleteView, CreateView
 from accounts.enums import RoleChoices
-from learning_outcomes_assessment.forms.edit import MultiFormView
+from learning_outcomes_assessment.forms.edit import (
+    MultiFormView,
+    MultiModelFormView,
+)
 from ilo.models import Ilo
 from mata_kuliah_semester.models import MataKuliahSemester
 from rps.models import RencanaPembelajaranSemester
@@ -38,8 +41,8 @@ from .forms import (
     RincianPertemuanRPSForm,
     PembelajaranPertemuanLuringRPSForm,
     PembelajaranPertemuanDaringRPSForm,
-    DurasiPertemuanLuringRPSForm,
-    DurasiPertemuanDaringRPSForm,
+    DurasiPertemuanLuringRPSFormset,
+    DurasiPertemuanDaringRPSFormset,
 )
 
 
@@ -450,13 +453,13 @@ class PertemuanRPSCreateView(CreateView):
         return context
 
 
-class RincianPertemuanRPSFormView(MultiFormView):
+class RincianPertemuanRPSFormView(MultiModelFormView):
     form_classes = {
         'rincian_pertemuan_rps_form': RincianPertemuanRPSForm,
         'pembelajaran_pertemuan_luring_rps_form': PembelajaranPertemuanLuringRPSForm,
         'pembelajaran_pertemuan_daring_rps_form': PembelajaranPertemuanDaringRPSForm,
-        'durasi_pertemuan_luring_rps_form': DurasiPertemuanLuringRPSForm,
-        'durasi_pertemuan_daring_rps_form': DurasiPertemuanDaringRPSForm,
+        'durasi_pertemuan_luring_rps_formset': DurasiPertemuanLuringRPSFormset,
+        'durasi_pertemuan_daring_rps_formset': DurasiPertemuanDaringRPSFormset,
     }
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:

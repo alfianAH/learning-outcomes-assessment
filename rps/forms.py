@@ -7,6 +7,7 @@ from learning_outcomes_assessment.widgets import (
     MyNumberInput,
     MyTextareaInput,
 )
+from learning_outcomes_assessment.forms.formset import CanDeleteInlineFormSet
 from mata_kuliah_semester.models import MataKuliahSemester
 from mata_kuliah_kurikulum.models import MataKuliahKurikulum
 from clo.models import Clo
@@ -358,3 +359,23 @@ class DurasiPertemuanDaringRPSForm(PertemuanDaringForm, DurasiPertemuanRPSForm):
     
     def add_prefix(self, field_name: str) -> str:
         return '{}_durasi_daring'.format(super().add_prefix(field_name))
+
+
+DurasiPertemuanLuringRPSFormset = inlineformset_factory(
+    PertemuanRPS,
+    DurasiPertemuanRPS,
+    form=DurasiPertemuanLuringRPSForm,
+    formset=CanDeleteInlineFormSet,
+    extra=1,
+    can_delete=True,
+)
+
+DurasiPertemuanDaringRPSFormset = inlineformset_factory(
+    PertemuanRPS,
+    DurasiPertemuanRPS,
+    form=DurasiPertemuanDaringRPSForm,
+    formset=CanDeleteInlineFormSet,
+    extra=1,
+    can_delete=True,
+)
+

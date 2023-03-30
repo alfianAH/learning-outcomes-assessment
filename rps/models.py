@@ -96,7 +96,7 @@ class JenisPertemuan(models.TextChoices):
 
 
 class PembelajaranPertemuanRPS(models.Model):
-    pertemuan_rps = models.OneToOneField(PertemuanRPS, on_delete=models.CASCADE)
+    pertemuan_rps = models.ForeignKey(PertemuanRPS, on_delete=models.CASCADE)
 
     jenis_pertemuan = models.CharField(max_length=3, null=False, blank=False, choices=JenisPertemuan.choices)
     bentuk_pembelajaran = models.TextField(null=False, blank=False)
@@ -111,7 +111,7 @@ class TipeDurasi(models.TextChoices):
 
 
 class DurasiPertemuanRPS(models.Model):
-    pertemuan_rps = models.OneToOneField(PertemuanRPS, on_delete=models.CASCADE)
+    pertemuan_rps = models.ForeignKey(PertemuanRPS, on_delete=models.CASCADE)
 
     jenis_pertemuan = models.CharField(max_length=3, null=False, blank=False, choices=JenisPertemuan.choices)
     tipe_durasi = models.CharField(max_length=100, null=False, blank=False)
