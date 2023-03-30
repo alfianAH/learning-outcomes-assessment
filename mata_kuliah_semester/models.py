@@ -205,6 +205,9 @@ class MataKuliahSemester(MataKuliahSemesterLock):
     def get_pertemuan_rps_create_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:rps:pertemuan-create', self.get_kwargs)
     
+    def get_pertemuan_rps_bulk_delete_url(self):
+        return get_reverse_url('semester:mata_kuliah_semester:rps:pertemuan-bulk-delete', self.get_kwargs)
+    
 
 class NilaiExcelMataKuliahSemester(models.Model):
     mk_semester = models.OneToOneField(MataKuliahSemester, on_delete=models.CASCADE)

@@ -4,7 +4,9 @@ from .views import (
     RPSCreateView,
     RPSUpdateView,
     RPSDeleteView,
+
     PertemuanRPSCreateView,
+    PertemuanRPSBulkDeleteView,
 )
 
 
@@ -17,4 +19,5 @@ urlpatterns = [
 
     # PertemuanRPS
     path('pertemuan/create/', PertemuanRPSCreateView.as_view(), name='pertemuan-create'),
+    path('pertemuan/bulk-delete/', PertemuanRPSBulkDeleteView.as_view(), name='pertemuan-bulk-delete'),
 ]

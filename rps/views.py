@@ -5,7 +5,6 @@ from django.http import HttpRequest, HttpResponse
 from django.contrib.auth import authenticate
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
-from django.views.generic.base import TemplateView
 from django.views.generic.edit import DeleteView, CreateView
 from accounts.enums import RoleChoices
 from learning_outcomes_assessment.forms.edit import (
@@ -13,6 +12,7 @@ from learning_outcomes_assessment.forms.edit import (
     MultiModelFormView,
 )
 from learning_outcomes_assessment.list_view.views import DetailWithListViewModelA
+from learning_outcomes_assessment.forms.edit import ModelBulkDeleteView
 from ilo.models import Ilo
 from mata_kuliah_semester.models import MataKuliahSemester
 from rps.models import RencanaPembelajaranSemester
@@ -76,6 +76,10 @@ class RPSHomeView(DetailWithListViewModelA):
         ).distinct()
 
         return ilo_qs
+    
+    def setup(self, request: HttpRequest, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.bulk_delete_url = self.single_object.get_pertemuan_rps_bulk_delete_url()
     
     def get_queryset(self):
         self.queryset = self.model.objects.filter(
@@ -535,6 +539,23 @@ class PertemuanRPSCreateView(CreateView):
         pertemuan_rps_obj.save()
 
         return redirect(self.success_url)
+
+
+class PertemuanRPSBulkDeleteView(ModelBulkDeleteView):
+    model = PertemuanRPS
+    id_list_obj: str = 'id_pertemuan_rps'
+    success_msg: str = 'Berhasil menghapus pertemuan RPS.'
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        mk_semester_id = kwargs.get('mk_semester_id')
+        self.mk_semester_obj: MataKuliahSemester = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+        self.success_url = '{}?active_tab=pertemuan'.format(self.mk_semester_obj.get_rps_home_url())
+        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
+
+    def get_queryset(self):
+        self.queryset = self.model.objects.filter(id__in=self.get_list_selected_obj())
+        return super().get_queryset()
 
 
 class RincianPertemuanRPSFormView(MultiModelFormView):
