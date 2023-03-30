@@ -5,7 +5,8 @@ from django.http import HttpRequest, HttpResponse
 from django.contrib.auth import authenticate
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
-from django.views.generic.edit import DeleteView, CreateView
+from django.views.generic.edit import DeleteView, CreateView, UpdateView
+from django.views.generic.detail import DetailView
 from accounts.enums import RoleChoices
 from learning_outcomes_assessment.forms.edit import (
     MultiFormView,
@@ -556,6 +557,33 @@ class PertemuanRPSBulkDeleteView(ModelBulkDeleteView):
     def get_queryset(self):
         self.queryset = self.model.objects.filter(id__in=self.get_list_selected_obj())
         return super().get_queryset()
+
+
+class PertemuanRPSReadView(DetailView):
+    model = PertemuanRPS
+    pk_url_kwarg = 'rps_id'
+    template_name = 'rps/pertemuan/detail-view.html'
+
+
+class PertemuanRPSUpdateView(UpdateView):
+    template_name = 'rps/pertemuan/update-view.html'
+    model = PertemuanRPS
+    pk_url_kwarg = 'rps_id'
+    form_class = PertemuanRPSForm
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        self.object: PertemuanRPS = self.get_object()
+        self.success_url = '{}?active_tab=pertemuan'.format(self.object.read_detail_url())
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'clo_qs': self.object.mk_semester.get_all_clo(),
+            'pertemuan_rps_qs': self.object.mk_semester.get_all_pertemuan_rps(),
+            'current_pertemuan_rps': self.object,
+        })
+        return kwargs
 
 
 class RincianPertemuanRPSFormView(MultiModelFormView):

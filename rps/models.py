@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.db.models import Q, CheckConstraint
 from django.core.validators import MinValueValidator, MaxValueValidator
+from learning_outcomes_assessment.utils import get_reverse_url
 from mata_kuliah_semester.models import MataKuliahSemester
 from clo.models import Clo
 
@@ -78,6 +79,25 @@ class PertemuanRPS(models.Model):
                 name='bobot_penilaian_pertemuan_rps_range'
             ),
         )
+
+    def __str__(self) -> str:
+        if self.pertemuan_akhir is None:
+            return 'Pertemuan {}'.format(self.pertemuan_awal)
+        else:
+            return 'Pertemuan {}-{}'.format(self.pertemuan_awal, self.pertemuan_akhir)
+    
+    @property
+    def get_kwargs(self):
+        return {
+            **self.mk_semester.get_kwargs,
+            'rps_id': self.pk,
+        }
+    
+    def read_detail_url(self):
+        return get_reverse_url('semester:mata_kuliah_semester:rps:pertemuan-read', self.get_kwargs)
+    
+    def get_pertemuan_update_url(self):
+        return get_reverse_url('semester:mata_kuliah_semester:rps:pertemuan-update', self.get_kwargs)
 
 
 class RincianPertemuanRPS(models.Model):

@@ -235,10 +235,11 @@ class PertemuanRPSForm(forms.ModelForm):
             'tipe_pertemuan': MySelectInput(),
         }
     
-    def __init__(self, clo_qs: QuerySet[Clo], pertemuan_rps_qs: QuerySet[PertemuanRPS], *args, **kwargs):
+    def __init__(self, clo_qs: QuerySet[Clo], pertemuan_rps_qs: QuerySet[PertemuanRPS], current_pertemuan_rps: PertemuanRPS = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['clo'].queryset = clo_qs
         self.pertemuan_rps_qs = pertemuan_rps_qs
+        self.current_pertemuan_rps = current_pertemuan_rps
 
     def clean(self):
         cleaned_data = super().clean()
@@ -250,6 +251,9 @@ class PertemuanRPSForm(forms.ModelForm):
         )
 
         list_pertemuan_db = []
+        if self.current_pertemuan_rps is not None:
+            self.pertemuan_rps_qs = self.pertemuan_rps_qs.exclude(id=self.current_pertemuan_rps.pk)
+        
         for pertemuan_rps in self.pertemuan_rps_qs:
             # List pertemuan in database
             pertemuan_awal_db = pertemuan_rps.pertemuan_awal
