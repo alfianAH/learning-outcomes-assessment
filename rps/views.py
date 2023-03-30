@@ -6,12 +6,9 @@ from django.contrib.auth import authenticate
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic.base import TemplateView
-from django.views.generic.edit import DeleteView
+from django.views.generic.edit import DeleteView, CreateView
 from accounts.enums import RoleChoices
-from learning_outcomes_assessment.forms.edit import (
-    MultiFormView,
-    MultiModelFormView
-)
+from learning_outcomes_assessment.forms.edit import MultiFormView
 from ilo.models import Ilo
 from mata_kuliah_semester.models import MataKuliahSemester
 from rps.models import RencanaPembelajaranSemester
@@ -23,6 +20,7 @@ from .models import (
     DosenPengampuRPS,
     MataKuliahSyaratRPS,
     PertemuanRPS,
+    RincianPertemuanRPS,
     PembelajaranPertemuanRPS,
     DurasiPertemuanRPS,
     JenisPertemuan,
@@ -37,6 +35,7 @@ from .forms import (
     DosenPengampuRPSForm,
     MataKuliahSyaratRPSForm,
     PertemuanRPSForm,
+    RincianPertemuanRPSForm,
     PembelajaranPertemuanLuringRPSForm,
     PembelajaranPertemuanDaringRPSForm,
     DurasiPertemuanLuringRPSForm,
@@ -425,9 +424,35 @@ class RPSDeleteView(DeleteView):
 
 
 # Pertemuan RPS
-class PertemuanRPSFormView(MultiFormView):
+class PertemuanRPSCreateView(CreateView):
+    template_name = 'rps/pertemuan/create-view.html'
+    model = PertemuanRPS
+    form_class = PertemuanRPSForm
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        mk_semester_id = kwargs.get('mk_semester_id')
+        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+        self.success_url = self.mk_semester_obj.get_rps_home_url()
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'clo_qs': self.mk_semester_obj.get_all_clo()
+        })
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'mk_semester_obj': self.mk_semester_obj,
+        })
+        return context
+
+
+class RincianPertemuanRPSFormView(MultiFormView):
     form_classes = {
-        'pertemuan_rps_form': PertemuanRPSForm,
+        'rincian_pertemuan_rps_form': RincianPertemuanRPSForm,
         'pembelajaran_pertemuan_luring_rps_form': PembelajaranPertemuanLuringRPSForm,
         'pembelajaran_pertemuan_daring_rps_form': PembelajaranPertemuanDaringRPSForm,
         'durasi_pertemuan_luring_rps_form': DurasiPertemuanLuringRPSForm,
@@ -440,30 +465,3 @@ class PertemuanRPSFormView(MultiFormView):
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
         self.success_url = self.mk_semester_obj.get_rps_home_url()
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['pertemuan_rps_form'].update({
-            'clo_qs': self.mk_semester_obj.get_all_clo()
-        })
-        return kwargs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({
-            'mk_semester_obj': self.mk_semester_obj,
-        })
-        return context
-    
-
-class PertemuanRPSCreateView(PertemuanRPSFormView):
-    template_name = 'rps/pertemuan/create-view.html'
-
-    def forms_valid(self, forms: dict):
-        cleaned_data = {}
-
-        for key, form in forms.items():
-            cleaned_data[key] = form.cleaned_data
-        
-        print(cleaned_data)
-
-        return super().forms_valid(forms)

@@ -55,20 +55,20 @@ class MataKuliahSyaratRPS(models.Model):
     mk_semester = models.ForeignKey(MataKuliahSemester, on_delete=models.CASCADE)
 
 
+class TipePertemuan(models.TextChoices):
+    REGULER = 'reg', 'Reguler'
+    TEST = 'tes', 'Ujian Mid/Final'
+
+
 class PertemuanRPS(models.Model):
     mk_semester = models.ForeignKey(MataKuliahSemester, on_delete=models.CASCADE)
     clo = models.ForeignKey(Clo, on_delete=models.CASCADE)
+
+    tipe_pertemuan = models.CharField(max_length=3, choices=TipePertemuan.choices, null=False, blank=False)
+    bobot_penilaian = models.SmallIntegerField(null=False, blank=False, validators=[MinValueValidator(0.0), MaxValueValidator(100.0)])
     
     pertemuan_awal = models.PositiveSmallIntegerField(null=False, blank=False)
     pertemuan_akhir = models.PositiveSmallIntegerField(null=True, blank=True)
-    learning_outcome = models.TextField(null=False, blank=False)
-
-    # Penilaian
-    indikator = models.TextField(null=False, blank=False)
-    bentuk_kriteria = models.TextField(null=False, blank=False)
-
-    materi_pembelajaran = models.TextField(null=False, blank=False)
-    bobot_penilaian = models.SmallIntegerField(null=False, blank=False, validators=[MinValueValidator(0.0), MaxValueValidator(100.0)])
 
     class Meta:
         constraints = (
@@ -77,6 +77,17 @@ class PertemuanRPS(models.Model):
                 name='bobot_penilaian_pertemuan_rps_range'
             ),
         )
+
+
+class RincianPertemuanRPS(models.Model):
+    pertemuan_rps = models.OneToOneField(PertemuanRPS, on_delete=models.CASCADE)
+
+    learning_outcome = models.TextField(null=False, blank=False)
+    materi_pembelajaran = models.TextField(null=False, blank=False)
+
+    # Penilaian
+    indikator = models.TextField(null=False, blank=False)
+    bentuk_kriteria = models.TextField(null=False, blank=False)
 
 
 class JenisPertemuan(models.TextChoices):

@@ -13,6 +13,7 @@ from clo.models import Clo
 from .models import(
     RencanaPembelajaranSemester,
     PertemuanRPS,
+    RincianPertemuanRPS,
     PembelajaranPertemuanRPS,
     DurasiPertemuanRPS,
     JenisPertemuan,
@@ -204,16 +205,14 @@ class PertemuanRPSForm(forms.ModelForm):
             'bobot_penilaian': 'Bobot penilaian (%)',
             'pertemuan_awal': 'Awal',
             'pertemuan_akhir': 'Akhir (opsional)',
-            'learning_outcome': 'Capaian pembelajaran',
-            'indikator': 'Indikator',
-            'bentuk_kriteria': 'Bentuk dan kriteria',
-            'materi_pembelajaran': 'Materi pembelajaran',
+            'tipe_pertemuan': 'Tipe pertemuan',
         }
         help_texts = {
             'pertemuan_awal': 'Range pertemuan. Contoh: Pertemuan 1-3, maka awal = 1, akhir = 3.',
             'pertemuan_akhir': 'Range pertemuan. Contoh: Pertemuan 1-3, maka awal = 1, akhir = 3.',
             'clo': 'Pilih CLO yang berkaitan dengan pertemuan untuk menentukan bobot penilaian.',
             'bobot_penilaian': 'Bobot penilaian pertemuan dari persentase CLO yang dipilih.',
+            'tipe_pertemuan': 'Silakan memilih antara pertemuan biasa (reguler) atau pertemuan ujian (ujian mid atau final).'
         }
         widgets = {
             'clo': MySelectInput(attrs={
@@ -230,13 +229,7 @@ class PertemuanRPSForm(forms.ModelForm):
                 'placeholder': 3,
                 'min': 0,
             }),
-            'learning_outcome': MyTextareaInput(attrs={
-                'rows': 3,
-                'placeholder': 'Masukkan kemampuan akhir tiap tahapan pembelajaran.'
-            }),
-            'indikator': PagedownWidget(),
-            'bentuk_kriteria': PagedownWidget(),
-            'materi_pembelajaran': PagedownWidget(),
+            'tipe_pertemuan': MySelectInput(),
         }
     
     def __init__(self, clo_qs: QuerySet[Clo], *args, **kwargs):
@@ -247,6 +240,28 @@ class PertemuanRPSForm(forms.ModelForm):
         cleaned_data = super().clean()
         print(cleaned_data)
         return cleaned_data
+    
+
+class RincianPertemuanRPSForm(forms.ModelForm):
+    class Meta:
+        model = RincianPertemuanRPS
+        fields = '__all__'
+        exclude = ['pertemuan_rps']
+        labels = {
+            'learning_outcome': 'Capaian pembelajaran',
+            'indikator': 'Indikator',
+            'bentuk_kriteria': 'Bentuk dan kriteria',
+            'materi_pembelajaran': 'Materi pembelajaran',
+        }
+        widgets = {
+            'learning_outcome': MyTextareaInput(attrs={
+                'rows': 3,
+                'placeholder': 'Masukkan kemampuan akhir tiap tahapan pembelajaran.'
+            }),
+            'indikator': PagedownWidget(),
+            'bentuk_kriteria': PagedownWidget(),
+            'materi_pembelajaran': PagedownWidget(),
+        }
 
 
 class PertemuanLuringForm():
@@ -254,7 +269,6 @@ class PertemuanLuringForm():
         widget=forms.HiddenInput(),
         initial=JenisPertemuan.OFFLINE,
     )
-
 
 
 class PertemuanDaringForm():

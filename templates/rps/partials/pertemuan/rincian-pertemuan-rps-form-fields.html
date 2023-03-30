@@ -1,0 +1,50 @@
+{% include 'components/form/form-field.html' with field=forms.rincian_pertemuan_rps_form.learning_outcome %}
+
+<p class="font-bold">Penilaian</p>
+<div class="ml-5">
+    {% include 'components/form/form-field.html' with field=forms.rincian_pertemuan_rps_form.indikator %}
+    {% include 'components/form/form-field.html' with field=forms.rincian_pertemuan_rps_form.bentuk_kriteria %}
+</div>
+
+<p class="font-bold">Bentuk Pembelajaran</p>
+{{ forms.pembelajaran_pertemuan_luring_rps_form.jenis_pertemuan.as_hidden }}
+{{ forms.pembelajaran_pertemuan_daring_rps_form.jenis_pertemuan.as_hidden }}
+<div class="ml-5 grid grid-cols-1 sm:grid-cols-2 gap-">
+    {% include 'components/form/form-field.html' with field=forms.pembelajaran_pertemuan_luring_rps_form.bentuk_pembelajaran %}
+    {% include 'components/form/form-field.html' with field=forms.pembelajaran_pertemuan_daring_rps_form.bentuk_pembelajaran %}
+</div>
+
+<p class="font-bold">Metode Pembelajaran</p>
+<div class="ml-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+    {% include 'components/form/form-field.html' with field=forms.pembelajaran_pertemuan_luring_rps_form.metode_pembelajaran %}
+    {% include 'components/form/form-field.html' with field=forms.pembelajaran_pertemuan_daring_rps_form.metode_pembelajaran %}
+</div>
+
+<p class="font-bold">Durasi</p>
+<div class="ml-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div>
+        <span>Luring (offline)</span>
+        {{ forms.durasi_pertemuan_luring_rps_form.jenis_pertemuan.as_hidden }}
+        {% include 'components/form/form-field.html' with field=forms.durasi_pertemuan_luring_rps_form.tipe_durasi %}
+
+        <div class="flex space-x-2 items-center">
+            {% include 'components/form/form-field.html' with field=forms.durasi_pertemuan_luring_rps_form.pengali_durasi not_use_label=True %}
+            <span class="mb-3">X</span>
+            {% include 'components/form/form-field.html' with field=forms.durasi_pertemuan_luring_rps_form.durasi_menit not_use_label=True %}
+            <span class="mb-3">menit</span>
+        </div>
+    </div>
+
+    <div>
+        <span>Daring (online)</span>
+        {{ forms.durasi_pertemuan_daring_rps_form.jenis_pertemuan.as_hidden }}
+        {% include 'components/form/form-field.html' with field=forms.durasi_pertemuan_daring_rps_form.tipe_durasi %}
+
+        <div class="flex space-x-2 items-center">
+            {% include 'components/form/form-field.html' with field=forms.durasi_pertemuan_daring_rps_form.pengali_durasi not_use_label=True %}
+            <span class="mb-3">X</span>
+            {% include 'components/form/form-field.html' with field=forms.durasi_pertemuan_daring_rps_form.durasi_menit not_use_label=True %}
+            <span class="mb-3">menit</span>
+        </div>
+    </div>
+</div>
