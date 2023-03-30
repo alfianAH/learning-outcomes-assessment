@@ -90,7 +90,7 @@ class PertemuanRPS(models.Model):
     def get_kwargs(self):
         return {
             **self.mk_semester.get_kwargs,
-            'rps_id': self.pk,
+            'pertemuan_rps_id': self.pk,
         }
     
     def read_detail_url(self):
@@ -98,6 +98,12 @@ class PertemuanRPS(models.Model):
     
     def get_pertemuan_update_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:rps:pertemuan-update', self.get_kwargs)
+    
+    def get_rincian_pertemuan_create_url(self):
+        return get_reverse_url('semester:mata_kuliah_semester:rps:rincian-pertemuan-create', self.get_kwargs)
+    
+    def get_rincian_pertemuan_update_url(self):
+        return get_reverse_url('semester:mata_kuliah_semester:rps:rincian-pertemuan-update', self.get_kwargs)
 
 
 class RincianPertemuanRPS(models.Model):

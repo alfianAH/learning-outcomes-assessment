@@ -1,0 +1,53 @@
+{% extends 'home-view.html' %}
+
+{% block form_media %}
+{% for form in forms.values %}
+    {{ form.media }}
+{% endfor %}
+{% endblock form_media %}
+
+{% block title %}
+Update rincian pertemuan - 
+{% endblock title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'semester:read-all' %}" role="listitem">Semester</a></li>
+<li class="breadcrumb-item"><a href="{{ pertemuan_rps_obj.mk_semester.semester.read_detail_url }}" role="listitem">Detail</a></li>
+<li class="breadcrumb-item"><a href="{{ pertemuan_rps_obj.mk_semester.read_detail_url }}" role="listitem">Detail MK</a></li>
+<li class="breadcrumb-item"><a href="{{ pertemuan_rps_obj.mk_semester.get_rps_home_url }}?active_tab=pertemuan" role="listitem">RPS</a></li>
+<li class="breadcrumb-item"><a href="{{ pertemuan_rps_obj.read_detail_url }}" role="listitem">Detail pertemuan</a></li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">Update rincian</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<h1>Update Rincian Pertemuan RPS</h1>
+
+<div class="table-div">
+    <div class="tr-div">
+        <div class="w-32 md:w-36">Semester</div>
+        <div>:</div>
+        <div>{{ pertemuan_rps_obj.mk_semester.semester.semester }}</div>
+    </div>
+    <div class="tr-div">
+        <div class="w-32 md:w-36">Mata kuliah</div>
+        <div>:</div>
+        <div>{{ pertemuan_rps_obj.mk_semester.mk_kurikulum.nama }}</div>
+    </div>
+    <div class="tr-div">
+        <div class="w-32 md:w-36">Pertemuan</div>
+        <div>:</div>
+        <div>{{ pertemuan_rps_obj }}</div>
+    </div>
+</div>
+
+{% include 'components/form/default-form.html' with form_fields='rps/partials/pertemuan/rincian-pertemuan-rps-form-fields.html' %}
+{% endblock content %}
+
+{% block script %}
+<script>
+    $('.tipe-durasi-search').select2({
+        width: '256px',
+        tags: true,
+    });
+</script>
+{% endblock script %}

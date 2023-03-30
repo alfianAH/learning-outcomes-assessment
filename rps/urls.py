@@ -9,6 +9,9 @@ from .views import (
     PertemuanRPSBulkDeleteView,
     PertemuanRPSReadView,
     PertemuanRPSUpdateView,
+
+    RincianPertemuanRPSCreateView,
+    RincianPertemuanRPSUpdateView,
 )
 
 
@@ -20,8 +23,12 @@ urlpatterns = [
     path('delete/', RPSDeleteView.as_view(), name='delete'),
 
     # PertemuanRPS
-    path('pertemuan/<int:rps_id>/', PertemuanRPSReadView.as_view(), name='pertemuan-read'),
+    path('pertemuan/<int:pertemuan_rps_id>/', PertemuanRPSReadView.as_view(), name='pertemuan-read'),
     path('pertemuan/create/', PertemuanRPSCreateView.as_view(), name='pertemuan-create'),
     path('pertemuan/bulk-delete/', PertemuanRPSBulkDeleteView.as_view(), name='pertemuan-bulk-delete'),
-    path('pertemuan/<int:rps_id>/update/', PertemuanRPSUpdateView.as_view(), name='pertemuan-update'),
+    path('pertemuan/<int:pertemuan_rps_id>/update/', PertemuanRPSUpdateView.as_view(), name='pertemuan-update'),
+
+    # Rincian pertemuan RPS
+    path('pertemuan/<int:pertemuan_rps_id>/rincian/create/', RincianPertemuanRPSCreateView.as_view(), name='rincian-pertemuan-create'),
+    path('pertemuan/<int:pertemuan_rps_id>/rincian/update/', RincianPertemuanRPSUpdateView.as_view(), name='rincian-pertemuan-update'),
 ]

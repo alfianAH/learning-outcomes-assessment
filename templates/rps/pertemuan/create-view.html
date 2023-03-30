@@ -32,12 +32,3 @@ Tambah pertemuan RPS -
 
 {% include 'components/form/default-form.html' with form_fields='rps/partials/pertemuan/pertemuan-rps-form-fields.html' %}
 {% endblock content %}
-
-{% block script %}
-<script>
-    $('.tipe-durasi-search').select2({
-        width: '256px',
-        tags: true,
-    });
-</script>
-{% endblock script %}

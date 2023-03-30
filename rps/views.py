@@ -561,14 +561,14 @@ class PertemuanRPSBulkDeleteView(ModelBulkDeleteView):
 
 class PertemuanRPSReadView(DetailView):
     model = PertemuanRPS
-    pk_url_kwarg = 'rps_id'
+    pk_url_kwarg = 'pertemuan_rps_id'
     template_name = 'rps/pertemuan/detail-view.html'
 
 
 class PertemuanRPSUpdateView(UpdateView):
     template_name = 'rps/pertemuan/update-view.html'
     model = PertemuanRPS
-    pk_url_kwarg = 'rps_id'
+    pk_url_kwarg = 'pertemuan_rps_id'
     form_class = PertemuanRPSForm
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
@@ -597,7 +597,27 @@ class RincianPertemuanRPSFormView(MultiModelFormView):
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
-        mk_semester_id = kwargs.get('mk_semester_id')
-        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
-        self.success_url = self.mk_semester_obj.get_rps_home_url()
+        pertemuan_rps_id = kwargs.get('pertemuan_rps_id')
+        self.pertemuan_rps_obj = get_object_or_404(PertemuanRPS, id=pertemuan_rps_id)
+        self.success_url = self.pertemuan_rps_obj.read_detail_url()
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'pertemuan_rps_obj': self.pertemuan_rps_obj,
+        })
+        return context
+
+
+class RincianPertemuanRPSCreateView(RincianPertemuanRPSFormView):
+    template_name = 'rps/pertemuan/rincian-pertemuan-create-view.html'
+
+    def forms_valid(self, forms: dict):
+        pass
+
+
+class RincianPertemuanRPSUpdateView(RincianPertemuanRPSFormView):
+    template_name = 'rps/pertemuan/rincian-pertemuan-update-view.html'
+
+    def forms_valid(self, forms: dict):
+        pass
