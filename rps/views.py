@@ -142,17 +142,16 @@ class RPSHomeView(DetailWithListViewModelA):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
-        is_rincian_tab = False
-        is_pertemuan_tab = True
+        get_request = self.request.GET
+
+        if get_request.get('active_tab') == 'pertemuan':
+            context['is_pertemuan_tab'] = True
         
         rps: RencanaPembelajaranSemester = None
         if hasattr(self.single_object, 'rencanapembelajaransemester'):
             rps = self.single_object.rencanapembelajaransemester
 
         context.update({
-            'is_rincian_tab': is_rincian_tab,
-            'is_pertemuan_tab': is_pertemuan_tab,
             'ilo_object_list': self.get_ilo,
             'rps': rps,
             'total_bobot_penilaian_json': self.total_bobot_penilaian_json()
@@ -513,12 +512,13 @@ class PertemuanRPSCreateView(CreateView):
         super().setup(request, *args, **kwargs)
         mk_semester_id = kwargs.get('mk_semester_id')
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
-        self.success_url = self.mk_semester_obj.get_rps_home_url()
+        self.success_url = '{}?active_tab=pertemuan'.format(self.mk_semester_obj.get_rps_home_url())
     
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs.update({
-            'clo_qs': self.mk_semester_obj.get_all_clo()
+            'clo_qs': self.mk_semester_obj.get_all_clo(),
+            'pertemuan_rps_qs': self.mk_semester_obj.get_all_pertemuan_rps()
         })
         return kwargs
 

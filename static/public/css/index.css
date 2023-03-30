@@ -4447,6 +4447,26 @@ details.dropdown::marker {
   height: 0.625rem;
 }
 
+.h-full {
+  height: 100%;
+}
+
+.h-60 {
+  height: 15rem;
+}
+
+.h-20 {
+  height: 5rem;
+}
+
+.h-24 {
+  height: 6rem;
+}
+
+.h-16 {
+  height: 4rem;
+}
+
 .max-h-10 {
   max-height: 2.5rem;
 }
@@ -4475,8 +4495,16 @@ details.dropdown::marker {
   max-height: 20rem;
 }
 
+.max-h-full {
+  max-height: 100%;
+}
+
 .min-h-screen {
   min-height: 100vh;
+}
+
+.min-h-full {
+  min-height: 100%;
 }
 
 .w-full {
@@ -5061,6 +5089,10 @@ details.dropdown::marker {
 
 .\!align-middle {
   vertical-align: middle !important;
+}
+
+.align-middle {
+  vertical-align: middle;
 }
 
 .text-2xl {
@@ -5805,6 +5837,10 @@ details.dropdown::marker {
     height: 2rem;
   }
 
+  .md\:h-20 {
+    height: 5rem;
+  }
+
   .md\:max-h-48 {
     max-height: 12rem;
   }
@@ -5980,6 +6016,10 @@ details.dropdown::marker {
 
   .lg\:h-7 {
     height: 1.75rem;
+  }
+
+  .lg\:h-24 {
+    height: 6rem;
   }
 
   .lg\:max-h-72 {

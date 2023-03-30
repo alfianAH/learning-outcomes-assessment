@@ -1,9 +1,18 @@
 <p>Pertemuan</p>
-<div class="flex space-x-4 items-center">
-    {% include 'components/form/form-field.html' with field=form.pertemuan_awal %}
-    <span>_</span>
-    {% include 'components/form/form-field.html' with field=form.pertemuan_akhir %}
+<div class="flex space-x-4 items-start">
+    {% include 'components/form/form-field.html' with field=form.pertemuan_awal not_include_error=True %}
+    <div class="flex items-center h-16 md:h-20 lg:h-24">
+        <span>_</span>
+    </div>
+    {% include 'components/form/form-field.html' with field=form.pertemuan_akhir not_include_error=True %}
 </div>
+
+{% if form.pertemuan_awal.errors or form.pertemuan_akhir.errors  %}
+<div class="mb-3">
+    {% include 'components/form/form-errors.html' with errors=form.pertemuan_awal.errors %}
+    {% include 'components/form/form-errors.html' with errors=form.pertemuan_akhir.errors %}
+</div>
+{% endif %}
 
 {% include 'components/form/form-field.html' with field=form.tipe_pertemuan %}
 

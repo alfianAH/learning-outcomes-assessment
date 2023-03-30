@@ -1,12 +1,17 @@
 <span>SKS</span>
-<div class="flex space-x-4 items-center">
+<div class="flex space-x-4 items-start">
     {% include 'components/form/form-field.html' with field=forms.sks_form.teori_sks not_include_error=True %}
-    <span>_</span>
+    <div class="flex items-center h-16 md:h-20 lg:h-24">
+        <span>_</span>
+    </div>
     {% include 'components/form/form-field.html' with field=forms.sks_form.praktik_sks not_include_error=True %}
 </div>
+
+{% if forms.sks_form.teori_sks.errors %}
 <div class="mb-3">
 {% include 'components/form/form-errors.html' with errors=forms.sks_form.teori_sks.errors %}
 </div>
+{% endif %}
 
 {% include 'components/form/form-field.html' with field=forms.rps_form.semester %}
 {% include 'components/form/form-field.html' with field=forms.rps_form.deskripsi %}

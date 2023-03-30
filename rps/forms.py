@@ -225,21 +225,71 @@ class PertemuanRPSForm(forms.ModelForm):
             'pertemuan_awal': MyNumberInput(attrs={
                 'placeholder': 1,
                 'min': 0,
+                'class': 'w-full',
             }),
             'pertemuan_akhir': MyNumberInput(attrs={
                 'placeholder': 3,
                 'min': 0,
+                'class': 'w-full',
             }),
             'tipe_pertemuan': MySelectInput(),
         }
     
-    def __init__(self, clo_qs: QuerySet[Clo], *args, **kwargs):
+    def __init__(self, clo_qs: QuerySet[Clo], pertemuan_rps_qs: QuerySet[PertemuanRPS], *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['clo'].queryset = clo_qs
+        self.pertemuan_rps_qs = pertemuan_rps_qs
 
     def clean(self):
         cleaned_data = super().clean()
-        print(cleaned_data)
+        clo: Clo = cleaned_data.get('clo')
+
+        # Pertemuan RPS in database
+        pertemuan_rps_clo_qs = self.pertemuan_rps_qs.filter(
+            clo=clo
+        )
+
+        list_pertemuan_db = []
+        for pertemuan_rps in self.pertemuan_rps_qs:
+            # List pertemuan in database
+            pertemuan_awal_db = pertemuan_rps.pertemuan_awal
+            pertemuan_akhir_db = pertemuan_rps.pertemuan_akhir
+
+            if pertemuan_akhir_db is None:
+                list_pertemuan_db.append(pertemuan_awal_db)
+            else:
+                for i in range(pertemuan_awal_db, pertemuan_akhir_db + 1):
+                    list_pertemuan_db.append(i)
+
+        list_pertemuan_db = list(set(list_pertemuan_db))
+        # Check pertemuan
+        pertemuan_awal = cleaned_data.get('pertemuan_awal')
+        pertemuan_akhir = cleaned_data.get('pertemuan_akhir')
+        
+        # List pertemuan in input
+        list_pertemuan = []
+        if pertemuan_akhir is None:
+            list_pertemuan.append(pertemuan_awal)
+        else:
+            if pertemuan_akhir < pertemuan_awal:
+                self.add_error('pertemuan_akhir', 'Pertemuan akhir harus lebih besar dari pertemuan awal')
+            for i in range(pertemuan_awal, pertemuan_akhir + 1):
+                list_pertemuan.append(i)
+        
+        listed_pertemuan_in_db = [pertemuan for pertemuan in list_pertemuan if pertemuan in list_pertemuan_db]
+        if len(listed_pertemuan_in_db) > 0:
+            self.add_error('pertemuan_awal', 'Pertemuan {} sudah ada di database.'.format(listed_pertemuan_in_db))  
+
+        # Check bobot penilaian
+        bobot_penilaian = cleaned_data.get('bobot_penilaian')
+        total_bobot_penilaian_clo = sum([pertemuan_rps.bobot_penilaian for pertemuan_rps in pertemuan_rps_clo_qs])
+        total_persentase_clo = clo.get_total_persentase_komponen()
+
+        current_total_bobot_penilaian_clo = total_bobot_penilaian_clo + bobot_penilaian
+
+        if current_total_bobot_penilaian_clo > total_persentase_clo:
+            self.add_error('bobot_penilaian', 'Bobot penilaian untuk {} berlebihan. Persentase CLO: {}, Total bobot penilaian CLO saat ini: {}'.format(clo.nama, total_persentase_clo, current_total_bobot_penilaian_clo))
+        
         return cleaned_data
     
 
