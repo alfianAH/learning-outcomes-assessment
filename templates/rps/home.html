@@ -7,8 +7,8 @@ RPS -
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{% url 'semester:read-all' %}" role="listitem">Semester</a></li>
-<li class="breadcrumb-item"><a href="{{ mk_semester_obj.semester.read_detail_url }}" role="listitem">Detail</a></li>
-<li class="breadcrumb-item"><a href="{{ mk_semester_obj.read_detail_url }}" role="listitem">Detail MK</a></li>
+<li class="breadcrumb-item"><a href="{{ single_object.semester.read_detail_url }}" role="listitem">Detail</a></li>
+<li class="breadcrumb-item"><a href="{{ single_object.read_detail_url }}" role="listitem">Detail MK</a></li>
 <li class="breadcrumb-item active" aria-current="page" role="listitem">RPS</li>
 {% endblock breadcrumb %}
 
@@ -21,12 +21,12 @@ RPS -
     <div class="tr-div">
         <div class="w-32 md:w-36">Semester</div>
         <div>:</div>
-        <div>{{ mk_semester_obj.semester.semester }}</div>
+        <div>{{ single_object.semester.semester }}</div>
     </div>
     <div class="tr-div">
         <div class="w-32 md:w-36">Mata kuliah</div>
         <div>:</div>
-        <div>{{ mk_semester_obj.mk_kurikulum.nama }}</div>
+        <div>{{ single_object.mk_kurikulum.nama }}</div>
     </div>
     <div class="tr-div !items-center">
         <div class="w-32 md:w-36">Status</div>
@@ -47,7 +47,7 @@ RPS -
         <div class="tab-title">
             <span class="truncate">Rincian</span>
 
-            {% if not mk_semester_obj.status_rincian %}
+            {% if not single_object.status_rincian %}
             <div class="w-2 h-2 lg:w-2.5 lg:h-2.5 ml-2.5 badge-warning rounded-full"></div>
             {% endif %}
         </div>
@@ -67,7 +67,7 @@ RPS -
         <div class="tab-title">
             <span class="truncate">Pertemuan</span>
 
-            {% if not mk_semester_obj.status_pertemuan|default:False %}
+            {% if not single_object.status_pertemuan|default:False %}
             <div class="w-2 h-2 lg:w-2.5 lg:h-2.5 ml-2.5 badge-warning rounded-full"></div>
             {% endif %}
         </div>
@@ -82,7 +82,7 @@ RPS -
         {% if rps %}
         <div class="h-icon">
             <h2>Rincian RPS</h2>
-            <a href="{{ mk_semester_obj.get_rps_update_url }}" class="btn btn-success btn-icon-start loading-trigger max-w-min">
+            <a href="{{ single_object.get_rps_update_url }}" class="btn btn-success btn-icon-start loading-trigger max-w-min">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" focusable="False" aria-label="sync">
                     <path d="M.01 0h24v24h-24V0z" fill="none"/>
                     <path d="M12 4V2.21c0-.45-.54-.67-.85-.35l-2.8 2.79c-.2.2-.2.51 0 .71l2.79 2.79c.32.31.86.09.86-.36V6c3.31 0 6 2.69 6 6 0 .79-.15 1.56-.44 2.25-.15.36-.04.77.23 1.04.51.51 1.37.33 1.64-.34.37-.91.57-1.91.57-2.95 0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-.79.15-1.56.44-2.25.15-.36.04-.77-.23-1.04-.51-.51-1.37-.33-1.64.34C4.2 9.96 4 10.96 4 12c0 4.42 3.58 8 8 8v1.79c0 .45.54.67.85.35l2.79-2.79c.2-.2.2-.51 0-.71l-2.79-2.79c-.31-.31-.85-.09-.85.36V18z"/>
@@ -90,7 +90,7 @@ RPS -
                 <span class="hidden sm:block">Edit rincian RPS</span>
             </a>
 
-            <a href="{{ mk_semester_obj.get_rps_delete_url }}" class="btn btn-danger max-w-min btn-icon-start confirmation" data-confirm="Apakah anda yakin ingin menghapus item ini? Seluruh rincian dan pertemuan akan terhapus.">
+            <a href="{{ single_object.get_rps_delete_url }}" class="btn btn-danger max-w-min btn-icon-start confirmation" data-confirm="Apakah anda yakin ingin menghapus item ini? Seluruh rincian dan pertemuan akan terhapus.">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
                     <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
                     <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
@@ -100,7 +100,7 @@ RPS -
         </div>
 
         <div class="table-div">
-            {% with mk_semester_obj.mk_kurikulum as mk_kurikulum %}
+            {% with single_object.mk_kurikulum as mk_kurikulum %}
             <div class="tr-div">
                 <div class="font-bold min-w-24 md:min-w-40">Mata kuliah</div>
                 <div>:</div>
@@ -230,9 +230,9 @@ RPS -
             </div>
             <div class="tr-div">
                 <div>
-                    {% if mk_semester_obj.get_syarat_mata_kuliah_rps %}
+                    {% if single_object.get_syarat_mata_kuliah_rps %}
                     <ol class="list-decimal ml-8">
-                        {% for syarat_mk in mk_semester_obj.get_syarat_mata_kuliah_rps %}
+                        {% for syarat_mk in single_object.get_syarat_mata_kuliah_rps %}
                             <li>{{ syarat_mk.rps.mk_semester.mk_kurikulum.nama }}</li>
                         {% endfor %}
                     </ol>
@@ -244,7 +244,7 @@ RPS -
         </div>
         {% else %}
         <h2>Rincian RPS</h2>
-        <a href="{{ mk_semester_obj.get_rps_create_url }}" class="btn btn-primary loading-trigger max-w-min">
+        <a href="{{ single_object.get_rps_create_url }}" class="btn btn-primary loading-trigger max-w-min">
             <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
                 <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
             </svg>
@@ -294,7 +294,7 @@ RPS -
         <h2>Course Learning Outcomes (CLO)</h2>
         <p>{{ rps.clo_details }}</p>
         <ul class="flex flex-col masonry mt-2.5">
-            {% for clo in mk_semester_obj.get_all_clo %}
+            {% for clo in single_object.get_all_clo %}
             <li class="list-item-model-f">
                 <div class="flex flex-row items-center">
                     <span class="font-bold w-full">{{ clo.nama }}</span>
@@ -335,15 +335,70 @@ RPS -
 
     {% comment %} Pertemuan {% endcomment %}
     <div class="tab-pane fade min-h-screen {% if is_pertemuan_tab %}show active{% endif %}" id="tab-pertemuan-pane" role="tabpanel" aria-labelledby="tab-3">
-        <div class="h-icon">
-            <h2>Pertemuan</h2>
-            <a href="{{ mk_semester_obj.get_pertemuan_rps_create_url }}" class="btn btn-primary loading-trigger max-w-min">
-                <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-                </svg>
-                <span class="hidden sm:block">Tambah</span>
-            </a>
-        </div>
+        {% if object_list or data_exist %}
+            <div class="h-icon">
+                <h2>Pertemuan</h2>
+                <a href="{{ single_object.get_pertemuan_rps_create_url }}" class="btn btn-primary loading-trigger max-w-min">
+                    <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                    </svg>
+                    <span class="hidden sm:block">Tambah</span>
+                </a>
+            </div>
+
+            {% if object_list %}
+                <div class="flex flex-col sm:grid sm:grid-cols-2 md:block">
+                    <div class="w-min text-center mx-auto my-0 block md:hidden">
+                        <canvas id="total-bobot-penilaian" class="max-w-[18rem] max-h-[18rem]"></canvas>
+                    </div>
+                    {% include 'components/list-table-view/model-a/read-all-view.html' with use_footer=True use_chart=True %}
+                </div>
+            {% else %}
+                <p>Tidak ditemukan data dengan filter yang diberikan</p>
+            {% endif %}
+        {% else %}
+        <h2>Pertemuan</h2>
+        <p>Belum ada data pertemuan.</p>
+        <a href="{{ single_object.get_pertemuan_rps_create_url }}" class="btn btn-primary loading-trigger max-w-min">
+            <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+            </svg>
+            <span class="hidden sm:block">Tambah pertemuan</span>
+        </a>
+        {% endif %}
     </div>
 </div>
 {% endblock content %}
+
+{% block script %}
+<script>
+    {% if total_bobot_penilaian_json %}
+    let chartData = {{ total_bobot_penilaian_json|safe }};
+    let chartConfig = {
+        type: 'doughnut',
+        data: {
+            labels: chartData.labels,
+            datasets: [{
+                data: chartData.datasets.data,
+                backgroundColor: chartData.datasets.backgroundColor,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Total Bobot Penilaian',
+                    color: '#10b981' // Emerald 500
+                }
+            }
+        }
+    }
+    createChart('total-bobot-penilaian', chartConfig);
+    {% endif %}
+
+    // Update chart to dark mode
+    let isDarkMode = $('body').hasClass('dark');
+    chartDarkMode(isDarkMode);
+</script>
+{% endblock script %}

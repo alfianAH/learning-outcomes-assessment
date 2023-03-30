@@ -3529,6 +3529,7 @@ details.dropdown::marker {
 }
 
 .tab {
+  overflow-x: auto;
   border-bottom-width: 1px;
   --tw-border-opacity: 1;
   border-bottom-color: rgb(148 163 184 / var(--tw-border-opacity));

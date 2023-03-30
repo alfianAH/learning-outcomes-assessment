@@ -57,7 +57,8 @@ class MataKuliahSyaratRPS(models.Model):
 
 class TipePertemuan(models.TextChoices):
     REGULER = 'reg', 'Reguler'
-    TEST = 'tes', 'Ujian Mid/Final'
+    MID_TEST = 'mid', 'Ujian Mid'
+    FINAL_TEST = 'fin', 'Ujian Final'
 
 
 class PertemuanRPS(models.Model):
@@ -65,7 +66,7 @@ class PertemuanRPS(models.Model):
     clo = models.ForeignKey(Clo, on_delete=models.CASCADE)
 
     tipe_pertemuan = models.CharField(max_length=3, choices=TipePertemuan.choices, null=False, blank=False)
-    bobot_penilaian = models.SmallIntegerField(null=False, blank=False, validators=[MinValueValidator(0.0), MaxValueValidator(100.0)])
+    bobot_penilaian = models.PositiveSmallIntegerField(null=False, blank=False, validators=[MinValueValidator(0.0), MaxValueValidator(100.0)])
     
     pertemuan_awal = models.PositiveSmallIntegerField(null=False, blank=False)
     pertemuan_akhir = models.PositiveSmallIntegerField(null=True, blank=True)

@@ -181,6 +181,19 @@ class MataKuliahSemester(MataKuliahSemesterLock):
         return get_reverse_url('semester:mata_kuliah_semester:rps:delete', self.get_kwargs)
     
     # Pertemuan RPS
+    def get_all_pertemuan_rps(self):
+        return self.pertemuanrps_set.all()
+    
+    @property
+    def get_total_bobot_penilaian_pertemuan_rps(self):
+        list_pertemuan_rps = self.get_all_pertemuan_rps()
+        total_bobot_penilaian = 0
+
+        for pertemuan_rps in list_pertemuan_rps:
+            total_bobot_penilaian += pertemuan_rps.bobot_penilaian
+        
+        return total_bobot_penilaian
+    
     @property
     def status_pertemuan(self):
         if not hasattr(self, 'pertemuanrps'): 

@@ -1,0 +1,13 @@
+<td scope="col" class="text-left field-nama truncate max-w-[10rem] min-w-[8rem] lg:max-w-[7rem] lg:min-w-[6rem] xl:max-w-[12rem] xl:min-w-[10rem] {% if open_button and option.read_detail_url %} items-center relative {% endif %}">
+    {{ option.pertemuan_awal }}{% if option.pertemuan_akhir %}-{{ option.pertemuan_akhir }}{% endif %}
+    {% if open_button and option.read_detail_url %}
+        {% include 'components/button/open-list-item-button.html' %}
+    {% endif %}
+</td>
+<td class="text-left truncate max-w-[8rem] min-w-[6rem] lg:max-w-[7rem] xl:max-w-[10rem] xl:min-w-[8rem]">{{ option.clo.nama }}</td>
+<td class="text-left !align-middle">
+    <div class="badge {% if option.tipe_pertemuan == 'reg' %}badge-info{% else %}badge-primary{% endif %}">
+        {{ option.get_tipe_pertemuan_display }}
+    </div>
+</td>
+<td class="text-right">{{ option.bobot_penilaian }}</td>

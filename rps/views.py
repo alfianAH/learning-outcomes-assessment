@@ -12,6 +12,7 @@ from learning_outcomes_assessment.forms.edit import (
     MultiFormView,
     MultiModelFormView,
 )
+from learning_outcomes_assessment.list_view.views import DetailWithListViewModelA
 from ilo.models import Ilo
 from mata_kuliah_semester.models import MataKuliahSemester
 from rps.models import RencanaPembelajaranSemester
@@ -47,38 +48,114 @@ from .forms import (
 
 
 # Create your views here.
-class RPSHomeView(TemplateView):
+class RPSHomeView(DetailWithListViewModelA):
     template_name = 'rps/home.html'
 
-    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
-        super().setup(request, *args, **kwargs)
-        mk_semester_id = kwargs.get('mk_semester_id')
-        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+    single_model = MataKuliahSemester
+    single_pk_url_kwarg = 'mk_semester_id'
+    single_object: MataKuliahSemester = None
+    
+    model = PertemuanRPS
+    ordering = 'pertemuan_awal'
+
+    bulk_delete_url: str = ''
+    list_prefix_id = 'pertemuan-rps-'
+    input_name = 'id_pertemuan_rps'
+    list_id = 'pertemuan-rps-list-content'
+    badge_template: str = 'rps/partials/pertemuan/badge-template-pertemuan-rps.html'
+    list_item_name: str = 'rps/partials/pertemuan/list-item-name-pertemuan-rps.html'
+    list_custom_field_template: str = 'rps/partials/pertemuan/list-custom-field-pertemuan-rps.html'
+    table_custom_field_header_template: str = 'rps/partials/pertemuan/table-custom-field-header-pertemuan-rps.html'
+    table_custom_field_template: str = 'rps/partials/pertemuan/table-custom-field-pertemuan-rps.html'
+    table_footer_custom_field_template: str = 'rps/partials/pertemuan/table-footer-custom-field-pertemuan-rps.html'
     
     @property
     def get_ilo(self):
         ilo_qs = Ilo.objects.filter(
-            pi_area__performanceindicator__piclo__clo__mk_semester=self.mk_semester_obj
+            pi_area__performanceindicator__piclo__clo__mk_semester=self.single_object
         ).distinct()
 
         return ilo_qs
+    
+    def get_queryset(self):
+        self.queryset = self.model.objects.filter(
+            mk_semester=self.single_object
+        )
+        return super().get_queryset()
+    
+    def total_bobot_penilaian_json(self):
+        json_response = {}
+        total_bobot_penilaian = self.single_object.get_total_bobot_penilaian_pertemuan_rps
+        
+        if total_bobot_penilaian > 100:
+            total_exceed = total_bobot_penilaian - 100
+
+            json_response.update({
+                'labels': [
+                    'Persentase berlebihan',
+                    'Persentase bobot penilaian saat ini',
+                ],
+                'datasets': {
+                    'data': [
+                        total_exceed,
+                        total_bobot_penilaian - total_exceed
+                    ],
+                    'backgroundColor': [
+                        '#f43f5e',  # Rose 500
+                        '#10b981',  # Emerald 500
+                    ]
+                }
+            })
+        elif total_bobot_penilaian == 100:
+            json_response.update({
+                'labels': [
+                    'Persentase bobot penilaian saat ini',
+                ],
+                'datasets': {
+                    'data': [
+                        total_bobot_penilaian
+                    ],
+                    'backgroundColor': [
+                        '#10b981',  # Emerald 500
+                    ]
+                }
+            })
+        else:
+            json_response.update({
+                'labels': [
+                    'Persentase bobot penilaian saat ini',
+                    'Kosong',
+                ],
+                'datasets': {
+                    'data': [
+                        total_bobot_penilaian,
+                        100 - total_bobot_penilaian,
+                    ],
+                    'backgroundColor': [
+                        '#10b981',  # Emerald 500
+                        '#dcfce7',  # Emerald 100
+                    ]
+                }
+            })
+
+        return json.dumps(json_response)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        is_rincian_tab = True
-        is_pertemuan_tab = False
+        is_rincian_tab = False
+        is_pertemuan_tab = True
         
         rps: RencanaPembelajaranSemester = None
-        if hasattr(self.mk_semester_obj, 'rencanapembelajaransemester'):
-            rps = self.mk_semester_obj.rencanapembelajaransemester
+        if hasattr(self.single_object, 'rencanapembelajaransemester'):
+            rps = self.single_object.rencanapembelajaransemester
 
         context.update({
-            'mk_semester_obj': self.mk_semester_obj,
             'is_rincian_tab': is_rincian_tab,
             'is_pertemuan_tab': is_pertemuan_tab,
             'ilo_object_list': self.get_ilo,
             'rps': rps,
+            'total_bobot_penilaian_json': self.total_bobot_penilaian_json()
         })
         return context
     
@@ -451,6 +528,13 @@ class PertemuanRPSCreateView(CreateView):
             'mk_semester_obj': self.mk_semester_obj,
         })
         return context
+    
+    def form_valid(self, form) -> HttpResponse:
+        pertemuan_rps_obj: PertemuanRPS = form.save(commit=False)
+        pertemuan_rps_obj.mk_semester = self.mk_semester_obj
+        pertemuan_rps_obj.save()
+
+        return redirect(self.success_url)
 
 
 class RincianPertemuanRPSFormView(MultiModelFormView):

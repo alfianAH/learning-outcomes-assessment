@@ -660,7 +660,7 @@
 
     /* Tabs */
     .tab{
-        @apply flex space-x-2.5 list-none border-b border-b-slate-400;
+        @apply flex space-x-2.5 list-none border-b border-b-slate-400 overflow-x-auto;
     }
 
     .tab-content{
