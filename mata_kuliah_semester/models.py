@@ -180,6 +180,9 @@ class MataKuliahSemester(MataKuliahSemesterLock):
     def get_rps_delete_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:rps:delete', self.get_kwargs)
     
+    def get_rps_duplicate_url(self):
+        return get_reverse_url('semester:mata_kuliah_semester:rps:duplicate', self.get_kwargs)
+    
     # Pertemuan RPS
     def get_all_pertemuan_rps(self):
         return self.pertemuanrps_set.all()
@@ -207,6 +210,9 @@ class MataKuliahSemester(MataKuliahSemesterLock):
     
     def get_pertemuan_rps_bulk_delete_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:rps:pertemuan-bulk-delete', self.get_kwargs)
+    
+    def get_pertemuan_rps_duplicate_url(self):
+        return get_reverse_url('semester:mata_kuliah_semester:rps:pertemuan-duplicate', self.get_kwargs)
     
 
 class NilaiExcelMataKuliahSemester(models.Model):

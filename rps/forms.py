@@ -2,6 +2,7 @@ from django import forms
 from django.db.models import QuerySet
 from django.forms import inlineformset_factory
 from learning_outcomes_assessment.widgets import (
+    MyRadioInput,
     MySelectInput,
     PagedownWidget,
     MyNumberInput,
@@ -194,6 +195,20 @@ class MataKuliahSyaratRPSForm(forms.Form):
         if list_mk_syarat is None: return
         
         self.fields['mk_semester_syarat'].initial = [str(mk_semester.pk) for mk_semester in list_mk_syarat]
+
+
+class RincianRPSDuplicateForm(forms.Form):
+    semester = forms.ChoiceField(
+        widget=MyRadioInput(),
+        label='Duplikasi Rincian RPS',
+    )
+
+    def __init__(self, mk_semester: MataKuliahSemester, choices, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        self.fields['semester'].help_text = 'Berikut adalah pilihan semester dari <b>{}</b>. Pilih salah satu semester untuk menduplikasi Rincian RPS dari semester tersebut ke <b>{}</b>'.format(mk_semester.mk_kurikulum.kurikulum.nama, mk_semester.semester.semester.nama)
+
+        self.fields['semester'].choices = choices
 
 
 class PertemuanRPSForm(forms.ModelForm):
@@ -433,3 +448,16 @@ DurasiPertemuanDaringRPSFormset = inlineformset_factory(
     can_delete=True,
 )
 
+
+class PertemuanRPSDuplicateForm(forms.Form):
+    semester = forms.ChoiceField(
+        widget=MyRadioInput(),
+        label='Duplikasi Pertemuan RPS',
+    )
+
+    def __init__(self, mk_semester: MataKuliahSemester, choices, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        self.fields['semester'].help_text = 'Berikut adalah pilihan semester dari <b>{}</b>. Pilih salah satu semester untuk menduplikasi Pertemuan RPS dari semester tersebut ke <b>{}</b>'.format(mk_semester.mk_kurikulum.kurikulum.nama, mk_semester.semester.semester.nama)
+
+        self.fields['semester'].choices = choices

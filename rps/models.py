@@ -106,6 +106,9 @@ class PertemuanRPS(models.Model):
         return get_reverse_url('semester:mata_kuliah_semester:rps:rincian-pertemuan-update', self.get_kwargs)
     
     # Pembelajaran pertemuan rps
+    def get_all_pembelajaran_pertemuan(self):
+        return self.pembelajaranpertemuanrps_set.all()
+
     def get_pembelajaran_pertemuan_luring(self):
         return self.pembelajaranpertemuanrps_set.filter(
             jenis_pertemuan=JenisPertemuan.OFFLINE
@@ -117,6 +120,9 @@ class PertemuanRPS(models.Model):
         )
     
     # Durasi
+    def get_all_durasi_pertemuan(self):
+        return self.durasipertemuanrps_set.all()
+    
     def get_durasi_pertemuan_luring(self):
         return self.durasipertemuanrps_set.filter(
             jenis_pertemuan=JenisPertemuan.OFFLINE

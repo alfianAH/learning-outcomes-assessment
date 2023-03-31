@@ -13,12 +13,15 @@ from learning_outcomes_assessment.forms.edit import (
     MultiModelFormView,
 )
 from learning_outcomes_assessment.list_view.views import DetailWithListViewModelA
-from learning_outcomes_assessment.forms.edit import ModelBulkDeleteView
+from learning_outcomes_assessment.forms.edit import (
+    ModelBulkDeleteView,
+    DuplicateFormview,
+)
 from ilo.models import Ilo
 from mata_kuliah_semester.models import MataKuliahSemester
 from rps.models import RencanaPembelajaranSemester
 from accounts.utils import get_user_profile
-from rps.models import (
+from .models import (
     RencanaPembelajaranSemester,
     PengembangRPS,
     KoordinatorRPS,
@@ -45,6 +48,15 @@ from .forms import (
     PembelajaranPertemuanDaringRPSForm,
     DurasiPertemuanLuringRPSFormset,
     DurasiPertemuanDaringRPSFormset,
+    RincianRPSDuplicateForm,
+    PertemuanRPSDuplicateForm,
+)
+
+from .utils import(
+    get_semester_choices_rincian_rps_duplicate,
+    duplicate_rincian_rps,
+    get_semester_choices_pertemuan_rps_duplicate,
+    duplicate_pertemuan_rps,
 )
 
 
@@ -519,6 +531,17 @@ class PertemuanRPSCreateView(CreateView):
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
         self.success_url = '{}?active_tab=pertemuan'.format(self.mk_semester_obj.get_rps_home_url())
     
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        total_bobot_penilaian = self.mk_semester_obj.get_total_bobot_penilaian_pertemuan_rps
+
+        # If total_persentase is 100, no need to add anymore
+        if total_bobot_penilaian >= 100:
+            messages.info(self.request, 'Sudah tidak bisa menambahkan pertemuan lagi, karena total bobot penilaian sudah {}%'.format(total_bobot_penilaian))
+            return redirect(self.success_url)
+        
+        return super().get(request, *args, **kwargs)
+
+    
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs.update({
@@ -594,6 +617,8 @@ class RincianPertemuanRPSFormView(MultiModelFormView):
         'durasi_pertemuan_luring_rps_formset': DurasiPertemuanLuringRPSFormset,
         'durasi_pertemuan_daring_rps_formset': DurasiPertemuanDaringRPSFormset,
     }
+    success_msg = 'Berhasil'
+    failed_msg = 'Gagal'
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
@@ -627,10 +652,27 @@ class RincianPertemuanRPSFormView(MultiModelFormView):
         objects['durasi_pertemuan_daring_rps_formset'] = self.pertemuan_rps_obj
         
         return objects
+    
+    def forms_valid(self, forms: dict):
+        messages.success(self.request, self.success_msg)
+        return super().forms_valid(forms)
+    
+    def forms_invalid(self, forms: dict):
+        messages.error(self.request, self.failed_msg)
+        return super().forms_invalid(forms)
 
 
 class RincianPertemuanRPSCreateView(RincianPertemuanRPSFormView):
     template_name = 'rps/pertemuan/rincian-pertemuan-create-view.html'
+    success_msg = 'Berhasil menambahkan rincian pertemuan RPS.'
+    failed_msg = 'Gagal menambahkan rincian pertemuan RPS.'
+
+    def get(self, request, *args, **kwargs):
+        if hasattr(self.pertemuan_rps_obj, 'rincianpertemuanrps'):
+            messages.info(request, 'Rincian pertemuan RPS sudah ada.')
+            return redirect(self.success_url)
+        
+        return super().get(request, *args, **kwargs)
 
     def forms_valid(self, forms: dict):
         # Rincian RPS
@@ -653,6 +695,8 @@ class RincianPertemuanRPSCreateView(RincianPertemuanRPSFormView):
 
 class RincianPertemuanRPSUpdateView(RincianPertemuanRPSFormView):
     template_name = 'rps/pertemuan/rincian-pertemuan-update-view.html'
+    success_msg = 'Berhasil mengubah rincian pertemuan RPS.'
+    failed_msg = 'Gagal mengubah rincian pertemuan RPS.'
     
     def get_objects(self):
         objects = super().get_objects()
@@ -662,3 +706,91 @@ class RincianPertemuanRPSUpdateView(RincianPertemuanRPSFormView):
 
         objects['pembelajaran_pertemuan_daring_rps_form'] = self.pertemuan_rps_obj.get_pembelajaran_pertemuan_daring().first()
         return objects
+
+
+class RPSDuplicateView(DuplicateFormview):
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+
+        mk_semester_id = kwargs.get('mk_semester_id')
+        self.mk_semester_obj: MataKuliahSemester = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+
+        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
+
+        self.success_url = self.mk_semester_obj.get_rps_home_url()
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'mk_semester': self.mk_semester_obj,
+        })
+        return kwargs
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'mk_semester_obj': self.mk_semester_obj,
+            'back_url': self.success_url,
+        })
+        return context
+
+
+class RincianRPSDuplicateView(RPSDuplicateView):
+    form_class = RincianRPSDuplicateForm
+    empty_choices_msg = 'Semester lain belum mempunyai RPS.'
+    template_name = 'rps/duplicate-view.html'
+    
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        
+        self.choices = get_semester_choices_rincian_rps_duplicate(self.mk_semester_obj)
+
+    def form_valid(self, form) -> HttpResponse:
+        semester_prodi_id = form.cleaned_data.get('semester')
+
+        is_success, message = duplicate_rincian_rps(semester_prodi_id, self.mk_semester_obj)
+        if is_success:
+            messages.success(self.request, message)
+        else:
+            messages.error(self.request, message)
+
+        return super().form_valid(form)
+
+
+class PertemuanRPSDuplicateView(RPSDuplicateView):
+    form_class = PertemuanRPSDuplicateForm
+    empty_choices_msg = 'Semester lain belum mempunyai pertemuan di RPS.'
+    template_name = 'rps/pertemuan/duplicate-view.html'
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        
+        self.success_url = '{}?active_tab=pertemuan'.format(self.success_url)
+        self.choices = get_semester_choices_pertemuan_rps_duplicate(self.mk_semester_obj)
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        total_bobot_penilaian = self.mk_semester_obj.get_total_bobot_penilaian_pertemuan_rps
+
+        # If total_persentase is 100, no need to add anymore
+        if total_bobot_penilaian >= 100:
+            messages.info(self.request, 'Sudah tidak bisa menambahkan pertemuan lagi, karena total bobot penilaian sudah {}%'.format(total_bobot_penilaian))
+            return redirect(self.success_url)
+        
+        return super().get(request, *args, **kwargs)
+    
+    def form_valid(self, form) -> HttpResponse:
+        semester_prodi_id = form.cleaned_data.get('semester')
+
+        is_success, message = duplicate_pertemuan_rps(semester_prodi_id, self.mk_semester_obj)
+
+        if is_success:
+            messages.success(self.request, message)
+        else:
+            messages.error(self.request, message)
+        
+        # If current duplicated percentages is more than 100, add warning message
+        current_total_bobot_penilaian = self.mk_semester_obj.get_total_bobot_penilaian_pertemuan_rps
+        if current_total_bobot_penilaian > 100:
+            messages.warning(self.request, 'Total persentase saat ini: {}. Diharap untuk mengubah pertemuan RPS agar mencukupi 100%'.format(current_total_bobot_penilaian))
+        
+        return super().form_valid(form)
