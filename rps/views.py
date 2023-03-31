@@ -601,6 +601,17 @@ class RincianPertemuanRPSFormView(MultiModelFormView):
         self.pertemuan_rps_obj = get_object_or_404(PertemuanRPS, id=pertemuan_rps_id)
         self.success_url = self.pertemuan_rps_obj.read_detail_url()
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['durasi_pertemuan_luring_rps_formset'].update({
+            'prefix': 'durasi_pertemuan_luring',
+        })
+
+        kwargs['durasi_pertemuan_daring_rps_formset'].update({
+            'prefix': 'durasi_pertemuan_daring',
+        })
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({

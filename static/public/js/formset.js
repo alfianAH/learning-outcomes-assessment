@@ -1,11 +1,12 @@
-function addMoreForm(totalFormId, isRequired=true) {
-    $('#add-form').on('click', function(){
-        const currentFormCount = $('.added-form').length; // + 1
-        const copyEmptyFormEl = $('#empty-form').clone(true);
+function addMoreForm(totalFormId, isRequired = true) {
+    let totalFormIdWithoutHash = totalFormId.substring(1);
+    $(`#add-form-${totalFormIdWithoutHash}`).on('click', function(){
+        const currentFormCount = $(`#form-list-${totalFormIdWithoutHash}`).children('.added-form').length; // + 1
+        const copyEmptyFormEl = $(`#empty-form-${totalFormIdWithoutHash}`).clone(true);
 
         copyEmptyFormEl.removeClass('hidden').addClass('added-form mb-3');
         copyEmptyFormEl.removeAttr('id');
-        $(copyEmptyFormEl.children()[0]).attr('id', `form-${currentFormCount}`);
+        $(copyEmptyFormEl.children()[0]).attr('id', `form-${currentFormCount}-${totalFormIdWithoutHash}`);
         
         if(isRequired){
             copyEmptyFormEl.find('.form-control').attr('required', 'true');
@@ -16,7 +17,7 @@ function addMoreForm(totalFormId, isRequired=true) {
 
         $(totalFormId).val(currentFormCount + 1);
         // now add new empty form element to our html form
-        $('#form-list').append(copyEmptyFormEl);
+        $(`#form-list-${totalFormIdWithoutHash}`).append(copyEmptyFormEl);
     });
 }
 

@@ -21,30 +21,15 @@
 </div>
 
 <p class="font-bold">Durasi</p>
+
 <div class="ml-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
     <div>
         <span>Luring (offline)</span>
-        {{ forms.durasi_pertemuan_luring_rps_form.jenis_pertemuan.as_hidden }}
-        {% include 'components/form/form-field.html' with field=forms.durasi_pertemuan_luring_rps_form.tipe_durasi %}
-
-        <div class="flex space-x-2 items-center">
-            {% include 'components/form/form-field.html' with field=forms.durasi_pertemuan_luring_rps_form.pengali_durasi not_use_label=True %}
-            <span class="mb-3">X</span>
-            {% include 'components/form/form-field.html' with field=forms.durasi_pertemuan_luring_rps_form.durasi_menit not_use_label=True %}
-            <span class="mb-3">menit</span>
-        </div>
+        {% include 'components/form/formset.html' with formset=forms.durasi_pertemuan_luring_rps_formset formset_fields='rps/partials/pertemuan/durasi-formset-fields.html' %}
     </div>
 
     <div>
         <span>Daring (online)</span>
-        {{ forms.durasi_pertemuan_daring_rps_form.jenis_pertemuan.as_hidden }}
-        {% include 'components/form/form-field.html' with field=forms.durasi_pertemuan_daring_rps_form.tipe_durasi %}
-
-        <div class="flex space-x-2 items-center">
-            {% include 'components/form/form-field.html' with field=forms.durasi_pertemuan_daring_rps_form.pengali_durasi not_use_label=True %}
-            <span class="mb-3">X</span>
-            {% include 'components/form/form-field.html' with field=forms.durasi_pertemuan_daring_rps_form.durasi_menit not_use_label=True %}
-            <span class="mb-3">menit</span>
-        </div>
+        {% include 'components/form/formset.html' with formset=forms.durasi_pertemuan_daring_rps_formset formset_fields='rps/partials/pertemuan/durasi-formset-fields.html' %}
     </div>
 </div>
