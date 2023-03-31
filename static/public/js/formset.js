@@ -1,7 +1,12 @@
-function addMoreForm(totalFormId, isRequired = true) {
+function addMoreForm(totalFormId, isRequired = true, removeSelect2FieldHandler=null, addSelect2FieldHandler=null) {
     let totalFormIdWithoutHash = totalFormId.substring(1);
     $(`#add-form-${totalFormIdWithoutHash}`).on('click', function(){
         const currentFormCount = $(`#form-list-${totalFormIdWithoutHash}`).children('.added-form').length; // + 1
+        
+        if (removeSelect2FieldHandler != null) {
+            removeSelect2FieldHandler();
+        }
+
         const copyEmptyFormEl = $(`#empty-form-${totalFormIdWithoutHash}`).clone(true);
 
         copyEmptyFormEl.removeClass('hidden').addClass('added-form mb-3');
@@ -18,6 +23,10 @@ function addMoreForm(totalFormId, isRequired = true) {
         $(totalFormId).val(currentFormCount + 1);
         // now add new empty form element to our html form
         $(`#form-list-${totalFormIdWithoutHash}`).append(copyEmptyFormEl);
+
+        if (addSelect2FieldHandler != null) {
+            addSelect2FieldHandler();
+        }
     });
 }
 

@@ -47,7 +47,8 @@
     </div>
 </div>
 
-{% if object.rincianpertemuanrps %}
+{% with object.rincianpertemuanrps as rincian_pertemuan %}
+{% if rincian_pertemuan %}
 <div class="h-icon">
     <h2>Rincian RPS</h2>
     <a href="{{ object.get_rincian_pertemuan_update_url }}" class="btn btn-success btn-icon-start">
@@ -57,6 +58,102 @@
         </svg>
         <span class="hidden sm:block">Edit rincian</span>
     </a>
+</div>
+
+<div class="space-y-3">
+    <div class="space-y-1">
+        <div class="font-bold">Capaian pembelajaran:</div>
+        <div>
+            {{ rincian_pertemuan.learning_outcome }}
+        </div>
+    </div>
+
+    <div class="space-y-2">
+        <div class="font-bold">Penilaian</div>
+        <div class="ml-5 space-y-1">
+            <div>
+                <div class="font-bold">Indikator:</div>
+                <div>{{ rincian_pertemuan.indikator }}</div>
+            </div>
+            
+            <div>
+                <div class="font-bold">Bentuk dan kriteria:</div>
+                <div>{{ rincian_pertemuan.bentuk_kriteria }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+        <div class="space-y-2">
+            <div class="font-bold">Bentuk Pembelajaran</div>
+            <div class="ml-5 space-y-1">
+                <div>
+                    <div class="font-bold">Luring (offline):</div>
+                    <div>
+                        {{ object.get_pembelajaran_pertemuan_luring.first.bentuk_pembelajaran }}
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="font-bold">Daring (online):</div>
+                    <div>
+                        {{ object.get_pembelajaran_pertemuan_daring.first.bentuk_pembelajaran }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-2">
+            <div class="font-bold">Metode Pembelajaran</div>
+            <div class="ml-5 space-y-1">
+                <div>
+                    <div class="font-bold">Luring (offline):</div>
+                    <div>
+                        {{ object.get_pembelajaran_pertemuan_luring.first.metode_pembelajaran }}
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="font-bold">Daring (online):</div>
+                    <div>
+                        {{ object.get_pembelajaran_pertemuan_daring.first.metode_pembelajaran }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="space-y-2">
+        <div class="font-bold">Durasi</div>
+        <div class="ml-5 grid grid-cols-2 gap-4">
+            <div class="space-y-1">
+                <div class="font-bold">Luring (offline):</div>
+                <div>
+                    <ul>
+                        {% for durasi in object.get_durasi_pertemuan_luring %}
+                        <li>{{ durasi.tipe_durasi }}: {{ durasi.pengali_durasi }} x {{ durasi.durasi_menit }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="space-y-1">
+                <div class="font-bold">Daring (online):</div>
+                <div>
+                    <ul>
+                        {% for durasi in object.get_durasi_pertemuan_daring %}
+                        <li>{{ durasi.tipe_durasi }}: {{ durasi.pengali_durasi }} x {{ durasi.durasi_menit }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="space-y-1">
+        <div class="font-bold">Materi pembelajaran:</div>
+        <div>{{ rincian_pertemuan.materi_pembelajaran }}</div>
+    </div>
 </div>
 {% else %}
 <h2>Rincian RPS</h2>
@@ -68,4 +165,5 @@
     <span class="hidden sm:block">Tambah rincian</span>
 </a>
 {% endif %}
+{% endwith %}
 {% endblock content %}

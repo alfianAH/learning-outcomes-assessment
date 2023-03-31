@@ -104,6 +104,28 @@ class PertemuanRPS(models.Model):
     
     def get_rincian_pertemuan_update_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:rps:rincian-pertemuan-update', self.get_kwargs)
+    
+    # Pembelajaran pertemuan rps
+    def get_pembelajaran_pertemuan_luring(self):
+        return self.pembelajaranpertemuanrps_set.filter(
+            jenis_pertemuan=JenisPertemuan.OFFLINE
+        )
+    
+    def get_pembelajaran_pertemuan_daring(self):
+        return self.pembelajaranpertemuanrps_set.filter(
+            jenis_pertemuan=JenisPertemuan.ONLINE
+        )
+    
+    # Durasi
+    def get_durasi_pertemuan_luring(self):
+        return self.durasipertemuanrps_set.filter(
+            jenis_pertemuan=JenisPertemuan.OFFLINE
+        )
+    
+    def get_durasi_pertemuan_daring(self):
+        return self.durasipertemuanrps_set.filter(
+            jenis_pertemuan=JenisPertemuan.ONLINE
+        )
 
 
 class RincianPertemuanRPS(models.Model):
@@ -142,8 +164,8 @@ class DurasiPertemuanRPS(models.Model):
 
     jenis_pertemuan = models.CharField(max_length=3, null=False, blank=False, choices=JenisPertemuan.choices)
     tipe_durasi = models.CharField(max_length=100, null=False, blank=False)
-    pengali_durasi = models.SmallIntegerField(null=False, blank=False)
-    durasi_menit = models.SmallIntegerField(null=False, blank=False, validators=[MinValueValidator(0.0), MaxValueValidator(60.0)])
+    pengali_durasi = models.SmallIntegerField()
+    durasi_menit = models.SmallIntegerField(validators=[MinValueValidator(0.0), MaxValueValidator(60.0)])
 
     class Meta:
         constraints = (

@@ -18,7 +18,7 @@ from ilo.models import Ilo
 from mata_kuliah_semester.models import MataKuliahSemester
 from rps.models import RencanaPembelajaranSemester
 from accounts.utils import get_user_profile
-from .models import (
+from rps.models import (
     RencanaPembelajaranSemester,
     PengembangRPS,
     KoordinatorRPS,
@@ -586,7 +586,7 @@ class PertemuanRPSUpdateView(UpdateView):
         return kwargs
 
 
-class RincianPertemuanRPSFormView(MultiModelFormView):
+class RincianPertemuanRPSFormView(MultiFormView):
     form_classes = {
         'rincian_pertemuan_rps_form': RincianPertemuanRPSForm,
         'pembelajaran_pertemuan_luring_rps_form': PembelajaranPertemuanLuringRPSForm,
@@ -605,10 +605,12 @@ class RincianPertemuanRPSFormView(MultiModelFormView):
         kwargs = super().get_form_kwargs()
         kwargs['durasi_pertemuan_luring_rps_formset'].update({
             'prefix': 'durasi_pertemuan_luring',
+            'instance': self.pertemuan_rps_obj,
         })
 
         kwargs['durasi_pertemuan_daring_rps_formset'].update({
             'prefix': 'durasi_pertemuan_daring',
+            'instance': self.pertemuan_rps_obj,
         })
         return kwargs
 
@@ -624,11 +626,30 @@ class RincianPertemuanRPSCreateView(RincianPertemuanRPSFormView):
     template_name = 'rps/pertemuan/rincian-pertemuan-create-view.html'
 
     def forms_valid(self, forms: dict):
-        pass
+        # Rincian RPS
+        rincian_pertemuan_rps_obj: RincianPertemuanRPS = forms['rincian_pertemuan_rps_form'].save(commit=False)
+        rincian_pertemuan_rps_obj.pertemuan_rps = self.pertemuan_rps_obj
+        rincian_pertemuan_rps_obj.save()
+        
+        # Pembelajaran Pertemuan Luring RPS
+        pembelajaran_pertemuan_luring_rps_obj: PembelajaranPertemuanRPS = forms['pembelajaran_pertemuan_luring_rps_form'].save(commit=False)
+        pembelajaran_pertemuan_luring_rps_obj.pertemuan_rps = self.pertemuan_rps_obj
+        pembelajaran_pertemuan_luring_rps_obj.save()
+        
+        # Pembelajaran Pertemuan Daring RPS
+        pembelajaran_pertemuan_daring_rps_obj: PembelajaranPertemuanRPS = forms['pembelajaran_pertemuan_daring_rps_form'].save(commit=False)
+        pembelajaran_pertemuan_daring_rps_obj.pertemuan_rps = self.pertemuan_rps_obj
+        pembelajaran_pertemuan_daring_rps_obj.save()
+        
+        # Formset Durasi Pertemuan RPS
+        forms['durasi_pertemuan_luring_rps_formset'].save()
+        forms['durasi_pertemuan_daring_rps_formset'].save()
+
+        return super().forms_valid(forms)
 
 
 class RincianPertemuanRPSUpdateView(RincianPertemuanRPSFormView):
     template_name = 'rps/pertemuan/rincian-pertemuan-update-view.html'
 
     def forms_valid(self, forms: dict):
-        pass
+        return super().forms_valid(forms)

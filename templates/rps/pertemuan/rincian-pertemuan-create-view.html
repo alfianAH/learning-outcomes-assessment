@@ -45,8 +45,32 @@ Tambah rincian pertemuan -
 
 {% block script %}
 <script>
-    addMoreForm('#{{ forms.durasi_pertemuan_daring_rps_formset.management_form.TOTAL_FORMS.id_for_label }}');
-    addMoreForm('#{{ forms.durasi_pertemuan_luring_rps_formset.management_form.TOTAL_FORMS.id_for_label }}');
+    addMoreForm(
+        '#{{ forms.durasi_pertemuan_daring_rps_formset.management_form.TOTAL_FORMS.id_for_label }}', 
+        isRequired=false, 
+        removeSelect2FieldHandler=function(){
+            $('.tipe-durasi-search').select2('destroy');
+        },
+        addSelect2FieldHandler=function(){
+            $('.tipe-durasi-search').select2({
+                width: '256px',
+                tags: true,
+            });
+        },
+    );
+    addMoreForm(
+        '#{{ forms.durasi_pertemuan_luring_rps_formset.management_form.TOTAL_FORMS.id_for_label }}',
+        isRequired=false, 
+        removeSelect2FieldHandler=function(){
+            $('.tipe-durasi-search').select2('destroy');
+        },
+        addSelect2FieldHandler=function(){
+            $('.tipe-durasi-search').select2({
+                width: '256px',
+                tags: true,
+            });
+        },
+    );
     $('.tipe-durasi-search').select2({
         width: '256px',
         tags: true,
