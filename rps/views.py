@@ -586,7 +586,7 @@ class PertemuanRPSUpdateView(UpdateView):
         return kwargs
 
 
-class RincianPertemuanRPSFormView(MultiFormView):
+class RincianPertemuanRPSFormView(MultiModelFormView):
     form_classes = {
         'rincian_pertemuan_rps_form': RincianPertemuanRPSForm,
         'pembelajaran_pertemuan_luring_rps_form': PembelajaranPertemuanLuringRPSForm,
@@ -605,12 +605,12 @@ class RincianPertemuanRPSFormView(MultiFormView):
         kwargs = super().get_form_kwargs()
         kwargs['durasi_pertemuan_luring_rps_formset'].update({
             'prefix': 'durasi_pertemuan_luring',
-            'instance': self.pertemuan_rps_obj,
+            'queryset': self.pertemuan_rps_obj.get_durasi_pertemuan_luring(),
         })
 
         kwargs['durasi_pertemuan_daring_rps_formset'].update({
             'prefix': 'durasi_pertemuan_daring',
-            'instance': self.pertemuan_rps_obj,
+            'queryset': self.pertemuan_rps_obj.get_durasi_pertemuan_daring(),
         })
         return kwargs
 
@@ -620,6 +620,13 @@ class RincianPertemuanRPSFormView(MultiFormView):
             'pertemuan_rps_obj': self.pertemuan_rps_obj,
         })
         return context
+    
+    def get_objects(self):
+        objects = super().get_objects()
+        objects['durasi_pertemuan_luring_rps_formset'] = self.pertemuan_rps_obj
+        objects['durasi_pertemuan_daring_rps_formset'] = self.pertemuan_rps_obj
+        
+        return objects
 
 
 class RincianPertemuanRPSCreateView(RincianPertemuanRPSFormView):
@@ -640,16 +647,18 @@ class RincianPertemuanRPSCreateView(RincianPertemuanRPSFormView):
         pembelajaran_pertemuan_daring_rps_obj: PembelajaranPertemuanRPS = forms['pembelajaran_pertemuan_daring_rps_form'].save(commit=False)
         pembelajaran_pertemuan_daring_rps_obj.pertemuan_rps = self.pertemuan_rps_obj
         pembelajaran_pertemuan_daring_rps_obj.save()
-        
-        # Formset Durasi Pertemuan RPS
-        forms['durasi_pertemuan_luring_rps_formset'].save()
-        forms['durasi_pertemuan_daring_rps_formset'].save()
 
         return super().forms_valid(forms)
 
 
 class RincianPertemuanRPSUpdateView(RincianPertemuanRPSFormView):
     template_name = 'rps/pertemuan/rincian-pertemuan-update-view.html'
+    
+    def get_objects(self):
+        objects = super().get_objects()
+        objects['rincian_pertemuan_rps_form'] = self.pertemuan_rps_obj.rincianpertemuanrps
 
-    def forms_valid(self, forms: dict):
-        return super().forms_valid(forms)
+        objects['pembelajaran_pertemuan_luring_rps_form'] = self.pertemuan_rps_obj.get_pembelajaran_pertemuan_luring().first()
+
+        objects['pembelajaran_pertemuan_daring_rps_form'] = self.pertemuan_rps_obj.get_pembelajaran_pertemuan_daring().first()
+        return objects
