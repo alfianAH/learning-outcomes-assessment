@@ -199,7 +199,7 @@ class MataKuliahSemester(MataKuliahSemesterLock):
     
     @property
     def status_pertemuan(self):
-        if not hasattr(self, 'pertemuanrps'): 
+        if not hasattr(self, 'pertemuanrps_set'): 
             status = False
         else:
             status = True

@@ -4447,12 +4447,12 @@ details.dropdown::marker {
   height: 4rem;
 }
 
-.h-2\.5 {
-  height: 0.625rem;
-}
-
 .h-full {
   height: 100%;
+}
+
+.h-2\.5 {
+  height: 0.625rem;
 }
 
 .max-h-10 {
@@ -6250,10 +6250,6 @@ details.dropdown::marker {
 
   .xl\:grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .xl\:grid-cols-2 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .xl\:gap-6 {

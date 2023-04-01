@@ -11,7 +11,7 @@ from pi_area.models import (
     PerformanceIndicator
 )
 from mata_kuliah_semester.models import MataKuliahSemester
-from .models import Clo
+from .models import Clo, KomponenClo, PiClo
 
 
 def get_pi_area_by_kurikulum_choices(kurikulum_obj: Kurikulum):
@@ -84,22 +84,43 @@ def duplicate_clo(semester_prodi_id: int, new_mk_semester: MataKuliahSemester):
         return (is_success, message)
     
     list_clo: QuerySet[Clo] = mk_semester_obj.get_all_clo()
-    cloned_list_clo = []
 
     for clo in list_clo:
-        new_clo = clone_object(
-            clo,
-            attrs={
-                'mk_semester': new_mk_semester
-            }
+        # Get komponen CLO
+        list_komponen_clo: QuerySet[KomponenClo] = KomponenClo.objects.filter(
+            clo=clo
         )
-        cloned_list_clo.append(new_clo)
+
+        # Get PI CLO
+        list_pi_clo: QuerySet[PiClo] = PiClo.objects.filter(
+            clo=clo
+        )
+        
+        # Duplicate CLO
+        new_clo = clo
+        new_clo._state.adding = True
+        new_clo.pk = None
+        new_clo.mk_semester = new_mk_semester
+        new_clo.save()
+
+        # Duplicate Komponen CLO
+        for komponen_clo in list_komponen_clo:
+            new_komponen_clo = komponen_clo
+            new_komponen_clo._state.adding = True
+            new_komponen_clo.pk = None
+            new_komponen_clo.clo = new_clo
+            new_komponen_clo.save()
+
+        # Duplicate PI CLO
+        for pi_clo in list_pi_clo:
+            new_pi_clo = pi_clo
+            new_pi_clo._state.adding = True
+            new_pi_clo.pk = None
+            new_pi_clo.clo = new_clo
+            new_pi_clo.save()
     
-    if list_clo.count() == len(cloned_list_clo):
-        is_success = True
-        message = 'Berhasil menduplikasi CLO ke mata kuliah ini.'
-    else:
-        message = 'Jumlah pertemuan yang diduplikasi hanya {} pertemuan. Ekspektasi: {}.'.format(len(cloned_list_clo), list_clo.count())
+    is_success = True
+    message = 'Berhasil menduplikasi CLO ke mata kuliah ini.'
 
     return (is_success, message)
 

@@ -67,7 +67,7 @@ RPS -
         <div class="tab-title">
             <span class="truncate">Pertemuan</span>
 
-            {% if not single_object.status_pertemuan|default:False %}
+            {% if not single_object.status_pertemuan %}
             <div class="w-2 h-2 lg:w-2.5 lg:h-2.5 ml-2.5 badge-warning rounded-full"></div>
             {% endif %}
         </div>
