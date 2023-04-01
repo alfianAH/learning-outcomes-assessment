@@ -25,8 +25,4 @@ class Migration(migrations.Migration):
             model_name='ilo',
             constraint=models.CheckConstraint(check=models.Q(('satisfactory_level__gte', 0.0), ('satisfactory_level__lte', 100.0)), name='satisfactory_level_range'),
         ),
-        migrations.AddConstraint(
-            model_name='ilo',
-            constraint=models.CheckConstraint(check=models.Q(('persentase_capaian_ilo__gte', 0.0), ('persentase_capaian_ilo__lte', 100.0)), name='persentase_capaian_ilo_range'),
-        ),
     ]
