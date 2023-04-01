@@ -82,7 +82,7 @@ class RencanaPembelajaranSemesterForm(forms.ModelForm):
     class Meta:
         model = RencanaPembelajaranSemester
         fields = '__all__'
-        exclude = ['mk_semester', 'created_date', 'kaprodi']
+        exclude = ['mk_semester', 'created_date', 'kaprodi', 'lock']
         labels = {
             'semester': 'Semester',
             'deskripsi': 'Deskripsi singkat mata kuliah',
@@ -215,7 +215,7 @@ class PertemuanRPSForm(forms.ModelForm):
     class Meta:
         model = PertemuanRPS
         fields = '__all__'
-        exclude = ['mk_semester']
+        exclude = ['mk_semester', 'lock']
         labels = {
             'clo': 'CLO',
             'bobot_penilaian': 'Bobot penilaian (%)',
@@ -260,11 +260,6 @@ class PertemuanRPSForm(forms.ModelForm):
         cleaned_data = super().clean()
         clo: Clo = cleaned_data.get('clo')
 
-        # Pertemuan RPS in database
-        pertemuan_rps_clo_qs = self.pertemuan_rps_qs.filter(
-            clo=clo
-        )
-
         list_pertemuan_db = []
         if self.current_pertemuan_rps is not None:
             self.pertemuan_rps_qs = self.pertemuan_rps_qs.exclude(id=self.current_pertemuan_rps.pk)
@@ -300,6 +295,10 @@ class PertemuanRPSForm(forms.ModelForm):
             self.add_error('pertemuan_awal', 'Pertemuan {} sudah ada di database.'.format(listed_pertemuan_in_db))  
 
         # Check bobot penilaian
+        # Pertemuan RPS in database
+        pertemuan_rps_clo_qs = self.pertemuan_rps_qs.filter(
+            clo=clo
+        )
         bobot_penilaian = cleaned_data.get('bobot_penilaian')
         total_bobot_penilaian_clo = sum([pertemuan_rps.bobot_penilaian for pertemuan_rps in pertemuan_rps_clo_qs])
         total_persentase_clo = clo.get_total_persentase_komponen()
@@ -316,7 +315,7 @@ class RincianPertemuanRPSForm(forms.ModelForm):
     class Meta:
         model = RincianPertemuanRPS
         fields = '__all__'
-        exclude = ['pertemuan_rps']
+        exclude = ['pertemuan_rps', 'lock']
         labels = {
             'learning_outcome': 'Capaian pembelajaran',
             'indikator': 'Indikator',
@@ -352,7 +351,7 @@ class PembelajaranPertemuanRPSForm(forms.ModelForm):
     class Meta:
         model = PembelajaranPertemuanRPS
         fields = '__all__'
-        exclude = ['pertemuan_rps']
+        exclude = ['pertemuan_rps', 'lock']
         widgets = {
             'bentuk_pembelajaran': PagedownWidget(),
             'metode_pembelajaran': PagedownWidget(),
@@ -393,7 +392,7 @@ class DurasiPertemuanRPSForm(forms.ModelForm):
     class Meta:
         model = DurasiPertemuanRPS
         fields = '__all__'
-        exclude = ['pertemuan_rps']
+        exclude = ['pertemuan_rps', 'lock']
         labels = {
             'pengali_durasi': 'banyak',
             'durasi_menit': 'menit',

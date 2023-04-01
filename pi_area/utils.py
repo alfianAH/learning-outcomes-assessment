@@ -6,7 +6,6 @@ from .models import (
     PerformanceIndicator,
     PerformanceIndicatorArea,
 )
-from learning_outcomes_assessment.utils import clone_object
 
 
 def get_kurikulum_with_pi_area(kurikulum_obj: Kurikulum):

@@ -4,6 +4,8 @@ from .views import (
     RPSCreateView,
     RPSUpdateView,
     RPSDeleteView,
+    RPSLockView,
+    RPSUnlockView,
 
     RincianRPSDuplicateView,
 
@@ -25,6 +27,8 @@ urlpatterns = [
     path('update/', RPSUpdateView.as_view(), name='update'),
     path('delete/', RPSDeleteView.as_view(), name='delete'),
     path('duplicate/', RincianRPSDuplicateView.as_view(), name='duplicate'),
+    path('lock/',  RPSLockView.as_view(), name='lock'),
+    path('unlock/',  RPSUnlockView.as_view(), name='unlock'),
 
     # PertemuanRPS
     path('pertemuan/<int:pertemuan_rps_id>/', PertemuanRPSReadView.as_view(), name='pertemuan-read'),

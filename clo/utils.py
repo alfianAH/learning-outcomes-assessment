@@ -4,7 +4,6 @@ import time
 from django.db.models import QuerySet
 from django.conf import settings
 from learning_outcomes_assessment.exceptions import ConditionTimeoutException
-from learning_outcomes_assessment.utils import clone_object
 from kurikulum.models import Kurikulum
 from semester.models import SemesterProdi
 from pi_area.models import (

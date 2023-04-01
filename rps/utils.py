@@ -1,7 +1,6 @@
 from copy import copy
 from django.conf import settings
 from django.db.models import QuerySet
-from learning_outcomes_assessment.utils import clone_object
 from mata_kuliah_semester.models import MataKuliahSemester
 from .models import (
     DosenPengampuRPS,

@@ -5,6 +5,7 @@ from django.http import HttpRequest, HttpResponse
 from django.contrib.auth import authenticate
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
+from django.views.generic.base import RedirectView
 from django.views.generic.edit import DeleteView, CreateView, UpdateView
 from django.views.generic.detail import DetailView
 from accounts.enums import RoleChoices
@@ -519,6 +520,189 @@ class RPSDeleteView(DeleteView):
         return obj
 
 
+class RPSLockAndUnlockView(RedirectView):
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        mk_semester_id = kwargs.get('mk_semester_id')
+        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
+
+    def get_redirect_url(self, *args, **kwargs):
+        self.url = self.mk_semester_obj.get_rps_home_url()
+        return super().get_redirect_url(*args, **kwargs)
+    
+    def lock_child(self, is_locking_success: bool, is_success: bool, obj):
+        is_locking_success = is_locking_success and obj.lock_object(self.request.user)
+        is_success = is_success and obj.is_locked
+
+        print('L {}, S {}, {}'.format(is_locking_success, is_success, obj))
+
+        return is_locking_success, is_success
+        
+    def lock_children(self, is_locking_success: bool, is_success: bool, queryset: QuerySet):
+        for obj in queryset:
+            is_locking_success, is_success = self.lock_child(is_locking_success, is_success, obj)
+        
+        return is_locking_success, is_success
+    
+    def unlock_child(self, is_unlocking_success: bool, is_success: bool, obj):
+        is_unlocking_success = is_unlocking_success and obj.unlock_object()
+        is_success = is_success and not obj.is_locked
+
+        return is_unlocking_success, is_success
+        
+    def unlock_children(self, is_unlocking_success: bool, is_success: bool, queryset: QuerySet):
+        for obj in queryset:
+            is_unlocking_success, is_success = self.unlock_child(is_unlocking_success, is_success, obj)
+        
+        return is_unlocking_success, is_success
+    
+    def lock_rps(self):
+        is_success = True
+        is_locking_success = True
+
+        # RPS
+        rps_obj: RencanaPembelajaranSemester = self.mk_semester_obj.rencanapembelajaransemester
+        
+        # Dosen Pengembang RPS
+        pengembang_rps_qs: QuerySet[PengembangRPS] = rps_obj.get_pengembang_rps()
+        is_locking_success, is_success = self.lock_children(is_locking_success, is_success, pengembang_rps_qs)
+
+        # Koordinator RPS
+        koordinator_rps_qs: QuerySet[KoordinatorRPS] = rps_obj.get_koordinator_rps()
+        is_locking_success, is_success = self.lock_children(is_locking_success, is_success, koordinator_rps_qs)
+
+        # Dosen Pengampu RPS
+        dosen_pengampu_rps: QuerySet[DosenPengampuRPS] = rps_obj.get_dosen_pengampu_rps()
+        is_locking_success, is_success = self.lock_children(is_locking_success, is_success, dosen_pengampu_rps)
+
+        # MK Syarat RPS
+        mk_syarat_rps: QuerySet[MataKuliahSyaratRPS] = rps_obj.get_mata_kuliah_syarat_rps()
+        is_locking_success, is_success = self.lock_children(is_locking_success, is_success, mk_syarat_rps)
+
+        # Lock RPS
+        is_locking_success, is_success = self.lock_child(is_locking_success, is_success, rps_obj)
+
+        # Pertemuan
+        pertemuan_qs: QuerySet[PertemuanRPS] = self.mk_semester_obj.get_all_pertemuan_rps()
+
+        for pertemuan in pertemuan_qs:
+            if hasattr(pertemuan, 'rincianpertemuanrps'):
+                # Rincian Pertemuan
+                rincian_pertemuan_obj: RincianPertemuanRPS = pertemuan.rincianpertemuanrps
+                is_locking_success, is_success = self.lock_child(is_locking_success, is_success, rincian_pertemuan_obj)
+
+            # Pembelajaran Pertemuan
+            pembelajaran_pertemuan_rps_qs: QuerySet[PembelajaranPertemuanRPS] = pertemuan.get_all_pembelajaran_pertemuan()
+            is_locking_success, is_success = self.lock_children(is_locking_success, is_success, pembelajaran_pertemuan_rps_qs)
+
+            # Durasi Pertemuan
+            durasi_pertemuan_rps_qs: QuerySet[DurasiPertemuanRPS] = pertemuan.get_all_durasi_pertemuan()
+            is_locking_success, is_success = self.lock_children(is_locking_success, is_success, durasi_pertemuan_rps_qs)
+
+            # Lock pertemuan
+            is_locking_success, is_success = self.lock_child(is_locking_success, is_success, pertemuan)
+        
+        if is_success:
+            self.mk_semester_obj.is_rps_locked = True
+            self.mk_semester_obj.save()
+
+        return is_success, is_locking_success
+    
+    def unlock_rps(self):
+        is_success = True
+        is_unlocking_success = True
+
+        # RPS
+        rps_obj: RencanaPembelajaranSemester = self.mk_semester_obj.rencanapembelajaransemester
+        
+        # Dosen Pengembang RPS
+        pengembang_rps_qs: QuerySet[PengembangRPS] = rps_obj.get_pengembang_rps()
+        is_unlocking_success, is_success = self.unlock_children(is_unlocking_success, is_success, pengembang_rps_qs)
+
+        # Koordinator RPS
+        koordinator_rps_qs: QuerySet[KoordinatorRPS] = rps_obj.get_koordinator_rps()
+        is_unlocking_success, is_success = self.unlock_children(is_unlocking_success, is_success, koordinator_rps_qs)
+
+        # Dosen Pengampu RPS
+        dosen_pengampu_rps: QuerySet[DosenPengampuRPS] = rps_obj.get_dosen_pengampu_rps()
+        is_unlocking_success, is_success = self.unlock_children(is_unlocking_success, is_success, dosen_pengampu_rps)
+
+        # MK Syarat RPS
+        mk_syarat_rps: QuerySet[MataKuliahSyaratRPS] = rps_obj.get_mata_kuliah_syarat_rps()
+        is_unlocking_success, is_success = self.unlock_children(is_unlocking_success, is_success, mk_syarat_rps)
+
+        # Lock RPS
+        is_unlocking_success, is_success = self.unlock_child(is_unlocking_success, is_success, rps_obj)
+
+        # Pertemuan
+        pertemuan_qs: QuerySet[PertemuanRPS] = self.mk_semester_obj.get_all_pertemuan_rps()
+
+        for pertemuan in pertemuan_qs:
+            if hasattr(pertemuan, 'rincianpertemuanrps'):
+                # Rincian Pertemuan
+                rincian_pertemuan_obj: RincianPertemuanRPS = pertemuan.rincianpertemuanrps
+                is_unlocking_success, is_success = self.unlock_child(is_unlocking_success, is_success, rincian_pertemuan_obj)
+
+            # Pembelajaran Pertemuan
+            pembelajaran_pertemuan_rps_qs: QuerySet[PembelajaranPertemuanRPS] = pertemuan.get_all_pembelajaran_pertemuan()
+            is_unlocking_success, is_success = self.unlock_children(is_unlocking_success, is_success, pembelajaran_pertemuan_rps_qs)
+
+            # Durasi Pertemuan
+            durasi_pertemuan_rps_qs: QuerySet[DurasiPertemuanRPS] = pertemuan.get_all_durasi_pertemuan()
+            is_unlocking_success, is_success = self.unlock_children(is_unlocking_success, is_success, durasi_pertemuan_rps_qs)
+
+            # Lock pertemuan
+            is_unlocking_success, is_success = self.unlock_child(is_unlocking_success, is_success, pertemuan)
+        
+        if is_success:
+            self.mk_semester_obj.is_rps_locked = False
+            self.mk_semester_obj.save()
+
+        return is_success, is_unlocking_success
+
+
+class RPSLockView(RPSLockAndUnlockView):
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        total_bobot_penilaian = self.mk_semester_obj.get_total_bobot_penilaian_pertemuan_rps
+
+        # Can't lock if total persentase CLO is not 100%
+        if total_bobot_penilaian != 100: 
+            messages.warning(request, 'Gagal mengunci RPS dan pertemuannya. Pastikan total bobot penilaian adalah 100%.')
+            return super().get(request, *args, **kwargs)
+
+        is_locking_success, is_success = self.lock_rps()
+
+        if not is_locking_success:
+            messages.info(request, 'RPS dan pertemuannya sudah terkunci.')
+            return super().get(request, *args, **kwargs)
+            
+        if is_success:
+            messages.success(request, 'Berhasil mengunci RPS dan pertemuannya.')
+        else:
+            # Undo
+            self.unlock_rps()
+            messages.error(request, 'Gagal mengunci RPS dan pertemuannya.')
+        return super().get(request, *args, **kwargs)
+
+
+class RPSUnlockView(RPSLockAndUnlockView):
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        is_unlocking_success, is_success = self.unlock_rps()
+
+        if not is_unlocking_success:
+            messages.info(request, 'RPS dan pertemuannya tidak terkunci.')
+            return super().get(request, *args, **kwargs)
+            
+        if is_success:
+            messages.success(request, 'Berhasil membuka kunci RPS dan pertemuannya.')
+        else:
+            # Undo
+            self.lock_rps()
+            messages.error(request, 'Gagal membuka kunci RPS dan pertemuannya.')
+        return super().get(request, *args, **kwargs)
+
+
 # Pertemuan RPS
 class PertemuanRPSCreateView(CreateView):
     template_name = 'rps/pertemuan/create-view.html'
@@ -597,7 +781,7 @@ class PertemuanRPSUpdateView(UpdateView):
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
         self.object: PertemuanRPS = self.get_object()
-        self.success_url = '{}?active_tab=pertemuan'.format(self.object.read_detail_url())
+        self.success_url = self.object.read_detail_url()
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

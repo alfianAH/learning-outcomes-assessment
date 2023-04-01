@@ -3,6 +3,7 @@ from django.conf import settings
 from django.db.models import Q, CheckConstraint
 from django.core.validators import MinValueValidator, MaxValueValidator
 from learning_outcomes_assessment.utils import get_reverse_url
+from lock_model.models import LockableMixin
 from mata_kuliah_semester.models import MataKuliahSemester
 from clo.models import Clo
 
@@ -10,7 +11,7 @@ from clo.models import Clo
 User = settings.AUTH_USER_MODEL
 
 # Create your models here.
-class RencanaPembelajaranSemester(models.Model):
+class RencanaPembelajaranSemester(LockableMixin, models.Model):
     mk_semester = models.OneToOneField(MataKuliahSemester, on_delete=models.CASCADE)
     kaprodi = models.ForeignKey(User, on_delete=models.CASCADE)
 
@@ -36,22 +37,22 @@ class RencanaPembelajaranSemester(models.Model):
         return self.matakuliahsyaratrps_set.all()
 
 
-class PengembangRPS(models.Model):
+class PengembangRPS(LockableMixin, models.Model):
     rps = models.ForeignKey(RencanaPembelajaranSemester, on_delete=models.CASCADE)
     dosen = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
-class KoordinatorRPS(models.Model):
+class KoordinatorRPS(LockableMixin, models.Model):
     rps = models.ForeignKey(RencanaPembelajaranSemester, on_delete=models.CASCADE)
     dosen = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
-class DosenPengampuRPS(models.Model):
+class DosenPengampuRPS(LockableMixin, models.Model):
     rps = models.ForeignKey(RencanaPembelajaranSemester, on_delete=models.CASCADE)
     dosen = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
-class MataKuliahSyaratRPS(models.Model):
+class MataKuliahSyaratRPS(LockableMixin, models.Model):
     rps = models.ForeignKey(RencanaPembelajaranSemester, on_delete=models.CASCADE)
     mk_semester = models.ForeignKey(MataKuliahSemester, on_delete=models.CASCADE)
 
@@ -62,7 +63,7 @@ class TipePertemuan(models.TextChoices):
     FINAL_TEST = 'fin', 'Ujian Final'
 
 
-class PertemuanRPS(models.Model):
+class PertemuanRPS(LockableMixin, models.Model):
     mk_semester = models.ForeignKey(MataKuliahSemester, on_delete=models.CASCADE)
     clo = models.ForeignKey(Clo, on_delete=models.CASCADE)
 
@@ -134,7 +135,7 @@ class PertemuanRPS(models.Model):
         )
 
 
-class RincianPertemuanRPS(models.Model):
+class RincianPertemuanRPS(LockableMixin, models.Model):
     pertemuan_rps = models.OneToOneField(PertemuanRPS, on_delete=models.CASCADE)
 
     learning_outcome = models.TextField(null=False, blank=False)
@@ -150,7 +151,7 @@ class JenisPertemuan(models.TextChoices):
     OFFLINE = 'off', 'Offline'
 
 
-class PembelajaranPertemuanRPS(models.Model):
+class PembelajaranPertemuanRPS(LockableMixin, models.Model):
     pertemuan_rps = models.ForeignKey(PertemuanRPS, on_delete=models.CASCADE)
 
     jenis_pertemuan = models.CharField(max_length=3, null=False, blank=False, choices=JenisPertemuan.choices)
@@ -165,7 +166,7 @@ class TipeDurasi(models.TextChoices):
     VIDEO_CONFERENCE = 'VC', 'Video Conference'
 
 
-class DurasiPertemuanRPS(models.Model):
+class DurasiPertemuanRPS(LockableMixin, models.Model):
     pertemuan_rps = models.ForeignKey(PertemuanRPS, on_delete=models.CASCADE)
 
     jenis_pertemuan = models.CharField(max_length=3, null=False, blank=False, choices=JenisPertemuan.choices)

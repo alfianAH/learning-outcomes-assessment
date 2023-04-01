@@ -183,6 +183,12 @@ class MataKuliahSemester(MataKuliahSemesterLock):
     def get_rps_duplicate_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:rps:duplicate', self.get_kwargs)
     
+    def get_rps_lock_url(self):
+        return get_reverse_url('semester:mata_kuliah_semester:rps:lock', self.get_kwargs)
+    
+    def get_rps_unlock_url(self):
+        return get_reverse_url('semester:mata_kuliah_semester:rps:unlock', self.get_kwargs)
+
     # Pertemuan RPS
     def get_all_pertemuan_rps(self):
         return self.pertemuanrps_set.all()
