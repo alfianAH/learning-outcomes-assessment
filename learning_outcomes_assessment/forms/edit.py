@@ -90,6 +90,12 @@ class DuplicateFormview(FormView):
             'choices': self.choices
         })
         return kwargs
+    
+    def show_clone_result_message(self, is_success: bool, message: str):
+        if is_success:
+            messages.success(self.request, message)
+        else:
+            messages.error(self.request, message)
 
 
 class MultiFormView(FormView):

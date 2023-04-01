@@ -207,7 +207,11 @@ def clone_object(obj, attrs={}):
     # use them
     for key, value in attrs.items():
         setattr(clone, key, value)
-
+    
+    # Remove lock object first
+    if hasattr(clone, 'lock'):
+        clone.lock = None
+    
     # save the partial clone to have a valid ID assigned
     clone.save()
 

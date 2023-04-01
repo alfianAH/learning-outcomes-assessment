@@ -3,6 +3,7 @@ import time
 from django.db.models import QuerySet
 from django.conf import settings
 from learning_outcomes_assessment.exceptions import ConditionTimeoutException
+from learning_outcomes_assessment.utils import clone_object
 from kurikulum.models import Kurikulum
 from semester.models import SemesterProdi
 from pi_area.models import (
@@ -66,12 +67,15 @@ def get_semester_choices_clo_duplicate(mk_semester: MataKuliahSemester):
 
 
 def duplicate_clo(semester_prodi_id: int, new_mk_semester: MataKuliahSemester):
+    is_success = False
+    message = ''
+
     try:
         semester_prodi_obj = SemesterProdi.objects.get(id_neosia=semester_prodi_id)
     except (SemesterProdi.DoesNotExist, SemesterProdi.MultipleObjectsReturned):
-        if settings.DEBUG:
-            print('Semester Prodi object cannot be found. ID: {}'.format(semester_prodi_id)) 
-        return 
+        message = 'Semester Prodi tidak dapat ditemukan. ID: {}'.format(semester_prodi_id)
+        if settings.DEBUG: print(message) 
+        return (is_success, message) 
     
     try:    
         mk_semester_obj = MataKuliahSemester.objects.get(
@@ -79,45 +83,29 @@ def duplicate_clo(semester_prodi_id: int, new_mk_semester: MataKuliahSemester):
             semester=semester_prodi_obj
         )
     except (MataKuliahSemester.DoesNotExist, MataKuliahSemester.MultipleObjectsReturned):
-        if settings.DEBUG:
-            print('Mata Kuliah Semester object cannot be found. MK Kurikulum ID: {}, Semester ID: {}'.format(new_mk_semester.mk_kurikulum.id_neosia, semester_prodi_id)) 
-        return 
+        message = 'Mata Kuliah Semester tidak dapat ditemukan. MK Kurikulum ID: {}, Semester ID: {}'.format(new_mk_semester.mk_kurikulum.id_neosia, semester_prodi_id)
+        if settings.DEBUG: print(message) 
+        return (is_success, message)
     
     list_clo: QuerySet[Clo] = mk_semester_obj.get_all_clo()
+    cloned_list_clo = []
 
     for clo in list_clo:
-        # Get komponen CLO
-        list_komponen_clo: QuerySet[KomponenClo] = KomponenClo.objects.filter(
-            clo=clo
+        new_clo = clone_object(
+            clo,
+            attrs={
+                'mk_semester': new_mk_semester
+            }
         )
+        cloned_list_clo.append(new_clo)
+    
+    if list_clo.count() == len(cloned_list_clo):
+        is_success = True
+        message = 'Berhasil menduplikasi CLO ke mata kuliah ini.'
+    else:
+        message = 'Jumlah pertemuan yang diduplikasi hanya {} pertemuan. Ekspektasi: {}.'.format(len(cloned_list_clo), list_clo.count())
 
-        # Get PI CLO
-        list_pi_clo: QuerySet[PiClo] = PiClo.objects.filter(
-            clo=clo
-        )
-        
-        # Duplicate CLO
-        new_clo = clo
-        new_clo._state.adding = True
-        new_clo.pk = None
-        new_clo.mk_semester = new_mk_semester
-        new_clo.save()
-
-        # Duplicate Komponen CLO
-        for komponen_clo in list_komponen_clo:
-            new_komponen_clo = komponen_clo
-            new_komponen_clo._state.adding = True
-            new_komponen_clo.pk = None
-            new_komponen_clo.clo = new_clo
-            new_komponen_clo.save()
-
-        # Duplicate PI CLO
-        for pi_clo in list_pi_clo:
-            new_pi_clo = pi_clo
-            new_pi_clo._state.adding = True
-            new_pi_clo.pk = None
-            new_pi_clo.clo = new_clo
-            new_pi_clo.save()
+    return (is_success, message)
 
 
 def generate_nilai_clo(persentase_komponen_clo, nilai_akhir: float, timeout = 10):

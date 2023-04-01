@@ -4,14 +4,7 @@ from learning_outcomes_assessment.utils import clone_object
 from mata_kuliah_semester.models import MataKuliahSemester
 from rps.models import (
     RencanaPembelajaranSemester,
-    PengembangRPS,
-    KoordinatorRPS,
-    DosenPengampuRPS,
-    MataKuliahSyaratRPS,
     PertemuanRPS,
-    RincianPertemuanRPS,
-    PembelajaranPertemuanRPS,
-    DurasiPertemuanRPS,
 )
 from semester.models import SemesterProdi
 

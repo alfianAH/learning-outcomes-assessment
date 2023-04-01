@@ -749,10 +749,7 @@ class RincianRPSDuplicateView(RPSDuplicateView):
         semester_prodi_id = form.cleaned_data.get('semester')
 
         is_success, message = duplicate_rincian_rps(semester_prodi_id, self.mk_semester_obj)
-        if is_success:
-            messages.success(self.request, message)
-        else:
-            messages.error(self.request, message)
+        self.show_clone_result_message(is_success, message)
 
         return super().form_valid(form)
 
@@ -782,11 +779,7 @@ class PertemuanRPSDuplicateView(RPSDuplicateView):
         semester_prodi_id = form.cleaned_data.get('semester')
 
         is_success, message = duplicate_pertemuan_rps(semester_prodi_id, self.mk_semester_obj)
-
-        if is_success:
-            messages.success(self.request, message)
-        else:
-            messages.error(self.request, message)
+        self.show_clone_result_message(is_success, message)
         
         # If current duplicated percentages is more than 100, add warning message
         current_total_bobot_penilaian = self.mk_semester_obj.get_total_bobot_penilaian_pertemuan_rps

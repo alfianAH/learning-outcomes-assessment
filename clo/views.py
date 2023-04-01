@@ -476,8 +476,8 @@ class CloDuplicateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, Duplic
 
     def form_valid(self, form) -> HttpResponse:
         semester_prodi_id = form.cleaned_data.get('semester')
-        messages.success(self.request, 'Berhasil menduplikasi CLO ke mata kuliah ini.')
-        duplicate_clo(semester_prodi_id, self.mk_semester_obj)
+        is_success, message = duplicate_clo(semester_prodi_id, self.mk_semester_obj)
+        self.show_clone_result_message(is_success, message)
         
         # If current duplicated percentages is more than 100, add warning message
         current_total_persentase = self.mk_semester_obj.get_total_persentase_clo()
