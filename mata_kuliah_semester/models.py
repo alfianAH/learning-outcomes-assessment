@@ -13,7 +13,7 @@ User = settings.AUTH_USER_MODEL
 # Create your models here.
 class MataKuliahSemesterLock(models.Model):
     is_clo_locked = models.BooleanField(default=False)
-    is_rps_locked = models.BooleanField(default=False)
+    is_rencanapembelajaransemester_locked = models.BooleanField(default=False)
     
     class Meta:
         abstract = True
@@ -44,7 +44,7 @@ class MataKuliahSemester(MataKuliahSemesterLock):
     # Pedoman
     @property
     def status_pedoman(self):
-        return self.is_clo_locked and self.is_rps_locked
+        return self.is_clo_locked and self.is_rencanapembelajaransemester_locked
 
     def read_detail_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:read', self.get_kwargs)

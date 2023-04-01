@@ -396,7 +396,7 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin,
         self.update_status_pedoman(self.single_object.is_clo_locked, pedoman_objects[0])
         
         # Status pedoman RPS
-        self.update_status_pedoman(self.single_object.is_rps_locked, pedoman_objects[1])
+        self.update_status_pedoman(self.single_object.is_rencanapembelajaransemester_locked, pedoman_objects[1])
 
         context.update({
             'colspan_length': 8,

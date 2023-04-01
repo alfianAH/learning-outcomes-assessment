@@ -9,6 +9,11 @@ from django.views.generic.base import RedirectView
 from django.views.generic.edit import DeleteView, CreateView, UpdateView
 from django.views.generic.detail import DetailView
 from accounts.enums import RoleChoices
+from learning_outcomes_assessment.auth.mixins import (
+    ProgramStudiMixin,
+    MahasiswaAndMKSemesterMixin,
+)
+from .mixins import RPSLockedObjectPermissionMixin
 from learning_outcomes_assessment.forms.edit import (
     MultiFormView,
     MultiModelFormView,
@@ -32,8 +37,6 @@ from .models import (
     RincianPertemuanRPS,
     PembelajaranPertemuanRPS,
     DurasiPertemuanRPS,
-    JenisPertemuan,
-    TipeDurasi,
 )
 from .forms import (
     SKSForm,
@@ -62,7 +65,7 @@ from .utils import(
 
 
 # Create your views here.
-class RPSHomeView(DetailWithListViewModelA):
+class RPSHomeView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin ,DetailWithListViewModelA):
     template_name = 'rps/home.html'
 
     single_model = MataKuliahSemester
@@ -94,6 +97,8 @@ class RPSHomeView(DetailWithListViewModelA):
     def setup(self, request: HttpRequest, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.bulk_delete_url = self.single_object.get_pertemuan_rps_bulk_delete_url()
+        self.mk_semester_obj = self.single_object
+        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
     
     def get_queryset(self):
         self.queryset = self.model.objects.filter(
@@ -177,7 +182,7 @@ class RPSHomeView(DetailWithListViewModelA):
         return context
     
 
-class RPSFormView(MultiFormView):
+class RPSFormView(ProgramStudiMixin, RPSLockedObjectPermissionMixin, MultiFormView):
     form_classes = {
         'sks_form': SKSForm,
         'kaprodi_rps_form': KaprodiRPSForm,
@@ -193,6 +198,7 @@ class RPSFormView(MultiFormView):
         mk_semester_id = kwargs.get('mk_semester_id')
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
         self.success_url = self.mk_semester_obj.get_rps_home_url()
+        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -503,7 +509,7 @@ class RPSUpdateView(RPSFormView):
         return super().forms_valid(forms)
 
 
-class RPSDeleteView(DeleteView):
+class RPSDeleteView(ProgramStudiMixin, RPSLockedObjectPermissionMixin, DeleteView):
     model = RencanaPembelajaranSemester
 
     def setup(self, request: HttpRequest, *args, **kwargs):
@@ -511,6 +517,8 @@ class RPSDeleteView(DeleteView):
         mk_semester_id = kwargs.get('mk_semester_id')
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
         self.success_url = self.mk_semester_obj.get_rps_home_url()
+
+        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         return self.delete(request, *args, **kwargs)
@@ -520,7 +528,7 @@ class RPSDeleteView(DeleteView):
         return obj
 
 
-class RPSLockAndUnlockView(RedirectView):
+class RPSLockAndUnlockView(ProgramStudiMixin, RedirectView):
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
         mk_semester_id = kwargs.get('mk_semester_id')
@@ -604,7 +612,7 @@ class RPSLockAndUnlockView(RedirectView):
             is_locking_success, is_success = self.lock_child(is_locking_success, is_success, pertemuan)
         
         if is_success:
-            self.mk_semester_obj.is_rps_locked = True
+            self.mk_semester_obj.is_rencanapembelajaransemester_locked = True
             self.mk_semester_obj.save()
 
         return is_success, is_locking_success
@@ -656,7 +664,7 @@ class RPSLockAndUnlockView(RedirectView):
             is_unlocking_success, is_success = self.unlock_child(is_unlocking_success, is_success, pertemuan)
         
         if is_success:
-            self.mk_semester_obj.is_rps_locked = False
+            self.mk_semester_obj.is_rencanapembelajaransemester_locked = False
             self.mk_semester_obj.save()
 
         return is_success, is_unlocking_success
@@ -704,7 +712,7 @@ class RPSUnlockView(RPSLockAndUnlockView):
 
 
 # Pertemuan RPS
-class PertemuanRPSCreateView(CreateView):
+class PertemuanRPSCreateView(ProgramStudiMixin, RPSLockedObjectPermissionMixin, CreateView):
     template_name = 'rps/pertemuan/create-view.html'
     model = PertemuanRPS
     form_class = PertemuanRPSForm
@@ -714,6 +722,8 @@ class PertemuanRPSCreateView(CreateView):
         mk_semester_id = kwargs.get('mk_semester_id')
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
         self.success_url = '{}?active_tab=pertemuan'.format(self.mk_semester_obj.get_rps_home_url())
+        
+        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
     
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         total_bobot_penilaian = self.mk_semester_obj.get_total_bobot_penilaian_pertemuan_rps
@@ -749,7 +759,7 @@ class PertemuanRPSCreateView(CreateView):
         return redirect(self.success_url)
 
 
-class PertemuanRPSBulkDeleteView(ModelBulkDeleteView):
+class PertemuanRPSBulkDeleteView(ProgramStudiMixin, RPSLockedObjectPermissionMixin, ModelBulkDeleteView):
     model = PertemuanRPS
     id_list_obj: str = 'id_pertemuan_rps'
     success_msg: str = 'Berhasil menghapus pertemuan RPS.'
@@ -766,13 +776,19 @@ class PertemuanRPSBulkDeleteView(ModelBulkDeleteView):
         return super().get_queryset()
 
 
-class PertemuanRPSReadView(DetailView):
+class PertemuanRPSReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin, DetailView):
     model = PertemuanRPS
     pk_url_kwarg = 'pertemuan_rps_id'
     template_name = 'rps/pertemuan/detail-view.html'
 
+    def setup(self, request: HttpRequest, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.object: PertemuanRPS = self.get_object()
+        self.mk_semester_obj: MataKuliahSemester = self.object.mk_semester
+        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
 
-class PertemuanRPSUpdateView(UpdateView):
+
+class PertemuanRPSUpdateView(ProgramStudiMixin, RPSLockedObjectPermissionMixin, UpdateView):
     template_name = 'rps/pertemuan/update-view.html'
     model = PertemuanRPS
     pk_url_kwarg = 'pertemuan_rps_id'
@@ -782,6 +798,8 @@ class PertemuanRPSUpdateView(UpdateView):
         super().setup(request, *args, **kwargs)
         self.object: PertemuanRPS = self.get_object()
         self.success_url = self.object.read_detail_url()
+        self.mk_semester_obj = self.object.mk_semester
+        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -793,7 +811,7 @@ class PertemuanRPSUpdateView(UpdateView):
         return kwargs
 
 
-class RincianPertemuanRPSFormView(MultiModelFormView):
+class RincianPertemuanRPSFormView(ProgramStudiMixin, RPSLockedObjectPermissionMixin, MultiModelFormView):
     form_classes = {
         'rincian_pertemuan_rps_form': RincianPertemuanRPSForm,
         'pembelajaran_pertemuan_luring_rps_form': PembelajaranPertemuanLuringRPSForm,
@@ -809,6 +827,9 @@ class RincianPertemuanRPSFormView(MultiModelFormView):
         pertemuan_rps_id = kwargs.get('pertemuan_rps_id')
         self.pertemuan_rps_obj = get_object_or_404(PertemuanRPS, id=pertemuan_rps_id)
         self.success_url = self.pertemuan_rps_obj.read_detail_url()
+
+        self.mk_semester_obj = self.pertemuan_rps_obj.mk_semester
+        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -892,7 +913,7 @@ class RincianPertemuanRPSUpdateView(RincianPertemuanRPSFormView):
         return objects
 
 
-class RPSDuplicateView(DuplicateFormview):
+class RPSDuplicateView(ProgramStudiMixin, RPSLockedObjectPermissionMixin, DuplicateFormview):
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
 
