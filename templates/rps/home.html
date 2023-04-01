@@ -109,6 +109,8 @@ RPS -
         {% if rps %}
         <div class="h-icon">
             <h2>Rincian RPS</h2>
+            {% if user_role != 'm' %}
+            {% if not single_object.is_rencanapembelajaransemester_locked %}
             <a href="{{ single_object.get_rps_update_url }}" class="btn btn-success btn-icon-start loading-trigger max-w-min">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" focusable="False" aria-label="sync">
                     <path d="M.01 0h24v24h-24V0z" fill="none"/>
@@ -124,6 +126,8 @@ RPS -
                 </svg>
                 <span class="hidden sm:block">Hapus</span>
             </a>
+            {% endif %}
+            {% endif %}
         </div>
 
         <div class="table-div">
@@ -365,12 +369,16 @@ RPS -
         {% if object_list or data_exist %}
             <div class="h-icon">
                 <h2>Pertemuan</h2>
+                {% if user_role != 'm' %}
+                {% if not single_object.is_rencanapembelajaransemester_locked %}
                 <a href="{{ single_object.get_pertemuan_rps_create_url }}" class="btn btn-primary loading-trigger max-w-min">
                     <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
                         <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
                     </svg>
                     <span class="hidden sm:block">Tambah</span>
                 </a>
+                {% endif %}
+                {% endif %}
             </div>
 
             {% if object_list %}
