@@ -1,3 +1,4 @@
+from copy import copy
 import random
 import time
 from django.db.models import QuerySet
@@ -85,6 +86,15 @@ def duplicate_clo(semester_prodi_id: int, new_mk_semester: MataKuliahSemester):
     
     list_clo: QuerySet[Clo] = mk_semester_obj.get_all_clo()
 
+    def duplicate_clo_children(list_obj, new_clo):
+        for obj in list_obj:
+            new_obj = copy(obj)
+            new_obj._state.adding = True
+            new_obj.pk = None
+            new_obj.clo = new_clo
+            new_obj.lock = None
+            new_obj.save()
+
     for clo in list_clo:
         # Get komponen CLO
         list_komponen_clo: QuerySet[KomponenClo] = KomponenClo.objects.filter(
@@ -97,27 +107,16 @@ def duplicate_clo(semester_prodi_id: int, new_mk_semester: MataKuliahSemester):
         )
         
         # Duplicate CLO
-        new_clo = clo
+        new_clo = copy(clo)
         new_clo._state.adding = True
         new_clo.pk = None
         new_clo.mk_semester = new_mk_semester
+        new_clo.lock = None
         new_clo.save()
 
-        # Duplicate Komponen CLO
-        for komponen_clo in list_komponen_clo:
-            new_komponen_clo = komponen_clo
-            new_komponen_clo._state.adding = True
-            new_komponen_clo.pk = None
-            new_komponen_clo.clo = new_clo
-            new_komponen_clo.save()
-
-        # Duplicate PI CLO
-        for pi_clo in list_pi_clo:
-            new_pi_clo = pi_clo
-            new_pi_clo._state.adding = True
-            new_pi_clo.pk = None
-            new_pi_clo.clo = new_clo
-            new_pi_clo.save()
+        # Duplicate Komponen and PI CLO
+        duplicate_clo_children(list_komponen_clo, new_clo)
+        duplicate_clo_children(list_pi_clo, new_clo)
     
     is_success = True
     message = 'Berhasil menduplikasi CLO ke mata kuliah ini.'

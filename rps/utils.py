@@ -1,10 +1,18 @@
+from copy import copy
 from django.conf import settings
 from django.db.models import QuerySet
 from learning_outcomes_assessment.utils import clone_object
 from mata_kuliah_semester.models import MataKuliahSemester
-from rps.models import (
+from .models import (
+    DosenPengampuRPS,
+    DurasiPertemuanRPS,
+    KoordinatorRPS,
+    MataKuliahSyaratRPS,
+    PembelajaranPertemuanRPS,
+    PengembangRPS,
     RencanaPembelajaranSemester,
     PertemuanRPS,
+    RincianPertemuanRPS,
 )
 from semester.models import SemesterProdi
 
@@ -55,18 +63,41 @@ def duplicate_rincian_rps(semester_prodi_id, new_mk_semester: MataKuliahSemester
     
     rps_obj: RencanaPembelajaranSemester = mk_semester_obj.rencanapembelajaransemester
     
-    new_rps_obj = clone_object(
-        rps_obj, 
-        attrs={
-            'mk_semester': new_mk_semester
-        }
-    )
+    # Get pengembang RPS
+    list_pengembang_rps: QuerySet[PengembangRPS] = rps_obj.get_pengembang_rps()
+    # print(list_pengembang_rps.count())
+    
+    # Get koordinator RPS
+    list_koordinator_rps: QuerySet[KoordinatorRPS] = rps_obj.get_koordinator_rps()
 
-    if new_rps_obj is not None:
-        is_success = True
-        message = 'Berhasil menduplikasi rincian RPS.'
-    else:
-        message = 'Gagal menduplikasi rincian RPS.'
+    # Get dosen pengampu RPS
+    list_dosen_pengampu_rps: QuerySet[DosenPengampuRPS] = rps_obj.get_dosen_pengampu_rps()
+
+    # Get MK Syarat RPS
+    list_mk_syarat_rps: QuerySet[MataKuliahSyaratRPS] = rps_obj.get_mata_kuliah_syarat_rps()
+
+    # Duplicate RPS
+    new_rps = copy(rps_obj)
+    new_rps._state.adding = True
+    new_rps.pk = None
+    new_rps.mk_semester = new_mk_semester
+    new_rps.save()
+
+    def duplicate_dosen(list_obj, new_rps):
+        for obj in list_obj:
+            new_obj = copy(obj)
+            new_obj._state.adding = True
+            new_obj.pk = None
+            new_obj.rps = new_rps
+            new_obj.save()
+
+    duplicate_dosen(list_pengembang_rps, new_rps)
+    duplicate_dosen(list_koordinator_rps, new_rps)
+    duplicate_dosen(list_dosen_pengampu_rps, new_rps)
+    duplicate_dosen(list_mk_syarat_rps, new_rps)
+    
+    is_success = True
+    message = 'Berhasil menduplikasi rincian RPS.'
 
     return (is_success, message)
 
@@ -114,21 +145,38 @@ def duplicate_pertemuan_rps(semester_prodi_id, new_mk_semester: MataKuliahSemest
 
     # Get list pertemuan
     list_pertemuan_rps: QuerySet[PertemuanRPS] = mk_semester_obj.get_all_pertemuan_rps()
-    cloned_list_pertemuan_rps = []
+
+    def duplicate_pertemuan_rps(list_obj, new_pertemuan):
+        for obj in list_obj:
+            new_obj = copy(obj)
+            new_obj._state.adding = True
+            new_obj.pk = None
+            new_obj.pertemuan_rps = new_pertemuan
+            new_obj.save()
 
     for pertemuan in list_pertemuan_rps:
-        new_pertemuan = clone_object(
-            pertemuan,
-            attrs={
-                'mk_semester': new_mk_semester
-            }
-        )
-        cloned_list_pertemuan_rps.append(new_pertemuan)
-    
-    if list_pertemuan_rps.count() == len(cloned_list_pertemuan_rps):
-        is_success = True
-        message = 'Berhasil menduplikasi rincian RPS.'
-    else:
-        message = 'Jumlah pertemuan yang diduplikasi hanya {} pertemuan. Ekspektasi: {}.'.format(len(cloned_list_pertemuan_rps), list_pertemuan_rps.count())
+        list_pembelajaran_pertemuan_rps: QuerySet[PembelajaranPertemuanRPS] = pertemuan.get_all_pembelajaran_pertemuan()
+
+        list_durasi_pertemuan_rps: QuerySet[DurasiPertemuanRPS] = pertemuan.get_all_durasi_pertemuan()
+
+        # Duplicate pertemuan
+        new_pertemuan = copy(pertemuan)
+        new_pertemuan._state.adding = True
+        new_pertemuan.pk = None
+        new_pertemuan.mk_semester = new_mk_semester
+        new_pertemuan.save()
+        
+        # Duplicate rincian pertemuan
+        if hasattr(pertemuan, 'rincianpertemuanrps'):
+            rincian_pertemuan_rps: RincianPertemuanRPS = pertemuan.rincianpertemuanrps
+
+            new_rincian_pertemuan_rps = rincian_pertemuan_rps
+            new_rincian_pertemuan_rps._state.adding = True
+            new_rincian_pertemuan_rps.pk = None
+            new_rincian_pertemuan_rps.pertemuan_rps = new_pertemuan
+            new_rincian_pertemuan_rps.save()
+        
+        duplicate_pertemuan_rps(list_pembelajaran_pertemuan_rps, new_pertemuan)
+        duplicate_pertemuan_rps(list_durasi_pertemuan_rps, new_pertemuan)
 
     return (is_success, message)
