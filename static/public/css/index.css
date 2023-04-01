@@ -4451,6 +4451,10 @@ details.dropdown::marker {
   height: 0.625rem;
 }
 
+.h-full {
+  height: 100%;
+}
+
 .max-h-10 {
   max-height: 2.5rem;
 }
@@ -4838,6 +4842,10 @@ details.dropdown::marker {
   --tw-space-y-reverse: 0;
   margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
   margin-bottom: calc(1rem * var(--tw-space-y-reverse));
+}
+
+.self-center {
+  align-self: center;
 }
 
 .overflow-y-auto {
@@ -6242,6 +6250,10 @@ details.dropdown::marker {
 
   .xl\:grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .xl\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .xl\:gap-6 {
