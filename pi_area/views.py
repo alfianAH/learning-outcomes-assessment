@@ -245,8 +245,8 @@ class PIAreaDuplicateFormView(ProgramStudiMixin, PILockedObjectPermissionMixin, 
 
     def form_valid(self, form) -> HttpResponse:
         kurikulum_id = form.cleaned_data.get('kurikulum')
-        duplicate_pi_area_from_kurikulum_id(kurikulum_id, self.kurikulum_obj)
-        messages.success(self.request, 'Berhasil menduplikasi performance indicator ke kurikulum ini.')
+        is_success, message = duplicate_pi_area_from_kurikulum_id(kurikulum_id, self.kurikulum_obj)
+        self.show_clone_result_message(is_success, message)
         return super().form_valid(form)
 
 

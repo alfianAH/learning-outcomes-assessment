@@ -11,11 +11,7 @@ from pi_area.models import (
     PerformanceIndicator
 )
 from mata_kuliah_semester.models import MataKuliahSemester
-from .models import (
-    Clo,
-    KomponenClo,
-    PiClo,
-)
+from .models import Clo
 
 
 def get_pi_area_by_kurikulum_choices(kurikulum_obj: Kurikulum):

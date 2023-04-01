@@ -11,8 +11,7 @@ from .models import Ilo
 
 ILO_ORDERING_BY = (
     ('nama', 'Nama'), 
-    ('satisfactory_level', 'Satisfactory level'), 
-    ('persentase_capaian_ilo', 'Persentase Capaian ILO')
+    ('satisfactory_level', 'Satisfactory level'),
 )
 
 class IloFilter(filter.FilterSet):
@@ -45,28 +44,10 @@ class IloFilter(filter.FilterSet):
             )
         ),
     )
-    persentase_capaian_ilo = filter.RangeFilter(
-        field_name='persentase_capaian_ilo',
-        label='Persentase Capaian ILO',
-        widget=MyRangeWidget(
-            widgets=(
-                MyRangeInput(attrs={
-                    'placeholder': '0',
-                    'min': 0,
-                    'max': 100,
-                }),
-                MyRangeInput(attrs={
-                    'placeholder': '100',
-                    'min': 0,
-                    'max': 100,
-                })
-            )
-        ),
-    )
     
     class Meta:
         model = Ilo
-        fields = ('nama', 'satisfactory_level', 'persentase_capaian_ilo')
+        fields = ('nama', 'satisfactory_level')
 
 
 class IloSort(forms.Form):

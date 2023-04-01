@@ -3,8 +3,8 @@ from ilo.models import Ilo
 from .models import (
     AssessmentArea,
     PerformanceIndicatorArea,
-    PerformanceIndicator
 )
+from learning_outcomes_assessment.utils import clone_object
 
 
 def get_kurikulum_with_pi_area(kurikulum_obj: Kurikulum):
@@ -12,7 +12,7 @@ def get_kurikulum_with_pi_area(kurikulum_obj: Kurikulum):
 
     # Get list kurikulum and exclude obj itself
     kurikulum_qs = Kurikulum.objects.filter(
-        prodi=kurikulum_obj.prodi_jenjang.id_neosia).exclude(id_neosia=kurikulum_obj.id_neosia)
+        prodi_jenjang=kurikulum_obj.prodi_jenjang.id_neosia).exclude(id_neosia=kurikulum_obj.id_neosia)
 
     # Filter Assessment Area and PI Area in the semester
     for kurikulum_obj in kurikulum_qs:
@@ -38,53 +38,28 @@ def get_kurikulum_with_pi_area(kurikulum_obj: Kurikulum):
 
 
 def duplicate_pi_area_from_kurikulum_id(kurikulum_id: int, new_kurikulum: Kurikulum):
+    is_success = False
+    message = ''
+
     assessment_area_qs = AssessmentArea.objects.filter(
         kurikulum=kurikulum_id
     )
+    cloned_list_assessment_area = []
 
     # Duplicate assessment area
     for assessment_area_obj in assessment_area_qs:
-        pi_area_qs = PerformanceIndicatorArea.objects.filter(
-            assessment_area=assessment_area_obj,
-            assessment_area__kurikulum=kurikulum_id,
+        new_assessment_area_obj = clone_object(
+            assessment_area_obj,
+            attrs={
+                'kurikulum': new_kurikulum
+            }
         )
+        cloned_list_assessment_area.append(new_assessment_area_obj)
+    
+    if assessment_area_qs.count() == len(cloned_list_assessment_area):
+        is_success = True
+        message = 'Berhasil menduplikasi Assessment Area.'
+    else:
+        message = 'Jumlah assessment area yang diduplikasi hanya {} area. Ekspektasi: {}.'.format(len(cloned_list_assessment_area), assessment_area_qs.count())
 
-        new_assessment_area_obj = assessment_area_obj
-        new_assessment_area_obj._state.adding = True
-        new_assessment_area_obj.pk = None
-        new_assessment_area_obj.kurikulum = new_kurikulum
-        new_assessment_area_obj.save()
-        
-        # Duplicate PI Area 
-        for pi_area_obj in pi_area_qs:
-            pi_qs = PerformanceIndicator.objects.filter(
-                pi_area=pi_area_obj,
-                pi_area__assessment_area__kurikulum=kurikulum_id,
-            )
-            ilo_qs = Ilo.objects.filter(
-                pi_area=pi_area_obj,
-                pi_area__assessment_area__kurikulum=kurikulum_id,
-            )
-
-            new_pi_area_obj = pi_area_obj
-            new_pi_area_obj._state.adding = True
-            new_pi_area_obj.pk = None
-            new_pi_area_obj.assessment_area = new_assessment_area_obj
-            new_pi_area_obj.save()
-
-            # Duplicate Performance Indicator
-            for pi_obj in pi_qs:
-                new_pi_obj = pi_obj
-                new_pi_obj._state.adding = True
-                new_pi_obj.pk = None
-                new_pi_obj.pi_area = new_pi_area_obj
-                new_pi_obj.save()
-
-            # Duplicate ILO
-            for ilo_obj in ilo_qs:
-                new_ilo_obj = ilo_obj
-                new_ilo_obj._state.adding = True
-                new_ilo_obj.pk = None
-                new_ilo_obj.pi_area = new_pi_area_obj
-                new_ilo_obj.persentase_capaian_ilo = 0
-                new_ilo_obj.save()
+    return (is_success, message)
