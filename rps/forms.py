@@ -44,7 +44,7 @@ class KaprodiRPSForm(forms.Form):
 class SKSForm(forms.Form):
     teori_sks = forms.IntegerField(
         min_value=0,
-        required=True,
+        required=False,
         widget=MyNumberInput(attrs={
             'placeholder': 2
         }),
@@ -52,7 +52,7 @@ class SKSForm(forms.Form):
     )
     praktik_sks = forms.IntegerField(
         min_value=0,
-        required=True,
+        required=False,
         widget=MyNumberInput(attrs={
             'placeholder': 1
         }),
@@ -70,6 +70,8 @@ class SKSForm(forms.Form):
         cleaned_data = super().clean()
         teori_sks = cleaned_data['teori_sks']
         praktik_sks = cleaned_data['praktik_sks']
+
+        if teori_sks is None or praktik_sks is None: return cleaned_data
 
         total_sks = teori_sks + praktik_sks
         if total_sks > self.mk_kurikulum.sks:

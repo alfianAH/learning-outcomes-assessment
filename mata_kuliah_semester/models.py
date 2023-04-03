@@ -208,7 +208,10 @@ class MataKuliahSemester(MataKuliahSemesterLock):
         if not hasattr(self, 'pertemuanrps_set'): 
             status = False
         else:
-            status = True
+            if self.pertemuanrps_set.all().exists():
+                status = True
+            else:
+                status = False
         return status
     
     def get_pertemuan_rps_create_url(self):

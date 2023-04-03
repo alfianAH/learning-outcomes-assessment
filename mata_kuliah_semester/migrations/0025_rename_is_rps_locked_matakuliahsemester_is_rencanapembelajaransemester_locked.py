@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RenameField(
             model_name='matakuliahsemester',
-            old_name='is_rencanapembelajaransemester_locked',
+            old_name='is_rps_locked',
             new_name='is_rencanapembelajaransemester_locked',
         ),
     ]
