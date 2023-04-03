@@ -165,6 +165,88 @@ class PerformanceIndicatorAreaReadView(DetailView):
     pk_url_kwarg = 'pi_area_id'
     template_name = 'pi-area/pi-area-detail-view.html'
 
+    def pi_pagination(self):
+        pagination = []
+        current_pi_area: PerformanceIndicatorArea = self.get_object()
+        list_assessment_area: QuerySet[AssessmentArea] = current_pi_area.assessment_area.kurikulum.get_all_assessment_area()
+        
+        for assessment_area in list_assessment_area:
+            assessment_area_dict = {
+                'nama': assessment_area.nama,
+                'pi_area': []
+            }
+
+            # Loop through pi area
+            list_pi_area: QuerySet[PerformanceIndicatorArea] = assessment_area.get_pi_area()
+            for pi_area in list_pi_area:
+                pi_area_dict = {
+                    'is_current': False,
+                    'read_detail_url': pi_area.read_detail_url(),
+                    'title': '{}'.format(pi_area.pi_code),
+                    'badge_text': pi_area.assessment_area.nama,
+                    'badge_type': assessment_area.get_color_display(),
+                }
+
+                if hasattr(pi_area, 'ilo'):
+                    if pi_area.ilo is not None:
+                        pi_area_dict.update({
+                            'title': '{} - {}'.format(pi_area.pi_code, pi_area.ilo.nama),
+                        })
+
+                # Update is current to True
+                if pi_area == current_pi_area:
+                    pi_area_dict.update({
+                        'is_current': True
+                    })
+                
+                assessment_area_dict['pi_area'].append(pi_area_dict)
+            
+            pagination.append(assessment_area_dict)
+        
+        return pagination
+
+    def pi_pagination_next_prev(self):
+        current_pi_area: PerformanceIndicatorArea = self.get_object()
+        list_pi_area = PerformanceIndicatorArea.objects.filter(
+            assessment_area__kurikulum=current_pi_area.assessment_area.kurikulum
+        ).order_by('assessment_area__nama', 'pi_code')
+        
+        pagination = {
+            'prev': None,
+            'next': None,
+        }
+        if list_pi_area.count() <= 2: return pagination
+
+        for i, pi_area in enumerate(list_pi_area):
+            if pi_area != current_pi_area: continue
+            if i == 0:
+                # If current is on start, ...
+                pagination.update({
+                    'prev': list_pi_area.last(),
+                    'next': list_pi_area[i+1]
+                })
+            elif i == list_pi_area.count()-1:
+                # If current is on last, ...
+                pagination.update({
+                    'prev': list_pi_area[i-1],
+                    'next': list_pi_area.first(),
+                })
+                
+            else:
+                # If current is on middle
+                pagination.update({
+                    'prev': list_pi_area[i-1],
+                    'next': list_pi_area[i+1],
+                })
+            break
+        return pagination
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['pagination'] = self.pi_pagination()
+        context['pagination_next_prev'] = self.pi_pagination_next_prev()
+        return context
+
 
 class PerformanceIndicatorAreaBulkDeleteView(ProgramStudiMixin, PILockedObjectPermissionMixin, ModelBulkDeleteView):
     model = PerformanceIndicatorArea

@@ -12,61 +12,106 @@ Detail Performance Indicators -
 {% endblock breadcrumb %}
 
 {% block content %}
-<div class="h-icon">
-    <h1>Detail Performance Indicator</h1>
-    {% if user_role != 'm' %}
-    {% if not object.assessment_area.kurikulum.is_assessmentarea_locked %}
-        <a href="{{ object.get_pi_area_update_url }}" class="btn btn-success loading-trigger" title="Update">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path d="M0 0h24v24H0V0z" fill="none"/>
-                <path d="M3 17.46v3.04c0 .28.22.5.5.5h3.04c.13 0 .26-.05.35-.15L17.81 9.94l-3.75-3.75L3.15 17.1c-.1.1-.15.22-.15.36zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-            </svg>
-        </a>
-    {% endif %}
-    {% endif %}
+<div class="flex space-x-5">
+    <div class="w-full xl:w-2/3">
+        <div class="h-icon">
+            <h1>Detail Performance Indicator</h1>
+            {% if user_role != 'm' %}
+            {% if not object.assessment_area.kurikulum.is_assessmentarea_locked %}
+                <a href="{{ object.get_pi_area_update_url }}" class="btn btn-success loading-trigger" title="Update">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0V0z" fill="none"/>
+                        <path d="M3 17.46v3.04c0 .28.22.5.5.5h3.04c.13 0 .26-.05.35-.15L17.81 9.94l-3.75-3.75L3.15 17.1c-.1.1-.15.22-.15.36zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                    </svg>
+                </a>
+            {% endif %}
+            {% endif %}
+        </div>
+
+        <div class="table-div my-3">
+            <div class="tr-div">
+                <div class="min-w-24 sm:min-w-32 md:min-w-40 xl:min-w-48">Kurikulum</div>
+                <div>:</div>
+                <div>{{ object.assessment_area.kurikulum.nama }}</div>
+            </div>
+            <div class="tr-div !items-center">
+                <div class="min-w-24 sm:min-w-32 md:min-w-40 xl:min-w-48">Area</div>
+                <div>:</div>
+                <div class="badge {{ object.assessment_area.get_color_display }}">{{ object.assessment_area.nama }}</div>
+            </div>
+            <div class="tr-div">
+                <div class="min-w-24 sm:min-w-32 md:min-w-40 xl:min-w-48">Kode area PI</div>
+                <div>:</div>
+                <div>{{ object.pi_code }}</div>
+            </div>
+            <div class="tr-div">
+                <div class="min-w-24 sm:min-w-32 md:min-w-40 xl:min-w-48">Kode ILO</div>
+                <div>:</div>
+                <div>{{ object.ilo.nama|default:'-' }}</div>
+            </div>
+            {% if object.ilo %}
+            <div class="tr-div">
+                <div>Deskripsi ILO</div>
+                <div>:</div>
+            </div>
+
+            <div class="tr-div">
+                <div>{{ object.ilo.deskripsi }}</div>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if object.get_performance_indicator %}
+        <h2>Performance Indicator</h2>
+        {% comment %} List Performance indicator {% endcomment %}
+        <ul class="list-disc ml-5 my-3">
+        {% for performance_indicator in object.get_performance_indicator %}
+            <li>{{ performance_indicator.deskripsi }}</li>
+        {% endfor %}
+        </ul>
+        {% endif %}
+
+        <div class="flex justify-between">
+            <div>
+                {% with pagination_next_prev.prev as pi_prev %}
+                    {% if pi_prev %}
+                    <a href="{{ pi_prev.read_detail_url }}" class="btn btn-outline-dark btn-icon-start rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+                        </svg>
+                        <span class="max-w-[8.25rem] min-w-[5.5rem] truncate text-left">{{ pi_prev.pi_code }} {% if pi_prev.ilo %} - {{ pi_prev.ilo.nama }}{% endif %}</span>
+                    </a>
+                    {% endif %}
+                {% endwith %}
+            </div>
+
+            <div>
+                {% with pagination_next_prev.next as pi_next %}
+                    {% if pi_next %}
+                    <a href="{{ pi_next.read_detail_url }}" class="btn btn-outline-dark btn-icon-end rounded-full">
+                        <span class="max-w-[8.25rem] min-w-[5.5rem] truncate text-right">{{ pi_next.pi_code }} {% if pi_next.ilo %} - {{ pi_next.ilo.nama }}{% endif %}</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+                        </svg>
+                    </a>
+                    {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+    </div>
+
+    <div class="w-1/3 hidden xl:block">
+        <h3>List PI</h3>
+
+        <ul class="space-y-3">
+            {% for assessment_area in pagination %}
+            <li>
+                <span class="font-bold">{{ assessment_area.nama }}</span>
+
+                {% include 'components/list-table-view/model-b/list-view-model-b.html' with objects=assessment_area.pi_area use_checkbox=False not_use_cols=True %}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
 </div>
-
-<div class="table-div">
-    <div class="tr-div">
-        <div class="min-w-24 sm:min-w-32 md:min-w-40 xl:min-w-48">Kurikulum</div>
-        <div>:</div>
-        <div>{{ object.assessment_area.kurikulum.nama }}</div>
-    </div>
-    <div class="tr-div !items-center">
-        <div class="min-w-24 sm:min-w-32 md:min-w-40 xl:min-w-48">Area</div>
-        <div>:</div>
-        <div class="badge {{ object.assessment_area.get_color_display }}">{{ object.assessment_area.nama }}</div>
-    </div>
-    <div class="tr-div">
-        <div class="min-w-24 sm:min-w-32 md:min-w-40 xl:min-w-48">Kode area PI</div>
-        <div>:</div>
-        <div>{{ object.pi_code }}</div>
-    </div>
-    <div class="tr-div">
-        <div class="min-w-24 sm:min-w-32 md:min-w-40 xl:min-w-48">Kode ILO</div>
-        <div>:</div>
-        <div>{{ object.ilo.nama|default:'-' }}</div>
-    </div>
-    {% if object.ilo %}
-    <div class="tr-div">
-        <div>Deskripsi ILO</div>
-        <div>:</div>
-    </div>
-
-    <div class="tr-div">
-        <div>{{ object.ilo.deskripsi }}</div>
-    </div>
-    {% endif %}
-</div>
-
-{% if object.get_performance_indicator %}
-<h2>Performance Indicator</h2>
-{% comment %} List Performance indicator {% endcomment %}
-<ul class="list-disc ml-5">
-{% for performance_indicator in object.get_performance_indicator %}
-    <li>{{ performance_indicator.deskripsi }}</li>
-{% endfor %}
-</ul>
-{% endif %}
-
 {% endblock content %}

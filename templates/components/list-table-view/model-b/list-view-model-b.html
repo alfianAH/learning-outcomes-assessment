@@ -1,6 +1,6 @@
-<ol {% if id %}id="{{ id }}"{% endif %} class="flex flex-col sm:grid sm:grid-cols-2 {% if not is_not_cols_3 %} xl:grid-cols-3 {% endif %}" role="list">
+<ol {% if id %}id="{{ id }}"{% endif %} class="flex flex-col {% if not not_use_cols %} sm:grid sm:grid-cols-2 {% if not is_not_cols_3 %} xl:grid-cols-3 {% endif %}{% endif %}" role="list">
     {% for object in objects %}
-        <li class="list-item-model-b" role="listitem">
+        <li class="list-item-model-b {% if object.is_current %}active{% endif %}" role="listitem">
             {% if user_role != 'm' %}
             {% comment %} Checkbox {% endcomment %}
             {% if use_checkbox %}
@@ -26,7 +26,7 @@
                 
                 {% comment %} Detail {% endcomment %}
                 {% if object.read_detail_url %}
-                    <a href="{{ object.read_detail_url }}" class="hover:no-underline active:text-slate-800 dark:active:text-slate-100 text-slate-800 dark:text-slate-100 rounded-full hover:bg-slate-300 active:bg-slate-400 dark:hover:bg-neutral-600 dark:active:bg-neutral-500 p-4 self-center">
+                    <a href="{% if object.is_current %}javascript:void(0);{% else %}{{ object.read_detail_url }}{% endif %}" class="hover:no-underline active:text-slate-800 dark:active:text-slate-100 text-slate-800 dark:text-slate-100 rounded-full hover:bg-slate-300 active:bg-slate-400 dark:hover:bg-neutral-600 dark:active:bg-neutral-500 p-4 self-center">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-chevron-right w-4 h-4" viewBox="0 0 16 16">
                             <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
                         </svg>
