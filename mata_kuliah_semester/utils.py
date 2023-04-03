@@ -18,6 +18,7 @@ from .models import (
     KelasMataKuliahSemester,
     MataKuliahSemester,
     PesertaMataKuliah,
+    DosenMataKuliah,
     NilaiMataKuliahIloMahasiswa,
     NilaiExcelMataKuliahSemester,
 )
@@ -855,18 +856,103 @@ def process_excel_file(
     return (is_import_success, message, import_result)
 
 
+from reportlab.platypus import SimpleDocTemplate
+from reportlab.lib.units import cm
+from reportlab.platypus import Paragraph, Spacer, Table, ListFlowable, TableStyle
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib import colors
+
 def generate_nilai_file(mk_semester: MataKuliahSemester):
     file_stream = BytesIO()
 
     # Create the PDF object, using the buffer as its "file."
-    pdf_file = canvas.Canvas(file_stream)
+    pdf_file = SimpleDocTemplate(file_stream)
+    styles = getSampleStyleSheet()
+    font_size = styles['Normal'].fontSize
+    
+    # Title
+    title = Paragraph(
+        mk_semester.mk_kurikulum.nama,
+        style=styles['h1']
+    )
 
-    pdf_file.drawString(100, 100, 'Hello world')
+    # MK Semester detail
+    detail_data = [
+        ['Semester', ':', mk_semester.semester.semester.nama],
+        ['Kode', ':', mk_semester.mk_kurikulum.kode],
+        ['SKS', ':', mk_semester.mk_kurikulum.sks],
+        ['Dosen', ':']
+    ]
+    detail_table_style = TableStyle([
+        ('LEFTPADDING', (0, 0), (-1, -1), 0),
+    ])
+    detail = Table(
+        data=detail_data,
+        style=detail_table_style,
+        hAlign='LEFT'
+    )
+    list_dosen_mk_semester: list[DosenMataKuliah] = mk_semester.get_all_dosen_mk_semester()
+
+    list_dosen = ListFlowable(
+        [Paragraph('{}'.format(dosen_mk_semester.dosen.nama)) for dosen_mk_semester in list_dosen_mk_semester],
+        start='1',
+        bulletFontSize=font_size,
+        bulletFormat='%s.'
+    )
+
+    empty_line = Spacer(1, 20)
+
+    # Nilai Mahasiswa
+    mahasiswa_data = [
+        ['No.', 'NIM', 'Nama', 'Nilai angka', 'Nilai huruf']
+    ]
+    list_mahasiswa_mk_semester: list[PesertaMataKuliah] = mk_semester.get_all_peserta_mk_semester()
+
+    for i, mahasiswa in enumerate(list_mahasiswa_mk_semester, 1):
+        mahasiswa_data.append(
+            [
+                '{}.'.format(i), 
+                mahasiswa.mahasiswa.username,
+                Paragraph(mahasiswa.mahasiswa.nama),
+                mahasiswa.nilai_akhir,
+                mahasiswa.nilai_huruf
+            ],
+        )
+        mahasiswa_data.append(
+            ['lorem']
+        )
+    # (COL, ROW)
+    mahasiswa_table_style = TableStyle([
+        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),               # Header align
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),    # Header font
+        ('FONTSIZE', (0, 0), (-1, 0), 11),                  # Header font size
+        ('TOPPADDING', (0, 0), (-1, 0), 12),                # Header top padding
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),             # Header bottom padding
+        ('ALIGN', (0, 1), (0, -1), 'CENTER'),               # Nomor align
+        ('ALIGN', (3, 1), (-2, -1), 'RIGHT'),               # Nilai align
+        ('TOPPADDING', (0, 1), (-1, -1), 4),                # Body top padding
+        ('BOTTOMPADDING', (0, 1), (-1, -1), 4),             # Body bottom padding
+        ('GRID', (0, 0), (-1, -1), 0.25, colors.black),     # Grid
+        ('VALIGN', (0, 1), (-1, -1), 'TOP'),                # Body vertical align
+        ('SPAN', (0, 2), (-1, 2)),
+    ])
+    mahasiswa_table = Table(
+        mahasiswa_data,
+        style=mahasiswa_table_style,
+        hAlign='LEFT',
+        colWidths=[1*cm, 3*cm, 6.5*cm, None, None]
+    )
+
+    # Build
+    pdf_file.build([
+        title,
+        detail,
+        list_dosen,
+        empty_line,
+        mahasiswa_table,
+    ])
     
     # Close the PDF object cleanly
-    pdf_file.showPage()
-    pdf_file.save()
-
     file_stream.seek(0)
 
     return file_stream
