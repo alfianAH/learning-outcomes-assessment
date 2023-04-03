@@ -878,6 +878,9 @@ def generate_nilai_file(mk_semester: MataKuliahSemester):
 
     # MK Semester detail
     detail_data = [
+        ['Fakultas', ':', mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi.fakultas.nama],
+        ['Program Studi', ':', mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi.nama],
+        ['Jenjang Studi', ':', mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.jenjang_studi.kode],
         ['Semester', ':', mk_semester.semester.semester.nama],
         ['Kode', ':', mk_semester.mk_kurikulum.kode],
         ['SKS', ':', mk_semester.mk_kurikulum.sks],
@@ -907,22 +910,9 @@ def generate_nilai_file(mk_semester: MataKuliahSemester):
         ['No.', 'NIM', 'Nama', 'Nilai angka', 'Nilai huruf']
     ]
     list_mahasiswa_mk_semester: list[PesertaMataKuliah] = mk_semester.get_all_peserta_mk_semester()
-
-    for i, mahasiswa in enumerate(list_mahasiswa_mk_semester, 1):
-        mahasiswa_data.append(
-            [
-                '{}.'.format(i), 
-                mahasiswa.mahasiswa.username,
-                Paragraph(mahasiswa.mahasiswa.nama),
-                mahasiswa.nilai_akhir,
-                mahasiswa.nilai_huruf
-            ],
-        )
-        mahasiswa_data.append(
-            ['lorem']
-        )
+    
     # (COL, ROW)
-    mahasiswa_table_style = TableStyle([
+    mahasiswa_table_style_data = [
         ('ALIGN', (0, 0), (-1, 0), 'CENTER'),               # Header align
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),    # Header font
         ('FONTSIZE', (0, 0), (-1, 0), 11),                  # Header font size
@@ -934,8 +924,48 @@ def generate_nilai_file(mk_semester: MataKuliahSemester):
         ('BOTTOMPADDING', (0, 1), (-1, -1), 4),             # Body bottom padding
         ('GRID', (0, 0), (-1, -1), 0.25, colors.black),     # Grid
         ('VALIGN', (0, 1), (-1, -1), 'TOP'),                # Body vertical align
-        ('SPAN', (0, 2), (-1, 2)),
-    ])
+    ]
+
+    for i, mahasiswa in enumerate(list_mahasiswa_mk_semester, 1):
+        # Add mahasiswa nilai
+        mahasiswa_data.append(
+            [
+                '{}.'.format(i), 
+                mahasiswa.mahasiswa.username,
+                Paragraph(mahasiswa.mahasiswa.nama),
+                mahasiswa.nilai_akhir,
+                mahasiswa.nilai_huruf
+            ],
+        )
+
+        # Add merge cells for nilai komponen
+        mahasiswa_table_style_data += [
+            ('SPAN', (0, i*2), (-1, i*2)),
+            ('ALIGN', (0, i*2), (0, i*2), 'LEFT'),
+            ('LEFTPADDING', (0, i*2), (0, i*2), 32),
+        ]
+
+        # Nilai CLO Mahasiswa
+        list_nilai_komponen: QuerySet[NilaiKomponenCloPeserta] = mahasiswa.get_all_nilai_komponen_clo_peserta()
+        nilai_mahasiswa_table_data = []
+        for nilai_komponen in list_nilai_komponen:
+            nilai_mahasiswa_table_data.append(
+                [
+                    nilai_komponen.komponen_clo.clo.nama,
+                    nilai_komponen.komponen_clo.teknik_penilaian,
+                    '{}%'.format(nilai_komponen.komponen_clo.persentase),
+                    ':',
+                    nilai_komponen.nilai
+                ]
+            )
+        mahasiswa_data.append([
+            Table(
+                nilai_mahasiswa_table_data,
+                hAlign='LEFT',
+            )
+        ])
+
+    mahasiswa_table_style = TableStyle(mahasiswa_table_style_data)
     mahasiswa_table = Table(
         mahasiswa_data,
         style=mahasiswa_table_style,

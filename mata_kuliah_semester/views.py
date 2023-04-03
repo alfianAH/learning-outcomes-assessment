@@ -208,7 +208,7 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin,
             return self.download_template_nilai()
 
         if 'download_nilai' in request.GET:
-            # if not request.is_ajax(): raise PermissionDenied
+            if not request.is_ajax(): raise PermissionDenied
             return self.download_nilai()
 
         if self.peserta_mk_semester_qs.exists():
@@ -376,7 +376,7 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin,
     
     def download_nilai(self) -> HttpResponse:
         nilai_file = generate_nilai_file(self.single_object)
-        response = FileResponse(nilai_file, filename=self.nilai_filename)
+        response = FileResponse(nilai_file, as_attachment=True, filename=self.nilai_filename)
 
         return response
 
