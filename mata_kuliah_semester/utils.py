@@ -7,7 +7,11 @@ from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.styles import (
     Font, Alignment, Border, Side, Protection
 )
-from reportlab.pdfgen import canvas
+from reportlab.platypus import SimpleDocTemplate
+from reportlab.lib.units import cm
+from reportlab.platypus import Paragraph, Spacer, Table, ListFlowable, TableStyle
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib import colors
 from django.conf import settings
 from django.db.models import QuerySet
 from learning_outcomes_assessment.utils import (
@@ -855,12 +859,6 @@ def process_excel_file(
     if settings.DEBUG: print(message)
     return (is_import_success, message, import_result)
 
-
-from reportlab.platypus import SimpleDocTemplate
-from reportlab.lib.units import cm
-from reportlab.platypus import Paragraph, Spacer, Table, ListFlowable, TableStyle
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.lib import colors
 
 def generate_nilai_file(mk_semester: MataKuliahSemester):
     file_stream = BytesIO()
