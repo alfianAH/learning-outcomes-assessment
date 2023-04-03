@@ -145,13 +145,18 @@ class PIAreaReadAllView(ListView):
 class AssessmentAreaDeleteView(ProgramStudiMixin, PILockedObjectPermissionMixin, DeleteView):
     model = AssessmentArea
     pk_url_kwarg = 'assessment_area_id'
-    
-    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        assessment_area_obj: AssessmentArea = self.get_object()
+        
         assessment_area_obj: AssessmentArea = self.get_object()
         self.success_url = assessment_area_obj.kurikulum.read_all_pi_area_url()
 
         self.kurikulum_obj = assessment_area_obj.kurikulum
         self.program_studi_obj = self.kurikulum_obj.prodi_jenjang.program_studi
+    
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         return self.post(request, *args, **kwargs)
 
     def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:

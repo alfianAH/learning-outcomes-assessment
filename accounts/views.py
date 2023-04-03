@@ -173,7 +173,7 @@ class ProgramStudiJenjangSKSBulkUpdateView(ProgramStudiMixin, UpdateInlineFormse
     pk_url_kwarg: str = 'prodi_id'
     template_name = 'accounts/prodi/bulk-update-sks-view.html'
     form_class = ProgramStudiJenjangModelForm
-    object: ProgramStudiJenjang = None
+    object: ProgramStudi = None
 
     post_url: str = '.'
     button_text: str = 'Update'

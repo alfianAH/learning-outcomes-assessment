@@ -771,7 +771,7 @@ class StudentPerformanceCalculateView(ProgramStudiMixin, MahasiswaAsPesertaMixin
 
 
 # Nilai Komponen CLO Peserta
-class NilaiKomponenCloEditTemplateView(FormView):
+class NilaiKomponenCloEditTemplateView(ProgramStudiMixin, FormView):
     form_class = NilaiKomponenCloPesertaFormset
     mk_semester_obj: MataKuliahSemester = None
     list_komponen_clo = None
@@ -880,7 +880,7 @@ class NilaiKomponenCloEditTemplateView(FormView):
         return super().form_invalid(form)
 
 
-class NilaiKomponenCloEditView(ProgramStudiMixin, NilaiKomponenCloEditTemplateView):
+class NilaiKomponenCloEditView(NilaiKomponenCloEditTemplateView):
     template_name = 'mata-kuliah-semester/nilai-komponen/edit-view.html'
     is_import_success = False
     message = ''
@@ -889,7 +889,6 @@ class NilaiKomponenCloEditView(ProgramStudiMixin, NilaiKomponenCloEditTemplateVi
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         mk_semester_id = kwargs.get('mk_semester_id')
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
-
         self.list_peserta_mk = self.mk_semester_obj.get_all_peserta_mk_semester()
         super().setup(request, *args, **kwargs)
 
@@ -932,7 +931,7 @@ class NilaiKomponenCloEditView(ProgramStudiMixin, NilaiKomponenCloEditTemplateVi
         return super().form_valid(form)
 
 
-class NilaiKomponenCloPesertaEditView(ProgramStudiMixin, NilaiKomponenCloEditTemplateView):
+class NilaiKomponenCloPesertaEditView(NilaiKomponenCloEditTemplateView):
     peserta_mk_semester: PesertaMataKuliah = None
 
     modal_title: str = 'Edit Nilai'
