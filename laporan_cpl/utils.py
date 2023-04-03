@@ -173,7 +173,7 @@ def calculate_ilo_prodi(list_ilo: QuerySet[Ilo],
     if len(calculated_mk_semester) != expected_len_mk_semester:
         remaining_len_mk_semester = expected_len_mk_semester - len(calculated_mk_semester)
 
-        message = 'Terdapat {} mata kuliah yang belum dihitung. Ekspektasi: {}'.format(remaining_len_mk_semester, expected_len_mk_semester)
+        message = 'Terdapat {} mata kuliah yang belum dihitung. Total yang sudah dihitung: {}, ekspektasi: {}'.format(remaining_len_mk_semester, len(calculated_mk_semester), expected_len_mk_semester)
 
         return (is_success, message, result)
 
@@ -301,7 +301,7 @@ def calculate_ilo_mahasiswa(list_ilo: QuerySet[Ilo],
     if len(calculated_peserta) != expected_len_peserta_mk:
         remaining_len_peserta = expected_len_peserta_mk - len(calculated_peserta)
 
-        message = 'Terdapat {} mata kuliah ({}) yang belum dihitung. Ekspektasi: {}'.format(remaining_len_peserta, mahasiswa.nama, expected_len_peserta_mk)
+        message = 'Terdapat {} peserta yang belum dihitung. Total yang sudah dihitung: {}, ekspektasi: {}'.format(remaining_len_peserta, len(calculated_peserta), expected_len_peserta_mk)
 
         return (is_success, message, result)
     

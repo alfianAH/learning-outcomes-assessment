@@ -168,7 +168,7 @@
     $('#submit-btn').on('click', function(){
         let notDeletedForm = 0;
 
-        $('#form-list').children().each(function(index, elem) {
+        $('#form-list-{{ formset.management_form.TOTAL_FORMS.id_for_label }}').children().each(function(index, elem) {
             if(!$(elem).find('input:checkbox').is(':checked')){
                 notDeletedForm ++;
             }
