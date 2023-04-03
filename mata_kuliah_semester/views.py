@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.db.models import QuerySet
-from django.http import HttpRequest, HttpResponse, Http404
+from django.http import FileResponse, HttpRequest, HttpResponse, Http404
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic.base import View, RedirectView
@@ -67,6 +67,7 @@ from .utils import(
     calculate_nilai_per_ilo_mahasiswa,
     generate_template_nilai_mk_semester,
     process_excel_file,
+    generate_nilai_file,
 )
 
 
@@ -198,12 +199,17 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin,
 
         self.peserta_mk_semester_qs = self.get_queryset()
 
-        self.filename = '{}-{}.xlsx'.format(self.single_object.mk_kurikulum.nama, self.single_object.semester.semester.nama)
+        self.template_filename = '{}-{}.xlsx'.format(self.single_object.mk_kurikulum.nama, self.single_object.semester.semester.nama)
+        self.nilai_filename = '{}-{}.pdf'.format(self.single_object.mk_kurikulum.nama, self.single_object.semester.semester.nama)
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         if 'download_template' in request.GET:
             if not request.is_ajax(): raise PermissionDenied
             return self.download_template_nilai()
+
+        if 'download_nilai' in request.GET:
+            if not request.is_ajax(): raise PermissionDenied
+            return self.download_nilai()
 
         if self.peserta_mk_semester_qs.exists():
             filter_data = {
@@ -364,8 +370,13 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin,
     
     def download_template_nilai(self) -> HttpResponse:
         generated_template_file = generate_template_nilai_mk_semester(self.single_object, self.peserta_mk_semester_qs)
-        response = HttpResponse(generated_template_file, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        response['Content-Disposition'] = 'attachment; filename={}'.format(self.filename)
+        response = FileResponse(generated_template_file, as_attachment=True, filename=self.template_filename)
+
+        return response
+    
+    def download_nilai(self) -> HttpResponse:
+        nilai_file = generate_nilai_file(self.single_object)
+        response = FileResponse(nilai_file, as_attachment=True, filename=self.nilai_filename)
 
         return response
 
@@ -402,7 +413,8 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin,
             'colspan_length': 8,
             'pedoman_objects': pedoman_objects,
             'empty_komponen_clo': self.get_empty_komponen_clo(),
-            'template_file_name': self.filename,
+            'template_filename': self.template_filename,
+            'nilai_filename': self.nilai_filename,
             'import_nilai_url': self.single_object.get_hx_nilai_komponen_import_url(),
             'is_not_cols_3': True,
         })

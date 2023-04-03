@@ -7,6 +7,7 @@ from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.styles import (
     Font, Alignment, Border, Side, Protection
 )
+from reportlab.pdfgen import canvas
 from django.conf import settings
 from django.db.models import QuerySet
 from learning_outcomes_assessment.utils import (
@@ -852,3 +853,20 @@ def process_excel_file(
     
     if settings.DEBUG: print(message)
     return (is_import_success, message, import_result)
+
+
+def generate_nilai_file(mk_semester: MataKuliahSemester):
+    file_stream = BytesIO()
+
+    # Create the PDF object, using the buffer as its "file."
+    pdf_file = canvas.Canvas(file_stream)
+
+    pdf_file.drawString(100, 100, 'Hello world')
+    
+    # Close the PDF object cleanly
+    pdf_file.showPage()
+    pdf_file.save()
+
+    file_stream.seek(0)
+
+    return file_stream
