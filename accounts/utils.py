@@ -119,10 +119,14 @@ def validate_user(access_token: str):
         })
 
     if response.status_code == 200:
-        user = response.json()
+        try:
+            user = response.json()
+        except requests.JSONDecodeError:
+            if settings.DEBUG: print(response.text)
+            return None
         return user
     else:
-        if settings.DEBUG: print(response.raw)
+        if settings.DEBUG: print(response.text)
         return None
 
 
