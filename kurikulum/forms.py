@@ -38,14 +38,12 @@ class KurikulumCreateForm(forms.Form):
 
             if len(mk_kurikulum) > 0: 
                 # Check in database
-                is_all_mk_sync = True
-                for mk_data in mk_kurikulum:
-                    mk_id = mk_data['id_neosia']
-                    mk_in_db = MataKuliahKurikulum.objects.filter(id_neosia=int(mk_id), kurikulum=kurikulum_id)
-                    if mk_in_db.exists(): continue
-                    # Break and set to False if kurikulum has one or more MK Kurikulum to sync
-                    is_all_mk_sync = False
-                    break
+                mk_in_db = MataKuliahKurikulum.objects.filter(
+                    id_neosia__in=[mk_data['id_neosia'] for mk_data in mk_kurikulum], 
+                    kurikulum=kurikulum_id
+                )
+
+                is_all_mk_sync =  mk_in_db.count() == len(mk_kurikulum)
                 
                 # If all MK Kurikulum is already synchronized, remove kurikulum choices
                 if is_all_mk_sync:
