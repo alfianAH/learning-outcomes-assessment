@@ -495,7 +495,7 @@ class CloLockAndUnlockView(ProgramStudiMixin, RedirectView):
         mk_semester_id = kwargs.get('mk_semester_id')
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
         self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
-    
+
     def get_redirect_url(self, *args, **kwargs):
         self.url = self.mk_semester_obj.get_clo_read_all_url()
         return super().get_redirect_url(*args, **kwargs)
@@ -586,6 +586,8 @@ class CloUnlockView(CloLockAndUnlockView):
         clo_qs: QuerySet[Clo] = self.mk_semester_obj.get_all_clo()
         is_success, is_unlocking_success = self.unlock_clo(clo_qs)
 
+        print(is_unlocking_success, is_success)
+        
         if not is_unlocking_success:
             messages.info(request, 'CLO dan komponenya sudah tidak terkunci.')
             return super().get(request, *args, **kwargs)
@@ -596,7 +598,7 @@ class CloUnlockView(CloLockAndUnlockView):
             self.lock_clo(clo_qs)
             messages.error(request, 'Gagal membuka kunci CLO dan komponennya.')
 
-        return super().get(request, *args, **kwargs)
+        return redirect('{}?clo=true'.format(self.mk_semester_obj.get_rps_unlock_url()))
 
 
 # Komponen CLO

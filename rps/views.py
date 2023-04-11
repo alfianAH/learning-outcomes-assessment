@@ -536,14 +536,15 @@ class RPSLockAndUnlockView(ProgramStudiMixin, RedirectView):
         self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
 
     def get_redirect_url(self, *args, **kwargs):
-        self.url = self.mk_semester_obj.get_rps_home_url()
+        if self.request.GET.get('clo') == 'true':
+            self.url = self.mk_semester_obj.get_clo_read_all_url()
+        else:
+            self.url = self.mk_semester_obj.get_rps_home_url()
         return super().get_redirect_url(*args, **kwargs)
     
     def lock_child(self, is_locking_success: bool, is_success: bool, obj):
         is_locking_success = is_locking_success and obj.lock_object(self.request.user)
         is_success = is_success and obj.is_locked
-
-        print('L {}, S {}, {}'.format(is_locking_success, is_success, obj))
 
         return is_locking_success, is_success
         
@@ -615,7 +616,7 @@ class RPSLockAndUnlockView(ProgramStudiMixin, RedirectView):
             self.mk_semester_obj.is_rencanapembelajaransemester_locked = True
             self.mk_semester_obj.save()
 
-        return is_success, is_locking_success
+        return is_locking_success, is_success
     
     def unlock_rps(self):
         is_success = True
@@ -667,11 +668,15 @@ class RPSLockAndUnlockView(ProgramStudiMixin, RedirectView):
             self.mk_semester_obj.is_rencanapembelajaransemester_locked = False
             self.mk_semester_obj.save()
 
-        return is_success, is_unlocking_success
+        return is_unlocking_success, is_success
 
 
 class RPSLockView(RPSLockAndUnlockView):
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if not hasattr(self.mk_semester_obj, 'rencanapembelajaransemester'):
+            messages.info(request, 'Mata kuliah belum mempunyai RPS.')
+            return super().get(request, *args, **kwargs)
+        
         total_bobot_penilaian = self.mk_semester_obj.get_total_bobot_penilaian_pertemuan_rps
 
         # Can't lock if total persentase CLO is not 100%
@@ -696,6 +701,10 @@ class RPSLockView(RPSLockAndUnlockView):
 
 class RPSUnlockView(RPSLockAndUnlockView):
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if not hasattr(self.mk_semester_obj, 'rencanapembelajaransemester'):
+            messages.info(request, 'Mata kuliah belum mempunyai RPS.')
+            return super().get(request, *args, **kwargs)
+        
         is_unlocking_success, is_success = self.unlock_rps()
 
         if not is_unlocking_success:
