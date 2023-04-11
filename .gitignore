@@ -2,7 +2,8 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=django,python,visualstudiocode,pycharm,pycharm+iml,pycharm+all,visualstudio
 
 # My files
-config/test.py
+config/*
+!config/groups.py
 staticfiles-cdn/
 
 ### Django ###
