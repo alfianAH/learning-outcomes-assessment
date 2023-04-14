@@ -55,7 +55,7 @@ def get_semester_choices_clo_duplicate(mk_semester: MataKuliahSemester):
         # If mk semester doesn't have CLO, skip
         if not list_clo_mk_semester.exists(): continue
         
-        semester_choice = mk_semester_obj.semester.id_neosia, '{}. <a href="{}" target="_blank">Lihat CLO di sini</a>'.format(mk_semester_obj.semester.semester.nama, mk_semester_obj.get_clo_read_all_url())
+        semester_choice = mk_semester_obj.semester.id_neosia, '{}. <a href="{}" target="_blank">Lihat CPMK di sini</a>'.format(mk_semester_obj.semester.semester.nama, mk_semester_obj.get_clo_read_all_url())
 
         semester_choices.append(semester_choice)
     
@@ -118,7 +118,7 @@ def duplicate_clo(semester_prodi_id: int, new_mk_semester: MataKuliahSemester):
         duplicate_clo_children(list_pi_clo, new_clo)
     
     is_success = True
-    message = 'Berhasil menduplikasi CLO ke mata kuliah ini.'
+    message = 'Berhasil menduplikasi CPMK ke mata kuliah ini.'
 
     return (is_success, message)
 

@@ -219,7 +219,7 @@ class PertemuanRPSForm(forms.ModelForm):
         fields = '__all__'
         exclude = ['mk_semester', 'lock']
         labels = {
-            'clo': 'CLO',
+            'clo': 'CPMK',
             'bobot_penilaian': 'Bobot penilaian (%)',
             'pertemuan_awal': 'Awal',
             'pertemuan_akhir': 'Akhir (opsional)',
@@ -228,13 +228,13 @@ class PertemuanRPSForm(forms.ModelForm):
         help_texts = {
             'pertemuan_awal': 'Range pertemuan. Contoh: Pertemuan 1-3, maka awal = 1, akhir = 3.',
             'pertemuan_akhir': 'Range pertemuan. Contoh: Pertemuan 1-3, maka awal = 1, akhir = 3.',
-            'clo': 'Pilih CLO yang berkaitan dengan pertemuan untuk menentukan bobot penilaian.',
-            'bobot_penilaian': 'Bobot penilaian pertemuan dari persentase CLO yang dipilih.',
+            'clo': 'Pilih CPMK yang berkaitan dengan pertemuan untuk menentukan bobot penilaian.',
+            'bobot_penilaian': 'Bobot penilaian pertemuan dari persentase CPMK yang dipilih.',
             'tipe_pertemuan': 'Silakan memilih antara pertemuan biasa (reguler) atau pertemuan ujian (ujian mid atau final).'
         }
         widgets = {
             'clo': MySelectInput(attrs={
-                'placeholder': 'Pilih CLO'
+                'placeholder': 'Pilih CPMK'
             }),
             'bobot_penilaian': MyNumberInput(attrs={
                 'placeholder': 5
@@ -308,7 +308,7 @@ class PertemuanRPSForm(forms.ModelForm):
         current_total_bobot_penilaian_clo = total_bobot_penilaian_clo + bobot_penilaian
 
         if current_total_bobot_penilaian_clo > total_persentase_clo:
-            self.add_error('bobot_penilaian', 'Bobot penilaian untuk {} berlebihan. Persentase CLO: {}, Total bobot penilaian CLO saat ini: {}'.format(clo.nama, total_persentase_clo, current_total_bobot_penilaian_clo))
+            self.add_error('bobot_penilaian', 'Bobot penilaian untuk {} berlebihan. Persentase CPMK: {}, Total bobot penilaian CPMK saat ini: {}'.format(clo.nama, total_persentase_clo, current_total_bobot_penilaian_clo))
         
         return cleaned_data
     

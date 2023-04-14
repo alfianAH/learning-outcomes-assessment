@@ -97,7 +97,7 @@ class CloReadAllGraphJsonResponse(ProgramStudiMixin, View):
             json_response.update({
                 'labels': [
                     'Persentase berlebihan',
-                    'Total Persentase CLO',
+                    'Total Persentase CPMK',
                 ],
                 'datasets': {
                     'data': [
@@ -113,7 +113,7 @@ class CloReadAllGraphJsonResponse(ProgramStudiMixin, View):
         elif total_percentage == 100:
             json_response.update({
                 'labels': [
-                    'Total Persentase CLO',
+                    'Total Persentase CPMK',
                 ],
                 'datasets': {
                     'data': [
@@ -127,7 +127,7 @@ class CloReadAllGraphJsonResponse(ProgramStudiMixin, View):
         else:
             json_response.update({
                 'labels': [
-                    'Total Persentase CLO',
+                    'Total Persentase CPMK',
                     'Kosong',
                 ],
                 'datasets': {
@@ -195,13 +195,13 @@ class CloCreateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, MySession
         kurikulum_obj = self.mk_semester_obj.mk_kurikulum.kurikulum
         # If PI hasn't been locked, give error message
         if not kurikulum_obj.is_assessmentarea_locked:
-            messages.error(request, 'Pastikan anda sudah mengunci performance indicator sebelum menambahkan CLO.')
+            messages.error(request, 'Pastikan anda sudah mengunci performance indicator sebelum menambahkan CPMK.')
             return redirect(self.success_url)
         
         total_persentase = self.mk_semester_obj.get_total_persentase_clo()
         # If total_persentase is 100, no need to add anymore
         if total_persentase >= 100:
-            messages.info(request, 'Sudah tidak bisa menambahkan CLO lagi, karena persentase CLO sudah {}%'.format(total_persentase))
+            messages.info(request, 'Sudah tidak bisa menambahkan CPMK lagi, karena persentase CPMK sudah {}%'.format(total_persentase))
             return redirect(self.success_url)
 
         return super().get(request, *args, **kwargs)
@@ -234,17 +234,17 @@ class CloCreateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, MySession
 
         match(self.steps.current):
             case '0':
-                current_title = 'Lengkapi Data CLO'
-                current_help_text = 'Masukkan nama dan deskripsi dari CLO dari mata kuliah {0}. Untuk <b>menduplikasi CLO</b> mata kuliah <b>{0}</b> dari semester lain klik <a href="{1}">di sini</a>.'.format(self.mk_semester_obj.mk_kurikulum.nama, self.mk_semester_obj.get_clo_duplicate_url())
+                current_title = 'Lengkapi Data CPMK'
+                current_help_text = 'Masukkan nama dan deskripsi dari CPMK dari mata kuliah {0}. Untuk <b>menduplikasi CPMK</b> mata kuliah <b>{0}</b> dari semester lain klik <a href="{1}">di sini</a>.'.format(self.mk_semester_obj.mk_kurikulum.nama, self.mk_semester_obj.get_clo_duplicate_url())
             case '1':
                 current_title = 'Pilih ILO'
                 current_help_text = 'Pilih salah satu ILO untuk mendapatkan Performance Indicator dari ILO tersebut. Performance Indicator dapat dipilih di step berikutnya.'
             case '2':
                 current_title = 'Pilih Performance Indicator'
-                current_help_text = 'Pilih Performance Indicator (PI) yang sesuai atau memiliki keterkaitan dengan CLO.'
+                current_help_text = 'Pilih Performance Indicator (PI) yang sesuai atau memiliki keterkaitan dengan CPMK.'
             case '3':
                 current_title = 'Tambahkan Komponen Penilaian'
-                current_help_text = 'Tambahkan komponen penilaian pada CLO, yang terdiri dari teknik dan instrumen penilaian, dan persentasenya.<p class="text-danger">Peringatan: Jika anda meninggalkan step ini sebelum submit, maka seluruh data komponen penilaian yang diisi tidak akan tersimpan. Contoh meninggalkan step ini: pergi ke step sebelumnya atau me-refresh page.</p>'
+                current_help_text = 'Tambahkan komponen penilaian pada CPMK, yang terdiri dari teknik dan instrumen penilaian, dan persentasenya.<p class="text-danger">Peringatan: Jika anda meninggalkan step ini sebelum submit, maka seluruh data komponen penilaian yang diisi tidak akan tersimpan. Contoh meninggalkan step ini: pergi ke step sebelumnya atau me-refresh page.</p>'
                 context.update({
                     'id_total_form': '#id_{}-TOTAL_FORMS'.format(self.steps.current)
                 })
@@ -290,7 +290,7 @@ class CloCreateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, MySession
                 persentase=komponen_clo_data['persentase']
             )
         
-        messages.success(self.request, 'Berhasil membuat CLO dan komponen-komponennya.')
+        messages.success(self.request, 'Berhasil membuat CPMK dan komponen-komponennya.')
 
         return redirect(self.success_url)    
 
@@ -353,14 +353,14 @@ class CloUpdateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, MySession
 
         match(self.steps.current):
             case '0':
-                current_title = 'Lengkapi Data CLO'
-                current_help_text = 'Masukkan nama dan deskripsi dari CLO dari mata kuliah {}.'.format(self.clo_obj.mk_semester.mk_kurikulum.nama)
+                current_title = 'Lengkapi Data CPMK'
+                current_help_text = 'Masukkan nama dan deskripsi dari CPMK dari mata kuliah {}.'.format(self.clo_obj.mk_semester.mk_kurikulum.nama)
             case '1':
                 current_title = 'Pilih ILO'
                 current_help_text = 'Pilih salah satu ILO untuk mendapatkan Performance Indicator dari ILO tersebut. Performance Indicator dapat dipilih di step berikutnya.'
             case '2':
                 current_title = 'Pilih Performance Indicator'
-                current_help_text = 'Pilih Performance Indicator (PI) yang sesuai atau memiliki keterkaitan dengan CLO.'
+                current_help_text = 'Pilih Performance Indicator (PI) yang sesuai atau memiliki keterkaitan dengan CPMK.'
         
         context.update({
             'current_title': current_title,
@@ -420,7 +420,7 @@ class CloUpdateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, MySession
 class CloBulkDeleteView(ProgramStudiMixin, CloLockedObjectPermissionMixin, ModelBulkDeleteView):
     model = Clo
     id_list_obj = 'id_clo'
-    success_msg = 'Berhasil menghapus CLO'
+    success_msg = 'Berhasil menghapus CPMK'
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
@@ -436,7 +436,7 @@ class CloBulkDeleteView(ProgramStudiMixin, CloLockedObjectPermissionMixin, Model
 
 class CloDuplicateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, DuplicateFormview):
     form_class = CloDuplicateForm
-    empty_choices_msg = 'Semester lain belum mempunyai CLO.'
+    empty_choices_msg = 'Semester lain belum mempunyai CPMK.'
     template_name = 'clo/duplicate-view.html'
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
@@ -454,7 +454,7 @@ class CloDuplicateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, Duplic
         total_persentase = self.mk_semester_obj.get_total_persentase_clo()
         # If total_persentase is 100, no need to add anymore
         if total_persentase >= 100:
-            messages.info(self.request, 'Sudah tidak bisa menambahkan CLO lagi, karena persentase CLO sudah {}%'.format(total_persentase))
+            messages.info(self.request, 'Sudah tidak bisa menambahkan CPMK lagi, karena persentase CPMK sudah {}%'.format(total_persentase))
             return redirect(self.success_url)
 
         return super().get(request, *args, **kwargs)
@@ -482,7 +482,7 @@ class CloDuplicateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, Duplic
         # If current duplicated percentages is more than 100, add warning message
         current_total_persentase = self.mk_semester_obj.get_total_persentase_clo()
         if current_total_persentase > 100:
-            messages.warning(self.request, 'Total persentase saat ini: {}. Diharap untuk mengubah komponen CLO agar mencukupi 100%'.format(current_total_persentase))
+            messages.warning(self.request, 'Total persentase saat ini: {}. Diharap untuk mengubah komponen CPMK agar mencukupi 100%'.format(current_total_persentase))
 
         return super().form_valid(form)
 
@@ -563,21 +563,21 @@ class CloLockView(CloLockAndUnlockView):
 
         # Can't lock if total persentase CLO is not 100%
         if total_persentase_clo != 100: 
-            messages.warning(request, 'Gagal mengunci CLO dan komponennya. Pastikan total persentase semua komponen CLO adalah 100%.')
+            messages.warning(request, 'Gagal mengunci CPMK dan komponennya. Pastikan total persentase semua komponen CPMK adalah 100%.')
             return super().get(request, *args, **kwargs)
 
         clo_qs: QuerySet[Clo] = self.mk_semester_obj.get_all_clo()
         is_success, is_locking_success = self.lock_clo(clo_qs)
 
         if not is_locking_success:
-            messages.info(request, 'CLO dan komponennya sudah terkunci.')
+            messages.info(request, 'CPMK dan komponennya sudah terkunci.')
             return super().get(request, *args, **kwargs)
             
         if is_success:
-            messages.success(request, 'Berhasil mengunci CLO dan komponennya.')
+            messages.success(request, 'Berhasil mengunci CPMK dan komponennya.')
         else:
             self.unlock_clo(clo_qs)
-            messages.error(request, 'Gagal mengunci CLO dan komponennya.')
+            messages.error(request, 'Gagal mengunci CPMK dan komponennya.')
         return super().get(request, *args, **kwargs)
 
 
@@ -589,14 +589,14 @@ class CloUnlockView(CloLockAndUnlockView):
         print(is_unlocking_success, is_success)
         
         if not is_unlocking_success:
-            messages.info(request, 'CLO dan komponenya sudah tidak terkunci.')
+            messages.info(request, 'CPMK dan komponenya sudah tidak terkunci.')
             return super().get(request, *args, **kwargs)
 
         if is_success:
-            messages.success(request, 'Berhasil membuka kunci CLO dan komponennya.')
+            messages.success(request, 'Berhasil membuka kunci CPMK dan komponennya.')
         else:
             self.lock_clo(clo_qs)
-            messages.error(request, 'Gagal membuka kunci CLO dan komponennya.')
+            messages.error(request, 'Gagal membuka kunci CPMK dan komponennya.')
 
         return redirect('{}?clo=true'.format(self.mk_semester_obj.get_rps_unlock_url()))
 
@@ -605,7 +605,7 @@ class CloUnlockView(CloLockAndUnlockView):
 class KomponenCloBulkDeleteView(ProgramStudiMixin, CloLockedObjectPermissionMixin, ModelBulkDeleteView):
     model = KomponenClo
     id_list_obj = 'id_komponen_clo'
-    success_msg = 'Berhasil menghapus komponen CLO'
+    success_msg = 'Berhasil menghapus komponen CPMK'
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
@@ -656,7 +656,7 @@ class KomponenCloCreateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, F
     
     def form_valid(self, form) -> HttpResponse:
         form.save()
-        messages.success(self.request, 'Berhasil menambahkan komponen CLO.')
+        messages.success(self.request, 'Berhasil menambahkan komponen CPMK.')
         return super().form_valid(form)
 
 
@@ -680,8 +680,8 @@ class KomponenCloGraphJsonResponse(ProgramStudiMixin, View):
             json_response.update({
                 'labels': [
                     'Persentase berlebihan',
-                    'Persentase CLO saat ini',
-                    'Persentase CLO lain',
+                    'Persentase CPMK saat ini',
+                    'Persentase CPMK lain',
                 ],
                 'datasets': {
                     'data': [
@@ -699,8 +699,8 @@ class KomponenCloGraphJsonResponse(ProgramStudiMixin, View):
         elif total_clo_percentage == 100:
             json_response.update({
                 'labels': [
-                    'Persentase CLO saat ini',
-                    'Persentase CLO lain',
+                    'Persentase CPMK saat ini',
+                    'Persentase CPMK lain',
                 ],
                 'datasets': {
                     'data': [
@@ -716,8 +716,8 @@ class KomponenCloGraphJsonResponse(ProgramStudiMixin, View):
         else:
             json_response.update({
                 'labels': [
-                    'Persentase CLO saat ini',
-                    'Persentase CLO lain',
+                    'Persentase CPMK saat ini',
+                    'Persentase CPMK lain',
                     'Kosong',
                 ],
                 'datasets': {

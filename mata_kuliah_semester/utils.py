@@ -395,7 +395,7 @@ def calculate_nilai_per_ilo_mahasiswa(peserta: PesertaMataKuliah):
             konversi_clo_to_ilo = bobot_mk * (list_persentase_clo * list_bobot_pi_ilo) * nilai_max
         except ValueError:
             if settings.DEBUG:
-                print('Shape array tidak sama. Persentase CLO: {}, Bobot PI ILO: {}, Nilai CLO Peserta: {}'.format(
+                print('Shape array tidak sama. Persentase CPMK: {}, Bobot PI ILO: {}, Nilai CPMK Peserta: {}'.format(
                     list_persentase_clo.shape, list_bobot_pi_ilo.shape, list_nilai_clo_peserta.shape))
             continue
         
@@ -406,7 +406,7 @@ def calculate_nilai_per_ilo_mahasiswa(peserta: PesertaMataKuliah):
             persentase_capaian_ilo = persentase_konversi * list_nilai_clo_peserta
         except ValueError:
             if settings.DEBUG:
-                print('Shape array tidak sama. Persentase Konversi: {}, Nilai CLO Peserta: {}'.format(
+                print('Shape array tidak sama. Persentase Konversi: {}, Nilai CPMK Peserta: {}'.format(
                     persentase_konversi.shape, list_nilai_clo_peserta.shape))
             continue
 
@@ -784,7 +784,7 @@ def process_excel_file(
         # Check CLO order
         current_clo = list_komponen_clo[komponen_index].clo.nama
         if current_clo != clo_excel:
-            message = 'Urutan CLO tidak sesuai. Ekspektasi: {}, file excel:{}'.format(
+            message = 'Urutan CPMK tidak sesuai. Ekspektasi: {}, file excel:{}'.format(
                 current_clo, clo_excel)
             if settings.DEBUG: print(message)
             return (is_import_success, message, import_result)
@@ -825,7 +825,7 @@ def process_excel_file(
             )
 
             if not qs.exists():
-                message = 'CLO, komponen, dan persentasenya tidak sesuai (case sensitive). File excel: CLO: {}, Komponen CLO: {}, Persentase: {}'.format(clo_excel, nama_komponen, persentase_komponen)
+                message = 'CPMK, komponen, dan persentasenya tidak sesuai (case sensitive). File excel: CPMK: {}, Komponen CPMK: {}, Persentase: {}'.format(clo_excel, nama_komponen, persentase_komponen)
                 if settings.DEBUG: print(message)
                 return (is_import_success, message, import_result)
             

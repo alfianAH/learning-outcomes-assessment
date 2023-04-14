@@ -47,7 +47,7 @@ def calculate_ilo(list_bobot_mk: list, list_persentase_clo: list,
     try:
         konversi_clo_to_ilo = (list_bobot_mk * list_persentase_clo * list_bobot_pi_ilo) * nilai_max
     except ValueError:
-        message = 'Shape array tidak sama. Bobot MK: {} Persentase CLO: {}, Bobot PI ILO: {}.'.format(
+        message = 'Shape array tidak sama. Bobot MK: {} Persentase CPMK: {}, Bobot PI ILO: {}.'.format(
             list_bobot_mk.shape, list_persentase_clo.shape, list_bobot_pi_ilo.shape)
         if settings.DEBUG: print(message)
         return (is_success, None)
@@ -62,7 +62,7 @@ def calculate_ilo(list_bobot_mk: list, list_persentase_clo: list,
     try:
         persentase_capaian_ilo = persentase_konversi * list_nilai_clo
     except ValueError:
-        message = 'Shape array tidak sama. Persentase Konversi: {}, Nilai CLO: {}.'.format(
+        message = 'Shape array tidak sama. Persentase Konversi: {}, Nilai CPMK: {}.'.format(
             persentase_konversi.shape, list_nilai_clo.shape)
         if settings.DEBUG: print(message)
         return (is_success, None)
@@ -155,7 +155,7 @@ def calculate_ilo_prodi(list_ilo: QuerySet[Ilo],
             if nilai_clo_mk_semester_qs.exists():
                 list_nilai_clo_mk_semester += [nilai_clo[0] for nilai_clo in nilai_clo_mk_semester_qs]
             else:
-                message = 'Mata Kuliah: {}, belum mempunyai Nilai CLO.'.format(mk_semester.mk_kurikulum.nama)
+                message = 'Mata Kuliah: {}, belum mempunyai Nilai CPMK.'.format(mk_semester.mk_kurikulum.nama)
                 return (is_success, message, result)
         
         # Calculate ILO
@@ -274,7 +274,7 @@ def calculate_ilo_mahasiswa(list_ilo: QuerySet[Ilo],
             if nilai_clo_peserta_qs.exists():
                 list_nilai_clo_peserta += [nilai_clo[0] for nilai_clo in nilai_clo_peserta_qs]
             else:
-                message = 'Peserta: {} di Mata Kuliah: {}, {}, belum mempunyai Nilai CLO.'.format(mahasiswa.nama, mk_semester.mk_kurikulum.nama, mk_semester.semester.semester)
+                message = 'Peserta: {} di Mata Kuliah: {}, {}, belum mempunyai Nilai CPMK.'.format(mahasiswa.nama, mk_semester.mk_kurikulum.nama, mk_semester.semester.semester)
                 if settings.DEBUG: print(message)
                 return (is_success, message, result)
 

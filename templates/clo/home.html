@@ -1,31 +1,31 @@
 {% extends 'home-view.html' %}
 
 {% block title %}
-CLO - 
+CPMK - 
 {% endblock title %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{% url 'semester:read-all' %}" role="listitem">Semester</a></li>
 <li class="breadcrumb-item"><a href="{{ mk_semester_obj.semester.read_detail_url }}" role="listitem">Detail</a></li>
 <li class="breadcrumb-item"><a href="{{ mk_semester_obj.read_detail_url }}" role="listitem">Detail MK</a></li>
-<li class="breadcrumb-item active" aria-current="page" role="listitem">CLO</li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">CPMK</li>
 {% endblock breadcrumb %}
 
 {% block content %}
 {% if object_list or data_exist %}
     <div class="h-icon">
-        <h1>Course Learning Outcomes</h1>
+        <h1>Capaian Pembelajaran Mata Kuliah</h1>
         
         {% if user_role != 'm' %}
         {% if mk_semester_obj.is_clo_locked %}
-        <a href="{{ mk_semester_obj.get_clo_unlock_url }}" class="btn btn-primary confirmation" data-confirm="Apakah anda yakin ingin membuka kunci CLO? Membuka kunci CLO sama dengan membuka kunci RPS juga." type="button">
+        <a href="{{ mk_semester_obj.get_clo_unlock_url }}" class="btn btn-primary confirmation" data-confirm="Apakah anda yakin ingin membuka kunci CPMK? Membuka kunci CPMK sama dengan membuka kunci RPS juga." type="button">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-unlock" viewBox="0 0 16 16">
                 <path d="M11 1a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5V3a3 3 0 0 1 6 0v4a.5.5 0 0 1-1 0V3a2 2 0 0 0-2-2zM3 8a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1H3z"/>
             </svg>
             <span class="hidden sm:block sm:ml-2.5">Buka kunci</span>
         </a>    
         {% else %}
-        <a href="{{ mk_semester_obj.get_clo_create_url }}" title="Tambah CLO" type="button" class="btn btn-success loading-trigger">
+        <a href="{{ mk_semester_obj.get_clo_create_url }}" title="Tambah CPMK" type="button" class="btn btn-success loading-trigger">
             <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
                 <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
             </svg>
@@ -89,7 +89,7 @@ CLO -
         <p>Tidak ditemukan data dengan filter yang diberikan</p>
     {% endif %}
 {% else %}
-    <h1>Course Learning Outcomes</h1>
+    <h1>Capaian Pembelajaran Mata Kuliah</h1>
     <div class="table-div">
         <div class="tr-div">
             <div class="min-w-24 md:min-w-40">Semester</div>
@@ -115,13 +115,13 @@ CLO -
     </div>
 
     {% if user_role == 'm' %}
-    <p>CLO belum dibuat.</p>
+    <p>CPMK belum dibuat.</p>
     {% else %}
-    <a href="{{ mk_semester_obj.get_clo_create_url }}" title="Tambah CLO" type="button" class="btn btn-primary max-w-min loading-trigger">
+    <a href="{{ mk_semester_obj.get_clo_create_url }}" title="Tambah CPMK" type="button" class="btn btn-primary max-w-min loading-trigger">
         <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
             <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
         </svg>
-        <span class="hidden sm:block">Tambah CLO</span>
+        <span class="hidden sm:block">Tambah CPMK</span>
     </a>
     {% endif %}
 {% endif %}
@@ -147,7 +147,7 @@ CLO -
                     plugins: {
                         title: {
                             display: true,
-                            text: 'Total persentase CLO Mata Kuliah',
+                            text: 'Total persentase CPMK Mata Kuliah',
                             color: '#10b981' // Emerald 500
                         }
                     }

@@ -5,7 +5,7 @@ from .models import Clo
 
 class CloLockedObjectPermissionMixin(LockedObjectPermissionMixin):
     mk_semester_obj: MataKuliahSemester = None
-    access_denied_message = 'CLO sudah dikunci. Jika ingin mengubah atau mengedit, silakan membuka kunci terlebih dahulu.'
+    access_denied_message = 'CPMK sudah dikunci. Jika ingin mengubah atau mengedit, silakan membuka kunci terlebih dahulu.'
     
     def get_locked_object_parent_model(self):
         return self.mk_semester_obj

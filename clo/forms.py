@@ -36,27 +36,27 @@ class CloForm(forms.ModelForm):
         model = Clo
         fields = ['nama', 'deskripsi']
         labels = {
-            'nama': 'Nama CLO'
+            'nama': 'Nama CPMK'
         }
         widgets = {
             'nama': MyTextInput(attrs={
-                'placeholder': 'Masukkan nama CLO...',
+                'placeholder': 'Masukkan nama CPMK...',
             }),
             'deskripsi': MyTextareaInput(attrs={
-                'placeholder': 'Masukkan deskripsi CLO...',
+                'placeholder': 'Masukkan deskripsi CPMK...',
                 'cols': 30,
                 'rows': 3,
             })
         }
         help_texts = {
-            'nama': 'Nama CLO. Contoh: <b>CLO 1</b>',
+            'nama': 'Nama CPMK. Contoh: <b>CPMK 1</b>',
         }
 
 
 class CloDuplicateForm(forms.Form):
     semester = forms.ChoiceField(
         widget=MyRadioInput(),
-        label='Duplikasi Course Learning Outcomes',
+        label='Duplikasi Capaian Pembelajaran Mata Kuliah',
     )
 
     def __init__(self, *args, **kwargs):
@@ -64,7 +64,7 @@ class CloDuplicateForm(forms.Form):
         choices = kwargs.pop('choices')
         super().__init__(*args, **kwargs)
         
-        self.fields['semester'].help_text = 'Berikut adalah pilihan semester dari <b>{}</b>. Pilih salah satu semester untuk menduplikasi Course Learning Outcomes dari semester tersebut ke <b>{}</b>'.format(mk_semester.mk_kurikulum.kurikulum.nama, mk_semester.semester.semester.nama)
+        self.fields['semester'].help_text = 'Berikut adalah pilihan semester dari <b>{}</b>. Pilih salah satu semester untuk menduplikasi Capaian Pembelajaran Mata Kuliah dari semester tersebut ke <b>{}</b>'.format(mk_semester.mk_kurikulum.kurikulum.nama, mk_semester.semester.semester.nama)
 
         self.fields['semester'].choices = choices
 
@@ -129,7 +129,7 @@ class KomponenCloForm(forms.ModelForm):
         help_texts = {
             'teknik_penilaian': 'Teknik penilaian terdiri dari <b>observasi</b>, <b>partisipasi</b>, <b>unjuk kerja</b>, <b>tes tertulis</b>, <b>tes lisan</b>, dan <b>angket</b>.',
             'instrumen_penilaian': 'Instrumen penilaian biasanya berupa <b>tugas</b>, <b>ujian mid</b>, <b>ujian final</b>, dll.',
-            'persentase': 'Persentase tiap komponen CLO (0-100).'
+            'persentase': 'Persentase tiap komponen CPMK (0-100).'
         }
 
     def __init__(self, *args, **kwargs):
@@ -215,7 +215,7 @@ class NilaiKomponenCloPesertaFormsetClass(forms.BaseFormSet):
         self.list_komponen_clo: QuerySet[KomponenClo] = list_komponen_clo
         self.is_generate = is_generate
 
-        # List persentase for each komponen CLO
+        # List persentase for each komponen CPMK
         list_persentase_komponen_clo = [komponen_clo.persentase for komponen_clo in self.list_komponen_clo]
         
         self.list_komponen_clo_len = self.list_komponen_clo.count()

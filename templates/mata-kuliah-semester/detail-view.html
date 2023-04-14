@@ -289,11 +289,11 @@
             </div>
 
             <div class="space-y-2.5 lg:space-y-3">
-                {% comment %} Pencapaian per CLO & Pencapaian CLO rata-rata {% endcomment %}
+                {% comment %} Pencapaian per CPMK & Pencapaian CPMK rata-rata {% endcomment %}
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 md:gap-2.5 xl:gap-6">
                     <div class="space-y-2.5">
                         <div class="flex flex-row justify-between items-center space-x-4">
-                            <h3 class="truncate">Pencapaian per CLO</h3>
+                            <h3 class="truncate">Pencapaian per CPMK</h3>
                             <select class="form-control select-input-content">
                                 <option value="capaian-per-clo-1" selected>Pie chart</option>
                                 <option value="capaian-per-clo-2">List view</option>
@@ -301,14 +301,14 @@
                         </div>
                         
                         <div>
-                            {% comment %} Capaian per CLO pie chart {% endcomment %}
+                            {% comment %} Capaian per CPMK pie chart {% endcomment %}
                             <div class="select-content hidden" id="capaian-per-clo-1">
                                 <div class="w-full mx-auto my-0">
                                     <canvas id="capaian-per-clo" class="w-full max-h-40 md:max-h-48 lg:max-h-52 xl:max-h-64 fill-slate-100"></canvas>
                                 </div>
                             </div>
 
-                            {% comment %} Capaian per CLO List view {% endcomment %}
+                            {% comment %} Capaian per CPMK List view {% endcomment %}
                             <div class="select-content hidden" id="capaian-per-clo-2">
                                 <ul class="space-y-2.5 pr-4 w-full max-h-64 overflow-y-auto" role="list">
                                     {% for nilai_clo in single_object.get_nilai_clo_mk_semester %}
@@ -334,7 +334,7 @@
 
                     <div class="space-y-2.5">
                         <div class="flex flex-row justify-between items-center space-x-4">
-                            <h3 class="truncate">Pencapaian CLO rata-rata</h3>
+                            <h3 class="truncate">Pencapaian CPMK rata-rata</h3>
                             <select class="form-control w-0 invisible">
                                 <option value="">List view</option>
                                 <option value="">Pie chart</option>
@@ -401,7 +401,7 @@
                 <table class="w-full">
                     <tbody class="flex flex-col space-y-2.5 md:space-y-3 xl:space-y-4">
                         <tr class="flex space-x-2.5">
-                            <th scope="row" class="w-full">CLO</th>
+                            <th scope="row" class="w-full">CPMK</th>
                             <td scope="row" class="text-right whitespace-nowrap">{{ nilai_komponen_clo.komponen_clo.clo.nama }}</th>
                         </tr>
                         <tr class="flex space-x-2.5">
@@ -488,7 +488,7 @@
         });
     });
 
-    {% comment %} Capaian per CLO {% endcomment %}
+    {% comment %} Capaian per CPMK {% endcomment %}
     let pencapaianPerCloData = {{ pencapaian_per_clo_graph|safe }};
     let pencapaianPerCloChartConfig = {
         type: 'pie',
@@ -510,7 +510,7 @@
 
     createChart('capaian-per-clo', pencapaianPerCloChartConfig);
 
-    {% comment %} Pencapaian CLO rata-rata {% endcomment %}
+    {% comment %} Pencapaian CPMK rata-rata {% endcomment %}
     let pencapaianCloRerataData = {{ pencapaian_clo_rerata_graph|safe }};
     let pencapaianCloRerataChartConfig = {
         type: 'doughnut',

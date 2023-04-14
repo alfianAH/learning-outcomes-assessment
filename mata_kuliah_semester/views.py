@@ -281,7 +281,7 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin,
             json_response.update({
                 'labels': [
                     'Persentase berlebihan',
-                    'Capaian CLO rata-rata',
+                    'Capaian CPMK rata-rata',
                 ],
                 'datasets': {
                     'data': [
@@ -297,7 +297,7 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin,
         elif average_clo_achievement == 100:
             json_response.update({
                 'labels': [
-                    'Capaian CLO rata-rata',
+                    'Capaian CPMK rata-rata',
                 ],
                 'datasets': {
                     'data': [
@@ -311,7 +311,7 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin,
         else:
             json_response.update({
                 'labels': [
-                    'Capaian CLO rata-rata',
+                    'Capaian CPMK rata-rata',
                     '-',
                 ],
                 'datasets': {
@@ -394,7 +394,7 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin,
         context = super().get_context_data(**kwargs)
         pedoman_objects = [
             {
-                'title': 'Course Learning Outcomes (CLO)',
+                'title': 'Capaian Pembelajaran Mata Kuliah (CPMK)',
                 'read_detail_url': self.single_object.get_clo_read_all_url()
             },
             {
@@ -760,7 +760,7 @@ class StudentPerformanceCalculateView(ProgramStudiMixin, MahasiswaAsPesertaMixin
 
         # If CLO is not locked or status nilai is not True, give error message
         if not mk_semester_obj.is_clo_locked or not mk_semester_obj.status_nilai:
-            messages.error(request, 'Gagal menghitung student performance. Pastikan anda sudah melengkapi dan mengunci CLO serta melengkapi nilai peserta mata kuliah.')
+            messages.error(request, 'Gagal menghitung student performance. Pastikan anda sudah melengkapi dan mengunci CPMK serta melengkapi nilai peserta mata kuliah.')
             return super().get(request, *args, **kwargs)
         
         calculate_nilai_per_clo_peserta(self.peserta_mk)
@@ -776,7 +776,7 @@ class NilaiKomponenCloEditTemplateView(ProgramStudiMixin, FormView):
     mk_semester_obj: MataKuliahSemester = None
     list_komponen_clo = None
     list_peserta_mk: list[PesertaMataKuliah] = []
-    success_msg = 'Proses mengedit nilai komponen CLO sudah selesai.'
+    success_msg = 'Proses mengedit nilai komponen CPMK sudah selesai.'
     error_msg: str = 'Gagal mengedit nilai. Pastikan data yang anda masukkan valid.'
     can_generate = True
 
@@ -794,16 +794,16 @@ class NilaiKomponenCloEditTemplateView(ProgramStudiMixin, FormView):
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         if not self.mk_semester_obj.is_clo_locked:
-            messages.warning(request, 'Pastikan anda sudah mengunci CLO terlebih dahulu sebelum memasukkan nilai.')
+            messages.warning(request, 'Pastikan anda sudah mengunci CPMK terlebih dahulu sebelum memasukkan nilai.')
             return redirect(self.success_url)
         
         if len(self.get_form().forms) == 0:
-            messages.warning(self.request, 'Edit nilai belum bisa dilakukan. Pastikan anda sudah melengkapi CLO dan komponen penilaiannya.')
+            messages.warning(self.request, 'Edit nilai belum bisa dilakukan. Pastikan anda sudah melengkapi CPMK dan komponen penilaiannya.')
             return redirect(self.success_url)
 
         if request.user.role == 'a' and self.can_generate:
             if request.GET.get('generate') == 'true':
-                messages.info(request, 'Proses generate sudah selesai. Generate nilai hanya berlaku untuk peserta yang belum memiliki nilai di semua komponen CLO.')
+                messages.info(request, 'Proses generate sudah selesai. Generate nilai hanya berlaku untuk peserta yang belum memiliki nilai di semua komponen CPMK.')
         
         return super().get(request, *args, **kwargs)
 
@@ -1018,10 +1018,10 @@ class NilaiAverageCloAchievementCalculateView(ProgramStudiMixin, RedirectView):
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         # If CLO is not locked or status nilai is not True, give error message
         if not self.mk_semester_obj.is_clo_locked or not self.mk_semester_obj.status_nilai:
-            messages.error(request, 'Gagal menghitung capaian CLO rata-rata. Pastikan anda sudah melengkapi dan mengunci CLO serta melengkapi nilai peserta mata kuliah.')
+            messages.error(request, 'Gagal menghitung capaian CPMK rata-rata. Pastikan anda sudah melengkapi dan mengunci CPMK serta melengkapi nilai peserta mata kuliah.')
             return super().get(request, *args, **kwargs)
         
         calculate_nilai_per_clo_mk_semester(self.mk_semester_obj)
         
-        messages.success(request, 'Proses perhitungan capaian CLO rata-rata sudah selesai.')
+        messages.success(request, 'Proses perhitungan capaian CPMK rata-rata sudah selesai.')
         return super().get(request, *args, **kwargs)

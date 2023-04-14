@@ -8,7 +8,7 @@
 <li class="breadcrumb-item"><a href="{% url 'semester:read-all' %}" role="listitem">Semester</a></li>
 <li class="breadcrumb-item"><a href="{{ single_object.mk_semester.semester.read_detail_url }}" role="listitem">Detail</a></li>
 <li class="breadcrumb-item"><a href="{{ single_object.mk_semester.read_detail_url }}" role="listitem">Detail MK</a></li>
-<li class="breadcrumb-item"><a href="{{ single_object.mk_semester.get_clo_read_all_url }}" role="listitem">CLO</a></li>
+<li class="breadcrumb-item"><a href="{{ single_object.mk_semester.get_clo_read_all_url }}" role="listitem">CPMK</a></li>
 <li class="breadcrumb-item active" aria-current="page" role="listitem">Detail</li>
 {% endblock breadcrumb %}
 
@@ -69,7 +69,7 @@
 
 {% if object_list or data_exist %}
     <div class="h-icon">
-        <h2>Komponen CLO</h2>
+        <h2>Komponen CPMK</h2>
         {% if user_role != 'm' %}
         {% if not single_object.mk_semester.is_clo_locked %}
         <a href="{{ single_object.get_komponen_clo_create_url }}" class="btn btn-success btn-icon-start">
@@ -94,7 +94,7 @@
         <p>Tidak ditemukan data dengan filter yang diberikan</p>
     {% endif %}
 {% else %}
-    <h2>Komponen CLO</h2>
+    <h2>Komponen CPMK</h2>
     <a href="{{ single_object.get_komponen_clo_create_url }}" class="btn btn-primary btn-icon-start max-w-min">
         <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
             <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
@@ -125,7 +125,7 @@
                     plugins: {
                         title: {
                             display: true,
-                            text: 'Total persentase CLO Mata Kuliah',
+                            text: 'Total persentase CPMK Mata Kuliah',
                             color: '#10b981' // Emerald 500
                         }
                     }

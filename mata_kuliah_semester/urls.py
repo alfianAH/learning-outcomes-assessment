@@ -49,7 +49,7 @@ urlpatterns = [
     path('<int:mk_semester_id>/results/nilai-avg-calculate/', NilaiAverageCloAchievementCalculateView.as_view(), name='nilai-avg-calculate'),
     
     # CLO
-    path('<int:mk_semester_id>/clo/', include('clo.urls')),
+    path('<int:mk_semester_id>/cpmk/', include('clo.urls')),
 
     # RPS
     path('<int:mk_semester_id>/rps/', include('rps.urls')),
