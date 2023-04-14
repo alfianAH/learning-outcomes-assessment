@@ -138,10 +138,6 @@ class TahunAjaranSemesterFormsetClass(CanDeleteBaseFormSet):
                 form for form in self.forms
                 if not (self.can_delete and self._should_delete_form(form))
             ]
-
-            # Minimum valid form is 1
-            if len(forms_valid) < 1:
-                errors.append('Minimal 1 filter yang diterapkan')
         
         return errors
 
@@ -184,5 +180,4 @@ TahunAjaranSemesterFormset = formset_factory(
     formset=TahunAjaranSemesterFormsetClass,
     extra=0,
     can_delete=True,
-    min_num=1,
 )

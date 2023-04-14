@@ -97,6 +97,7 @@ class GetSemesterJsonResponse(TemplateView):
 
 class LaporanCapaianPembelajaranTemplateView(FormView):
     formset_class = None
+    add_more_btn_text = 'Tambah filter'
 
     def get_formset_class(self):
         return self.formset_class
@@ -135,6 +136,7 @@ class LaporanCapaianPembelajaranTemplateView(FormView):
         context = super().get_context_data(**kwargs)
         context.update({
             'is_formset_row': True,
+            'add_more_btn_text': self.add_more_btn_text,
         })
         if 'formset' not in kwargs:
             context['formset'] = self.get_formset()
@@ -242,94 +244,103 @@ class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
         """
         filter_dict = {}
 
-        is_semester_included = len(formset_cleaned_data[0].get('semester', '').strip()) != 0
-
-        # Separate tahun ajaran and semester
-        for clean_data in formset_cleaned_data:
-            tahun_ajaran_prodi_id = clean_data['tahun_ajaran']
-
-            if tahun_ajaran_prodi_id not in filter_dict.keys():
-                filter_dict[tahun_ajaran_prodi_id] = []
-            
-            if is_semester_included:
-                semester_prodi_id = clean_data['semester']
-                filter_dict[tahun_ajaran_prodi_id].append(semester_prodi_id)
-        
-        filter = []
-        if is_semester_included:
-            # Semester filters
-            for tahun_ajaran_prodi_id, list_semester_prodi_id in filter_dict.items():
-                for semester_prodi_id in list_semester_prodi_id:
-                    if not semester_prodi_id.strip(): continue
-
-                    try:
-                        semester_prodi_obj = SemesterProdi.objects.get(
-                            id_neosia=semester_prodi_id
-                        )
-                    except SemesterProdi.DoesNotExist:
-                        message = 'Semester Prodi (ID={}) tidak ada di database.'.format(semester_prodi_id)
-                        if settings.DEBUG: print(message)
-                        messages.error(self.request, message)
-                        continue
-                    except SemesterProdi.MultipleObjectsReturned:
-                        message = 'Semester Prodi (ID={}) mengembalikan multiple object.'.format(semester_prodi_id)
-                        if settings.DEBUG: print(message)
-                        messages.error(self.request, message)
-                        continue
-                    
-                    filter.append((semester_prodi_obj, str(semester_prodi_obj.semester)))
-
-            # Filter peserta MK
-            list_peserta_mk = PesertaMataKuliah.objects.filter(
-                kelas_mk_semester__mk_semester__semester__in=[semester_prodi_obj for semester_prodi_obj, _ in filter]
+        if len(formset_cleaned_data) == 0:
+            # Filter by kurikulum
+            return self.render_to_response(
+                self.get_context_data(
+                    form=form, formset=formset,
+                )
             )
         else:
-            # Tahun ajaran filters
-            for tahun_ajaran_prodi_id in filter_dict.keys():
-                if not tahun_ajaran_prodi_id.strip(): continue
+            # Filter by tahun ajaran or semester
+            is_semester_included = len(formset_cleaned_data[0].get('semester', '').strip()) != 0
 
-                try:
-                    tahun_ajaran_prodi_obj = TahunAjaranProdi.objects.get(
-                        id=tahun_ajaran_prodi_id
-                    )
-                except TahunAjaranProdi.DoesNotExist:
-                    message = 'TahunAjaranProdi (ID={}) tidak ada di database.'.format(tahun_ajaran_prodi_id)
-                    if settings.DEBUG: print(message)
-                    continue
-                except TahunAjaranProdi.MultipleObjectsReturned:
-                    message = 'TahunAjaranProdi (ID={}) mengembalikan multiple object.'.format(tahun_ajaran_prodi_id)
-                    if settings.DEBUG: print(message)
-                    continue
+            # Separate tahun ajaran and semester
+            for clean_data in formset_cleaned_data:
+                tahun_ajaran_prodi_id = clean_data['tahun_ajaran']
+
+                if tahun_ajaran_prodi_id not in filter_dict.keys():
+                    filter_dict[tahun_ajaran_prodi_id] = []
                 
-                filter.append((tahun_ajaran_prodi_obj, str(tahun_ajaran_prodi_obj.tahun_ajaran)))
+                if is_semester_included:
+                    semester_prodi_id = clean_data['semester']
+                    filter_dict[tahun_ajaran_prodi_id].append(semester_prodi_id)
+            
+            filter = []
+            if is_semester_included:
+                # Semester filters
+                for tahun_ajaran_prodi_id, list_semester_prodi_id in filter_dict.items():
+                    for semester_prodi_id in list_semester_prodi_id:
+                        if not semester_prodi_id.strip(): continue
 
-            # Filter peserta MK
-            list_peserta_mk = PesertaMataKuliah.objects.filter(
-                kelas_mk_semester__mk_semester__semester__tahun_ajaran_prodi__in=[tahun_ajaran_prodi_obj for tahun_ajaran_prodi_obj, _ in filter]
+                        try:
+                            semester_prodi_obj = SemesterProdi.objects.get(
+                                id_neosia=semester_prodi_id
+                            )
+                        except SemesterProdi.DoesNotExist:
+                            message = 'Semester Prodi (ID={}) tidak ada di database.'.format(semester_prodi_id)
+                            if settings.DEBUG: print(message)
+                            messages.error(self.request, message)
+                            continue
+                        except SemesterProdi.MultipleObjectsReturned:
+                            message = 'Semester Prodi (ID={}) mengembalikan multiple object.'.format(semester_prodi_id)
+                            if settings.DEBUG: print(message)
+                            messages.error(self.request, message)
+                            continue
+                        
+                        filter.append((semester_prodi_obj, str(semester_prodi_obj.semester)))
+
+                # Filter peserta MK
+                list_peserta_mk = PesertaMataKuliah.objects.filter(
+                    kelas_mk_semester__mk_semester__semester__in=[semester_prodi_obj for semester_prodi_obj, _ in filter]
+                )
+            else:
+                # Tahun ajaran filters
+                for tahun_ajaran_prodi_id in filter_dict.keys():
+                    if not tahun_ajaran_prodi_id.strip(): continue
+
+                    try:
+                        tahun_ajaran_prodi_obj = TahunAjaranProdi.objects.get(
+                            id=tahun_ajaran_prodi_id
+                        )
+                    except TahunAjaranProdi.DoesNotExist:
+                        message = 'TahunAjaranProdi (ID={}) tidak ada di database.'.format(tahun_ajaran_prodi_id)
+                        if settings.DEBUG: print(message)
+                        continue
+                    except TahunAjaranProdi.MultipleObjectsReturned:
+                        message = 'TahunAjaranProdi (ID={}) mengembalikan multiple object.'.format(tahun_ajaran_prodi_id)
+                        if settings.DEBUG: print(message)
+                        continue
+                    
+                    filter.append((tahun_ajaran_prodi_obj, str(tahun_ajaran_prodi_obj.tahun_ajaran)))
+
+                # Filter peserta MK
+                list_peserta_mk = PesertaMataKuliah.objects.filter(
+                    kelas_mk_semester__mk_semester__semester__tahun_ajaran_prodi__in=[tahun_ajaran_prodi_obj for tahun_ajaran_prodi_obj, _ in filter]
+                )
+
+            # If is multiple result, use line chart, else, use radar chart
+            is_multiple_result = len(filter) > 1
+
+            # Process
+            prodi_is_success, prodi_message, prodi_result = process_ilo_prodi(list_ilo, max_sks_prodi, is_semester_included, filter)
+            mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa(list_ilo, max_sks_prodi, list_peserta_mk, is_semester_included, filter)
+
+            perolehan_nilai_ilo_graph = self.perolehan_nilai_ilo_graph(list_ilo, is_multiple_result, prodi_result)
+
+            # Success and Error messages
+            self.show_result_messages(prodi_is_success, prodi_message)
+            self.show_result_messages(mahasiswa_is_success, mahasiswa_message)
+
+            return self.render_to_response(
+                self.get_context_data(
+                    form=form, formset=formset,
+                    perolehan_nilai_ilo_graph=perolehan_nilai_ilo_graph,
+                    object_list=mahasiswa_result,
+                    list_ilo=list_ilo,
+                    list_filter=filter,
+                )
             )
-
-        # If is multiple result, use line chart, else, use radar chart
-        is_multiple_result = len(filter) > 1
-
-        # Process
-        prodi_is_success, prodi_message, prodi_result = process_ilo_prodi(list_ilo, max_sks_prodi, is_semester_included, filter)
-        mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa(list_ilo, max_sks_prodi, list_peserta_mk, is_semester_included, filter)
-
-        perolehan_nilai_ilo_graph = self.perolehan_nilai_ilo_graph(list_ilo, is_multiple_result, prodi_result)
-
-        # Success and Error messages
-        self.show_result_messages(prodi_is_success, prodi_message)
-        self.show_result_messages(mahasiswa_is_success, mahasiswa_message)
-
-        return self.render_to_response(
-            self.get_context_data(
-                form=form, formset=formset,
-                perolehan_nilai_ilo_graph=perolehan_nilai_ilo_graph,
-                object_list=mahasiswa_result,
-                list_ilo=list_ilo,
-                list_filter=filter,
-            )
-        )
 
 
 class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCapaianPembelajaranTemplateView):
@@ -410,88 +421,97 @@ class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCa
         }
         """
         filter_dict = {}
-
-        is_semester_included = len(formset_cleaned_data[0].get('semester', '').strip()) != 0
-
-        # Separate tahun ajaran and semester
-        for clean_data in formset_cleaned_data:
-            tahun_ajaran_prodi_id = clean_data['tahun_ajaran']
-
-            if tahun_ajaran_prodi_id not in filter_dict.keys():
-                filter_dict[tahun_ajaran_prodi_id] = []
-            
-            if is_semester_included:
-                semester_prodi_id = clean_data['semester']
-                filter_dict[tahun_ajaran_prodi_id].append(semester_prodi_id)
         
-        filter = []
-        if is_semester_included:
-            # Semester filters
-            for tahun_ajaran_prodi_id, list_semester_prodi_id in filter_dict.items():
-                for semester_prodi_id in list_semester_prodi_id:
-                    if not semester_prodi_id.strip(): continue
-
-                    try:
-                        semester_prodi_obj = SemesterProdi.objects.get(
-                            id_neosia=semester_prodi_id
-                        )
-                    except SemesterProdi.DoesNotExist:
-                        message = 'Semester Prodi (ID={}) tidak ada di database.'.format(semester_prodi_id)
-                        if settings.DEBUG: print(message)
-                        messages.error(self.request, message)
-                        continue
-                    except SemesterProdi.MultipleObjectsReturned:
-                        message = 'Semester Prodi (ID={}) mengembalikan multiple object.'.format(semester_prodi_id)
-                        if settings.DEBUG: print(message)
-                        messages.error(self.request, message)
-                        continue
-                    
-                    filter.append((semester_prodi_obj, str(semester_prodi_obj.semester)))
-
-            # Filter peserta MK
-            list_peserta_mk = PesertaMataKuliah.objects.filter(
-                mahasiswa=self.user,
-                kelas_mk_semester__mk_semester__semester__in=[semester_prodi_obj for semester_prodi_obj, _ in filter]
+        if len(formset_cleaned_data) == 0:
+            # Filter by kurikulum
+            return self.render_to_response(
+                self.get_context_data(
+                    form=form, formset=formset,
+                )
             )
         else:
-            # Tahun ajaran filters
-            for tahun_ajaran_prodi_id in filter_dict.keys():
-                if not tahun_ajaran_prodi_id.strip(): continue
+            # Filter by tahun ajaran or semester
+            is_semester_included = len(formset_cleaned_data[0].get('semester', '').strip()) != 0
 
-                try:
-                    tahun_ajaran_prodi_obj = TahunAjaranProdi.objects.get(
-                        id=tahun_ajaran_prodi_id
-                    )
-                except TahunAjaranProdi.DoesNotExist:
-                    message = 'TahunAjaranProdi (ID={}) tidak ada di database.'.format(tahun_ajaran_prodi_id)
-                    if settings.DEBUG: print(message)
-                    continue
-                except TahunAjaranProdi.MultipleObjectsReturned:
-                    message = 'TahunAjaranProdi (ID={}) mengembalikan multiple object.'.format(tahun_ajaran_prodi_id)
-                    if settings.DEBUG: print(message)
-                    continue
+            # Separate tahun ajaran and semester
+            for clean_data in formset_cleaned_data:
+                tahun_ajaran_prodi_id = clean_data['tahun_ajaran']
+
+                if tahun_ajaran_prodi_id not in filter_dict.keys():
+                    filter_dict[tahun_ajaran_prodi_id] = []
                 
-                filter.append((tahun_ajaran_prodi_obj, str(tahun_ajaran_prodi_obj.tahun_ajaran)))
+                if is_semester_included:
+                    semester_prodi_id = clean_data['semester']
+                    filter_dict[tahun_ajaran_prodi_id].append(semester_prodi_id)
+            
+            filter = []
+            if is_semester_included:
+                # Semester filters
+                for tahun_ajaran_prodi_id, list_semester_prodi_id in filter_dict.items():
+                    for semester_prodi_id in list_semester_prodi_id:
+                        if not semester_prodi_id.strip(): continue
 
-            # Filter peserta MK
-            list_peserta_mk = PesertaMataKuliah.objects.filter(
-                mahasiswa=self.user,
-                kelas_mk_semester__mk_semester__semester__tahun_ajaran_prodi__in=[tahun_ajaran_prodi_obj for tahun_ajaran_prodi_obj, _ in filter]
+                        try:
+                            semester_prodi_obj = SemesterProdi.objects.get(
+                                id_neosia=semester_prodi_id
+                            )
+                        except SemesterProdi.DoesNotExist:
+                            message = 'Semester Prodi (ID={}) tidak ada di database.'.format(semester_prodi_id)
+                            if settings.DEBUG: print(message)
+                            messages.error(self.request, message)
+                            continue
+                        except SemesterProdi.MultipleObjectsReturned:
+                            message = 'Semester Prodi (ID={}) mengembalikan multiple object.'.format(semester_prodi_id)
+                            if settings.DEBUG: print(message)
+                            messages.error(self.request, message)
+                            continue
+                        
+                        filter.append((semester_prodi_obj, str(semester_prodi_obj.semester)))
+
+                # Filter peserta MK
+                list_peserta_mk = PesertaMataKuliah.objects.filter(
+                    mahasiswa=self.user,
+                    kelas_mk_semester__mk_semester__semester__in=[semester_prodi_obj for semester_prodi_obj, _ in filter]
+                )
+            else:
+                # Tahun ajaran filters
+                for tahun_ajaran_prodi_id in filter_dict.keys():
+                    if not tahun_ajaran_prodi_id.strip(): continue
+
+                    try:
+                        tahun_ajaran_prodi_obj = TahunAjaranProdi.objects.get(
+                            id=tahun_ajaran_prodi_id
+                        )
+                    except TahunAjaranProdi.DoesNotExist:
+                        message = 'TahunAjaranProdi (ID={}) tidak ada di database.'.format(tahun_ajaran_prodi_id)
+                        if settings.DEBUG: print(message)
+                        continue
+                    except TahunAjaranProdi.MultipleObjectsReturned:
+                        message = 'TahunAjaranProdi (ID={}) mengembalikan multiple object.'.format(tahun_ajaran_prodi_id)
+                        if settings.DEBUG: print(message)
+                        continue
+                    
+                    filter.append((tahun_ajaran_prodi_obj, str(tahun_ajaran_prodi_obj.tahun_ajaran)))
+
+                # Filter peserta MK
+                list_peserta_mk = PesertaMataKuliah.objects.filter(
+                    mahasiswa=self.user,
+                    kelas_mk_semester__mk_semester__semester__tahun_ajaran_prodi__in=[tahun_ajaran_prodi_obj for tahun_ajaran_prodi_obj, _ in filter]
+                )
+            
+            # If is multiple result, use line chart, else, use radar chart
+            is_multiple_result = len(filter) > 1
+
+            mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa(list_ilo, max_sks_prodi, list_peserta_mk, is_semester_included, filter)
+
+            perolehan_nilai_ilo_graph = self.perolehan_nilai_ilo_graph(list_ilo, is_multiple_result, mahasiswa_result)
+
+            self.show_result_messages(mahasiswa_is_success, mahasiswa_message)
+
+            return self.render_to_response(
+                self.get_context_data(
+                    form=form, formset=formset,
+                    perolehan_nilai_ilo_graph=perolehan_nilai_ilo_graph,
+                    options=list_peserta_mk,
+                )
             )
-        
-        # If is multiple result, use line chart, else, use radar chart
-        is_multiple_result = len(filter) > 1
-
-        mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa(list_ilo, max_sks_prodi, list_peserta_mk, is_semester_included, filter)
-
-        perolehan_nilai_ilo_graph = self.perolehan_nilai_ilo_graph(list_ilo, is_multiple_result, mahasiswa_result)
-
-        self.show_result_messages(mahasiswa_is_success, mahasiswa_message)
-
-        return self.render_to_response(
-            self.get_context_data(
-                form=form, formset=formset,
-                perolehan_nilai_ilo_graph=perolehan_nilai_ilo_graph,
-                options=list_peserta_mk,
-            )
-        )
