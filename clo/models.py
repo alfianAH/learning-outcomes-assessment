@@ -71,10 +71,19 @@ class Clo(LockableMixin, models.Model):
         return get_reverse_url('semester:mata_kuliah_semester:clo:komponen-clo-graph', self.get_kwargs)
 
 
+class TeknikPenilaianChoices(models.TextChoices):
+    OBSERVASI = 'observasi', 'Observasi'
+    PARTISIPASI = 'partisipasi', 'Partisipasi'
+    UNJUK_KERJA = 'unjuk kerja', 'Unjuk kerja'
+    TES_TERTULIS = 'tes tertulis', 'Tes tertulis'
+    TES_LISAN = 'tes lisan', 'Tes lisan'
+    ANGKET = 'angket', 'Angket'
+
+
 class KomponenClo(LockableMixin, models.Model):
     clo = models.ForeignKey(Clo, on_delete=models.CASCADE)
 
-    teknik_penilaian = models.CharField(null=False, blank=False, max_length=255)
+    teknik_penilaian = models.CharField(null=False, blank=False, max_length=255, choices=TeknikPenilaianChoices.choices)
     instrumen_penilaian = models.CharField(null=False, blank=False, max_length=255)
     persentase = models.FloatField(null=False, blank=False, validators=[MinValueValidator(0.0), MaxValueValidator(100.0)])
 

@@ -4,5 +4,5 @@
         {% include 'components/button/open-list-item-button.html' %}
     {% endif %}
 </td>
-<td class="text-left truncate max-w-[8rem] min-w-[6rem] lg:max-w-[7rem] xl:max-w-[10rem] xl:min-w-[8rem]">{{ option.teknik_penilaian }}</td>
+<td class="text-left truncate max-w-[8rem] min-w-[6rem] lg:max-w-[7rem] xl:max-w-[10rem] xl:min-w-[8rem]">{{ option.get_teknik_penilaian_display }}</td>
 <td class="text-right">{{ option.persentase }}</td>

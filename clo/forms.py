@@ -112,7 +112,8 @@ class KomponenCloForm(forms.ModelForm):
         model = KomponenClo
         fields = ['teknik_penilaian', 'instrumen_penilaian', 'persentase']
         widgets = {
-            'teknik_penilaian': MyTextInput(attrs={
+            'teknik_penilaian': MySelectInput(attrs={
+                'class': 'teknik-penilaian-search',
                 'placeholder': 'Masukkan teknik penilaian',
             }),
             'instrumen_penilaian': MyTextInput(attrs={
