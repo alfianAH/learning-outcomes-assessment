@@ -4682,6 +4682,10 @@ details.dropdown::marker {
   min-width: 10rem;
 }
 
+.min-w-\[5\.5rem\] {
+  min-width: 5.5rem;
+}
+
 .min-w-32 {
   min-width: 8rem;
 }
@@ -4698,30 +4702,6 @@ details.dropdown::marker {
   min-width: 9rem;
 }
 
-.min-w-\[\] {
-  min-width: ;
-}
-
-.min-w-\[rem\] {
-  min-width: rem;
-}
-
-.min-w-\[7rem\] {
-  min-width: 7rem;
-}
-
-.min-w-\[5rem\] {
-  min-width: 5rem;
-}
-
-.min-w-\[6em\] {
-  min-width: 6em;
-}
-
-.min-w-\[5\.5rem\] {
-  min-width: 5.5rem;
-}
-
 .max-w-\[18rem\] {
   max-width: 18rem;
 }
@@ -4734,6 +4714,10 @@ details.dropdown::marker {
 
 .max-w-\[10rem\] {
   max-width: 10rem;
+}
+
+.max-w-\[8\.25rem\] {
+  max-width: 8.25rem;
 }
 
 .max-w-none {
@@ -4762,18 +4746,6 @@ details.dropdown::marker {
 
 .max-w-full {
   max-width: 100%;
-}
-
-.max-w-\[\] {
-  max-width: ;
-}
-
-.max-w-\[25rem\] {
-  max-width: 25rem;
-}
-
-.max-w-\[8\.25rem\] {
-  max-width: 8.25rem;
 }
 
 .-translate-x-1\/2 {
@@ -4845,10 +4817,6 @@ details.dropdown::marker {
   align-items: flex-start;
 }
 
-.items-end {
-  align-items: flex-end;
-}
-
 .items-center {
   align-items: center;
 }
@@ -4859,14 +4827,6 @@ details.dropdown::marker {
 
 .\!justify-start {
   justify-content: flex-start !important;
-}
-
-.justify-start {
-  justify-content: flex-start;
-}
-
-.justify-end {
-  justify-content: flex-end;
 }
 
 .justify-center {

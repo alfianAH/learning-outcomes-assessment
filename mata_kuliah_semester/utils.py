@@ -5,7 +5,9 @@ from io import BytesIO
 from openpyxl.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.styles import (
-    Font, Alignment, Border, Side, Protection
+    Font, Alignment, Border, Side,
+    Protection,
+    PatternFill
 )
 from reportlab.platypus import SimpleDocTemplate
 from reportlab.lib.units import cm
@@ -502,6 +504,19 @@ def lock_or_unlock_cells(cells_by_row, protection):
             cell.protection = protection
 
 
+def fill_cells(cells_by_row, fill):
+    """Fill cell with color
+
+    Args:
+        cells_by_row (list): Range Cells
+        fill (PatternFill): Fill color
+    """
+
+    for cells in cells_by_row:
+        for cell in cells:
+            cell.fill = fill
+
+
 def generate_template_nilai_mk_semester(mk_semester: MataKuliahSemester, list_peserta_mk: QuerySet[PesertaMataKuliah]):
     workbook = openpyxl.Workbook()
     worksheet: Worksheet  = workbook.active
@@ -678,8 +693,10 @@ def generate_template_nilai_mk_semester(mk_semester: MataKuliahSemester, list_pe
 
     # Lock cells
     nilai_protection = Protection(locked=False, hidden=False)
-    nilai_cells = 'D14:{}{}'.format(end_col, end_row)
+    nilai_fill = PatternFill('solid', fgColor='fde047')
+    nilai_cells = 'D19:{}{}'.format(end_col, end_row)
     lock_or_unlock_cells(worksheet[nilai_cells], nilai_protection)
+    fill_cells(worksheet[nilai_cells], nilai_fill)
     worksheet.protection.enable()
     
     # Save the workbook to a BytesIO object
