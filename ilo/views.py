@@ -97,11 +97,11 @@ class IloCreateView(HtmxCreateFormView):
     form_class = IloForm
     kurikulum_obj: Kurikulum = None
 
-    modal_title: str = 'Tambah ILO'
+    modal_title: str = 'Tambah CPL'
     modal_content_id: str = 'create-modal-content'
     button_text: str = 'Tambah'
-    success_msg: str = 'Berhasil menambahkan ILO'
-    error_msg: str = 'Gagal menambahkan ILO. Pastikan data yang anda masukkan valid.'
+    success_msg: str = 'Berhasil menambahkan CPL'
+    error_msg: str = 'Gagal menambahkan CPL. Pastikan data yang anda masukkan valid.'
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
@@ -138,12 +138,12 @@ class IloUpdateView(HtmxUpdateFormView):
     pk_url_kwarg = 'ilo_id'
     object: Ilo = None
 
-    modal_title: str = 'Update ILO'
+    modal_title: str = 'Update CPL'
     modal_content_id: str = 'update-modal-content'
     button_text: str = 'Update'
     post_url: str = ''
-    success_msg: str = 'Berhasil mengupdate ILO'
-    error_msg: str = 'Gagal mengupdate ILO. Pastikan data yang anda masukkan valid.'
+    success_msg: str = 'Berhasil mengupdate CPL'
+    error_msg: str = 'Gagal mengupdate CPL. Pastikan data yang anda masukkan valid.'
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
@@ -166,7 +166,7 @@ class IloUpdateView(HtmxUpdateFormView):
 class IloBulkDeleteView(ModelBulkDeleteView):
     model = Ilo
     id_list_obj: str = 'id_ilo'
-    success_msg = 'Berhasil menghapus ILO'
+    success_msg = 'Berhasil menghapus CPL'
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)

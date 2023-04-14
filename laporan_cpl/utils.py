@@ -47,7 +47,7 @@ def calculate_ilo(list_bobot_mk: list, list_persentase_clo: list,
     try:
         konversi_clo_to_ilo = (list_bobot_mk * list_persentase_clo * list_bobot_pi_ilo) * nilai_max
     except ValueError:
-        message = 'Shape array tidak sama. Bobot MK: {} Persentase CPMK: {}, Bobot PI ILO: {}.'.format(
+        message = 'Shape array tidak sama. Bobot MK: {} Persentase CPMK: {}, Bobot PI CPL: {}.'.format(
             list_bobot_mk.shape, list_persentase_clo.shape, list_bobot_pi_ilo.shape)
         if settings.DEBUG: print(message)
         return (is_success, None)
@@ -178,10 +178,10 @@ def calculate_ilo_prodi(list_ilo: QuerySet[Ilo],
         return (is_success, message, result)
 
     if len(result.keys()) != list_ilo.count():
-        message = 'Panjang array List ILO dan hasil tidak sesuai. List ILO: {}, Hasil: {}.'.format(list_ilo.count(), len(result.keys()))
+        message = 'Panjang array List CPL dan hasil tidak sesuai. List CPL: {}, Hasil: {}.'.format(list_ilo.count(), len(result.keys()))
     else:
         is_success = True
-        message = 'Berhasil menghitung capaian ILO Program Studi.'
+        message = 'Berhasil menghitung capaian CPL Program Studi.'
 
     return (is_success, message, result)
 
@@ -306,7 +306,7 @@ def calculate_ilo_mahasiswa(list_ilo: QuerySet[Ilo],
         return (is_success, message, result)
     
     is_success = True
-    message = 'Berhasil menghitung capaian ILO Mahasiswa.'
+    message = 'Berhasil menghitung capaian CPL Mahasiswa.'
     return (is_success, message, result)
 
 
@@ -387,7 +387,7 @@ def process_ilo_mahasiswa(list_ilo: QuerySet[Ilo], max_sks_prodi: int,
                 
                 # Return if not success
                 if not is_success: 
-                    if settings.DEBUG: print('ILO Mahasiswa gagal.', message)
+                    if settings.DEBUG: print('CPL Mahasiswa gagal.', message)
                     return (is_success, message, result)
         else:
             for tahun_ajaran_prodi_obj, tahun_ajaran_name in filter:
@@ -411,7 +411,7 @@ def process_ilo_mahasiswa(list_ilo: QuerySet[Ilo], max_sks_prodi: int,
 
                 # Return if not success
                 if not is_success: 
-                    if settings.DEBUG: print('ILO Mahasiswa gagal.', message)
+                    if settings.DEBUG: print('CPL Mahasiswa gagal.', message)
                     return (is_success, message, result)
         
         if mahasiswa.username not in result.keys():
@@ -486,7 +486,7 @@ def process_ilo_prodi(list_ilo: QuerySet[Ilo], max_sks_prodi: int,
             })
 
             if not is_success: 
-                if settings.DEBUG: print('ILO Prodi gagal.', message)
+                if settings.DEBUG: print('CPL Prodi gagal.', message)
                 return (is_success, message, result)
     else:
         for tahun_ajaran_prodi_obj, tahun_ajaran_nama in filter:
@@ -502,7 +502,7 @@ def process_ilo_prodi(list_ilo: QuerySet[Ilo], max_sks_prodi: int,
             })
 
             if not is_success: 
-                if settings.DEBUG: print('ILO Prodi gagal.', message)
+                if settings.DEBUG: print('CPL Prodi gagal.', message)
                 return (is_success, message, result)
     
     

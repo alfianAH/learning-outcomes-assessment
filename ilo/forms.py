@@ -19,7 +19,7 @@ class IloForm(forms.ModelForm):
         }
         widgets = {
             'nama': MyTextInput(attrs={
-                'placeholder': 'ILO {}'.format(randint(1, 5)),
+                'placeholder': 'CPL {}'.format(randint(1, 5)),
             }),
             'pi_area': MySelectInput(),
             'satisfactory_level': MyNumberInput(attrs={
@@ -35,8 +35,8 @@ class IloForm(forms.ModelForm):
         }
 
         help_texts = {
-            'nama': 'Nama ILO. Contoh: <b>ILO 1</b>',
-            'satisfactory_level': 'Nilai standar dari ILO (0-100).'
+            'nama': 'Nama CPL. Contoh: <b>CPL 1</b>',
+            'satisfactory_level': 'Nilai standar dari CPL (0-100).'
         }
 
     def __init__(self, *args, **kwargs):

@@ -72,7 +72,7 @@ class CloDuplicateForm(forms.Form):
 class PerformanceIndicatorAreaForPiCloForm(forms.Form):
     pi_area = forms.ChoiceField(
         widget=MySelectInput(),
-        label = 'Pilih ILO',
+        label = 'Pilih CPL',
         required=True
     )
 
@@ -81,7 +81,7 @@ class PerformanceIndicatorAreaForPiCloForm(forms.Form):
         super().__init__(*args, **kwargs)
         pi_area_choices = get_pi_area_by_kurikulum_choices(kurikulum_obj)
         self.fields['pi_area'].choices = pi_area_choices
-        self.fields['pi_area'].help_text = 'List ILO dari {}.'.format(kurikulum_obj.nama)
+        self.fields['pi_area'].help_text = 'List CPL dari {}.'.format(kurikulum_obj.nama)
 
     def clean(self):
         cleaned_data = super().clean()
@@ -90,7 +90,7 @@ class PerformanceIndicatorAreaForPiCloForm(forms.Form):
         pi_area = cleaned_data.get('pi_area', None)
         
         if pi_area is None:
-            self.add_error('pi_area', 'Harus memilih salah satu ILO terlebih dahulu')
+            self.add_error('pi_area', 'Harus memilih salah satu CPL terlebih dahulu')
         
         return cleaned_data
 

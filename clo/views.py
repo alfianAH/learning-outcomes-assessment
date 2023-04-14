@@ -237,8 +237,8 @@ class CloCreateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, MySession
                 current_title = 'Lengkapi Data CPMK'
                 current_help_text = 'Masukkan nama dan deskripsi dari CPMK dari mata kuliah {0}. Untuk <b>menduplikasi CPMK</b> mata kuliah <b>{0}</b> dari semester lain klik <a href="{1}">di sini</a>.'.format(self.mk_semester_obj.mk_kurikulum.nama, self.mk_semester_obj.get_clo_duplicate_url())
             case '1':
-                current_title = 'Pilih ILO'
-                current_help_text = 'Pilih salah satu ILO untuk mendapatkan Performance Indicator dari ILO tersebut. Performance Indicator dapat dipilih di step berikutnya.'
+                current_title = 'Pilih CPL'
+                current_help_text = 'Pilih salah satu CPL untuk mendapatkan Performance Indicator dari CPL tersebut. Performance Indicator dapat dipilih di step berikutnya.'
             case '2':
                 current_title = 'Pilih Performance Indicator'
                 current_help_text = 'Pilih Performance Indicator (PI) yang sesuai atau memiliki keterkaitan dengan CPMK.'
@@ -356,8 +356,8 @@ class CloUpdateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, MySession
                 current_title = 'Lengkapi Data CPMK'
                 current_help_text = 'Masukkan nama dan deskripsi dari CPMK dari mata kuliah {}.'.format(self.clo_obj.mk_semester.mk_kurikulum.nama)
             case '1':
-                current_title = 'Pilih ILO'
-                current_help_text = 'Pilih salah satu ILO untuk mendapatkan Performance Indicator dari ILO tersebut. Performance Indicator dapat dipilih di step berikutnya.'
+                current_title = 'Pilih CPL'
+                current_help_text = 'Pilih salah satu CPL untuk mendapatkan Performance Indicator dari CPL tersebut. Performance Indicator dapat dipilih di step berikutnya.'
             case '2':
                 current_title = 'Pilih Performance Indicator'
                 current_help_text = 'Pilih Performance Indicator (PI) yang sesuai atau memiliki keterkaitan dengan CPMK.'

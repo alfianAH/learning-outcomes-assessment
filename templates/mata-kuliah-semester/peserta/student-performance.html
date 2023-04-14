@@ -58,14 +58,14 @@ Student Performance -
     </div>
 </div>
 
-<h2>Grafik Perolahan Nilai CPMK</h2>
+<h2>Grafik Perolahan Nilai CLO</h2>
 <div>
-    {% comment %} Perolehan nilai CPMK bar chart {% endcomment %}
+    {% comment %} Perolehan nilai CLO bar chart {% endcomment %}
     <canvas id="perolehan-nilai-clo" class="w-full {% if is_bar_chart_max_h_60 %} max-h-60 {% else %} max-h-80 {% endif %}"></canvas>
 </div>
 
 <div class="flex flex-row justify-between items-center space-x-4">
-    <h2>Grafik Perolahan Nilai ILO</h2>
+    <h2>Grafik Perolahan Nilai CPL</h2>
     <select class="form-control select-input-content">
         <option value="perolehan-nilai-ilo-1" selected>Chart</option>
         <option value="perolehan-nilai-ilo-2">List view</option>
@@ -119,7 +119,7 @@ Student Performance -
 
 {% block script %}
 <script>
-    {% comment %} Pencapaian nilai CPMK bar graph {% endcomment %}
+    {% comment %} Pencapaian nilai CLO bar graph {% endcomment %}
     let perolehanNilaiCloData = {{ perolehan_nilai_clo_graph|safe }};
     let perolehanNilaiCloGraphConfig = {
         type: 'bar',
@@ -148,7 +148,7 @@ Student Performance -
                 y: {
                     title: {
                         display: true,
-                        text: 'CPMK',
+                        text: 'CLO',
                     },
                 }
             }

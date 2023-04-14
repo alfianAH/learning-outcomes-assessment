@@ -1,19 +1,19 @@
 {% extends 'home-view.html' %}
 
 {% block title %}
-ILO - 
+CPL - 
 {% endblock title %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{% url 'kurikulum:read-all' %}" role="listitem">Kurikulum</a></li>
 <li class="breadcrumb-item"><a href="{{ kurikulum_obj.read_detail_url }}" role="listitem">Detail</a></li>
-<li class="breadcrumb-item active" aria-current="page" role="listitem">ILO</li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">CPL</li>
 {% endblock breadcrumb %}
 
 {% block content %}
 {% if object_list or data_exist %}
     <div class="h-icon">
-        <h1>Intended Learning Outcomes</h1>
+        <h1>Capaian Pembelajaran Lulusan</h1>
         {% if user_role != 'm' %}
         <button class="btn btn-primary" type="button" data-target="#create-modal" onclick="openModalByButton(this)" hx-get="{{ create_ilo_url }}" hx-target="#create-modal-content" hx-swap="outerHTML" hx-trigger="click">
             <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
@@ -45,7 +45,7 @@ ILO -
         <p>Tidak ditemukan data dengan filter yang diberikan</p>
     {% endif %}
 {% else %}
-<h1>Intended Learning Outcomes</h1>
+<h1>Capaian Pembelajaran Lulusan</h1>
 <div class="table-div">
     <div class="tr-div">
         <div class="min-w-24 md:min-w-40">Kurikulum</div>
@@ -59,7 +59,7 @@ ILO -
     </div>
 </div>
 {% if user_role == 'm' %}
-<p>Data ILO belum ada.</p>
+<p>Data CPL belum ada.</p>
 {% else %}
 <button class="btn btn-primary" type="button" data-target="#create-modal" onclick="openModalByButton(this)" hx-get="{{ create_ilo_url }}" hx-target="#create-modal-content" hx-swap="outerHTML" hx-trigger="click">
     <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">

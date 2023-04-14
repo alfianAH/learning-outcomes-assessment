@@ -395,7 +395,7 @@ def calculate_nilai_per_ilo_mahasiswa(peserta: PesertaMataKuliah):
             konversi_clo_to_ilo = bobot_mk * (list_persentase_clo * list_bobot_pi_ilo) * nilai_max
         except ValueError:
             if settings.DEBUG:
-                print('Shape array tidak sama. Persentase CPMK: {}, Bobot PI ILO: {}, Nilai CPMK Peserta: {}'.format(
+                print('Shape array tidak sama. Persentase CPMK: {}, Bobot PI CPL: {}, Nilai CPMK Peserta: {}'.format(
                     list_persentase_clo.shape, list_bobot_pi_ilo.shape, list_nilai_clo_peserta.shape))
             continue
         

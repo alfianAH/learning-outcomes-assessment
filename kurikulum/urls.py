@@ -19,7 +19,7 @@ urlpatterns = [
     # Mata Kuliah Kurikulum
     path('<int:kurikulum_id>/mk/', include('mata_kuliah_kurikulum.urls')),
     # ILO
-    path('<int:kurikulum_id>/ilo/', include('ilo.urls')),
+    path('<int:kurikulum_id>/cpl/', include('ilo.urls')),
     # Performance Indicator
     path('<int:kurikulum_id>/pi-area/', include('pi_area.urls')),
 ]

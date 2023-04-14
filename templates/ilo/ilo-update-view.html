@@ -1,15 +1,15 @@
 {% extends 'home-view.html' %}
 
 {% block title %}
-Update ILO - 
+Update CPL - 
 {% endblock title %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{% url 'kurikulum:read-all' %}" role="listitem">Kurikulum</a></li>
 <li class="breadcrumb-item"><a href="{{ object.get_kurikulum.read_detail_url }}" role="listitem">Detail</a></li>
-<li class="breadcrumb-item"><a href="{{ object.get_kurikulum.read_all_ilo_url }}" role="listitem">ILO</a></li>
+<li class="breadcrumb-item"><a href="{{ object.get_kurikulum.read_all_ilo_url }}" role="listitem">CPL</a></li>
 <li class="breadcrumb-item"><a href="{{ object.read_detail_url }}" role="listitem">Detail</a></li>
-<li class="breadcrumb-item active" aria-current="page" role="listitem">Update ILO</li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">Update CPL</li>
 {% endblock breadcrumb %}
 
 {% block content %}

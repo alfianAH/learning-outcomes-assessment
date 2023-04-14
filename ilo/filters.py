@@ -18,10 +18,10 @@ class IloFilter(filter.FilterSet):
     nama = filter.CharFilter(
         field_name='nama', 
         lookup_expr='icontains', 
-        label='Nama ILO',
+        label='Nama CPL',
         widget=MySearchInput(
             attrs={
-                'placeholder': 'Cari nama ILO...',
+                'placeholder': 'Cari nama CPL...',
                 'autocomplete': 'off'
             }
         ),

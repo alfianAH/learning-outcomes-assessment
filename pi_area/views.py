@@ -421,7 +421,7 @@ class PIAreaLockView(PIAreaLockAndUnlockView):
             for pi_area_obj in pi_area_qs:
                 # If PI Area doesn't have ILO, give error message
                 if not hasattr(pi_area_obj, 'ilo'):
-                    messages.error(request, 'Gagal mengunci performance indicator. Pastikan anda sudah membuat ILO dan memiliki hubungan/keterkaitan dengan masing-masing kode PI.')
+                    messages.error(request, 'Gagal mengunci performance indicator. Pastikan anda sudah membuat CPL dan memiliki hubungan/keterkaitan dengan masing-masing kode PI.')
                     return super().get(request, *args, **kwargs)
                 
                 pi_qs: QuerySet[PerformanceIndicator] = pi_area_obj.get_performance_indicator()
