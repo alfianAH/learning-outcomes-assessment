@@ -19,7 +19,7 @@ Tambah CLO -
 {% block script %}
 {% if wizard.form.forms %}
 <script>
-    addMoreForm('#{{ wizard.form.management_form.TOTAL_FORMS.id_for_label }}');
+    addMoreForm('#{{ wizard.form.management_form.TOTAL_FORMS.id_for_label }}', isRequired=false);
     $('.teknik-penilaian-search').select2({
         width: '256px',
         tags: true,

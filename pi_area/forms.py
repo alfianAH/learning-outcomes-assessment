@@ -50,6 +50,10 @@ class PerformanceIndicatorAreaForm(forms.ModelForm):
             'pi_code': 'Kode PI. Contoh: <b>A1</b>, <b>A2</b>, <b>K1</b>, dll.'
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.empty_permitted = False
+
 
 class PerformanceIndicatorForm(forms.ModelForm):
     class Meta:

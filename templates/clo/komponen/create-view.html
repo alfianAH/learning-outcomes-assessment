@@ -31,7 +31,7 @@ Tambah Komponen -
 
 {% block script %}
 <script>
-    addMoreForm('{{ id_total_form }}');
+    addMoreForm('{{ id_total_form }}', isRequired=false);
     $('.teknik-penilaian-search').select2({
         width: '256px',
         tags: true,

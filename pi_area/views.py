@@ -42,6 +42,7 @@ from .utils import(
 class PIAreaCreateView(ProgramStudiMixin, PILockedObjectPermissionMixin, HtmxCreateInlineFormsetView):
     model = AssessmentArea
     form_class = AssessmentAreaForm
+    object = None
 
     modal_title: str = 'Tambah Assessment Area'
     modal_content_id: str = 'create-modal-content'
