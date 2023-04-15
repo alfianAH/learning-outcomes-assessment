@@ -2,6 +2,7 @@ import numpy as np
 import openpyxl
 import types
 from io import BytesIO
+from functools import partial
 from openpyxl.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.styles import (
@@ -10,8 +11,12 @@ from openpyxl.styles import (
     PatternFill
 )
 from reportlab.platypus import SimpleDocTemplate
-from reportlab.lib.units import cm
-from reportlab.platypus import Paragraph, Spacer, Table, ListFlowable, TableStyle
+from reportlab.lib.units import cm, inch
+from reportlab.platypus import (
+    Paragraph, Spacer, Table, ListFlowable, TableStyle,
+    Frame, PageTemplate, KeepInFrame
+)
+from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
 from django.conf import settings
@@ -28,6 +33,7 @@ from .models import (
     NilaiMataKuliahIloMahasiswa,
     NilaiExcelMataKuliahSemester,
 )
+from learning_outcomes_assessment.utils import export_pdf_header
 from clo.models import (
     Clo,
     KomponenClo,
@@ -883,18 +889,21 @@ def generate_nilai_file(mk_semester: MataKuliahSemester):
     # Create the PDF object, using the buffer as its "file."
     pdf_file = SimpleDocTemplate(file_stream)
     styles = getSampleStyleSheet()
-    font_size = styles['Normal'].fontSize
-    
+    normal_style = styles['Normal']
+    font_size = normal_style.fontSize
+
     # Title
     title = Paragraph(
         mk_semester.mk_kurikulum.nama,
         style=styles['h1']
     )
 
+    fakultas = mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi.fakultas.nama
+    prodi = mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi.nama
     # MK Semester detail
     detail_data = [
-        ['Fakultas', ':', mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi.fakultas.nama],
-        ['Program Studi', ':', mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi.nama],
+        ['Fakultas', ':', fakultas],
+        ['Program Studi', ':', prodi],
         ['Jenjang Studi', ':', mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.jenjang_studi.kode],
         ['Semester', ':', mk_semester.semester.semester.nama],
         ['Kode', ':', mk_semester.mk_kurikulum.kode],
@@ -910,6 +919,41 @@ def generate_nilai_file(mk_semester: MataKuliahSemester):
         hAlign='LEFT'
     )
     list_dosen_mk_semester: list[DosenMataKuliah] = mk_semester.get_all_dosen_mk_semester()
+
+    header_style = styles['h2']
+    header_style.alignment = TA_CENTER
+    header_content = Paragraph(
+        "UNIVERSITAS HASANUDDIN<br/>FAKULTAS {}<br/>PROGRAM STUDI {}".format(fakultas, prodi), 
+        header_style
+    )
+
+    # Get the space before and after the paragraph
+    space_before = header_content.getSpaceBefore()
+    space_after = header_content.getSpaceAfter()
+
+    # Get the height of the paragraph
+    para_height = header_content.wrap(pdf_file.width, pdf_file.height)[1]
+
+    # Calculate the total height of the block
+    block_height = para_height + space_before + space_after
+
+    frame = Frame(
+        pdf_file.leftMargin, 
+        pdf_file.bottomMargin, 
+        pdf_file.width, 
+        pdf_file.height - block_height
+    )
+    template = PageTemplate(
+        frames=frame, 
+        onPage=partial(
+            export_pdf_header, 
+            content=header_content,
+            image_path='./static/public/img/logo-unhas.jpg',
+            image_width=0.6*inch,
+            image_height=0.75*inch,
+        )
+    )
+    pdf_file.addPageTemplates([template])
 
     list_dosen = ListFlowable(
         [Paragraph('{}'.format(dosen_mk_semester.dosen.nama)) for dosen_mk_semester in list_dosen_mk_semester],

@@ -376,7 +376,8 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin,
     
     def download_nilai(self) -> HttpResponse:
         nilai_file = generate_nilai_file(self.single_object)
-        response = FileResponse(nilai_file, as_attachment=True, filename=self.nilai_filename)
+        as_attachment = True
+        response = FileResponse(nilai_file, as_attachment=as_attachment, filename=self.nilai_filename)
 
         return response
 

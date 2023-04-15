@@ -8,6 +8,7 @@ from requests import Session
 from requests.auth import HTTPBasicAuth
 from zeep import Client
 from zeep.transports import Transport
+from reportlab.lib.units import inch
 
 
 def extract_tahun_ajaran(tahun_ajaran: str) -> dict:
@@ -148,6 +149,7 @@ def nilai_excel_upload_handler(instance, filename):
     file_path = os.path.join(settings.MEDIA_ROOT, 'mk-semester', 'nilai', new_filename)
     return file_path 
 
+
 def _iter_cols(self, min_col=None, max_col=None, min_row=None,
                max_row=None, values_only=False):
     """Iter cols for load workbook with read_only=True
@@ -192,3 +194,30 @@ def request_nusoap(search_text: str) -> dict:
         })
 
     return json_response
+
+
+def export_pdf_header(canvas, doc, content, image_path, image_width, image_height):
+    canvas.saveState()
+    canvas.drawImage(
+        image_path, 
+        doc.leftMargin,
+        doc.height + doc.topMargin - image_height,
+        width=image_width, 
+        height=image_height
+    )
+    
+    w, h = content.wrap(doc.width - image_width, doc.topMargin)
+    content.drawOn(
+        canvas, 
+        doc.leftMargin + image_width, 
+        doc.height + doc.topMargin - h
+    )
+    canvas.setLineWidth(0.5)
+    line_y = doc.height + image_height - h + 0.2*inch
+    canvas.line(
+        doc.leftMargin, 
+        line_y,
+        doc.width + doc.rightMargin, 
+        line_y
+    )
+    canvas.restoreState()
