@@ -164,9 +164,6 @@ class MataKuliahSemester(MataKuliahSemesterLock):
         else:
             status = True
         return status
-
-    def get_syarat_mata_kuliah_rps(self):
-        return self.matakuliahsyaratrps_set.all()
     
     def get_rps_home_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:rps:home', self.get_kwargs)
@@ -180,48 +177,11 @@ class MataKuliahSemester(MataKuliahSemesterLock):
     def get_rps_delete_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:rps:delete', self.get_kwargs)
     
-    def get_rps_duplicate_url(self):
-        return get_reverse_url('semester:mata_kuliah_semester:rps:duplicate', self.get_kwargs)
-    
     def get_rps_lock_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:rps:lock', self.get_kwargs)
     
     def get_rps_unlock_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:rps:unlock', self.get_kwargs)
-
-    # Pertemuan RPS
-    def get_all_pertemuan_rps(self):
-        return self.pertemuanrps_set.all()
-    
-    @property
-    def get_total_bobot_penilaian_pertemuan_rps(self):
-        list_pertemuan_rps = self.get_all_pertemuan_rps()
-        total_bobot_penilaian = 0
-
-        for pertemuan_rps in list_pertemuan_rps:
-            total_bobot_penilaian += pertemuan_rps.bobot_penilaian
-        
-        return total_bobot_penilaian
-    
-    @property
-    def status_pertemuan(self):
-        if not hasattr(self, 'pertemuanrps_set'): 
-            status = False
-        else:
-            if self.pertemuanrps_set.all().exists():
-                status = True
-            else:
-                status = False
-        return status
-    
-    def get_pertemuan_rps_create_url(self):
-        return get_reverse_url('semester:mata_kuliah_semester:rps:pertemuan-create', self.get_kwargs)
-    
-    def get_pertemuan_rps_bulk_delete_url(self):
-        return get_reverse_url('semester:mata_kuliah_semester:rps:pertemuan-bulk-delete', self.get_kwargs)
-    
-    def get_pertemuan_rps_duplicate_url(self):
-        return get_reverse_url('semester:mata_kuliah_semester:rps:pertemuan-duplicate', self.get_kwargs)
     
 
 class NilaiExcelMataKuliahSemester(models.Model):
