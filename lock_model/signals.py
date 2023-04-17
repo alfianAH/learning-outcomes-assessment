@@ -14,6 +14,7 @@ from pi_area.models import(
     PerformanceIndicator
 )
 from lock_model.models import Lock
+from rps.models import RencanaPembelajaranSemester
 
 
 @receiver(pre_save, sender=Clo)
@@ -22,6 +23,7 @@ from lock_model.models import Lock
 @receiver(pre_save, sender=AssessmentArea)
 @receiver(pre_save, sender=PerformanceIndicatorArea)
 @receiver(pre_save, sender=PerformanceIndicator)
+@receiver(pre_save, sender=RencanaPembelajaranSemester)
 def prevent_save_when_locked(sender, instance, **kwargs):
     if instance.lock and instance.lock.is_locked:
         raise Exception('Model {} (pk={}) is locked and cannot be modified.'.format(sender.__name__, instance.pk))
@@ -42,6 +44,7 @@ def prevent_lock_save(sender, instance, **kwargs):
 @receiver(pre_delete, sender=AssessmentArea)
 @receiver(pre_delete, sender=PerformanceIndicatorArea)
 @receiver(pre_delete, sender=PerformanceIndicator)
+@receiver(pre_delete, sender=RencanaPembelajaranSemester)
 def prevent_delete_when_locked(sender, instance, **kwargs):
     if instance.lock and instance.lock.is_locked:
         raise Exception('Model {} (pk={}) is locked and cannot be deleted.'.format(sender.__name__, instance.pk))
@@ -53,6 +56,7 @@ def prevent_delete_when_locked(sender, instance, **kwargs):
 @receiver(post_delete, sender=AssessmentArea)
 @receiver(post_delete, sender=PerformanceIndicatorArea)
 @receiver(post_delete, sender=PerformanceIndicator)
+@receiver(post_delete, sender=RencanaPembelajaranSemester)
 def delete_lock_object_when_deleted(sender, instance, **kwargs):
     if instance.lock and not instance.lock.is_locked:
         instance.lock.delete()
