@@ -1,5 +1,6 @@
+import os
 from django.http import FileResponse, HttpRequest, HttpResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.core.exceptions import PermissionDenied
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import CreateView, UpdateView
@@ -67,7 +68,57 @@ class RPSCreateView(CreateView):
     
     def form_valid(self, form):
         form.instance.mk_semester = self.mk_semester_obj
-        return super().form_valid(form)
+        self.object: RencanaPembelajaranSemester = form.save()
+
+        # Change permission
+        os.chmod(self.object.file_rps.path, 0o600)
+
+        return redirect(self.success_url)
+    
+
+class RPSUpdateView(UpdateView):
+    model = RencanaPembelajaranSemester
+    form_class = RPSModelForm
+    template_name = 'rps/update-view.html'
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        mk_semester_id = kwargs.get('mk_semester_id')
+        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+        self.success_url = self.mk_semester_obj.get_rps_home_url()
+        self.object = self.get_object()
+
+    def get_object(self, queryset=None) -> RencanaPembelajaranSemester:
+        print('get obj')
+        if hasattr(self.mk_semester_obj, 'rencanapembelajaransemester'):
+            return self.mk_semester_obj.rencanapembelajaransemester
+        
+        return super().get_object(queryset)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'mk_semester_obj': self.mk_semester_obj,
+        })
+        return context
+    
+    def post(self, request: HttpRequest, *args: str, **kwargs) -> HttpResponse:
+        old_file_path = self.object.file_rps.path
+        form = self.get_form()
+        if form.is_valid():
+            # Remove previous file
+            os.remove(old_file_path)
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+        
+    def form_valid(self, form):
+        self.object: RencanaPembelajaranSemester = form.save()
+
+        # Change permission
+        os.chmod(self.object.file_rps.path, 0o600)
+
+        return redirect(self.success_url)
 
 
 class RPSLockAndUnlockTemplateView(RedirectView):

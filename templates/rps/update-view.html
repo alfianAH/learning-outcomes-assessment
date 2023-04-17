@@ -7,7 +7,7 @@
 {% endblock form_media %}
 
 {% block title %}
-Edit rincian RPS - 
+Edit RPS - 
 {% endblock title %}
 
 {% block breadcrumb %}
@@ -15,44 +15,11 @@ Edit rincian RPS -
 <li class="breadcrumb-item"><a href="{{ mk_semester_obj.semester.read_detail_url }}" role="listitem">Detail</a></li>
 <li class="breadcrumb-item"><a href="{{ mk_semester_obj.read_detail_url }}" role="listitem">Detail MK</a></li>
 <li class="breadcrumb-item"><a href="{{ mk_semester_obj.get_rps_home_url }}" role="listitem">RPS</a></li>
-<li class="breadcrumb-item active" aria-current="page" role="listitem">Edit rincian RPS</li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">Edit RPS</li>
 {% endblock breadcrumb %}
 
 {% block content %}
-<h1>Edit Rincian RPS</h1>
+<h1>Edit RPS</h1>
 
-{% include 'components/form/default-form.html' with form_fields='rps/partials/rincian-rps-form-fields.html' %}
+{% include 'components/form/default-form.html' with is_upload_file=True %}
 {% endblock content %}
-
-{% block script %}
-<script>
-    $('.select-search-dosen').select2({
-        width: '256px',
-        ajax: {
-            method: 'GET',
-            url: '{% url "dosen-search" %}',
-            data: function(params){
-                let query = {
-                    search: params.term
-                }
-
-                // Query parameters will be ?search=[term]
-                return query;
-            },
-            dataType: 'json',
-            processResults: function(data){
-                return {
-                    results: data.results
-                };
-            },
-        }
-    });
-
-    $('.multi-select-search-mk-semester').select2({
-        width: '256px', 
-    });
-
-    let mkSyarat = {{ mk_semester_syarat|safe }};
-    $('#id_mk_semester_syarat').val(mkSyarat.results).trigger('change');
-</script>
-{% endblock script %}
