@@ -1,6 +1,7 @@
 import os
 from django.http import FileResponse, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import CreateView, UpdateView
@@ -72,7 +73,7 @@ class RPSCreateView(CreateView):
 
         # Change permission
         os.chmod(self.object.file_rps.path, 0o600)
-
+        messages.success(self.request, 'Berhasil menambah RPS.')
         return redirect(self.success_url)
     
 
@@ -86,7 +87,12 @@ class RPSUpdateView(UpdateView):
         mk_semester_id = kwargs.get('mk_semester_id')
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
         self.success_url = self.mk_semester_obj.get_rps_home_url()
-        self.object = self.get_object()
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if not hasattr(self.mk_semester_obj, 'rencanapembelajaransemester'):
+            messages.info(request, 'Mata kuliah belum mempunyai RPS.')
+            return redirect(self.success_url)
+        return super().get(request, *args, **kwargs)
 
     def get_object(self, queryset=None) -> RencanaPembelajaranSemester:
         print('get obj')
@@ -103,7 +109,9 @@ class RPSUpdateView(UpdateView):
         return context
     
     def post(self, request: HttpRequest, *args: str, **kwargs) -> HttpResponse:
+        self.object = self.get_object()
         old_file_path = self.object.file_rps.path
+
         form = self.get_form()
         if form.is_valid():
             # Remove previous file
@@ -117,8 +125,26 @@ class RPSUpdateView(UpdateView):
 
         # Change permission
         os.chmod(self.object.file_rps.path, 0o600)
-
+        messages.success(self.request, 'Berhasil meng-update RPS.')
         return redirect(self.success_url)
+    
+
+class RPSDeleteView(RedirectView):
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        mk_semester_id = kwargs.get('mk_semester_id')
+        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+        self.url = self.mk_semester_obj.get_rps_home_url()
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if not hasattr(self.mk_semester_obj, 'rencanapembelajaransemester'):
+            messages.info(request, 'Mata kuliah belum mempunyai RPS.')
+        else:
+            self.rps_obj: RencanaPembelajaranSemester = self.mk_semester_obj.rencanapembelajaransemester
+            # Remove file
+            os.remove(self.rps_obj.file_rps.path)
+            self.rps_obj.delete()
+        return super().get(request, *args, **kwargs)
 
 
 class RPSLockAndUnlockTemplateView(RedirectView):
