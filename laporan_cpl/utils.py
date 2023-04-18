@@ -1,7 +1,19 @@
+from functools import partial
+from io import BytesIO
 import numpy as np
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import QuerySet
+from reportlab.platypus import SimpleDocTemplate
+from reportlab.lib.units import cm, inch
+from reportlab.platypus import (
+    Paragraph, Spacer, Table, ListFlowable, TableStyle,
+    Frame, PageTemplate
+)
+from reportlab.lib.enums import TA_CENTER
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib import colors
+from learning_outcomes_assessment.utils import export_pdf_header
 from kurikulum.models import Kurikulum
 from ilo.models import Ilo
 from pi_area.models import PerformanceIndicator
@@ -650,3 +662,135 @@ def process_ilo_mahasiswa_by_kurikulum(list_ilo: QuerySet[Ilo], max_sks_prodi: i
             result[mahasiswa.username] = result_mahasiswa
 
     return (is_success, message, result)
+
+
+def generate_laporan_cpl_prodi_pdf(
+        list_ilo: QuerySet[Ilo],
+        list_filter,
+        calculation_result: dict,
+        prodi_name: str, fakultas_name: str,
+):
+    file_stream = BytesIO()
+
+    # Create the PDF object, using the buffer as its "file."
+    pdf_file = SimpleDocTemplate(file_stream)
+    styles = getSampleStyleSheet()
+    normal_style = styles['Normal']
+    font_size = normal_style.fontSize
+
+    # Title
+    title = Paragraph(
+        'Laporan Capaian Pembelajaran Lulusan Prodi',
+        style=styles['h1']
+    )
+
+    header_style = styles['h2']
+    header_style.alignment = TA_CENTER
+    header_content = Paragraph(
+        "UNIVERSITAS HASANUDDIN<br/>FAKULTAS {}<br/>PROGRAM STUDI {}".format(fakultas_name, prodi_name), 
+        header_style
+    )
+
+    # Get the space before and after the paragraph
+    space_before = header_content.getSpaceBefore()
+    space_after = header_content.getSpaceAfter()
+
+    # Get the height of the paragraph
+    para_height = header_content.wrap(pdf_file.width, pdf_file.height)[1]
+
+    # Calculate the total height of the block
+    block_height = para_height + space_before + space_after
+
+    frame = Frame(
+        pdf_file.leftMargin, 
+        pdf_file.bottomMargin, 
+        pdf_file.width, 
+        pdf_file.height - block_height
+    )
+    template = PageTemplate(
+        frames=frame, 
+        onPage=partial(
+            export_pdf_header, 
+            content=header_content,
+            image_path='./static/public/img/logo-unhas.jpg',
+            image_width=0.6*inch,
+            image_height=0.75*inch,
+        )
+    )
+    pdf_file.addPageTemplates([template])
+
+    # Build
+    pdf_file.build([
+        title,
+    ])
+    
+    # Close the PDF object cleanly
+    file_stream.seek(0)
+
+    return file_stream
+
+
+def generate_laporan_cpl_mahasiswa_pdf(
+        list_ilo: QuerySet[Ilo],
+        list_filter,
+        calculation_result: dict,
+        prodi_name: str, fakultas_name: str,
+):
+    file_stream = BytesIO()
+
+    # Create the PDF object, using the buffer as its "file."
+    pdf_file = SimpleDocTemplate(file_stream)
+    styles = getSampleStyleSheet()
+    normal_style = styles['Normal']
+    font_size = normal_style.fontSize
+
+    # Title
+    title = Paragraph(
+        'Laporan Capaian Pembelajaran Lulusan Mahasiswa',
+        style=styles['h1']
+    )
+
+    header_style = styles['h2']
+    header_style.alignment = TA_CENTER
+    header_content = Paragraph(
+        "UNIVERSITAS HASANUDDIN<br/>FAKULTAS {}<br/>PROGRAM STUDI {}".format(fakultas_name, prodi_name), 
+        header_style
+    )
+
+    # Get the space before and after the paragraph
+    space_before = header_content.getSpaceBefore()
+    space_after = header_content.getSpaceAfter()
+
+    # Get the height of the paragraph
+    para_height = header_content.wrap(pdf_file.width, pdf_file.height)[1]
+
+    # Calculate the total height of the block
+    block_height = para_height + space_before + space_after
+
+    frame = Frame(
+        pdf_file.leftMargin, 
+        pdf_file.bottomMargin, 
+        pdf_file.width, 
+        pdf_file.height - block_height
+    )
+    template = PageTemplate(
+        frames=frame, 
+        onPage=partial(
+            export_pdf_header, 
+            content=header_content,
+            image_path='./static/public/img/logo-unhas.jpg',
+            image_width=0.6*inch,
+            image_height=0.75*inch,
+        )
+    )
+    pdf_file.addPageTemplates([template])
+
+    # Build
+    pdf_file.build([
+        title,
+    ])
+    
+    # Close the PDF object cleanly
+    file_stream.seek(0)
+
+    return file_stream

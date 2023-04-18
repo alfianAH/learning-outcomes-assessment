@@ -14,7 +14,7 @@ from reportlab.platypus import SimpleDocTemplate
 from reportlab.lib.units import cm, inch
 from reportlab.platypus import (
     Paragraph, Spacer, Table, ListFlowable, TableStyle,
-    Frame, PageTemplate, KeepInFrame
+    Frame, PageTemplate
 )
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.styles import getSampleStyleSheet

@@ -77,6 +77,7 @@ class TahunAjaranSemesterFormsetClass(CanDeleteBaseFormSet):
         if data is None: return
         
         self.kurikulum_id = data.get('kurikulum')
+        if self.kurikulum_id is None: return
         # Return if kurikulum id is blank
         if not self.kurikulum_id.strip(): return
 
