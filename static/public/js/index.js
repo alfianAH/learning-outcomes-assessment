@@ -760,6 +760,37 @@ window.onscroll = () => {
     }
 };
 
+function downloadFileButton(buttonId, filename) {
+    $(buttonId).on('click', function(){
+        event.preventDefault();  // Prevent the link from changing the URL
+        let targetUrl = $(this).attr('data-url');
+        
+        // Send an AJAX request to the server to download the file
+        $.ajax({
+            url: targetUrl,
+            method: "GET",
+            xhrFields: {
+                responseType: "blob"  // Set the response type to blob
+            },
+            success: function(response) {
+                // Create a temporary URL for the downloaded file
+                let url = window.URL.createObjectURL(response);
+
+                // Create a link to trigger the download
+                let link = document.createElement("a");
+                link.href = url;
+                link.download = filename;
+                document.body.appendChild(link);
+
+                // Trigger the download and clean up
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+            }
+        });
+    });
+}
+
 var transitionEvent = whichTransitionEvent();
 console.log(transitionEvent);
 
