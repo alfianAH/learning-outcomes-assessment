@@ -26,6 +26,8 @@ from .utils import (
     get_ilo_and_sks_from_kurikulum,
     process_ilo_prodi,
     process_ilo_mahasiswa,
+    process_ilo_prodi_by_kurikulum,
+    process_ilo_mahasiswa_by_kurikulum,
 )
 
 
@@ -246,9 +248,27 @@ class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
 
         if len(formset_cleaned_data) == 0:
             # Filter by kurikulum
+            # Filter peserta MK
+            list_peserta_mk = PesertaMataKuliah.objects.filter(
+                kelas_mk_semester__mk_semester__mk_kurikulum__kurikulum=kurikulum_obj
+            )
+            # Process
+            prodi_is_success, prodi_message, prodi_result = process_ilo_prodi_by_kurikulum(list_ilo, max_sks_prodi, kurikulum_obj)
+            mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa_by_kurikulum(list_ilo, max_sks_prodi, list_peserta_mk, kurikulum_obj)
+
+            perolehan_nilai_ilo_graph = self.perolehan_nilai_ilo_graph(list_ilo, False, prodi_result)
+
+            # Success and Error messages
+            self.show_result_messages(prodi_is_success, prodi_message)
+            self.show_result_messages(mahasiswa_is_success, mahasiswa_message)
+
             return self.render_to_response(
                 self.get_context_data(
                     form=form, formset=formset,
+                    perolehan_nilai_ilo_graph=perolehan_nilai_ilo_graph,
+                    object_list=mahasiswa_result,
+                    list_ilo=list_ilo,
+                    list_filter=[(kurikulum_obj, kurikulum_obj.nama)],
                 )
             )
         else:
@@ -375,7 +395,6 @@ class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCa
             })
         return kwargs
 
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
@@ -424,11 +443,17 @@ class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCa
         
         if len(formset_cleaned_data) == 0:
             # Filter by kurikulum
-            return self.render_to_response(
-                self.get_context_data(
-                    form=form, formset=formset,
-                )
+            # Filter peserta MK
+            list_peserta_mk = PesertaMataKuliah.objects.filter(
+                mahasiswa=self.user,
+                kelas_mk_semester__mk_semester__mk_kurikulum__kurikulum=kurikulum_obj
             )
+
+            mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa_by_kurikulum(list_ilo, max_sks_prodi, list_peserta_mk, kurikulum_obj)
+
+            perolehan_nilai_ilo_graph = self.perolehan_nilai_ilo_graph(list_ilo, False, mahasiswa_result)
+
+            self.show_result_messages(mahasiswa_is_success, mahasiswa_message)
         else:
             # Filter by tahun ajaran or semester
             is_semester_included = len(formset_cleaned_data[0].get('semester', '').strip()) != 0
@@ -508,10 +533,10 @@ class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCa
 
             self.show_result_messages(mahasiswa_is_success, mahasiswa_message)
 
-            return self.render_to_response(
-                self.get_context_data(
-                    form=form, formset=formset,
-                    perolehan_nilai_ilo_graph=perolehan_nilai_ilo_graph,
-                    options=list_peserta_mk,
-                )
+        return self.render_to_response(
+            self.get_context_data(
+                form=form, formset=formset,
+                perolehan_nilai_ilo_graph=perolehan_nilai_ilo_graph,
+                options=list_peserta_mk,
             )
+        )

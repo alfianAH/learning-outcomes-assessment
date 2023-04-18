@@ -387,7 +387,7 @@ def process_ilo_mahasiswa(list_ilo: QuerySet[Ilo], max_sks_prodi: int,
                 
                 # Return if not success
                 if not is_success: 
-                    if settings.DEBUG: print('CPL Mahasiswa gagal.', message)
+                    if settings.DEBUG: print('Perhitungan CPL Mahasiswa gagal.', message)
                     return (is_success, message, result)
         else:
             for tahun_ajaran_prodi_obj, tahun_ajaran_name in filter:
@@ -411,7 +411,7 @@ def process_ilo_mahasiswa(list_ilo: QuerySet[Ilo], max_sks_prodi: int,
 
                 # Return if not success
                 if not is_success: 
-                    if settings.DEBUG: print('CPL Mahasiswa gagal.', message)
+                    if settings.DEBUG: print('Perhitungan CPL Mahasiswa gagal.', message)
                     return (is_success, message, result)
         
         if mahasiswa.username not in result.keys():
@@ -486,7 +486,7 @@ def process_ilo_prodi(list_ilo: QuerySet[Ilo], max_sks_prodi: int,
             })
 
             if not is_success: 
-                if settings.DEBUG: print('CPL Prodi gagal.', message)
+                if settings.DEBUG: print('Perhitungan CPL Prodi gagal.', message)
                 return (is_success, message, result)
     else:
         for tahun_ajaran_prodi_obj, tahun_ajaran_nama in filter:
@@ -502,17 +502,151 @@ def process_ilo_prodi(list_ilo: QuerySet[Ilo], max_sks_prodi: int,
             })
 
             if not is_success: 
-                if settings.DEBUG: print('CPL Prodi gagal.', message)
+                if settings.DEBUG: print('Perhitungan CPL Prodi gagal.', message)
                 return (is_success, message, result)
     
     
     if len(result.keys()) != len(filter):
         is_success = False
         if is_semester_included:
-            message = 'Panjang semester prodi tidak sesuai. Ekspektasi: {}, hasil: {}'.format(len(filter), len(result.keys()))
+            message = 'Banyak semester prodi tidak sesuai. Ekspektasi: {}, hasil: {}'.format(len(filter), len(result.keys()))
         else:
-            message = 'Panjang tahun ajaran prodi tidak sesuai. Ekspektasi: {}, hasil: {}'.format(len(filter), len(result.keys()))
+            message = 'Banyak tahun ajaran prodi tidak sesuai. Ekspektasi: {}, hasil: {}'.format(len(filter), len(result.keys()))
     else:
         is_success = True
   
+    return (is_success, message, result)
+
+
+def process_ilo_prodi_by_kurikulum(list_ilo: QuerySet[Ilo], max_sks_prodi: int, kurikulum: Kurikulum):
+    """Calculate ILO Prodi in Kurikulum
+
+    Args:
+        list_ilo (QuerySet[Ilo]): QuerySet of ILO from kurikulum
+        max_sks_prodi (int): Max SKS Kelulusan Prodi
+        kurikulum (Kurikulum): Filtered kurikulum object
+    
+    Returns:
+        (bool, str, dict): 
+            is_success: Is calculation success?
+            message: Success or error message
+            result: Result of calculation
+                Example:
+                result = {
+                    'nama_kurikulum': {
+                        'nama_ilo': nilai,
+                        'nama_ilo': nilai,
+                    }
+                }
+    """
+    is_success = False
+    message = ''
+    result = {}
+
+    # Prepare all needed components
+    nilai_max = 100
+
+     # Get all mata kuliah semester
+    list_mk_semester = MataKuliahSemester.objects.filter(
+        mk_kurikulum__kurikulum=kurikulum
+    ).distinct()
+    
+    # Calculate ILO Prodi
+    is_success, message, calculation_result = calculate_ilo_prodi(list_ilo, list_mk_semester, max_sks_prodi, nilai_max)
+    result.update({
+        kurikulum.nama: calculation_result
+    })
+
+    if not is_success: 
+        if settings.DEBUG: print('Perhitungan CPL Prodi gagal.', message)
+        return (is_success, message, result)
+    
+    # Check result key's length
+    if len(result.keys()) == 1:
+        is_success = True
+    else:
+        is_success = False
+        message = 'Banyak kurikulum tidak sesuai. Ekspektasi: {}, hasil: {}'.format(1, len(result.keys()))
+
+    return (is_success, message, result)
+
+
+def process_ilo_mahasiswa_by_kurikulum(list_ilo: QuerySet[Ilo], max_sks_prodi: int, 
+                                       list_peserta_mk: QuerySet[PesertaMataKuliah],
+                                       kurikulum_obj: Kurikulum):
+    """Calculate ILO All Mahasiswa in Kurikulum
+
+    Args:
+        list_ilo (QuerySet[Ilo]): QuerySet of ILO from kurikulum
+        max_sks_prodi (int): Max SKS Kelulusan Prodi
+        kurikulum (Kurikulum): Filtered kurikulum object
+
+    Returns:
+        (bool, str, dict): 
+            is_success: Is calculation success?
+            message: Success or error message
+            result: Result of calculation
+                Example:
+                result = {
+                    'nim': {
+                        'nama': 'nama_mahasiswa',
+                        'nim': 'nim_mahasiswa',
+                        'result': [
+                            'filter': 'kurikulum',
+                            'result': [
+                                {
+                                    'nama': 'nama_ilo',
+                                    'nilai': 'nilai_ilo',
+                                    'satisfactory_level': satisfactory_level_ilo
+                                }
+                            ]
+                        ]
+                    }
+                }
+    """
+
+    is_success = False
+    message = ''
+    result: dict = {}
+    nilai_max = 100
+
+    list_mahasiswa = User.objects.filter(
+        pesertamatakuliah__in=list_peserta_mk
+    ).distinct().order_by('-username')
+
+    for mahasiswa in list_mahasiswa:
+        result_mahasiswa = {
+            'nim': mahasiswa.username,
+            'nama': mahasiswa.nama,
+            'read_detail_url': mahasiswa.get_laporan_cpl_url(),
+            'result': []
+        }
+
+        # Get mahasiswa's mata kuliah participation
+        list_mahasiswa_as_peserta_mk = list_peserta_mk.filter(
+            mahasiswa=mahasiswa,
+            kelas_mk_semester__mk_semester__mk_kurikulum__kurikulum=kurikulum_obj
+        )
+
+        if list_mahasiswa_as_peserta_mk.exists():
+            # Proceed
+            is_success, message, calculation_result = calculate_ilo_mahasiswa(list_ilo, list_mahasiswa_as_peserta_mk, mahasiswa, max_sks_prodi, nilai_max)
+        else:
+            # Just add empty list
+            is_success = True
+            calculation_result = []
+        
+        result_mahasiswa['result'].append({
+            'filter': kurikulum_obj.nama,
+            'result': calculation_result
+        })
+        
+        # Return if not success
+        if not is_success: 
+            if settings.DEBUG: print('Perhitungan CPL Mahasiswa gagal.', message)
+            return (is_success, message, result)
+        
+        if mahasiswa.username not in result.keys():
+            result[mahasiswa.username] = result_mahasiswa
+
     return (is_success, message, result)
