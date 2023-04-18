@@ -7,12 +7,17 @@ from django.core.exceptions import PermissionDenied
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import CreateView, UpdateView
 from mata_kuliah_semester.models import MataKuliahSemester
+from learning_outcomes_assessment.auth.mixins import(
+    ProgramStudiMixin,
+    MahasiswaAndMKSemesterMixin
+)
+from .mixins import RPSLockedObjectPermissionMixin
 from .models import RencanaPembelajaranSemester
 from .forms import RPSModelForm
 
 
 # Create your views here.
-class RPSHomeView(TemplateView):
+class RPSHomeView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin, TemplateView):
     template_name = 'rps/home.html'
     rps_obj: RencanaPembelajaranSemester = None
     rps_filename = 'RPS-'
@@ -21,6 +26,7 @@ class RPSHomeView(TemplateView):
         super().setup(request, *args, **kwargs)
         mk_semester_id = kwargs.get('mk_semester_id')
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
         if hasattr(self.mk_semester_obj, 'rencanapembelajaransemester'):
             self.rps_obj = self.mk_semester_obj.rencanapembelajaransemester
             self.rps_filename = 'RPS-{}-{}.pdf'.format(self.mk_semester_obj.mk_kurikulum.nama, self.mk_semester_obj.semester.semester.nama)
@@ -50,7 +56,7 @@ class RPSHomeView(TemplateView):
         return response
 
 
-class RPSCreateView(CreateView):
+class RPSCreateView(ProgramStudiMixin, RPSLockedObjectPermissionMixin, CreateView):
     form_class = RPSModelForm
     model = RencanaPembelajaranSemester
     template_name = 'rps/create-view.html'
@@ -59,6 +65,7 @@ class RPSCreateView(CreateView):
         super().setup(request, *args, **kwargs)
         mk_semester_id = kwargs.get('mk_semester_id')
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
         self.success_url = self.mk_semester_obj.get_rps_home_url()
 
     def get_context_data(self, **kwargs):
@@ -78,7 +85,7 @@ class RPSCreateView(CreateView):
         return redirect(self.success_url)
     
 
-class RPSUpdateView(UpdateView):
+class RPSUpdateView(ProgramStudiMixin, RPSLockedObjectPermissionMixin, UpdateView):
     model = RencanaPembelajaranSemester
     form_class = RPSModelForm
     template_name = 'rps/update-view.html'
@@ -87,6 +94,7 @@ class RPSUpdateView(UpdateView):
         super().setup(request, *args, **kwargs)
         mk_semester_id = kwargs.get('mk_semester_id')
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
         self.success_url = self.mk_semester_obj.get_rps_home_url()
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
@@ -130,11 +138,12 @@ class RPSUpdateView(UpdateView):
         return redirect(self.success_url)
     
 
-class RPSDeleteView(RedirectView):
+class RPSDeleteView(ProgramStudiMixin, RPSLockedObjectPermissionMixin, RedirectView):
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
         mk_semester_id = kwargs.get('mk_semester_id')
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
         self.url = self.mk_semester_obj.get_rps_home_url()
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
@@ -156,7 +165,7 @@ class RPSDeleteView(RedirectView):
         return super().get(request, *args, **kwargs)
 
 
-class RPSLockAndUnlockTemplateView(RedirectView):
+class RPSLockAndUnlockTemplateView(ProgramStudiMixin, RedirectView):
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
         mk_semester_id = kwargs.get('mk_semester_id')
