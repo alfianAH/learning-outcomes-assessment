@@ -158,10 +158,16 @@ Laporan CPL -
         data: perolehanNilaiIloData,
         options: {
             scales: {
+                {% if is_multiple_result %}
+                y: {
+                    suggestedMax: 100,
+                }
+                {% else %}
                 r: {
                     beginAtZero: true,
                     suggestedMax: 100,
-                }
+                },
+                {% endif %}
             }
         }
     };

@@ -258,6 +258,7 @@ class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
         filter_dict = {}
 
         if len(formset_cleaned_data) == 0:
+            is_multiple_result = False
             # Filter by kurikulum
             # Filter peserta MK
             list_peserta_mk = PesertaMataKuliah.objects.filter(
@@ -270,7 +271,7 @@ class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
             prodi_is_success, prodi_message, prodi_result = process_ilo_prodi_by_kurikulum(list_ilo, max_sks_prodi, kurikulum_obj)
             mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa_by_kurikulum(list_ilo, max_sks_prodi, list_peserta_mk, kurikulum_obj)
 
-            perolehan_nilai_ilo_graph = self.perolehan_nilai_ilo_graph(list_ilo, False, prodi_result)
+            perolehan_nilai_ilo_graph = self.perolehan_nilai_ilo_graph(list_ilo, is_multiple_result, prodi_result)
 
             # Success and Error messages
             self.show_result_messages(prodi_is_success, prodi_message)
@@ -363,6 +364,7 @@ class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
                 object_list=mahasiswa_result,
                 list_ilo=list_ilo,
                 list_filter=filter,
+                is_multiple_result=is_multiple_result,
             )
         )
     

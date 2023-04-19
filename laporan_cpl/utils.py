@@ -498,7 +498,6 @@ def process_ilo_prodi(list_ilo: QuerySet[Ilo], max_sks_prodi: int,
             result.update({
                 semester_nama: calculation_result
             })
-            print(result)
 
             if not is_success: 
                 if settings.DEBUG: print('Perhitungan CPL Prodi gagal.', message)
@@ -684,6 +683,7 @@ def generate_laporan_cpl_prodi_pdf(
     pdf_file = SimpleDocTemplate(file_stream, pagesize=page_size)
     styles = getSampleStyleSheet()
     normal_style = styles['Normal']
+    empty_line = Spacer(1, 20)
     font_size = normal_style.fontSize
 
     # Title
@@ -733,33 +733,6 @@ def generate_laporan_cpl_prodi_pdf(
         style=styles['h2']
     )
 
-    table_spider_chart_data = [
-        ['CPL', 'Satisfactory Level',]
-    ]
-    # Table spider chart header
-    for filter in list_filter:
-        table_spider_chart_data[0].append(filter[1])
-
-    # Table spider chart data
-    for ilo in list_ilo:
-        data = [ilo.nama, ilo.satisfactory_level]
-
-        for nama_filter, ilo_dict in calculation_result.items():
-            for nama_ilo, nilai_ilo in ilo_dict.items():
-                # Skip if not current ILO
-                if nama_ilo != ilo.nama: continue
-                
-                # Add nilai to row
-                if nilai_ilo is None:
-                    data.append('-')
-                else:
-                    data.append(float("{:.2f}".format(nilai_ilo)))
-                # Go to next filter
-                break
-
-        # Append data
-        table_spider_chart_data.append(data)
-    
     # (COL, ROW)
     table_style_data = [
         ('ALIGN', (0, 0), (-1, 0), 'CENTER'),               # Header align
@@ -774,18 +747,76 @@ def generate_laporan_cpl_prodi_pdf(
     ]
 
     table_spider_chart_style = TableStyle(table_style_data)
-    spider_chart_table = Table(
-        table_spider_chart_data,
-        style=table_spider_chart_style,
-        hAlign='LEFT',
-    )
+    
+    # Table spider chart
+    len_table_spider_chart = len(list_filter) // 3
+    if len(list_filter) % 3 > 0: len_table_spider_chart += 1
+    
+    list_table_spider_chart = []
+    
+    for i in range(len_table_spider_chart):
+        table_data = [['CPL', 'Satisfactory Level',]]
+        
+        # Calculate index subscriptable
+        filter_index_start = i*3
+
+        if len_table_spider_chart > 1:
+            # If table is more than 1, ...
+            if i+1 == len_table_spider_chart:
+                filter_index_end = filter_index_start + len(list_filter) % 3
+            else:
+                filter_index_end = filter_index_start + 3
+        else:
+            # If table is only 1 row, ...
+            filter_index_end = len(list_filter)
+        
+        # Make header for filter
+        for filter in list_filter[filter_index_start:filter_index_end]:
+            table_data[0].append(filter[1])
+
+        # Table spider chart data
+        for ilo in list_ilo:
+            data = [ilo.nama, ilo.satisfactory_level]
+
+            calcultation_result_sub = list(calculation_result.items())[filter_index_start:filter_index_end]
+            for nama_filter, ilo_dict in calcultation_result_sub:
+                for nama_ilo, nilai_ilo in ilo_dict.items():
+                    # Skip if not current ILO
+                    if nama_ilo != ilo.nama: continue
+                    
+                    # Add nilai to row
+                    if nilai_ilo is None: data.append('-')
+                    else: data.append(float("{:.2f}".format(nilai_ilo)))
+                    # Go to next filter
+                    break
+
+            # Append data
+            table_data.append(data)
+        
+        spider_chart_table = Table(
+            table_data,
+            style=table_spider_chart_style,
+            hAlign='LEFT',
+        )
+
+        list_table_spider_chart.append(spider_chart_table)
+    
+    # Chart ILO
+    is_multiple_result = len(list_filter) > 1
+    if is_multiple_result:
+        pass
+    else:
+        pass
 
     # Build
-    pdf_file.build([
+    pdf_file_elements = [
         title,
         table_spider_chart_title,
-        spider_chart_table,
-    ])
+    ]
+    for spider_chart_table in list_table_spider_chart:
+        pdf_file_elements += [spider_chart_table, empty_line]
+
+    pdf_file.build(pdf_file_elements)
     
     # Close the PDF object cleanly
     file_stream.seek(0)
