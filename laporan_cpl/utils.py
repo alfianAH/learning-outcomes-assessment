@@ -1,5 +1,6 @@
 from functools import partial
 from io import BytesIO
+from copy import copy
 import numpy as np
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -10,6 +11,7 @@ from reportlab.platypus import (
     Paragraph, Spacer, Table, ListFlowable, TableStyle,
     Frame, PageTemplate
 )
+from reportlab.lib.pagesizes import letter, landscape
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
@@ -496,6 +498,7 @@ def process_ilo_prodi(list_ilo: QuerySet[Ilo], max_sks_prodi: int,
             result.update({
                 semester_nama: calculation_result
             })
+            print(result)
 
             if not is_success: 
                 if settings.DEBUG: print('Perhitungan CPL Prodi gagal.', message)
@@ -664,6 +667,10 @@ def process_ilo_mahasiswa_by_kurikulum(list_ilo: QuerySet[Ilo], max_sks_prodi: i
     return (is_success, message, result)
 
 
+def make_landscape(canvas, doc):
+    canvas.setPageSize(landscape(letter))
+
+
 def generate_laporan_cpl_prodi_pdf(
         list_ilo: QuerySet[Ilo],
         list_filter,
@@ -673,7 +680,8 @@ def generate_laporan_cpl_prodi_pdf(
     file_stream = BytesIO()
 
     # Create the PDF object, using the buffer as its "file."
-    pdf_file = SimpleDocTemplate(file_stream)
+    page_size = landscape(letter)
+    pdf_file = SimpleDocTemplate(file_stream, pagesize=page_size)
     styles = getSampleStyleSheet()
     normal_style = styles['Normal']
     font_size = normal_style.fontSize
@@ -684,7 +692,7 @@ def generate_laporan_cpl_prodi_pdf(
         style=styles['h1']
     )
 
-    header_style = styles['h2']
+    header_style = copy(styles['h2'])
     header_style.alignment = TA_CENTER
     header_content = Paragraph(
         "UNIVERSITAS HASANUDDIN<br/>FAKULTAS {}<br/>PROGRAM STUDI {}".format(fakultas_name, prodi_name), 
@@ -719,9 +727,64 @@ def generate_laporan_cpl_prodi_pdf(
     )
     pdf_file.addPageTemplates([template])
 
+    # Tabel detail spider chart
+    table_spider_chart_title = Paragraph(
+        'Tabel Pencapaian Capaian Pembelajaran Lulusan',
+        style=styles['h2']
+    )
+
+    table_spider_chart_data = [
+        ['CPL', 'Satisfactory Level',]
+    ]
+    # Table spider chart header
+    for filter in list_filter:
+        table_spider_chart_data[0].append(filter[1])
+
+    # Table spider chart data
+    for ilo in list_ilo:
+        data = [ilo.nama, ilo.satisfactory_level]
+
+        for nama_filter, ilo_dict in calculation_result.items():
+            for nama_ilo, nilai_ilo in ilo_dict.items():
+                # Skip if not current ILO
+                if nama_ilo != ilo.nama: continue
+                
+                # Add nilai to row
+                if nilai_ilo is None:
+                    data.append('-')
+                else:
+                    data.append(float("{:.2f}".format(nilai_ilo)))
+                # Go to next filter
+                break
+
+        # Append data
+        table_spider_chart_data.append(data)
+    
+    # (COL, ROW)
+    table_style_data = [
+        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),               # Header align
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),    # Header font
+        ('FONTSIZE', (0, 0), (-1, 0), 11),                  # Header font size
+        ('TOPPADDING', (0, 0), (-1, 0), 12),                # Header top padding
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),             # Header bottom padding
+        ('TOPPADDING', (0, 1), (-1, -1), 4),                # Body top padding
+        ('BOTTOMPADDING', (0, 1), (-1, -1), 4),             # Body bottom padding
+        ('GRID', (0, 0), (-1, -1), 0.25, colors.black),     # Grid
+        ('VALIGN', (0, 1), (-1, -1), 'TOP'),                # Body vertical align
+    ]
+
+    table_spider_chart_style = TableStyle(table_style_data)
+    spider_chart_table = Table(
+        table_spider_chart_data,
+        style=table_spider_chart_style,
+        hAlign='LEFT',
+    )
+
     # Build
     pdf_file.build([
         title,
+        table_spider_chart_title,
+        spider_chart_table,
     ])
     
     # Close the PDF object cleanly

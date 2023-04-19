@@ -412,7 +412,7 @@ class LaporanCapaianPembelajaranDownloadView(LaporanCapaianPembelajaranTemplateV
         return super().get(request, *args, **kwargs)
     
     def download_laporan_cpl(self, file, filename):
-        as_attachment = False
+        as_attachment = True
         response = FileResponse(file, as_attachment=as_attachment, filename=filename)
         return response
 
@@ -447,7 +447,7 @@ class LaporanCapaianPembelajaranDownloadView(LaporanCapaianPembelajaranTemplateV
 
             # Process
             if self.download_cpl_prodi:
-                prodi_is_success, _, prodi_result = process_ilo_prodi_by_kurikulum(list_ilo, max_sks_prodi, kurikulum_obj)
+                prodi_is_success, prodi_message, prodi_result = process_ilo_prodi_by_kurikulum(list_ilo, max_sks_prodi, kurikulum_obj)
 
                 if prodi_is_success:
                     file = generate_laporan_cpl_prodi_pdf(list_ilo, filter, prodi_result, prodi, fakultas)
@@ -458,7 +458,7 @@ class LaporanCapaianPembelajaranDownloadView(LaporanCapaianPembelajaranTemplateV
                     return HttpResponse(prodi_message)
             
             if self.download_cpl_mahasiswa:
-                mahasiswa_is_success, _, mahasiswa_result = process_ilo_mahasiswa_by_kurikulum(list_ilo, max_sks_prodi, list_peserta_mk, kurikulum_obj)
+                mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa_by_kurikulum(list_ilo, max_sks_prodi, list_peserta_mk, kurikulum_obj)
 
                 if mahasiswa_is_success:
                     file = generate_laporan_cpl_mahasiswa_pdf(list_ilo, filter, mahasiswa_result, prodi, fakultas)

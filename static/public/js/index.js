@@ -46,6 +46,7 @@ function updateChartColor(axisOption, textColor, borderColor) {
 
 function updateRadarChartColor(axisOption, textColor, borderColor) {
     if (axisOption == null) return;
+    if (axisOption.pointLabels == null) return;
 
     // Titles
     axisOption.pointLabels.color = textColor;
