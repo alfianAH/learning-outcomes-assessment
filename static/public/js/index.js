@@ -791,6 +791,54 @@ function downloadFileButton(buttonId, filename) {
     });
 }
 
+function downloadLaporanCPL(buttonId, filename) { 
+    $(buttonId).on('click', function(){
+        let formData = {};
+        $('form').serializeArray().forEach(function(input) {
+            formData[input.name] = input.value;
+        });
+        let targetUrl = $(this).attr('data-url');
+
+        $.ajax({
+            url: targetUrl,
+            type: 'POST',
+            data: JSON.stringify(formData),
+            contentType: 'application/json;charset=UTF-8',
+            xhrFields: {
+                responseType: "blob"  // Set the response type to blob
+            },
+            beforeSend: function(xhr, settings) {
+                // Get the CSRF token from the cookie and set the header
+                let csrftoken = $("[name=csrfmiddlewaretoken]").val();
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                addToast(toastType='info', message='Sedang memproses file laporan CPL.');
+            },
+            success: function(response){
+                // Create download link for PDF file
+                let blob = new Blob([response], {type: 'application/pdf'});
+                
+                // Create a temporary URL for the downloaded file
+                let url = window.URL.createObjectURL(blob);
+
+                // Create a link to trigger the download
+                let link = document.createElement("a");
+                link.href = url;
+                link.download = filename;
+                document.body.appendChild(link);
+
+                // Trigger the download and clean up
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+                addToast(toastType='success', message='Berhasil mendownload file laporan CPL.');
+            },
+            error: function(){
+                addToast(toastType='error', message='Gagal mendownload file laporan CPL.');
+            }
+        });
+    });
+}
+
 var transitionEvent = whichTransitionEvent();
 console.log(transitionEvent);
 
