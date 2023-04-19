@@ -1,15 +1,19 @@
 from functools import partial
 from io import BytesIO
 from copy import copy
+import os
+import uuid
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import QuerySet
 from reportlab.platypus import SimpleDocTemplate
 from reportlab.lib.units import cm, inch
 from reportlab.platypus import (
-    Paragraph, Spacer, Table, ListFlowable, TableStyle,
-    Frame, PageTemplate
+    Paragraph, Spacer, Table, TableStyle,
+    Frame, PageTemplate, Image
 )
 from reportlab.lib.pagesizes import letter, landscape
 from reportlab.lib.enums import TA_CENTER
@@ -666,10 +670,6 @@ def process_ilo_mahasiswa_by_kurikulum(list_ilo: QuerySet[Ilo], max_sks_prodi: i
     return (is_success, message, result)
 
 
-def make_landscape(canvas, doc):
-    canvas.setPageSize(landscape(letter))
-
-
 def generate_laporan_cpl_prodi_pdf(
         list_ilo: QuerySet[Ilo],
         list_filter,
@@ -753,6 +753,7 @@ def generate_laporan_cpl_prodi_pdf(
     if len(list_filter) % 3 > 0: len_table_spider_chart += 1
     
     list_table_spider_chart = []
+    chart_data = {}
     
     for i in range(len_table_spider_chart):
         table_data = [['CPL', 'Satisfactory Level',]]
@@ -780,13 +781,25 @@ def generate_laporan_cpl_prodi_pdf(
 
             calcultation_result_sub = list(calculation_result.items())[filter_index_start:filter_index_end]
             for nama_filter, ilo_dict in calcultation_result_sub:
+                # Set chart data
+                if nama_filter not in chart_data.keys():
+                    chart_data[nama_filter] = []
+                
                 for nama_ilo, nilai_ilo in ilo_dict.items():
                     # Skip if not current ILO
                     if nama_ilo != ilo.nama: continue
-                    
+
                     # Add nilai to row
-                    if nilai_ilo is None: data.append('-')
-                    else: data.append(float("{:.2f}".format(nilai_ilo)))
+                    if nilai_ilo is None: 
+                        data.append('-')    
+                        # Add chart data
+                        chart_data[nama_filter].append(0)
+                    else: 
+                        nilai_ilo_formatted = float("{:.2f}".format(nilai_ilo))
+                        data.append(nilai_ilo_formatted)
+                        # Add chart data
+                        chart_data[nama_filter].append(nilai_ilo_formatted)
+                    
                     # Go to next filter
                     break
 
@@ -803,10 +816,70 @@ def generate_laporan_cpl_prodi_pdf(
     
     # Chart ILO
     is_multiple_result = len(list_filter) > 1
+    
+    # If multiple result, bar and line chart
+    # Else, radar chart
     if is_multiple_result:
-        pass
+        x_ticks = []
+        satisfactory_level_data = []
+        for ilo in list_ilo:
+            x_ticks.append(ilo.nama)
+            satisfactory_level_data.append(ilo.satisfactory_level)
+
+        x = np.arange(len(x_ticks))  # the label locations
+        width = 0.25  # the width of the bars
+        multiplier = 0
+
+        fig, ax = plt.subplots(layout='constrained')
+
+        # Bar chart
+        for nama_filter, list_nilai_ilo in chart_data.items():
+            offset = width * multiplier
+            ax.bar(
+                x + offset, 
+                list_nilai_ilo, 
+                width, 
+                label=nama_filter
+            )
+            multiplier += 1
+
+        # Satisfactory level line chart
+        ax.plot(
+            x + (len(list_filter)-1) * width/2, 
+            satisfactory_level_data, 
+            marker='o', 
+            color='dimgrey', 
+            label='Satisfactory level'
+        )
+
+        # Styling
+        ax.set_title('Laporan Capaian Pembelajaran Lulusan Program Studi')
+        ax.set_xticks(x + (len(list_filter)-1) * width/2, x_ticks)
+        ax.grid(True, axis='y', which='major')
+        ax.grid(True, axis='x', which='minor')
+        
+        minor_locator = mticker.AutoMinorLocator(2) # set the number of minor intervals per major interval
+        ax.xaxis.set_minor_locator(minor_locator)
+        ax.legend(loc='lower center', bbox_to_anchor=(0.5, -0.3), ncol=2)
+        ax.set_ylim(0, 100)
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_visible(False)
+        ax.spines['bottom'].set_color('#DDDDDD')
+        
+        # Save chart
+        chart_filename = '{}.png'.format(uuid.uuid1())
+        chart_dir =  os.path.join(settings.STATIC_ROOT, 'laporan_cpl', 'charts')
+        if not os.path.exists(chart_dir):
+            os.makedirs(chart_dir)
+        
+        chart_path = os.path.join(chart_dir, chart_filename)
+        fig.set_size_inches(6, 4)
+        fig.savefig(chart_path)
     else:
         pass
+
+    chart_image = Image(chart_path)
 
     # Build
     pdf_file_elements = [
@@ -815,6 +888,10 @@ def generate_laporan_cpl_prodi_pdf(
     ]
     for spider_chart_table in list_table_spider_chart:
         pdf_file_elements += [spider_chart_table, empty_line]
+    
+    pdf_file_elements += [
+        chart_image,
+    ]
 
     pdf_file.build(pdf_file_elements)
     
