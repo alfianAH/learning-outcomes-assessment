@@ -24,7 +24,7 @@ from reportlab.platypus import (
 )
 from reportlab.lib.pagesizes import letter, landscape
 from reportlab.lib.enums import TA_CENTER
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 from learning_outcomes_assessment.utils import export_pdf_header
 from kurikulum.models import Kurikulum
@@ -360,13 +360,13 @@ def process_ilo_mahasiswa(list_ilo: QuerySet[Ilo], max_sks_prodi: int,
                         'nim': 'nim_mahasiswa',
                         'result': [
                             'filter': 'tahun_ajaran or semester',
-                            'result': [
+                            'result': [{
                                 {
                                     'nama': 'nama_ilo',
                                     'nilai': 'nilai_ilo',
                                     'satisfactory_level': satisfactory_level_ilo
                                 }
-                            ]
+                            }]
                         ]
                     }
                 }
@@ -617,7 +617,7 @@ def process_ilo_mahasiswa_by_kurikulum(list_ilo: QuerySet[Ilo], max_sks_prodi: i
                     'nim': {
                         'nama': 'nama_mahasiswa',
                         'nim': 'nim_mahasiswa',
-                        'result': [
+                        'result': [{
                             'filter': 'kurikulum',
                             'result': [
                                 {
@@ -625,7 +625,7 @@ def process_ilo_mahasiswa_by_kurikulum(list_ilo: QuerySet[Ilo], max_sks_prodi: i
                                     'nilai': 'nilai_ilo',
                                     'satisfactory_level': satisfactory_level_ilo
                                 }
-                            ]
+                            }]
                         ]
                     }
                 }
@@ -768,16 +768,6 @@ def radar_factory(num_vars, frame='circle'):
     return theta
 
 
-def example_data():
-    data = [
-        ['ILO 1', 'ILO 2', 'ILO 3', 'ILO 4', 'ILO 5', 'ILO 6', 'ILO 7'],
-        ('Kurikulum', [
-            [75, 75, 75, 75, 75, 75, 75],
-            [75, 80, 90, 10, 75, 70, 60]]),
-    ]
-    return data
-
-
 def generate_laporan_cpl_prodi_pdf(
         list_ilo: QuerySet[Ilo],
         list_filter,
@@ -792,7 +782,6 @@ def generate_laporan_cpl_prodi_pdf(
     styles = getSampleStyleSheet()
     normal_style = styles['Normal']
     empty_line = Spacer(1, 20)
-    font_size = normal_style.fontSize
 
     # Title
     title = Paragraph(
@@ -1121,10 +1110,10 @@ def generate_laporan_cpl_mahasiswa_pdf(
     file_stream = BytesIO()
 
     # Create the PDF object, using the buffer as its "file."
-    pdf_file = SimpleDocTemplate(file_stream)
+    page_size = landscape(letter)
+    pdf_file = SimpleDocTemplate(file_stream, pagesize=page_size)
     styles = getSampleStyleSheet()
-    normal_style = styles['Normal']
-    font_size = normal_style.fontSize
+    empty_line = Spacer(1, 20)
 
     # Title
     title = Paragraph(
@@ -1132,7 +1121,7 @@ def generate_laporan_cpl_mahasiswa_pdf(
         style=styles['h1']
     )
 
-    header_style = styles['h2']
+    header_style = copy(styles['h2'])
     header_style.alignment = TA_CENTER
     header_content = Paragraph(
         "UNIVERSITAS HASANUDDIN<br/>FAKULTAS {}<br/>PROGRAM STUDI {}".format(fakultas_name, prodi_name), 
@@ -1167,10 +1156,116 @@ def generate_laporan_cpl_mahasiswa_pdf(
     )
     pdf_file.addPageTemplates([template])
 
+    # Tabel detail ILO
+    table_detail_ilo_title = Paragraph(
+        'Tabel Pencapaian Capaian Pembelajaran Lulusan',
+        style=styles['h2']
+    )
+
+    # (COL, ROW)
+    table_detail_ilo_style_data = [
+        ('ALIGN', (0, 0), (-1, 1), 'CENTER'),               # Header align
+        ('FONTNAME', (0, 0), (-1, 1), 'Helvetica-Bold'),    # Header font
+        ('FONTSIZE', (0, 0), (-1, 1), 11),                  # Header font size
+        ('TOPPADDING', (0, 0), (-1, 1), 12),                # Header top padding
+        ('BOTTOMPADDING', (0, 0), (-1, 1), 12),             # Header bottom padding
+        ('TOPPADDING', (0, 1), (-1, -1), 4),                # Body top padding
+        ('BOTTOMPADDING', (0, 1), (-1, -1), 4),             # Body bottom padding
+        ('GRID', (0, 0), (-1, -1), 0.25, colors.black),     # Grid
+        ('VALIGN', (0, 1), (-1, -1), 'TOP'),                # Body vertical align
+        ('SPAN', (0, 0), (0, 1)),                           # Nomor merge
+        ('SPAN', (1, 0), (1, 1)),                           # NIM merge
+        ('SPAN', (2, 0), (2, 1)),                           # Nama merge
+        ('VALIGN', (0, 0), (2, 0), 'MIDDLE'),               # Header vertical align
+        ('ALIGN', (0, 1), (0, -1), 'CENTER'),               # Nomor align
+        ('ALIGN', (3, 2), (-1, -1), 'RIGHT'),               # Nilai align
+    ]
+
+    list_table_detail_ilo = []
+    
+    for filter in list_filter:
+        table_data = [['No.', 'NIM', 'Nama', ]]
+        # Add filter name to header
+        table_data[0].append(
+            Paragraph(
+                filter[1],
+                style=ParagraphStyle(
+                    name='table_filter_header',
+                    alignment=TA_CENTER,
+                    fontName='Helvetica-Bold',
+                    fontSize=11
+                )
+            )
+        )
+
+        current_table_detail_ilo_style_data = copy(table_detail_ilo_style_data)
+
+        current_table_detail_ilo_style_data += [
+            ('SPAN', (3, 0), (-1, 0)),           # Merge filter name cells
+        ]
+        
+        # Space for Nomor NIM Nama
+        ilo_header = ['', '', '']
+        ilo_header += [ilo.nama for ilo in list_ilo]
+        table_data.append(ilo_header)
+
+        # List mahasiswa
+        for i, (nim, peserta_mk) in enumerate(calculation_result.items()):
+            list_peserta_ilo_result: list[dict] = peserta_mk['result']
+            mahasiswa_row = [
+                '{}.'.format(i+1),
+                nim,
+                Paragraph(peserta_mk['nama'])
+            ]
+            for peserta_ilo_result in list_peserta_ilo_result:
+                # Check by nama filter
+                if filter[1] != peserta_ilo_result['filter']: continue
+                
+                # Add result to row
+                list_ilo_result: list[dict] = peserta_ilo_result['result']
+                for j, ilo_result in enumerate(list_ilo_result):
+                    nilai_ilo_mahasiswa = ilo_result['nilai']
+
+                    # Append nilai ILO mahasiswa
+                    if nilai_ilo_mahasiswa is None:
+                        mahasiswa_row.append('-')
+                    else:
+                        nilai_ilo_mahasiswa = float('{:.2f}'.format(nilai_ilo_mahasiswa))
+                        mahasiswa_row.append(nilai_ilo_mahasiswa)
+
+                        if nilai_ilo_mahasiswa < ilo_result['satisfactory_level']:
+                            col = 3 + j
+                            row = 2 + i
+                            current_table_detail_ilo_style_data.append((
+                                'TEXTCOLOR', (col, row), (col, row), colors.red
+                            ))
+                    
+                # Break after filter is found
+                break
+
+            # Add row to table data
+            table_data.append(mahasiswa_row)
+        
+        current_table_detail_ilo_style = TableStyle(current_table_detail_ilo_style_data)
+        # Make table
+        detail_ilo_table = Table(
+            table_data, 
+            style=current_table_detail_ilo_style,
+            hAlign='LEFT',
+            colWidths=[1*cm, 3*cm, 6.5*cm, None]
+        )
+
+        list_table_detail_ilo.append(detail_ilo_table)
+
     # Build
-    pdf_file.build([
+    pdf_file_elements = [
         title,
-    ])
+        table_detail_ilo_title,
+    ]
+    for detail_ilo_table in list_table_detail_ilo:
+        pdf_file_elements += [detail_ilo_table, empty_line]
+    
+    pdf_file.build(pdf_file_elements)
     
     # Close the PDF object cleanly
     file_stream.seek(0)
