@@ -1271,3 +1271,92 @@ def generate_laporan_cpl_mahasiswa_pdf(
     file_stream.seek(0)
 
     return file_stream
+
+
+def generate_laporan_cpl_per_mahasiswa_pdf(
+        list_ilo: QuerySet[Ilo],
+        list_filter,
+        calculation_result: dict, user,
+        prodi_name: str, fakultas_name: str
+):
+    file_stream = BytesIO()
+
+    # Create the PDF object, using the buffer as its "file."
+    page_size = landscape(letter)
+    pdf_file = SimpleDocTemplate(file_stream, pagesize=page_size)
+    styles = getSampleStyleSheet()
+    empty_line = Spacer(1, 20)
+
+    # Title
+    title = Paragraph(
+        'Laporan Capaian Pembelajaran Lulusan Mahasiswa',
+        style=styles['h1']
+    )
+
+    header_style = copy(styles['h2'])
+    header_style.alignment = TA_CENTER
+    header_content = Paragraph(
+        "UNIVERSITAS HASANUDDIN<br/>FAKULTAS {}<br/>PROGRAM STUDI {}".format(fakultas_name, prodi_name), 
+        header_style
+    )
+
+    # Get the space before and after the paragraph
+    space_before = header_content.getSpaceBefore()
+    space_after = header_content.getSpaceAfter()
+
+    # Get the height of the paragraph
+    para_height = header_content.wrap(pdf_file.width, pdf_file.height)[1]
+
+    # Calculate the total height of the block
+    block_height = para_height + space_before + space_after
+
+    frame = Frame(
+        pdf_file.leftMargin, 
+        pdf_file.bottomMargin, 
+        pdf_file.width, 
+        pdf_file.height - block_height
+    )
+    template = PageTemplate(
+        frames=frame, 
+        onPage=partial(
+            export_pdf_header, 
+            content=header_content,
+            image_path='./static/public/img/logo-unhas.jpg',
+            image_width=0.6*inch,
+            image_height=0.75*inch,
+        )
+    )
+    pdf_file.addPageTemplates([template])
+    
+    user_data = [
+        ['Nama', ':', user.nama],
+        ['NIM', ':', user.username],
+        ['Program Studi', ':', user.prodi],
+    ]
+    user_table_style = TableStyle([
+        ('LEFTPADDING', (0, 0), (-1, -1), 0),
+    ])
+    user_table = Table(
+        data=user_data,
+        style=user_table_style,
+        hAlign='LEFT'
+    )
+
+    # Tabel detail ILO
+    table_detail_ilo_title = Paragraph(
+        'Tabel Pencapaian Capaian Pembelajaran Lulusan',
+        style=styles['h2']
+    )
+
+    # Build
+    pdf_file_elements = [
+        title, user_table,
+    ]
+    
+    pdf_file.build(pdf_file_elements)
+    
+    # Close the PDF object cleanly
+    file_stream.seek(0)
+
+    return file_stream
+
