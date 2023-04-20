@@ -37,6 +37,7 @@ from clo.models import (
 from mata_kuliah_semester.models import (
     MataKuliahSemester,
     PesertaMataKuliah,
+    NilaiMataKuliahIloMahasiswa,
 )
 
 
@@ -1275,6 +1276,7 @@ def generate_laporan_cpl_mahasiswa_pdf(
 
 def generate_laporan_cpl_per_mahasiswa_pdf(
         list_ilo: QuerySet[Ilo],
+        list_peserta_mk_semester: QuerySet[PesertaMataKuliah],
         list_filter,
         calculation_result: dict, user,
         prodi_name: str, fakultas_name: str
@@ -1342,16 +1344,203 @@ def generate_laporan_cpl_per_mahasiswa_pdf(
         hAlign='LEFT'
     )
 
-    # Tabel detail ILO
-    table_detail_ilo_title = Paragraph(
+    # Tabel detail MK dan ILO
+    table_detail_mk_ilo_title = Paragraph(
+        'Tabel Pencapaian Capaian Pembelajaran Lulusan per Mata Kuliah',
+        style=styles['h2']
+    )
+
+    # (COL, ROW)
+    table_detail_mk_ilo_style_data = [
+        ('ALIGN', (0, 0), (-1, 1), 'CENTER'),               # Header align
+        ('FONTNAME', (0, 0), (-1, 1), 'Helvetica-Bold'),    # Header font
+        ('FONTSIZE', (0, 0), (-1, 1), 11),                  # Header font size
+        ('TOPPADDING', (0, 0), (-1, 1), 12),                # Header top padding
+        ('BOTTOMPADDING', (0, 0), (-1, 1), 12),             # Header bottom padding
+        ('TOPPADDING', (0, 1), (-1, -1), 4),                # Body top padding
+        ('BOTTOMPADDING', (0, 1), (-1, -1), 4),             # Body bottom padding
+        ('GRID', (0, 0), (-1, -1), 0.25, colors.black),     # Grid
+        ('VALIGN', (0, 1), (-1, -1), 'TOP'),                # Body vertical align
+        ('SPAN', (0, 0), (0, 1)),                           # Nomor merge
+        ('SPAN', (1, 0), (1, 1)),                           # Kode merge
+        ('SPAN', (2, 0), (2, 1)),                           # Nama MK merge
+        ('SPAN', (3, 0), (3, 1)),                           # SKS MK merge
+        ('SPAN', (4, 0), (4, 1)),                           # Nilai akhir MK merge
+        ('SPAN', (5, 0), (-1, 0)),                          # CPL merge
+        ('VALIGN', (0, 0), (4, 0), 'MIDDLE'),               # Header vertical align
+        ('ALIGN', (0, 1), (0, -1), 'CENTER'),               # Nomor align
+        ('ALIGN', (3, 2), (-1, -1), 'RIGHT'),               # Number align
+    ]
+    
+    # Tabel detail MK dan ILO header
+    table_detail_mk_ilo_data = [
+        ['No.', 'Kode', 'Nama', 'SKS', 'Nilai akhir', 'CPL'],
+        ['', '', '', '', '']
+    ]
+
+    # ILO Header
+    table_detail_mk_ilo_data[1] += [ilo.nama for ilo in list_ilo]
+
+    # List peserta
+    for i, peserta_mk_semester in enumerate(list_peserta_mk_semester):
+        mk_kurikulum = peserta_mk_semester.kelas_mk_semester.mk_semester.mk_kurikulum
+        # Detail MK
+        mk_semester_row = [
+            '{}.'.format(i+1),
+            mk_kurikulum.kode,
+            Paragraph(mk_kurikulum.nama),
+            mk_kurikulum.sks,
+        ]
+
+        # Add Nilai akhir
+        if peserta_mk_semester.nilai_akhir is None:
+            mk_semester_row.append('-')
+        else:
+            mk_semester_row.append(float('{:.2f}'.format(peserta_mk_semester.nilai_akhir)))
+
+        # Add nilai ILO
+        for ilo in list_ilo:
+            nilai_mk_ilo_peserta = NilaiMataKuliahIloMahasiswa.objects.filter(
+                peserta=peserta_mk_semester,
+                ilo=ilo,
+            )
+
+            if nilai_mk_ilo_peserta.exists():
+                nilai_ilo_peserta = float('{:.2f}'.format(nilai_mk_ilo_peserta.first().nilai_ilo))
+                mk_semester_row.append(nilai_ilo_peserta)
+            else:
+                mk_semester_row.append('-')
+        
+        table_detail_mk_ilo_data.append(mk_semester_row)
+
+    # Make table
+    table_detail_mk_ilo_style = TableStyle(table_detail_mk_ilo_style_data)
+    detail_mk_ilo_table = Table(
+        table_detail_mk_ilo_data,
+        style=table_detail_mk_ilo_style,
+        hAlign='LEFT',
+        colWidths=[1*cm, None]
+    )
+
+    # Table chart header
+    table_chart_title = Paragraph(
         'Tabel Pencapaian Capaian Pembelajaran Lulusan',
         style=styles['h2']
     )
 
+    # Table chart
+    table_chart_style_data = [
+        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),               # Header align
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),    # Header font
+        ('FONTSIZE', (0, 0), (-1, 0), 11),                  # Header font size
+        ('TOPPADDING', (0, 0), (-1, 0), 12),                # Header top padding
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),             # Header bottom padding
+        ('TOPPADDING', (0, 1), (-1, -1), 4),                # Body top padding
+        ('BOTTOMPADDING', (0, 1), (-1, -1), 4),             # Body bottom padding
+        ('GRID', (0, 0), (-1, -1), 0.25, colors.black),     # Grid
+        ('VALIGN', (0, 1), (-1, -1), 'TOP'),                # Body vertical align
+    ]
+    table_chart_style = TableStyle(table_chart_style_data)
+
+    # Table spider chart
+    len_table_chart = len(list_filter) // 3
+    if len(list_filter) % 3 > 0: len_table_chart += 1
+    
+    list_table_chart = []
+    chart_data = {}
+    
+    for i in range(len_table_chart):
+        table_data = [['CPL', 'Satisfactory Level',]]
+        
+        # Calculate index subscriptable
+        filter_index_start = i*3
+
+        if len_table_chart > 1:
+            # If table is more than 1, ...
+            if i+1 == len_table_chart:
+                filter_index_end = filter_index_start + len(list_filter) % 3
+            else:
+                filter_index_end = filter_index_start + 3
+        else:
+            # If table is only 1 row, ...
+            filter_index_end = len(list_filter)
+        
+        # Make header for filter
+        for filter in list_filter[filter_index_start:filter_index_end]:
+            table_data[0].append(filter[1])
+
+        # Table spider chart data
+        for ilo in list_ilo:
+            ilo_row = [ilo.nama, ilo.satisfactory_level]
+
+            for _, peserta_mk in calculation_result.items():
+                list_peserta_ilo_result: list[dict] = peserta_mk['result']
+                
+                for peserta_ilo_result in list_peserta_ilo_result:
+                    # Add result to row
+                    list_ilo_result: list[dict] = peserta_ilo_result['result']
+
+                    for ilo_result in list_ilo_result:
+                        if ilo_result['nama'] != ilo.nama: 
+                            continue
+                        
+                        nilai_ilo = ilo_result['nilai']
+
+                        if nilai_ilo is None:
+                            ilo_row.append('-')
+                        else:
+                            ilo_row.append(float('{:.2f}'.format(nilai_ilo)))
+
+            table_data.append(ilo_row)
+
+        # for ilo in list_ilo:
+        #     data = [ilo.nama, ilo.satisfactory_level]
+
+        #     calcultation_result_sub = list(calculation_result.items())[filter_index_start:filter_index_end]
+        #     for nama_filter, ilo_dict in calcultation_result_sub:
+        #         # Set chart data
+        #         if nama_filter not in chart_data.keys():
+        #             chart_data[nama_filter] = []
+                
+        #         for nama_ilo, nilai_ilo in ilo_dict.items():
+        #             # Skip if not current ILO
+        #             if nama_ilo != ilo.nama: continue
+
+        #             # Add nilai to row
+        #             if nilai_ilo is None: 
+        #                 data.append('-')    
+        #                 # Add chart data
+        #                 chart_data[nama_filter].append(0)
+        #             else: 
+        #                 nilai_ilo_formatted = float("{:.2f}".format(nilai_ilo))
+        #                 data.append(nilai_ilo_formatted)
+        #                 # Add chart data
+        #                 chart_data[nama_filter].append(nilai_ilo_formatted)
+                    
+        #             # Go to next filter
+        #             break
+
+        #     # Append data
+        #     table_data.append(data)
+            
+        chart_table = Table(
+            table_data,
+            style=table_chart_style,
+            hAlign='LEFT',
+        )
+
+        list_table_chart.append(chart_table)
+
     # Build
     pdf_file_elements = [
         title, user_table,
+        table_detail_mk_ilo_title,
+        detail_mk_ilo_table, empty_line,
+        table_chart_title,
     ]
+
+    for chart_table in list_table_chart:
+        pdf_file_elements += [chart_table, empty_line]
     
     pdf_file.build(pdf_file_elements)
     

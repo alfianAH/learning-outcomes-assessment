@@ -912,7 +912,8 @@ class LaporanCapaianPembelajaranMahasiswaDownloadView(MahasiswaAsPesertaMixin, L
             mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa(list_ilo, max_sks_prodi, list_peserta_mk, is_semester_included, filter)
 
         if mahasiswa_is_success:
-            file = generate_laporan_cpl_per_mahasiswa_pdf(list_ilo, filter, mahasiswa_result, self.user, prodi, fakultas)
+            file = generate_laporan_cpl_per_mahasiswa_pdf(
+                list_ilo, list_peserta_mk, filter, mahasiswa_result, self.user, prodi, fakultas)
             if settings.DEBUG: print('Berhasil generate file laporan CPL mahasiswa.')
             return self.download_laporan_cpl(file, self.cpl_mahasiswa_filename)
         else:
