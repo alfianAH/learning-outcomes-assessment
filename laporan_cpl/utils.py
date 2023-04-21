@@ -920,8 +920,6 @@ def generate_laporan_cpl_prodi_pdf(
         ('GRID', (0, 0), (-1, -1), 0.25, colors.black),     # Grid
         ('VALIGN', (0, 1), (-1, -1), 'TOP'),                # Body vertical align
     ]
-
-    table_spider_chart_style = TableStyle(table_style_data)
     
     # Table spider chart
     len_table_spider_chart = len(list_filter) // 3
@@ -932,6 +930,7 @@ def generate_laporan_cpl_prodi_pdf(
     
     for i in range(len_table_spider_chart):
         table_data = [['CPL', 'Satisfactory Level',]]
+        current_table_style_data = copy(table_style_data)
         
         # Calculate index subscriptable
         filter_index_start = i*3
@@ -951,11 +950,11 @@ def generate_laporan_cpl_prodi_pdf(
             table_data[0].append(filter[1])
 
         # Table spider chart data
-        for ilo in list_ilo:
+        for j, ilo in enumerate(list_ilo):
             data = [ilo.nama, ilo.satisfactory_level]
 
             calcultation_result_sub = list(calculation_result.items())[filter_index_start:filter_index_end]
-            for nama_filter, ilo_dict in calcultation_result_sub:
+            for k, (nama_filter, ilo_dict) in enumerate(calcultation_result_sub):
                 # Set chart data
                 if nama_filter not in chart_data.keys():
                     chart_data[nama_filter] = []
@@ -966,24 +965,33 @@ def generate_laporan_cpl_prodi_pdf(
 
                     # Add nilai to row
                     if nilai_ilo is None: 
-                        data.append('-')    
+                        data.append('-')
                         # Add chart data
-                        chart_data[nama_filter].append(0)
+                        chart_data[nama_filter].append(np.NaN)
                     else: 
                         nilai_ilo_formatted = float("{:.2f}".format(nilai_ilo))
                         data.append(nilai_ilo_formatted)
                         # Add chart data
                         chart_data[nama_filter].append(nilai_ilo_formatted)
+
+                        # Give red color
+                        if nilai_ilo_formatted < ilo.satisfactory_level:
+                            col = 2 + k
+                            row = 1 + j
+                            current_table_style_data.append((
+                                'TEXTCOLOR', (col, row), (col, row), colors.red
+                            ))
                     
                     # Go to next filter
                     break
 
             # Append data
             table_data.append(data)
-        
+
+        current_table_spider_chart_style = TableStyle(current_table_style_data)
         spider_chart_table = Table(
             table_data,
-            style=table_spider_chart_style,
+            style=current_table_spider_chart_style,
             hAlign='LEFT',
         )
 
@@ -1148,6 +1156,7 @@ def generate_laporan_cpl_mahasiswa_pdf(
                         nilai_ilo_mahasiswa = float('{:.2f}'.format(nilai_ilo_mahasiswa))
                         mahasiswa_row.append(nilai_ilo_mahasiswa)
 
+                        # Give red color
                         if nilai_ilo_mahasiswa < ilo_result['satisfactory_level']:
                             col = 3 + j
                             row = 2 + i
@@ -1295,7 +1304,7 @@ def generate_laporan_cpl_per_mahasiswa_pdf(
     # ILO Header
     table_detail_mk_ilo_data[1] += [ilo.nama for ilo in list_ilo]
 
-    # List peserta
+    # List mk semester
     for i, peserta_mk_semester in enumerate(list_peserta_mk_semester):
         mk_kurikulum = peserta_mk_semester.kelas_mk_semester.mk_semester.mk_kurikulum
         # Detail MK
@@ -1313,7 +1322,7 @@ def generate_laporan_cpl_per_mahasiswa_pdf(
             mk_semester_row.append(float('{:.2f}'.format(peserta_mk_semester.nilai_akhir)))
 
         # Add nilai ILO
-        for ilo in list_ilo:
+        for j, ilo in enumerate(list_ilo):
             nilai_mk_ilo_peserta = NilaiMataKuliahIloMahasiswa.objects.filter(
                 peserta=peserta_mk_semester,
                 ilo=ilo,
@@ -1322,6 +1331,14 @@ def generate_laporan_cpl_per_mahasiswa_pdf(
             if nilai_mk_ilo_peserta.exists():
                 nilai_ilo_peserta = float('{:.2f}'.format(nilai_mk_ilo_peserta.first().nilai_ilo))
                 mk_semester_row.append(nilai_ilo_peserta)
+
+                # Give red color
+                if nilai_ilo_peserta < ilo.satisfactory_level:
+                    col = 5 + j
+                    row = 2 + i
+                    table_detail_mk_ilo_style_data.append((
+                        'TEXTCOLOR', (col, row), (col, row), colors.red
+                    ))
             else:
                 mk_semester_row.append('-')
         
@@ -1354,7 +1371,6 @@ def generate_laporan_cpl_per_mahasiswa_pdf(
         ('GRID', (0, 0), (-1, -1), 0.25, colors.black),     # Grid
         ('VALIGN', (0, 1), (-1, -1), 'TOP'),                # Body vertical align
     ]
-    table_chart_style = TableStyle(table_chart_style_data)
 
     # Table spider chart
     len_table_chart = len(list_filter) // 3
@@ -1365,6 +1381,7 @@ def generate_laporan_cpl_per_mahasiswa_pdf(
     
     for i in range(len_table_chart):
         table_data = [['CPL', 'Satisfactory Level',]]
+        current_table_chart_style_data = copy(table_chart_style_data)
         
         # Calculate index subscriptable
         filter_index_start = i*3
@@ -1384,13 +1401,17 @@ def generate_laporan_cpl_per_mahasiswa_pdf(
             table_data[0].append(filter[1])
 
         # Table spider chart data
-        for ilo in list_ilo:
+        for j, ilo in enumerate(list_ilo):
             ilo_row = [ilo.nama, ilo.satisfactory_level]
-
+            
             for _, peserta_mk in calculation_result.items():
                 list_peserta_ilo_result: list[dict] = peserta_mk['result']
                 
-                for peserta_ilo_result in list_peserta_ilo_result:
+                for k, peserta_ilo_result in enumerate(list_peserta_ilo_result):
+                    nama_filter = peserta_ilo_result['filter']
+                    if nama_filter not in chart_data.keys():
+                        chart_data[nama_filter] = []
+                    
                     # Add result to row
                     list_ilo_result: list[dict] = peserta_ilo_result['result']
 
@@ -1402,48 +1423,42 @@ def generate_laporan_cpl_per_mahasiswa_pdf(
 
                         if nilai_ilo is None:
                             ilo_row.append('-')
+                            # Add chart data
+                            chart_data[nama_filter].append(np.NaN)
                         else:
-                            ilo_row.append(float('{:.2f}'.format(nilai_ilo)))
+                            nilai_ilo_formatted = float('{:.2f}'.format(nilai_ilo))
+
+                            ilo_row.append(nilai_ilo_formatted)
+                            # Add chart data
+                            chart_data[nama_filter].append(nilai_ilo_formatted)
+
+                            # Give red color
+                            if nilai_ilo_formatted < ilo_result['satisfactory_level']:
+                                col = 2 + k
+                                row = 1 + j
+                                current_table_chart_style_data.append((
+                                    'TEXTCOLOR', (col, row), (col, row), colors.red
+                                ))
 
             table_data.append(ilo_row)
 
-        # for ilo in list_ilo:
-        #     data = [ilo.nama, ilo.satisfactory_level]
-
-        #     calcultation_result_sub = list(calculation_result.items())[filter_index_start:filter_index_end]
-        #     for nama_filter, ilo_dict in calcultation_result_sub:
-        #         # Set chart data
-        #         if nama_filter not in chart_data.keys():
-        #             chart_data[nama_filter] = []
-                
-        #         for nama_ilo, nilai_ilo in ilo_dict.items():
-        #             # Skip if not current ILO
-        #             if nama_ilo != ilo.nama: continue
-
-        #             # Add nilai to row
-        #             if nilai_ilo is None: 
-        #                 data.append('-')    
-        #                 # Add chart data
-        #                 chart_data[nama_filter].append(0)
-        #             else: 
-        #                 nilai_ilo_formatted = float("{:.2f}".format(nilai_ilo))
-        #                 data.append(nilai_ilo_formatted)
-        #                 # Add chart data
-        #                 chart_data[nama_filter].append(nilai_ilo_formatted)
-                    
-        #             # Go to next filter
-        #             break
-
-        #     # Append data
-        #     table_data.append(data)
-            
+        current_table_chart_style = TableStyle(current_table_chart_style_data)
+        
         chart_table = Table(
             table_data,
-            style=table_chart_style,
+            style=current_table_chart_style,
             hAlign='LEFT',
         )
 
         list_table_chart.append(chart_table)
+
+    # Chart ILO
+    chart_path = generate_laporan_cpl_chart(
+        chart_data,
+        list_ilo, list_filter, 
+        'Laporan Capaian Pembelajaran Lulusan Mahasiswa',
+    )
+    chart_image = Image(chart_path)
 
     # Build
     pdf_file_elements = [
@@ -1455,6 +1470,10 @@ def generate_laporan_cpl_per_mahasiswa_pdf(
 
     for chart_table in list_table_chart:
         pdf_file_elements += [chart_table, empty_line]
+    
+    pdf_file_elements += [
+        chart_image,
+    ]
     
     pdf_file.build(pdf_file_elements)
     
