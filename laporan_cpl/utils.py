@@ -7,12 +7,6 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
-from matplotlib.patches import Circle, RegularPolygon
-from matplotlib.path import Path
-from matplotlib.projections.polar import PolarAxes
-from matplotlib.projections import register_projection
-from matplotlib.spines import Spine
-from matplotlib.transforms import Affine2D
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import QuerySet
@@ -27,6 +21,10 @@ from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 from learning_outcomes_assessment.utils import export_pdf_header
+from learning_outcomes_assessment.chart.utils import (
+    radar_factory,
+    save_chart
+)
 from kurikulum.models import Kurikulum
 from ilo.models import Ilo
 from pi_area.models import PerformanceIndicator
@@ -679,94 +677,174 @@ def process_ilo_mahasiswa_by_kurikulum(list_ilo: QuerySet[Ilo], max_sks_prodi: i
     return (is_success, message, result)
 
 
-def radar_factory(num_vars, frame='circle'):
+def generate_laporan_cpl_chart(
+        chart_data: dict,
+        list_ilo: QuerySet[Ilo], list_filter: list,
+        chart_title: str,
+):
+    """Generate chart for laporan CPL
+
+    Args:
+        chart_data (dict): Chart data
+        list_ilo (QuerySet[Ilo]): List ILO
+        list_filter (list): List filter laporan CPL
+        chart_title (str): Chart title
+
+    Returns:
+        str: Chart saved location path
     """
-    Create a radar chart with `num_vars` axes.
+    
+    is_multiple_result = len(list_filter) > 1
+    list_nama_ilo = []
+    satisfactory_level_data = []
 
-    This function creates a RadarAxes projection and registers it.
+    for ilo in list_ilo:
+        list_nama_ilo.append(ilo.nama)
+        satisfactory_level_data.append(ilo.satisfactory_level)
+    
+    # If multiple result, bar and line chart
+    # Else, radar chart
+    if is_multiple_result:
+        x = np.arange(len(list_nama_ilo))  # the label locations
+        width = 0.25  # the width of the bars
+        multiplier = 0
 
-    Parameters
-    ----------
-    num_vars : int
-        Number of variables for radar chart.
-    frame : {'circle', 'polygon'}
-        Shape of frame surrounding axes.
+        fig, ax = plt.subplots(layout='constrained')
 
-    """
-    # calculate evenly-spaced axis angles
-    theta = np.linspace(0, 2*np.pi, num_vars, endpoint=False)
+        # Bar chart
+        for nama_filter, list_nilai_ilo in chart_data.items():
+            offset = width * multiplier
+            ax.bar(
+                x + offset, 
+                list_nilai_ilo, 
+                width, 
+                label=nama_filter
+            )
+            multiplier += 1
 
-    class RadarTransform(PolarAxes.PolarTransform):
+        # Satisfactory level line chart
+        ax.plot(
+            x + (len(list_filter)-1) * width/2, 
+            satisfactory_level_data, 
+            marker='o', 
+            color='dimgrey', 
+            label='Satisfactory level'
+        )
 
-        def transform_path_non_affine(self, path):
-            # Paths with non-unit interpolation steps correspond to gridlines,
-            # in which case we force interpolation (to defeat PolarTransform's
-            # autoconversion to circular arcs).
-            if path._interpolation_steps > 1:
-                path = path.interpolated(num_vars)
-            return Path(self.transform(path.vertices), path.codes)
+        # Styling
+        ax.set_title(chart_title)
+        ax.set_xticks(x + (len(list_filter)-1) * width/2, list_nama_ilo)
+        ax.grid(True, axis='y', which='major')
+        ax.grid(True, axis='x', which='minor')
+        
+        minor_locator = mticker.AutoMinorLocator(2) # set the number of minor intervals per major interval
+        ax.xaxis.set_minor_locator(minor_locator)
+        ax.legend(loc='lower center', bbox_to_anchor=(0.5, -0.3), ncol=2)
+        ax.set_ylim(0, 100)
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_visible(False)
+        ax.spines['bottom'].set_color('#DDDDDD')
+        
+        # Save chart
+        chart_dir =  os.path.join(settings.STATIC_ROOT, 'laporan_cpl', 'charts')
+        chart_path = save_chart(chart_dir, fig)
+    else:
+        if list_ilo.count() > 2:
+            # If ILO are more than 2, use radar chart
+            theta = radar_factory(list_ilo.count(), frame='polygon')
 
-    class RadarAxes(PolarAxes):
+            data = [list_nama_ilo]
+            labels = ['Satisfactory level']
 
-        name = 'radar'
-        PolarTransform = RadarTransform
+            # Setup data and label
+            for nama_filter, list_nilai_ilo in chart_data.items():
+                labels.append(nama_filter)
+                data.append((
+                    nama_filter, [
+                        satisfactory_level_data,
+                        list_nilai_ilo,
+                    ]
+                ),)
 
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-            # rotate plot such that the first axis is at the top
-            self.set_theta_zero_location('N')
+            # R axis label
+            spoke_labels = data.pop(0)
 
-        def fill(self, *args, closed=True, **kwargs):
-            """Override fill so that line is closed by default"""
-            return super().fill(closed=closed, *args, **kwargs)
+            # Setup radar chart
+            fig, axs = plt.subplots(
+                figsize=(3, 3), nrows=1, ncols=1,
+                subplot_kw=dict(projection='radar'))
+            fig.subplots_adjust(wspace=0.25, hspace=0.20, top=0.85, bottom=0.05)
+            line_colors = ['r', 'b']
 
-        def plot(self, *args, **kwargs):
-            """Override plot so that line is closed by default"""
-            lines = super().plot(*args, **kwargs)
-            for line in lines:
-                self._close_line(line)
+            # Styling
+            for ax, (plot_title, case_data) in zip([axs], data):
+                ax.set_rlim(0, 100)
+                ax.set_rgrids([0, 20, 40, 60, 80, 100])
+                ax.set_title(
+                    plot_title, weight='bold', size='medium', position=(0.5, 1.1),
+                    horizontalalignment='center', verticalalignment='center')
+                for d, color in zip(case_data, line_colors):
+                    ax.plot(theta, d, color=color)
+                ax.set_varlabels(spoke_labels)
+            
+            # add legend relative to top-left plot
+            axs.legend(
+                labels, loc=(0.9, .95),
+                labelspacing=0.1, fontsize='small'
+            )
 
-        def _close_line(self, line):
-            x, y = line.get_data()
-            # FIXME: markers at x[0], y[0] get doubled-up
-            if x[0] != x[-1]:
-                x = np.append(x, x[0])
-                y = np.append(y, y[0])
-                line.set_data(x, y)
+            # Chart title
+            fig.text(
+                0.5, 0.965, 
+                chart_title,
+                horizontalalignment='center', 
+                color='black', weight='bold',
+                size='large'
+            )
+            
+            # Save chart
+            chart_dir =  os.path.join(settings.STATIC_ROOT, 'laporan_cpl', 'charts')
+            chart_path = save_chart(chart_dir, fig)
+        else:
+            # If ILO are less or equal to 2, use bar chart
+            x = np.arange(len(list_nama_ilo))  # the label locations
+            width = 0.25  # the width of the bars
+            multiplier = 0
 
-        def set_varlabels(self, labels):
-            self.set_thetagrids(np.degrees(theta), labels)
+            fig, ax = plt.subplots(layout='constrained')
+            chart_data['Satisfactory level'] = satisfactory_level_data
+            # Bar chart
+            for nama_filter, list_nilai_ilo in chart_data.items():
+                offset = width * multiplier
+                ax.bar(
+                    x + offset, 
+                    list_nilai_ilo, 
+                    width, 
+                    label=nama_filter
+                )
+                multiplier += 1
 
-        def _gen_axes_patch(self):
-            # The Axes patch must be centered at (0.5, 0.5) and of radius 0.5
-            # in axes coordinates.
-            if frame == 'circle':
-                return Circle((0.5, 0.5), 0.5)
-            elif frame == 'polygon':
-                return RegularPolygon((0.5, 0.5), num_vars,
-                                      radius=.5, edgecolor="k")
-            else:
-                raise ValueError("Unknown value for 'frame': %s" % frame)
+            # Styling
+            ax.set_title(chart_title)
+            ax.set_xticks(x + width/2, list_nama_ilo)
+            ax.grid(True, axis='y', which='major')
+            ax.grid(True, axis='x', which='minor')
+            
+            minor_locator = mticker.AutoMinorLocator(2) # set the number of minor intervals per major interval
+            ax.xaxis.set_minor_locator(minor_locator)
+            ax.legend(loc='lower center', bbox_to_anchor=(0.5, -0.3), ncol=2)
+            ax.set_ylim(0, 100)
+            ax.spines['top'].set_visible(False)
+            ax.spines['right'].set_visible(False)
+            ax.spines['left'].set_visible(False)
+            ax.spines['bottom'].set_color('#DDDDDD')
+            
+            # Save chart
+            chart_dir =  os.path.join(settings.STATIC_ROOT, 'laporan_cpl', 'charts')
+            chart_path = save_chart(chart_dir, fig)
 
-        def _gen_axes_spines(self):
-            if frame == 'circle':
-                return super()._gen_axes_spines()
-            elif frame == 'polygon':
-                # spine_type must be 'left'/'right'/'top'/'bottom'/'circle'.
-                spine = Spine(axes=self,
-                              spine_type='circle',
-                              path=Path.unit_regular_polygon(num_vars))
-                # unit_regular_polygon gives a polygon of radius 1 centered at
-                # (0, 0) but we want a polygon of radius 0.5 centered at (0.5,
-                # 0.5) in axes coordinates.
-                spine.set_transform(Affine2D().scale(.5).translate(.5, .5)
-                                    + self.transAxes)
-                return {'polar': spine}
-            else:
-                raise ValueError("Unknown value for 'frame': %s" % frame)
-
-    register_projection(RadarAxes)
-    return theta
+    return chart_path
 
 
 def generate_laporan_cpl_prodi_pdf(
@@ -781,7 +859,6 @@ def generate_laporan_cpl_prodi_pdf(
     page_size = landscape(letter)
     pdf_file = SimpleDocTemplate(file_stream, pagesize=page_size)
     styles = getSampleStyleSheet()
-    normal_style = styles['Normal']
     empty_line = Spacer(1, 20)
 
     # Title
@@ -913,174 +990,11 @@ def generate_laporan_cpl_prodi_pdf(
         list_table_spider_chart.append(spider_chart_table)
     
     # Chart ILO
-    is_multiple_result = len(list_filter) > 1
-    
-    list_nama_ilo = []
-    satisfactory_level_data = []
-    for ilo in list_ilo:
-        list_nama_ilo.append(ilo.nama)
-        satisfactory_level_data.append(ilo.satisfactory_level)
-
-    # If multiple result, bar and line chart
-    # Else, radar chart
-    if is_multiple_result:
-        x = np.arange(len(list_nama_ilo))  # the label locations
-        width = 0.25  # the width of the bars
-        multiplier = 0
-
-        fig, ax = plt.subplots(layout='constrained')
-
-        # Bar chart
-        for nama_filter, list_nilai_ilo in chart_data.items():
-            offset = width * multiplier
-            ax.bar(
-                x + offset, 
-                list_nilai_ilo, 
-                width, 
-                label=nama_filter
-            )
-            multiplier += 1
-
-        # Satisfactory level line chart
-        ax.plot(
-            x + (len(list_filter)-1) * width/2, 
-            satisfactory_level_data, 
-            marker='o', 
-            color='dimgrey', 
-            label='Satisfactory level'
-        )
-
-        # Styling
-        ax.set_title('Laporan Capaian Pembelajaran Lulusan Program Studi')
-        ax.set_xticks(x + (len(list_filter)-1) * width/2, list_nama_ilo)
-        ax.grid(True, axis='y', which='major')
-        ax.grid(True, axis='x', which='minor')
-        
-        minor_locator = mticker.AutoMinorLocator(2) # set the number of minor intervals per major interval
-        ax.xaxis.set_minor_locator(minor_locator)
-        ax.legend(loc='lower center', bbox_to_anchor=(0.5, -0.3), ncol=2)
-        ax.set_ylim(0, 100)
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
-        ax.spines['left'].set_visible(False)
-        ax.spines['bottom'].set_color('#DDDDDD')
-        
-        # Save chart
-        chart_filename = '{}.png'.format(uuid.uuid1())
-        chart_dir =  os.path.join(settings.STATIC_ROOT, 'laporan_cpl', 'charts')
-        if not os.path.exists(chart_dir):
-            os.makedirs(chart_dir)
-        
-        chart_path = os.path.join(chart_dir, chart_filename)
-        fig.set_size_inches(6, 4)
-        fig.savefig(chart_path)
-    else:
-        if list_ilo.count() > 2:
-            # If ILO are more than 2, use radar chart
-            theta = radar_factory(list_ilo.count(), frame='polygon')
-
-            data = [list_nama_ilo]
-            labels = ['Satisfactory level']
-
-            # Setup data and label
-            for nama_filter, list_nilai_ilo in chart_data.items():
-                labels.append(nama_filter)
-                data.append((
-                    nama_filter, [
-                        satisfactory_level_data,
-                        list_nilai_ilo,
-                    ]
-                ),)
-
-            # R axis label
-            spoke_labels = data.pop(0)
-
-            # Setup radar chart
-            fig, axs = plt.subplots(
-                figsize=(3, 3), nrows=1, ncols=1,
-                subplot_kw=dict(projection='radar'))
-            fig.subplots_adjust(wspace=0.25, hspace=0.20, top=0.85, bottom=0.05)
-            line_colors = ['r', 'b']
-
-            # Styling
-            for ax, (plot_title, case_data) in zip([axs], data):
-                ax.set_rlim(0, 100)
-                ax.set_rgrids([0, 20, 40, 60, 80, 100])
-                ax.set_title(
-                    plot_title, weight='bold', size='medium', position=(0.5, 1.1),
-                    horizontalalignment='center', verticalalignment='center')
-                for d, color in zip(case_data, line_colors):
-                    ax.plot(theta, d, color=color)
-                ax.set_varlabels(spoke_labels)
-            
-            # add legend relative to top-left plot
-            axs.legend(
-                labels, loc=(0.9, .95),
-                labelspacing=0.1, fontsize='small'
-            )
-
-            # Chart title
-            fig.text(
-                0.5, 0.965, 
-                'Laporan Capaian Pembelajaran Lulusan Program Studi',
-                horizontalalignment='center', 
-                color='black', weight='bold',
-                size='large'
-            )
-            
-            # Save chart
-            chart_filename = '{}.png'.format(uuid.uuid1())
-            chart_dir =  os.path.join(settings.STATIC_ROOT, 'laporan_cpl', 'charts')
-            if not os.path.exists(chart_dir):
-                os.makedirs(chart_dir)
-            
-            chart_path = os.path.join(chart_dir, chart_filename)
-            fig.set_size_inches(6, 4)
-            fig.savefig(chart_path)
-        else:
-            # If ILO are less or equal to 2, use bar chart
-            x = np.arange(len(list_nama_ilo))  # the label locations
-            width = 0.25  # the width of the bars
-            multiplier = 0
-
-            fig, ax = plt.subplots(layout='constrained')
-            chart_data['Satisfactory level'] = satisfactory_level_data
-            # Bar chart
-            for nama_filter, list_nilai_ilo in chart_data.items():
-                offset = width * multiplier
-                ax.bar(
-                    x + offset, 
-                    list_nilai_ilo, 
-                    width, 
-                    label=nama_filter
-                )
-                multiplier += 1
-
-            # Styling
-            ax.set_title('Laporan Capaian Pembelajaran Lulusan Program Studi')
-            ax.set_xticks(x + width/2, list_nama_ilo)
-            ax.grid(True, axis='y', which='major')
-            ax.grid(True, axis='x', which='minor')
-            
-            minor_locator = mticker.AutoMinorLocator(2) # set the number of minor intervals per major interval
-            ax.xaxis.set_minor_locator(minor_locator)
-            ax.legend(loc='lower center', bbox_to_anchor=(0.5, -0.3), ncol=2)
-            ax.set_ylim(0, 100)
-            ax.spines['top'].set_visible(False)
-            ax.spines['right'].set_visible(False)
-            ax.spines['left'].set_visible(False)
-            ax.spines['bottom'].set_color('#DDDDDD')
-            
-            # Save chart
-            chart_filename = '{}.png'.format(uuid.uuid1())
-            chart_dir =  os.path.join(settings.STATIC_ROOT, 'laporan_cpl', 'charts')
-            if not os.path.exists(chart_dir):
-                os.makedirs(chart_dir)
-            
-            chart_path = os.path.join(chart_dir, chart_filename)
-            fig.set_size_inches(6, 4)
-            fig.savefig(chart_path)
-
+    chart_path = generate_laporan_cpl_chart(
+        chart_data,
+        list_ilo, list_filter, 
+        'Laporan Capaian Pembelajaran Lulusan Program Studi',
+    )
     chart_image = Image(chart_path)
 
     # Build
