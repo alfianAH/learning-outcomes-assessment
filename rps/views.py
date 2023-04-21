@@ -171,9 +171,12 @@ class RPSLockAndUnlockTemplateView(ProgramStudiMixin, RedirectView):
         mk_semester_id = kwargs.get('mk_semester_id')
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
         self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
-
+    
     def get_redirect_url(self, *args, **kwargs):
-        self.url = self.mk_semester_obj.get_rps_home_url()
+        if self.request.GET.get('clo') == 'true':
+            self.url = self.mk_semester_obj.get_clo_read_all_url()
+        else:
+            self.url = self.mk_semester_obj.get_rps_home_url()
         return super().get_redirect_url(*args, **kwargs)
     
     def lock_rps(self):

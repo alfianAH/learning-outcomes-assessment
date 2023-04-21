@@ -585,8 +585,6 @@ class CloUnlockView(CloLockAndUnlockView):
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         clo_qs: QuerySet[Clo] = self.mk_semester_obj.get_all_clo()
         is_success, is_unlocking_success = self.unlock_clo(clo_qs)
-
-        print(is_unlocking_success, is_success)
         
         if not is_unlocking_success:
             messages.info(request, 'CPMK dan komponenya sudah tidak terkunci.')
