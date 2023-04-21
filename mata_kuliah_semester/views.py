@@ -208,7 +208,7 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin,
             return self.download_template_nilai()
 
         if 'download_nilai' in request.GET:
-            if not request.is_ajax(): raise PermissionDenied
+            # if not request.is_ajax(): raise PermissionDenied
             return self.download_nilai()
 
         if self.peserta_mk_semester_qs.exists():
@@ -376,7 +376,7 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin,
     
     def download_nilai(self) -> HttpResponse:
         nilai_file = generate_nilai_file(self.single_object)
-        as_attachment = True
+        as_attachment = False
         response = FileResponse(nilai_file, as_attachment=as_attachment, filename=self.nilai_filename)
 
         return response
@@ -1025,4 +1025,29 @@ class NilaiAverageCloAchievementCalculateView(ProgramStudiMixin, RedirectView):
         calculate_nilai_per_clo_mk_semester(self.mk_semester_obj)
         
         messages.success(request, 'Proses perhitungan capaian CPMK rata-rata sudah selesai.')
+        return super().get(request, *args, **kwargs)
+
+
+class NilaiAverageCloAchivementDeleteView(ProgramStudiMixin, RedirectView):
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        mk_semester_id = kwargs.get('mk_semester_id')
+        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
+
+    def get_redirect_url(self, *args, **kwargs):
+        self.url = '{}?active_tab={}'.format(
+            self.mk_semester_obj.read_detail_url(), 
+            'hasil'
+        )
+        return super().get_redirect_url(*args, **kwargs)
+    
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        list_nilai_clo_mk_semester: QuerySet[NilaiCloMataKuliahSemester] = self.mk_semester_obj.get_nilai_clo_mk_semester()
+        
+        list_nilai_clo_mk_semester.delete()
+        self.mk_semester_obj.average_clo_achievement = None
+        self.mk_semester_obj.save()
+        
+        messages.success(request, 'Nilai capaian per CPMK sudah dihapus.')
         return super().get(request, *args, **kwargs)

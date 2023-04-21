@@ -156,6 +156,9 @@ class MataKuliahSemester(MataKuliahSemesterLock):
     def get_nilai_average_calculate_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:nilai-avg-calculate', self.get_kwargs)
     
+    def get_nilai_average_delete_url(self):
+        return get_reverse_url('semester:mata_kuliah_semester:results-delete', self.get_kwargs)
+    
     # RPS
     @property
     def status_rincian(self):

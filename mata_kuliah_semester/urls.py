@@ -18,6 +18,7 @@ from .views import (
     ImportNilaiMataKuliahSemesterView,
 
     NilaiAverageCloAchievementCalculateView,
+    NilaiAverageCloAchivementDeleteView
 )
 
 
@@ -47,6 +48,7 @@ urlpatterns = [
 
     # Nilai Average CLO Achivement
     path('<int:mk_semester_id>/results/nilai-avg-calculate/', NilaiAverageCloAchievementCalculateView.as_view(), name='nilai-avg-calculate'),
+    path('<int:mk_semester_id>/results/delete/', NilaiAverageCloAchivementDeleteView.as_view(), name='results-delete'),
     
     # CLO
     path('<int:mk_semester_id>/cpmk/', include('clo.urls')),
