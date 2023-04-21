@@ -366,7 +366,7 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin,
             }
         }
 
-        return json.dumps(json_response)
+        return list_nilai, json.dumps(json_response)
     
     def download_template_nilai(self) -> HttpResponse:
         generated_template_file = generate_template_nilai_mk_semester(self.single_object, self.peserta_mk_semester_qs)
@@ -375,7 +375,8 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin,
         return response
     
     def download_nilai(self) -> HttpResponse:
-        nilai_file = generate_nilai_file(self.single_object)
+        list_nilai_huruf = self.distribusi_nilai_huruf_graph()[0]
+        nilai_file = generate_nilai_file(self.single_object, list_nilai_huruf)
         as_attachment = False
         response = FileResponse(nilai_file, as_attachment=as_attachment, filename=self.nilai_filename)
 
@@ -425,7 +426,7 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin,
             context.update({
                 'pencapaian_per_clo_graph': self.pencapaian_per_clo_graph(),
                 'pencapaian_clo_rerata_graph': self.pencapaian_clo_rerata_graph(),
-                'distribusi_nilai_huruf_graph': self.distribusi_nilai_huruf_graph(),
+                'distribusi_nilai_huruf_graph': self.distribusi_nilai_huruf_graph()[1],
             })
         
         get_request = self.request.GET

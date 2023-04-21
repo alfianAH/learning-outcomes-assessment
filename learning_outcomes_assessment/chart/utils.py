@@ -100,7 +100,7 @@ def radar_factory(num_vars, frame='circle'):
     return theta
 
 
-def save_chart(chart_dir, chart_figure: Figure):
+def save_chart(chart_dir, chart_figure: Figure, width=6, height=4):
     """Save chart figure in chart dir
 
     Args:
@@ -117,7 +117,7 @@ def save_chart(chart_dir, chart_figure: Figure):
         os.makedirs(chart_dir)
     
     chart_path = os.path.join(chart_dir, chart_filename)
-    chart_figure.set_size_inches(6, 4)
+    chart_figure.set_size_inches(width, height)
     chart_figure.savefig(chart_path)
     
     return chart_path

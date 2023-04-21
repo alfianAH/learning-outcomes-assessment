@@ -1,6 +1,10 @@
+import os
 import numpy as np
 import openpyxl
 import types
+import matplotlib
+import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 from copy import copy
 from io import BytesIO
 from functools import partial
@@ -15,13 +19,14 @@ from reportlab.platypus import SimpleDocTemplate
 from reportlab.lib.units import cm, inch
 from reportlab.platypus import (
     Paragraph, Spacer, Table, ListFlowable, TableStyle,
-    Frame, PageTemplate
+    Frame, PageTemplate, Image
 )
 from reportlab.lib.enums import TA_CENTER, TA_RIGHT
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 from django.conf import settings
 from django.db.models import QuerySet
+from learning_outcomes_assessment.chart.utils import save_chart
 from learning_outcomes_assessment.utils import (
     request_data_to_neosia,
     _iter_cols,
@@ -51,6 +56,7 @@ PRODI_SEMESTER_URL = 'https://customapi.neosia.unhas.ac.id/getProdiSemester'
 MATA_KULIAH_SEMESTER_URL = 'https://customapi.neosia.unhas.ac.id/getKelasBySemester'
 PESERTA_MATA_KULIAH_URL = 'https://customapi.neosia.unhas.ac.id/getMahasiswaByKelas'
 DOSEN_MATA_KULIAH_URL = 'https://customapi.neosia.unhas.ac.id/getDosenByKelas'
+matplotlib.use('Agg')
 
 
 def get_kelas_mk_semester(semester_prodi_id: int):
@@ -884,7 +890,7 @@ def process_excel_file(
     return (is_import_success, message, import_result)
 
 
-def generate_nilai_file(mk_semester: MataKuliahSemester):
+def generate_nilai_file(mk_semester: MataKuliahSemester, list_nilai_huruf: dict):
     file_stream = BytesIO()
 
     # Create the PDF object, using the buffer as its "file."
@@ -1047,6 +1053,7 @@ def generate_nilai_file(mk_semester: MataKuliahSemester):
     ]
 
     list_nilai_clo_mk_semester: QuerySet[NilaiCloMataKuliahSemester] = mk_semester.get_nilai_clo_mk_semester()
+    pencapaian_per_cpmk_chart_data = {}
 
     for nilai_clo in list_nilai_clo_mk_semester:
         clo = nilai_clo.clo
@@ -1058,10 +1065,13 @@ def generate_nilai_file(mk_semester: MataKuliahSemester):
             clo.nama,
             clo.get_ilo().nama,
             '{}%'.format(persentase_clo),
-            nilai_clo.nilai,
+            float('{:.2f}'.format(nilai_clo.nilai)),
             hasil_clo
         ))
+
+        pencapaian_per_cpmk_chart_data[clo.nama] = hasil_clo
     
+    # Avg CLO achievement
     if mk_semester.average_clo_achievement:
         pencapaian_per_cpmk_table_data.append((
             Paragraph(
@@ -1074,9 +1084,10 @@ def generate_nilai_file(mk_semester: MataKuliahSemester):
                 )
             ),
             '', '', '',
-            mk_semester.average_clo_achievement
+            float('{:.2f}'.format(mk_semester.average_clo_achievement)),
         ))
     
+    # Make table and table style
     pencapaian_per_cpmk_table_style_data = copy(table_style_data)
     pencapaian_per_cpmk_table_style_data += [
         ('ALIGN', (2, 1), (-1, -1), 'RIGHT'),               # Nilai align
@@ -1090,6 +1101,42 @@ def generate_nilai_file(mk_semester: MataKuliahSemester):
         hAlign='LEFT'
     )
 
+    # Pie chart capaian per CPMK
+    pencapaian_per_cpmk_labels = pencapaian_per_cpmk_chart_data.keys()
+    pencapaian_per_cpmk_sizes = pencapaian_per_cpmk_chart_data.values()
+
+    fig, ax = plt.subplots(layout='constrained')
+    ax.pie(pencapaian_per_cpmk_sizes, labels=pencapaian_per_cpmk_labels, autopct='%1.1f%%')
+    ax.set_title('Pencapaian per CPMK')
+    # Save chart
+    pencapaian_per_cpmk_chart_dir =  os.path.join(settings.STATIC_ROOT, 'laporan_cpl', 'charts')
+    pencapaian_per_cpmk_chart_path = save_chart(pencapaian_per_cpmk_chart_dir, fig, width=3, height=3)
+
+    pencapaian_per_cpmk_chart_image = Image(pencapaian_per_cpmk_chart_path)
+
+    # Bar chart nilai mahasiswa
+    nilai_mhs_labels = list_nilai_huruf.keys()
+    nilai_mhs_sizes = list_nilai_huruf.values()
+
+    fig, ax = plt.subplots(layout='constrained')
+    ax.bar(nilai_mhs_labels, nilai_mhs_sizes)
+    # Styling
+    ax.set_title('Distribusi Nilai Mahasiswa')
+    ax.grid(True, axis='y', which='major')
+    ax.grid(True, axis='x', which='minor')
+    minor_locator = mticker.AutoMinorLocator(2) # set the number of minor intervals per major interval
+    ax.xaxis.set_minor_locator(minor_locator)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['bottom'].set_color('#DDDDDD')
+    
+    # Save chart
+    nilai_mhs_chart_dir =  os.path.join(settings.STATIC_ROOT, 'laporan_cpl', 'charts')
+    nilai_mhs_chart_path = save_chart(nilai_mhs_chart_dir, fig, width=4.5, height=2.5)
+
+    nilai_mhs_chart_image = Image(nilai_mhs_chart_path)
+
     # Build
     pdf_file.build([
         title, detail,
@@ -1097,6 +1144,8 @@ def generate_nilai_file(mk_semester: MataKuliahSemester):
         mahasiswa_table, empty_line,
         pencapaian_per_cpmk_title,
         pencapaian_per_cpmk_table, empty_line,
+        pencapaian_per_cpmk_chart_image, empty_line,
+        nilai_mhs_chart_image,
     ])
     
     # Close the PDF object cleanly

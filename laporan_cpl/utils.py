@@ -2,7 +2,6 @@ from functools import partial
 from io import BytesIO
 from copy import copy
 import os
-import uuid
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
