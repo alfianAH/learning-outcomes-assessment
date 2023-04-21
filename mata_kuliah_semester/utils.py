@@ -15,6 +15,7 @@ from openpyxl.styles import (
     Protection,
     PatternFill
 )
+from reportlab.lib.pagesizes import letter, landscape
 from reportlab.platypus import SimpleDocTemplate
 from reportlab.lib.units import cm, inch
 from reportlab.platypus import (
@@ -1146,6 +1147,95 @@ def generate_nilai_file(mk_semester: MataKuliahSemester, list_nilai_huruf: dict)
         pencapaian_per_cpmk_table, empty_line,
         pencapaian_per_cpmk_chart_image, empty_line,
         nilai_mhs_chart_image,
+    ])
+    
+    # Close the PDF object cleanly
+    file_stream.seek(0)
+
+    return file_stream
+
+
+def generate_student_performance_file(peserta_mk_semester: PesertaMataKuliah):
+    file_stream = BytesIO()
+
+    # Create the PDF object, using the buffer as its "file."
+    pagesize = landscape(letter)
+    pdf_file = SimpleDocTemplate(file_stream, pagesize=pagesize)
+    styles = getSampleStyleSheet()
+    normal_style = styles['Normal']
+    font_size = normal_style.fontSize
+    empty_line = Spacer(1, 20)
+
+    # Title
+    title = Paragraph(
+        'Student Performance',
+        style=styles['h1']
+    )
+
+    program_studi = peserta_mk_semester.kelas_mk_semester.mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
+    fakultas = program_studi.fakultas.nama
+    prodi = program_studi.nama
+
+    # Header
+    header_style = copy(styles['h2'])
+    header_style.alignment = TA_CENTER
+    header_content = Paragraph(
+        "UNIVERSITAS HASANUDDIN<br/>FAKULTAS {}<br/>PROGRAM STUDI {}".format(fakultas, prodi), 
+        header_style
+    )
+
+    # Get the space before and after the paragraph
+    space_before = header_content.getSpaceBefore()
+    space_after = header_content.getSpaceAfter()
+
+    # Get the height of the paragraph
+    para_height = header_content.wrap(pdf_file.width, pdf_file.height)[1]
+
+    # Calculate the total height of the block
+    block_height = para_height + space_before + space_after
+
+    frame = Frame(
+        pdf_file.leftMargin, 
+        pdf_file.bottomMargin, 
+        pdf_file.width, 
+        pdf_file.height - block_height
+    )
+    template = PageTemplate(
+        frames=frame, 
+        onPage=partial(
+            export_pdf_header, 
+            content=header_content,
+            image_path='./static/public/img/logo-unhas.jpg',
+            image_width=0.6*inch,
+            image_height=0.75*inch,
+        )
+    )
+    pdf_file.addPageTemplates([template])
+    
+    # Detail
+    # MK Semester detail
+    mk_semester = peserta_mk_semester.kelas_mk_semester.mk_semester
+    mk_kurikulum = mk_semester.mk_kurikulum
+    detail_data = [
+        ['Nama mahasiswa', ':', peserta_mk_semester.mahasiswa.nama],
+        ['Mata kuliah', ':', mk_kurikulum.nama],
+        ['Semester', ':', mk_semester.semester.semester.nama],
+        ['Kode', ':', mk_kurikulum.kode],
+        ['SKS', ':', mk_kurikulum.sks],
+        ['Nilai akhir', ':', peserta_mk_semester.nilai_akhir]
+    ]
+    detail_table_style = TableStyle([
+        ('LEFTPADDING', (0, 0), (-1, -1), 0),
+    ])
+    detail = Table(
+        data=detail_data,
+        style=detail_table_style,
+        hAlign='LEFT'
+    )
+
+    # Build
+    pdf_file.build([
+        title, detail,
     ])
     
     # Close the PDF object cleanly

@@ -68,6 +68,7 @@ from .utils import(
     generate_template_nilai_mk_semester,
     process_excel_file,
     generate_nilai_file,
+    generate_student_performance_file,
 )
 
 
@@ -208,7 +209,7 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin,
             return self.download_template_nilai()
 
         if 'download_nilai' in request.GET:
-            # if not request.is_ajax(): raise PermissionDenied
+            if not request.is_ajax(): raise PermissionDenied
             return self.download_nilai()
 
         if self.peserta_mk_semester_qs.exists():
@@ -377,7 +378,7 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin,
     def download_nilai(self) -> HttpResponse:
         list_nilai_huruf = self.distribusi_nilai_huruf_graph()[0]
         nilai_file = generate_nilai_file(self.single_object, list_nilai_huruf)
-        as_attachment = False
+        as_attachment = True
         response = FileResponse(nilai_file, as_attachment=as_attachment, filename=self.nilai_filename)
 
         return response
@@ -684,9 +685,24 @@ class StudentPerformanceReadView(ProgramStudiMixin, MahasiswaAsPesertaMixin, Det
 
         self.user = self.object.mahasiswa
         self.program_studi_obj = self.object.kelas_mk_semester.mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
+        self.filename = 'Student Performance-{}.pdf'.format(self.user.username)
     
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if 'download_performance' in request.GET:
+            # if not request.is_ajax(): raise PermissionDenied
+            return self.download_student_performance()
+        
+        return super().get(request, *args, **kwargs)
+
     def get_object(self, queryset=None) -> PesertaMataKuliah:
         return super().get_object(queryset)
+
+    def download_student_performance(self) -> HttpResponse:
+        nilai_file = generate_student_performance_file(self.object)
+        as_attachment = False
+        response = FileResponse(nilai_file, as_attachment=as_attachment, filename=self.filename)
+
+        return response
 
     def perolehan_nilai_clo_graph(self):
         self.list_clo: QuerySet[Clo] = self.object.kelas_mk_semester.mk_semester.get_all_clo()
@@ -741,6 +757,7 @@ class StudentPerformanceReadView(ProgramStudiMixin, MahasiswaAsPesertaMixin, Det
             'is_radar_chart': is_radar_chart,
             'is_bar_chart_max_h_60': is_bar_chart_max_h_60,
             'list_nilai_ilo': self.list_nilai_ilo,
+            'filename': self.filename,
         })
         return context
     

@@ -4408,6 +4408,10 @@ details.dropdown::marker {
   margin-left: 0.75rem;
 }
 
+.ml-0 {
+  margin-left: 0px;
+}
+
 .mt-2\.5 {
   margin-top: 0.625rem;
 }
