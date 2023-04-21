@@ -27,7 +27,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 from django.conf import settings
 from django.db.models import QuerySet
-from learning_outcomes_assessment.chart.utils import save_chart
+from learning_outcomes_assessment.chart.utils import radar_factory, save_chart
 from learning_outcomes_assessment.utils import (
     request_data_to_neosia,
     _iter_cols,
@@ -1233,9 +1233,238 @@ def generate_student_performance_file(peserta_mk_semester: PesertaMataKuliah):
         hAlign='LEFT'
     )
 
+    # Perolehan nilai CLO
+    perolehan_nilai_clo_title = Paragraph(
+        'Perolehan Nilai CPMK',
+        style=styles['h2']
+    )
+
+    # (COL, ROW)
+    table_style_data = [
+        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),               # Header align
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),    # Header font
+        ('FONTSIZE', (0, 0), (-1, 0), 11),                  # Header font size
+        ('TOPPADDING', (0, 0), (-1, 0), 12),                # Header top padding
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),             # Header bottom padding
+        ('TOPPADDING', (0, 1), (-1, -1), 4),                # Body top padding
+        ('BOTTOMPADDING', (0, 1), (-1, -1), 4),             # Body bottom padding
+        ('GRID', (0, 0), (-1, -1), 0.25, colors.black),     # Grid
+        ('VALIGN', (0, 1), (-1, -1), 'TOP'),                # Body vertical align
+    ]
+
+    perolehan_nilai_clo_table_data = [
+        ('CPMK', 'Nilai CPMK')
+    ]
+
+    list_clo: QuerySet[Clo] = peserta_mk_semester.kelas_mk_semester.mk_semester.get_all_clo()
+    list_nilai_clo_peserta: QuerySet[NilaiCloPeserta] = NilaiCloPeserta.objects.filter(
+        clo__in=list_clo,
+        peserta=peserta_mk_semester,
+    ).order_by('clo')
+    
+    nilai_clo_peserta_chart_data = {}
+    for nilai_clo_peserta in list_nilai_clo_peserta:
+        nama_clo = nilai_clo_peserta.clo.nama
+        nilai_clo = float('{:.2f}'.format(nilai_clo_peserta.nilai))
+
+        nilai_clo_peserta_chart_data[nama_clo] = nilai_clo
+        perolehan_nilai_clo_table_data.append((
+            nama_clo,
+            nilai_clo
+        ))
+
+    perolehan_nilai_clo_table = Table(
+        perolehan_nilai_clo_table_data,
+        style=table_style_data,
+        hAlign='LEFT'
+    )
+
+    fig, ax = plt.subplots()
+    ax.barh(
+        list(nilai_clo_peserta_chart_data.keys()),
+        list(nilai_clo_peserta_chart_data.values()),
+    )
+
+    # Styling
+    ax.grid(True, axis='y', which='minor')
+    ax.grid(True, axis='x', which='major')
+    minor_locator = mticker.AutoMinorLocator(2) # set the number of minor intervals per major interval
+    ax.yaxis.set_minor_locator(minor_locator)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['bottom'].set_color('#DDDDDD')
+
+    ax.invert_yaxis()
+    ax.set_xlim(0, 100)
+    ax.set_xlabel('Nilai')
+    ax.set_ylabel('CPMK')
+    ax.set_title('Grafik Perolehan Nilai CPMK')
+    
+    # Save chart
+    perolehan_nilai_clo_chart_dir =  os.path.join(settings.STATIC_ROOT, 'laporan_cpl', 'charts')
+    perolehan_nilai_clo_chart_path = save_chart(perolehan_nilai_clo_chart_dir, fig)
+
+    perolehan_nilai_clo_chart_image = Image(perolehan_nilai_clo_chart_path)
+
+    # Perolehan Nilai CPL
+    perolehan_nilai_ilo_title = Paragraph(
+        'Perolehan Nilai CPL',
+        style=styles['h2']
+    )
+
+    list_nilai_ilo_peserta: QuerySet[NilaiMataKuliahIloMahasiswa] = peserta_mk_semester.get_nilai_ilo()
+
+    # Perolehan Nilai CPL table
+    perolehan_nilai_ilo_table_data = [
+        ('CPL', 'Satisfactory Level', 'Nilai CPL')
+    ]
+
+    perolehan_nilai_ilo_table_style_data = copy(table_style_data)
+    list_nama_ilo = []
+    perolehan_nilai_ilo_chart_data = {
+        'Satisfactory level': [],
+        'Nilai mahasiswa': [],
+    }
+
+    for i, nilai_ilo_peserta in enumerate(list_nilai_ilo_peserta):
+        nilai_ilo = float('{:.2f}'.format(nilai_ilo_peserta.nilai_ilo))
+        nama_ilo = nilai_ilo_peserta.ilo.nama
+        satisfactory_level_ilo = nilai_ilo_peserta.ilo.satisfactory_level
+
+        perolehan_nilai_ilo_table_data.append((
+            nama_ilo,
+            satisfactory_level_ilo,
+            nilai_ilo
+        ))
+
+        list_nama_ilo.append(nama_ilo)
+        perolehan_nilai_ilo_chart_data['Satisfactory level'].append(satisfactory_level_ilo)
+        perolehan_nilai_ilo_chart_data['Nilai mahasiswa'].append(nilai_ilo)
+
+        # Give red color
+        if nilai_ilo < nilai_ilo_peserta.ilo.satisfactory_level:
+            col = 2
+            row = i + 1
+            perolehan_nilai_ilo_table_style_data.append((
+                'TEXTCOLOR', (col, row), (col, row), colors.red
+            ))
+
+    # Make table
+    perolehan_nilai_ilo_table_style = TableStyle(perolehan_nilai_ilo_table_style_data)
+    perolehan_nilai_ilo_table = Table(
+        perolehan_nilai_ilo_table_data,
+        style=perolehan_nilai_ilo_table_style,
+        hAlign='LEFT'
+    )
+
+    is_radar_chart = True
+
+    if list_nilai_ilo_peserta.count() <= 2:
+        is_radar_chart = False
+
+    if is_radar_chart:
+        # If ILO are more than 2, use radar chart
+        theta = radar_factory(len(list_nama_ilo), frame='polygon')
+
+        data = [list_nama_ilo]
+        labels = ['Satisfactory level', 'Nilai Mahasiswa']
+
+        # Setup data and label
+        data.append((
+            mk_kurikulum.nama, [
+                perolehan_nilai_ilo_chart_data['Satisfactory level'],
+                perolehan_nilai_ilo_chart_data['Nilai mahasiswa'],
+            ]
+        ))
+        
+        # R axis label
+        spoke_labels = data.pop(0)
+
+        # Setup radar chart
+        fig, axs = plt.subplots(
+            figsize=(3, 3), nrows=1, ncols=1,
+            subplot_kw=dict(projection='radar'))
+        fig.subplots_adjust(wspace=0.25, hspace=0.20, top=0.85, bottom=0.05)
+        line_colors = ['r', 'b']
+
+        # Styling
+        for ax, (plot_title, case_data) in zip([axs], data):
+            ax.set_rlim(0, 100)
+            ax.set_rgrids([0, 20, 40, 60, 80, 100])
+            ax.set_title(
+                plot_title, weight='bold', size='medium', position=(0.5, 1.1),
+                horizontalalignment='center', verticalalignment='center')
+            for d, color in zip(case_data, line_colors):
+                ax.plot(theta, d, color=color)
+            ax.set_varlabels(spoke_labels)
+        
+        # add legend relative to top-left plot
+        axs.legend(
+            labels, loc=(0.9, .95),
+            labelspacing=0.1, fontsize='small'
+        )
+
+        # Chart title
+        fig.text(
+            0.5, 0.965, 
+            'Grafik Perolehan Nilai CPL',
+            horizontalalignment='center', 
+            color='black', weight='bold',
+            size='large'
+        )
+        
+        # Save chart
+        perolehan_nilai_ilo_chart_dir =  os.path.join(settings.STATIC_ROOT, 'laporan_cpl', 'charts')
+        perolehan_nilai_ilo_chart_path = save_chart(perolehan_nilai_ilo_chart_dir, fig)
+    else:
+        x = np.arange(len(list_nama_ilo))  # the label locations
+        width = 0.25  # the width of the bars
+        multiplier = 0
+
+        fig, ax = plt.subplots(layout='constrained')
+
+        # Bar chart
+        for nama_filter, list_nilai in perolehan_nilai_ilo_chart_data.items():
+            offset = width * multiplier
+            ax.bar(
+                x + offset, 
+                list_nilai, 
+                width, 
+                label=nama_filter
+            )
+            multiplier += 1
+
+        # Styling
+        ax.set_title('Grafik Perolahan Nilai CPL')
+        ax.set_xticks(x + (len(list_nama_ilo)-1) * width/2, list_nama_ilo)
+        ax.grid(True, axis='y', which='major')
+        ax.grid(True, axis='x', which='minor')
+        
+        minor_locator = mticker.AutoMinorLocator(2) # set the number of minor intervals per major interval
+        ax.xaxis.set_minor_locator(minor_locator)
+        ax.legend(loc='lower center', bbox_to_anchor=(0.5, -0.3), ncol=2)
+        ax.set_ylim(0, 100)
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_visible(False)
+        ax.spines['bottom'].set_color('#DDDDDD')
+        
+        # Save chart
+        perolehan_nilai_ilo_chart_dir =  os.path.join(settings.STATIC_ROOT, 'laporan_cpl', 'charts')
+        perolehan_nilai_ilo_chart_path = save_chart(perolehan_nilai_ilo_chart_dir, fig)
+
+    perolehan_nilai_ilo_chart_image = Image(perolehan_nilai_ilo_chart_path)
+
     # Build
     pdf_file.build([
         title, detail,
+        perolehan_nilai_clo_title,
+        perolehan_nilai_clo_table, empty_line,
+        perolehan_nilai_ilo_title,
+        perolehan_nilai_ilo_table, empty_line,
+        perolehan_nilai_clo_chart_image, empty_line,
+        perolehan_nilai_ilo_chart_image
     ])
     
     # Close the PDF object cleanly
