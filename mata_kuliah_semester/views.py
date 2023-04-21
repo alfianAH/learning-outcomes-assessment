@@ -689,7 +689,7 @@ class StudentPerformanceReadView(ProgramStudiMixin, MahasiswaAsPesertaMixin, Det
     
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         if 'download_performance' in request.GET:
-            # if not request.is_ajax(): raise PermissionDenied
+            if not request.is_ajax(): raise PermissionDenied
             return self.download_student_performance()
         
         return super().get(request, *args, **kwargs)
@@ -699,7 +699,7 @@ class StudentPerformanceReadView(ProgramStudiMixin, MahasiswaAsPesertaMixin, Det
 
     def download_student_performance(self) -> HttpResponse:
         nilai_file = generate_student_performance_file(self.object)
-        as_attachment = False
+        as_attachment = True
         response = FileResponse(nilai_file, as_attachment=as_attachment, filename=self.filename)
 
         return response

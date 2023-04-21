@@ -1107,7 +1107,13 @@ def generate_nilai_file(mk_semester: MataKuliahSemester, list_nilai_huruf: dict)
     pencapaian_per_cpmk_sizes = pencapaian_per_cpmk_chart_data.values()
 
     fig, ax = plt.subplots(layout='constrained')
-    ax.pie(pencapaian_per_cpmk_sizes, labels=pencapaian_per_cpmk_labels, autopct='%1.1f%%')
+
+    ax.pie(
+        pencapaian_per_cpmk_sizes, 
+        labels=pencapaian_per_cpmk_labels, 
+        autopct=lambda percentage: '{:.2f}'.format(
+            percentage / 100 * mk_semester.average_clo_achievement)
+    )
     ax.set_title('Pencapaian per CPMK')
     # Save chart
     pencapaian_per_cpmk_chart_dir =  os.path.join(settings.STATIC_ROOT, 'laporan_cpl', 'charts')
