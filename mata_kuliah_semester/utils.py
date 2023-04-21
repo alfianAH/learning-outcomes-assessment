@@ -1,6 +1,7 @@
 import numpy as np
 import openpyxl
 import types
+from copy import copy
 from io import BytesIO
 from functools import partial
 from openpyxl.workbook import Workbook
@@ -16,8 +17,8 @@ from reportlab.platypus import (
     Paragraph, Spacer, Table, ListFlowable, TableStyle,
     Frame, PageTemplate
 )
-from reportlab.lib.enums import TA_CENTER
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.enums import TA_CENTER, TA_RIGHT
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 from django.conf import settings
 from django.db.models import QuerySet
@@ -891,6 +892,7 @@ def generate_nilai_file(mk_semester: MataKuliahSemester):
     styles = getSampleStyleSheet()
     normal_style = styles['Normal']
     font_size = normal_style.fontSize
+    empty_line = Spacer(1, 20)
 
     # Title
     title = Paragraph(
@@ -920,7 +922,7 @@ def generate_nilai_file(mk_semester: MataKuliahSemester):
     )
     list_dosen_mk_semester: list[DosenMataKuliah] = mk_semester.get_all_dosen_mk_semester()
 
-    header_style = styles['h2']
+    header_style = copy(styles['h2'])
     header_style.alignment = TA_CENTER
     header_content = Paragraph(
         "UNIVERSITAS HASANUDDIN<br/>FAKULTAS {}<br/>PROGRAM STUDI {}".format(fakultas, prodi), 
@@ -962,8 +964,6 @@ def generate_nilai_file(mk_semester: MataKuliahSemester):
         bulletFormat='%s.'
     )
 
-    empty_line = Spacer(1, 20)
-
     # Nilai Mahasiswa
     mahasiswa_data = [
         ['No.', 'NIM', 'Nama', 'Nilai angka', 'Nilai huruf']
@@ -971,18 +971,21 @@ def generate_nilai_file(mk_semester: MataKuliahSemester):
     list_mahasiswa_mk_semester: list[PesertaMataKuliah] = mk_semester.get_all_peserta_mk_semester()
     
     # (COL, ROW)
-    mahasiswa_table_style_data = [
+    table_style_data = [
         ('ALIGN', (0, 0), (-1, 0), 'CENTER'),               # Header align
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),    # Header font
         ('FONTSIZE', (0, 0), (-1, 0), 11),                  # Header font size
         ('TOPPADDING', (0, 0), (-1, 0), 12),                # Header top padding
         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),             # Header bottom padding
-        ('ALIGN', (0, 1), (0, -1), 'CENTER'),               # Nomor align
-        ('ALIGN', (3, 1), (-2, -1), 'RIGHT'),               # Nilai align
         ('TOPPADDING', (0, 1), (-1, -1), 4),                # Body top padding
         ('BOTTOMPADDING', (0, 1), (-1, -1), 4),             # Body bottom padding
         ('GRID', (0, 0), (-1, -1), 0.25, colors.black),     # Grid
         ('VALIGN', (0, 1), (-1, -1), 'TOP'),                # Body vertical align
+    ]
+    mahasiswa_table_style_data = copy(table_style_data)
+    mahasiswa_table_style_data += [
+        ('ALIGN', (0, 1), (0, -1), 'CENTER'),               # Nomor align
+        ('ALIGN', (3, 1), (-2, -1), 'RIGHT'),               # Nilai align
     ]
 
     for i, mahasiswa in enumerate(list_mahasiswa_mk_semester, 1):
@@ -1032,13 +1035,68 @@ def generate_nilai_file(mk_semester: MataKuliahSemester):
         colWidths=[1*cm, 3*cm, 6.5*cm, None, None]
     )
 
+    # Pencapaian per CPMK
+    pencapaian_per_cpmk_title = Paragraph(
+        'Pencapaian Capaian Pembelajaran Mata Kuliah',
+        style=styles['h2']
+    )
+
+    # Pencapaian per CPMK table
+    pencapaian_per_cpmk_table_data = [
+        ('CPMK', 'CPL', 'Persentase CPMK', 'Skor CPMK', 'Hasil CPMK')
+    ]
+
+    list_nilai_clo_mk_semester: QuerySet[NilaiCloMataKuliahSemester] = mk_semester.get_nilai_clo_mk_semester()
+
+    for nilai_clo in list_nilai_clo_mk_semester:
+        clo = nilai_clo.clo
+        persentase_clo = clo.get_total_persentase_komponen()
+        hasil_clo = persentase_clo/100 * nilai_clo.nilai
+        hasil_clo = float('{:.2f}'.format(hasil_clo))
+
+        pencapaian_per_cpmk_table_data.append((
+            clo.nama,
+            clo.get_ilo().nama,
+            '{}%'.format(persentase_clo),
+            nilai_clo.nilai,
+            hasil_clo
+        ))
+    
+    if mk_semester.average_clo_achievement:
+        pencapaian_per_cpmk_table_data.append((
+            Paragraph(
+                'Total Capaian Pembelajaran Mata Kuliah',
+                style=ParagraphStyle(
+                    name='table_capaian_cpmk_footer',
+                    alignment=TA_RIGHT,
+                    fontName='Helvetica-Bold',
+                    fontSize=10
+                )
+            ),
+            '', '', '',
+            mk_semester.average_clo_achievement
+        ))
+    
+    pencapaian_per_cpmk_table_style_data = copy(table_style_data)
+    pencapaian_per_cpmk_table_style_data += [
+        ('ALIGN', (2, 1), (-1, -1), 'RIGHT'),               # Nilai align
+        ('SPAN', (0, -1), (-2, -1)),                        # Total merge
+        ('FONTNAME', (-1, -1), (-1, -1), 'Helvetica-Bold'),    # Total font
+    ]
+    pencapaian_per_cpmk_table_style = TableStyle(pencapaian_per_cpmk_table_style_data)
+    pencapaian_per_cpmk_table = Table(
+        pencapaian_per_cpmk_table_data,
+        style=pencapaian_per_cpmk_table_style,
+        hAlign='LEFT'
+    )
+
     # Build
     pdf_file.build([
-        title,
-        detail,
-        list_dosen,
-        empty_line,
-        mahasiswa_table,
+        title, detail,
+        list_dosen, empty_line,
+        mahasiswa_table, empty_line,
+        pencapaian_per_cpmk_title,
+        pencapaian_per_cpmk_table, empty_line,
     ])
     
     # Close the PDF object cleanly
