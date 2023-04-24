@@ -1,5 +1,6 @@
 from django.http import HttpRequest, HttpResponse
 from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib import messages
 from django.forms import BaseInlineFormSet
 from django.shortcuts import redirect, render, get_object_or_404
@@ -92,7 +93,8 @@ def logout_view(request: HttpRequest):
     return redirect('/')
 
 
-class ProgramStudiReadView(ProgramStudiMixin, DetailWithListViewModelA):
+class ProgramStudiReadView(ProgramStudiMixin, PermissionRequiredMixin, DetailWithListViewModelA):
+    permission_required = ('accounts.view_programstudi', 'accounts.view_programstudijenjang')
     single_model = ProgramStudi
     single_pk_url_kwarg = 'prodi_id'
     single_object: ProgramStudi = None
@@ -122,7 +124,8 @@ class ProgramStudiReadView(ProgramStudiMixin, DetailWithListViewModelA):
         return super().get_queryset()
 
 
-class ProgramStudiCreateFormView(ProgramStudiMixin, FormView):
+class ProgramStudiCreateFormView(ProgramStudiMixin, PermissionRequiredMixin, FormView):
+    permission_required = ('accounts.add_jenjangstudi', 'accounts.add_programstudijenjang', 'accounts.add_fakultas', 'accounts.change_programstudi')
     form_class = ProgramStudiJenjangCreateForm    
     template_name: str = 'accounts/prodi/create-view.html'
 
@@ -177,7 +180,8 @@ class ProgramStudiCreateFormView(ProgramStudiMixin, FormView):
         return super().form_valid(form)
 
 
-class ProgramStudiJenjangSKSBulkUpdateView(ProgramStudiMixin, UpdateInlineFormsetView):
+class ProgramStudiJenjangSKSBulkUpdateView(ProgramStudiMixin, PermissionRequiredMixin, UpdateInlineFormsetView):
+    permission_required = ('accounts.change_programstudijenjang', )
     model = ProgramStudi
     pk_url_kwarg: str = 'prodi_id'
     template_name = 'accounts/prodi/bulk-update-sks-view.html'
@@ -225,7 +229,8 @@ class ProgramStudiJenjangSKSBulkUpdateView(ProgramStudiMixin, UpdateInlineFormse
         return redirect(self.success_url)
 
 
-class ProgramStudiJenjangBulkUpdateView(ProgramStudiMixin, ModelBulkUpdateView):
+class ProgramStudiJenjangBulkUpdateView(ProgramStudiMixin, PermissionRequiredMixin, ModelBulkUpdateView):
+    permission_required = ('accounts.change_programstudijenjang', 'accounts.change_jenjangstudi')
     form_class = ProgramStudiJenjangUpdateForm
     template_name = 'accounts/prodi/bulk-update-view.html'
 
@@ -264,7 +269,8 @@ class ProgramStudiJenjangBulkUpdateView(ProgramStudiMixin, ModelBulkUpdateView):
         return super().form_valid(form)
 
 
-class ProgramStudiJenjangBulkDeleteView(ProgramStudiMixin, ModelBulkDeleteView):
+class ProgramStudiJenjangBulkDeleteView(ProgramStudiMixin, PermissionRequiredMixin, ModelBulkDeleteView):
+    permission_required = ('accounts.delete_programstudijenjang', )
     model = ProgramStudiJenjang
     id_list_obj = 'id_prodi_jenjang'
     success_msg = 'Berhasil menghapus jenjang program studi.'
