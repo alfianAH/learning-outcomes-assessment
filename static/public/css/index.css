@@ -5035,6 +5035,22 @@ details.dropdown::marker {
   background-color: rgb(245 158 11 / var(--tw-bg-opacity));
 }
 
+.bg-contain {
+  background-size: contain;
+}
+
+.bg-cover {
+  background-size: cover;
+}
+
+.bg-center {
+  background-position: center;
+}
+
+.bg-no-repeat {
+  background-repeat: no-repeat;
+}
+
 .fill-slate-50 {
   fill: #f8fafc;
 }
@@ -5053,6 +5069,11 @@ details.dropdown::marker {
 
 .fill-sky-600 {
   fill: #0284c7;
+}
+
+.object-left {
+  -o-object-position: left;
+     object-position: left;
 }
 
 .p-1 {

@@ -1,4 +1,5 @@
 {% extends 'home-view.html' %}
+{% load static %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{% url 'kurikulum:read-all' %}" role="listitem">Kurikulum</a></li>
@@ -19,7 +20,8 @@
 <ul class="w-full text-center sm:text-start space-y-2 sm:space-y-0 sm:space-x-2 xl:space-x-10">
     <li class="link-item-icon">
         <a href="{{ object.read_all_mk_kurikulum_url }}">
-            <div class="rounded-full bg-slate-500 w-48 h-48"></div>
+            <div class="rounded-full bg-slate-500 w-48 h-48 bg-cover bg-center bg-no-repeat" style="background-image: url({% static 'public/img/mk-kurikulum.jpg' %})">
+            </div>
             <span>
                 Mata Kuliah Kurikulum
             </span>
@@ -28,7 +30,8 @@
 
     <li class="link-item-icon">
         <a href="{{ object.read_all_pi_area_url }}" class="link-with-icon">
-            <div class="rounded-full bg-slate-500 w-48 h-48"></div>
+            <div class="rounded-full bg-slate-500 w-48 h-48 bg-cover bg-center bg-no-repeat" style="background-image: url({% static 'public/img/performance-indicator.jpg' %})">
+            </div>
             <span>
                 Performance Indicators
             </span>
@@ -37,7 +40,8 @@
 
     <li class="link-item-icon">
         <a href="{{ object.read_all_ilo_url }}" class="link-with-icon">
-            <div class="rounded-full bg-slate-500 w-48 h-48"></div>
+            <div class="rounded-full bg-slate-500 w-48 h-48 bg-cover bg-center bg-no-repeat" style="background-image: url({% static 'public/img/ilo.jpg' %})">
+            </div>
             <span>
                 Capaian Pembelajaran Lulusan
             </span>
