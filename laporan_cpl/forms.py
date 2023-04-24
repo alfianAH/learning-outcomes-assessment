@@ -1,9 +1,7 @@
-from django.utils.functional import cached_property
 from django import forms
 from django.forms import (
     formset_factory,
 )
-from django.core.exceptions import ValidationError
 from learning_outcomes_assessment.forms.formset import CanDeleteBaseFormSet
 from learning_outcomes_assessment.widgets import MySelectInput
 from kurikulum.models import Kurikulum
