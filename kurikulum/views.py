@@ -2,6 +2,7 @@ import json
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.contrib import messages
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
@@ -39,7 +40,8 @@ from mata_kuliah_kurikulum.utils import(
 
 
 # Create your views here.
-class KurikulumCreateFormWizardView(MySessionWizardView):
+class KurikulumCreateFormWizardView(PermissionRequiredMixin, MySessionWizardView):
+    permission_required = ('kurikulum.add_kurikulum', 'mata_kuliah_kurikulum.add_matakuliahkurikulum')
     template_name: str = 'kurikulum/create-view.html'
     form_list: list = [ProgramStudiJenjangSelectForm, KurikulumCreateForm, MataKuliahKurikulumCreateForm]
 
@@ -191,7 +193,8 @@ class KurikulumCreateFormWizardView(MySessionWizardView):
         return redirect(success_url)
 
 
-class KurikulumBulkUpdateView(ModelBulkUpdateView):
+class KurikulumBulkUpdateView(PermissionRequiredMixin, ModelBulkUpdateView):
+    permission_required = ('kurikulum.change_kurikulum', )
     form_class = KurikulumBulkUpdateForm
     template_name: str = 'kurikulum/kurikulum-update-view.html'
     success_url = reverse_lazy('kurikulum:read-all')
@@ -247,10 +250,11 @@ class KurikulumBulkUpdateView(ModelBulkUpdateView):
         return redirect(self.success_url)
 
 
-class KurikulumReadAllView(ListViewModelA):
+class KurikulumReadAllView(PermissionRequiredMixin, ListViewModelA):
     """Read all Kurikulums from Program Studi X
     """
     
+    permission_required = ('kurikulum.view_kurikulum', )
     model = Kurikulum
     paginate_by: int = 10
     template_name: str = 'kurikulum/home.html'
@@ -307,7 +311,8 @@ class KurikulumReadAllView(ListViewModelA):
         return super().get_queryset()
 
 
-class KurikulumReadView(ProgramStudiMixin, DetailView):
+class KurikulumReadView(ProgramStudiMixin, PermissionRequiredMixin, DetailView):
+    permission_required = ('kurikulum.view_kurikulum', )
     model = Kurikulum
     pk_url_kwarg: str = 'kurikulum_id'
     template_name: str = 'kurikulum/detail-view.html'
@@ -318,7 +323,8 @@ class KurikulumReadView(ProgramStudiMixin, DetailView):
         self.program_studi_obj = self.object.prodi_jenjang.program_studi
 
 
-class KurikulumBulkDeleteView(ModelBulkDeleteView):
+class KurikulumBulkDeleteView(PermissionRequiredMixin, ModelBulkDeleteView):
+    permission_required = ('kurikulum.delete_kurikulum', )
     success_url = reverse_lazy('kurikulum:read-all')
     model = Kurikulum
     id_list_obj = 'id_kurikulum'
