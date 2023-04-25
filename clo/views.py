@@ -596,7 +596,7 @@ class CloUnlockView(CloLockAndUnlockView):
             self.lock_clo(clo_qs)
             messages.error(request, 'Gagal membuka kunci CPMK dan komponennya.')
 
-        return redirect('{}?clo=true'.format(self.mk_semester_obj.get_rps_unlock_url()))
+        return super().get(request, *args, **kwargs)
 
 
 # Komponen CLO

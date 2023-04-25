@@ -173,10 +173,7 @@ class RPSLockAndUnlockTemplateView(ProgramStudiMixin, RedirectView):
         self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
     
     def get_redirect_url(self, *args, **kwargs):
-        if self.request.GET.get('clo') == 'true':
-            self.url = self.mk_semester_obj.get_clo_read_all_url()
-        else:
-            self.url = self.mk_semester_obj.get_rps_home_url()
+        self.url = self.mk_semester_obj.get_rps_home_url()
         return super().get_redirect_url(*args, **kwargs)
     
     def lock_rps(self):
