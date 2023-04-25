@@ -18,6 +18,7 @@ from learning_outcomes_assessment.forms.views import (
     HtmxUpdateInlineFormsetView,
     UpdateInlineFormsetView,
 )
+from clo.models import PiClo
 from kurikulum.models import Kurikulum
 from .forms import (
     AssessmentAreaForm,
@@ -471,6 +472,17 @@ class PIAreaUnlockView(PermissionRequiredMixin, PIAreaLockAndUnlockView):
     )
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         assessment_area_qs: QuerySet[AssessmentArea] = self.kurikulum_obj.get_all_assessment_area()
+
+        pi_clo_qs: QuerySet[PiClo] = PiClo.objects.filter(
+            performance_indicator__pi_area__assessment_area__in=assessment_area_qs
+        )
+
+        if pi_clo_qs.exists():
+            messages.warning(request, 'Anda tidak boleh merubah performance indicator, karena PI digunakan di beberapa CPMK.')
+            messages.info(request, 'Jika anda ingin melakukan perubahan major pada PI, disarankan untuk membuat kurikulum baru.')
+            messages.info(request, 'Jika anda ingin melakukan perubahan minor pada PI, disarankan untuk membuka kunci CPMK secara manual. Pastikan anda memastikan PI dan CPMK sudah benar sebelum menguncinya.')
+            return super().get(request, *args, **kwargs)
+
         is_success, is_unlocking_success = self.unlock_pi(assessment_area_qs)
 
         if not is_unlocking_success:
