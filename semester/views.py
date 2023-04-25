@@ -2,6 +2,7 @@ from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 from django.core.exceptions import PermissionDenied
 from django.contrib import messages
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from learning_outcomes_assessment.wizard.views import MySessionWizardView
@@ -25,7 +26,7 @@ from .forms import(
     SemesterProdiCreateForm,
     SemesterProdiBulkUpdateForm,
 )
-from accounts.models import ProgramStudi, ProgramStudiJenjang
+from accounts.models import ProgramStudiJenjang
 from .models import(
     TahunAjaran,
     TahunAjaranProdi,
@@ -40,7 +41,13 @@ from .utils import(
 
 
 # Create your views here.
-class SemesterReadAllView(ListViewModelA):
+class SemesterReadAllView(PermissionRequiredMixin, ListViewModelA):
+    permission_required = (
+        'semester.view_semester', 
+        'semester.view_semesterprodi', 
+        'semester.view_tahunajaran', 
+        'semester.view_tahunajaranprodi',
+    )
     model = SemesterProdi
     paginate_by: int = 10
     template_name: str = 'semester/home.html'
@@ -103,7 +110,13 @@ class SemesterReadAllView(ListViewModelA):
         return super().get_queryset()
 
 
-class SemesterCreateView(MySessionWizardView):
+class SemesterCreateView(PermissionRequiredMixin, MySessionWizardView):
+    permission_required = (
+        'semester.add_tahunajaran',
+        'semester.add_tahunajaranprodi',
+        'semester.add_semester',
+        'semester.add_semesterprodi',
+    )
     form_list = [ProgramStudiJenjangSelectForm, SemesterProdiCreateForm]
     template_name = 'semester/create-view.html'
     success_url = reverse_lazy('semester:read-all')
@@ -192,7 +205,8 @@ class SemesterCreateView(MySessionWizardView):
         return redirect(self.success_url)
 
 
-class SemesterBulkUpdateView(ModelBulkUpdateView):
+class SemesterBulkUpdateView(PermissionRequiredMixin, ModelBulkUpdateView):
+    permission_required = ('semester.change_semester', 'semester.change_semesterprodi',)
     form_class = SemesterProdiBulkUpdateForm
     template_name = 'semester/bulk-update-view.html'
     success_url = reverse_lazy('semester:read-all')
@@ -285,7 +299,11 @@ class SemesterBulkUpdateView(ModelBulkUpdateView):
         return super().form_valid(form)
 
 
-class SemesterReadView(ProgramStudiMixin, DetailWithListViewModelA):
+class SemesterReadView(ProgramStudiMixin, PermissionRequiredMixin, DetailWithListViewModelA):
+    permission_required = (
+        'semester.view_semesterprodi',
+        'mata_kuliah_semester.view_matakuliahsemester',
+    )
     single_model = SemesterProdi
     single_pk_url_kwarg = 'semester_prodi_id'
     single_object: SemesterProdi = None
@@ -354,7 +372,8 @@ class SemesterReadView(ProgramStudiMixin, DetailWithListViewModelA):
         return super().get_queryset()
 
 
-class SemesterBulkDeleteView(ModelBulkDeleteView):
+class SemesterBulkDeleteView(PermissionRequiredMixin, ModelBulkDeleteView):
+    permission_required = ('semester.delete_semesterprodi',)
     success_url = reverse_lazy('semester:read-all')
     model = SemesterProdi
     id_list_obj: str = 'id_semester'
