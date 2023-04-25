@@ -10,7 +10,7 @@ class RPSModelForm(forms.ModelForm):
             'file_rps': 'Unggah File RPS'
         }
         widgets = {
-            'file_rps': forms.ClearableFileInput(attrs={
+            'file_rps': forms.FileInput(attrs={
                 'accept': 'application/pdf'
             }),
         }

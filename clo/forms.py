@@ -333,7 +333,7 @@ class ImportNilaiUploadForm(forms.Form):
     excel_file = forms.FileField(
         allow_empty_file=False, 
         validators=[validate_excel_file], 
-        widget=forms.ClearableFileInput(attrs={
+        widget=forms.FileInput(attrs={
             'accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'
         }),
         label='File Nilai (Excel)',
