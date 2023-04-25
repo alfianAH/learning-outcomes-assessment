@@ -4,7 +4,8 @@ from django.contrib.auth import authenticate
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.db.models import QuerySet
-from django.http import FileResponse, HttpRequest, HttpResponse, Http404
+from django.http import FileResponse, HttpRequest, HttpResponse
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic.base import View, RedirectView
@@ -73,7 +74,12 @@ from .utils import(
 
 
 # Create your views here.
-class MataKuliahSemesterCreateView(ProgramStudiMixin, FormView):
+class MataKuliahSemesterCreateView(ProgramStudiMixin, PermissionRequiredMixin, FormView):
+    permission_required = (
+        'mata_kuliah_semester.add_matakuliahsemester',
+        'mata_kuliah_semester.add_kelasmatakuliahsemester',
+        'mata_kuliah_semester.add_dosenmatakuliah',
+    )
     form_class = MataKuliahSemesterCreateForm
     template_name: str = 'mata-kuliah-semester/create-view.html'
     semester_obj: SemesterProdi = None
@@ -161,7 +167,15 @@ class MataKuliahSemesterCreateView(ProgramStudiMixin, FormView):
         return super().form_valid(form)
 
 
-class MataKuliahSemesterReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin, DetailWithListViewModelD):
+class MataKuliahSemesterReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin, PermissionRequiredMixin, DetailWithListViewModelD):
+    permission_required = (
+        'mata_kuliah_semester.view_matakuliahsemester',
+        'mata_kuliah_semester.view_kelasmatakuliahsemester',
+        'mata_kuliah_semester.view_dosenmatakuliah',
+        'mata_kuliah_semester.view_pesertamatakuliah',
+        'clo.view_nilaikomponenclopeserta',
+        'clo.view_nilaiclomatakuliahsemester',
+    )
     single_model = MataKuliahSemester
     single_pk_url_kwarg = 'mk_semester_id'
     single_object: MataKuliahSemester = None
@@ -440,7 +454,10 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin,
         return context
 
 
-class MataKuliahSemesterBulkDeleteView(ModelBulkDeleteView):
+class MataKuliahSemesterBulkDeleteView(ProgramStudiMixin, PermissionRequiredMixin, ModelBulkDeleteView):
+    permission_required = (
+        'mata_kuliah_semester.delete_matakuliahsemester',
+    )
     model = MataKuliahSemester
     id_list_obj = 'id_mk_semester'
     success_msg = 'Berhasil mmenghapus mata kuliah semester'
@@ -449,6 +466,7 @@ class MataKuliahSemesterBulkDeleteView(ModelBulkDeleteView):
         super().setup(request, *args, **kwargs)
         semester_prodi_id = kwargs.get('semester_prodi_id')
         semester_prodi_obj = get_object_or_404(SemesterProdi, id_neosia=semester_prodi_id)
+        self.program_studi_obj = semester_prodi_obj.tahun_ajaran_prodi.prodi_jenjang.program_studi
         self.success_url = semester_prodi_obj.read_detail_url()
 
     def get_queryset(self):
@@ -456,7 +474,8 @@ class MataKuliahSemesterBulkDeleteView(ModelBulkDeleteView):
         return super().get_queryset()
 
 
-class KelasMataKuliahSemesterUpdateView(ProgramStudiMixin, ModelBulkUpdateView):
+class KelasMataKuliahSemesterUpdateView(ProgramStudiMixin, PermissionRequiredMixin, ModelBulkUpdateView):
+    permission_required = ('mata_kuliah_semester.change_kelasmatakuliahsemester',)
     form_class = KelasMataKuliahSemesterUpdateForm
     template_name: str = 'mata-kuliah-semester/kelas-mk-semester-update-view.html'
     mk_semester_obj: MataKuliahSemester = None
@@ -504,7 +523,9 @@ class KelasMataKuliahSemesterUpdateView(ProgramStudiMixin, ModelBulkUpdateView):
         return super().form_valid(form)
 
 
-class KelasMataKuliahSemesterDeleteView(ProgramStudiMixin, View):
+class KelasMataKuliahSemesterDeleteView(ProgramStudiMixin, PermissionRequiredMixin, View):
+    permission_required = ('mata_kuliah_semester.delete_kelasmatakuliahsemester',)
+
     def setup(self, request: HttpRequest, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         mk_semester_id = kwargs.get('mk_semester_id')
@@ -529,7 +550,8 @@ class KelasMataKuliahSemesterDeleteView(ProgramStudiMixin, View):
 
 
 # Peserta Mata Kuliah
-class PesertaMataKuliahSemesterCreateView(ProgramStudiMixin, FormView):
+class PesertaMataKuliahSemesterCreateView(ProgramStudiMixin, PermissionRequiredMixin, FormView):
+    permission_required = ('mata_kuliah_semester.add_pesertamatakuliah',)
     form_class = PesertaMataKuliahSemesterCreateForm
     mk_semester_obj: MataKuliahSemester = None
     template_name = 'mata-kuliah-semester/peserta/create-view.html'
@@ -601,7 +623,8 @@ class PesertaMataKuliahSemesterCreateView(ProgramStudiMixin, FormView):
         return super().form_valid(form)
 
 
-class PesertaMataKuliahBulkUpdateView(ProgramStudiMixin, ModelBulkUpdateView):
+class PesertaMataKuliahBulkUpdateView(ProgramStudiMixin, PermissionRequiredMixin, ModelBulkUpdateView):
+    permission_required = ('mata_kuliah_semester.change_pesertamatakuliah',)
     form_class = PesertaMataKuliahSemesterUpdateForm
     template_name = 'mata-kuliah-semester/peserta/update-view.html'
     mk_semester_obj: MataKuliahSemester = None
@@ -652,7 +675,8 @@ class PesertaMataKuliahBulkUpdateView(ProgramStudiMixin, ModelBulkUpdateView):
         return super().form_valid(form)
 
 
-class PesertaMataKuliahBulkDeleteView(ProgramStudiMixin, ModelBulkDeleteView):
+class PesertaMataKuliahBulkDeleteView(ProgramStudiMixin, PermissionRequiredMixin, ModelBulkDeleteView):
+    permission_required = ('mata_kuliah_semester.delete_pesertamatakuliah',)
     model = PesertaMataKuliah
     success_msg = 'Berhasil menghapus peserta mata kuliah semester'
     id_list_obj = 'id_peserta_mk_semester'
@@ -674,7 +698,12 @@ class PesertaMataKuliahBulkDeleteView(ProgramStudiMixin, ModelBulkDeleteView):
         return super().get_queryset()
 
 
-class StudentPerformanceReadView(ProgramStudiMixin, MahasiswaAsPesertaMixin, DetailView):
+class StudentPerformanceReadView(ProgramStudiMixin, MahasiswaAsPesertaMixin, PermissionRequiredMixin, DetailView):
+    permission_required = (
+        'mata_kuliah_semester.view_pesertamatakuliah',
+        'mata_kuliah_semester.view_nilaimatakuliahilomahasiswa',
+        'clo.view_nilaiclopeserta',
+    )
     model = PesertaMataKuliah
     pk_url_kwarg = 'peserta_id'
     template_name = 'mata-kuliah-semester/peserta/student-performance.html'
@@ -762,7 +791,13 @@ class StudentPerformanceReadView(ProgramStudiMixin, MahasiswaAsPesertaMixin, Det
         return context
     
 
-class StudentPerformanceCalculateView(ProgramStudiMixin, MahasiswaAsPesertaMixin, RedirectView):
+class StudentPerformanceCalculateView(ProgramStudiMixin, MahasiswaAsPesertaMixin, PermissionRequiredMixin, RedirectView):
+    permission_required = (
+        'clo.add_nilaiclopeserta',
+        'clo.change_nilaiclopeserta',
+        'mata_kuliah_semester.add_nilaimatakuliahilomahasiswa',
+        'mata_kuliah_semester.change_nilaimatakuliahilomahasiswa',
+    )
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
         peserta_id = kwargs.get('peserta_id')
@@ -899,7 +934,13 @@ class NilaiKomponenCloEditTemplateView(ProgramStudiMixin, FormView):
         return super().form_invalid(form)
 
 
-class NilaiKomponenCloEditView(NilaiKomponenCloEditTemplateView):
+class NilaiKomponenCloEditView(PermissionRequiredMixin, NilaiKomponenCloEditTemplateView):
+    permission_required = (
+        'clo.add_nilaikomponenclopeserta',
+        'clo.change_nilaikomponenclopeserta',
+        'mata_kuliah_semester.delete_nilaiexcelmatakuliahsemester',
+        'mata_kuliah_semester.view_nilaiexcelmatakuliahsemester',
+    )
     template_name = 'mata-kuliah-semester/nilai-komponen/edit-view.html'
     is_import_success = False
     message = ''
@@ -950,7 +991,11 @@ class NilaiKomponenCloEditView(NilaiKomponenCloEditTemplateView):
         return super().form_valid(form)
 
 
-class NilaiKomponenCloPesertaEditView(NilaiKomponenCloEditTemplateView):
+class NilaiKomponenCloPesertaEditView(PermissionRequiredMixin, NilaiKomponenCloEditTemplateView):
+    permission_required = (
+        'clo.add_nilaikomponenclopeserta',
+        'clo.change_nilaikomponenclopeserta',
+    )
     peserta_mk_semester: PesertaMataKuliah = None
 
     modal_title: str = 'Edit Nilai'
@@ -975,7 +1020,11 @@ class NilaiKomponenCloPesertaEditView(NilaiKomponenCloEditTemplateView):
         return context
 
 
-class ImportNilaiMataKuliahSemesterView(ProgramStudiMixin, FormView):
+class ImportNilaiMataKuliahSemesterView(ProgramStudiMixin, PermissionRequiredMixin, FormView):
+    permission_required = (
+        'mata_kuliah_semester.add_nilaiexcelmatakuliahsemester',
+        'mata_kuliah_semester.change_nilaiexcelmatakuliahsemester',
+    )
     form_class = ImportNilaiUploadForm
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
@@ -1020,7 +1069,13 @@ class ImportNilaiMataKuliahSemesterView(ProgramStudiMixin, FormView):
 
 
 # Nilai average CLO achievement
-class NilaiAverageCloAchievementCalculateView(ProgramStudiMixin, RedirectView):
+class NilaiAverageCloAchievementCalculateView(ProgramStudiMixin, PermissionRequiredMixin, RedirectView):
+    permission_required = (
+        'clo.add_nilaiclomatakuliahsemester',
+        'clo.change_nilaiclomatakuliahsemester',
+        'mata_kuliah_semester.change_matakuliahsemester',
+    )
+
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
         mk_semester_id = kwargs.get('mk_semester_id')
@@ -1046,7 +1101,12 @@ class NilaiAverageCloAchievementCalculateView(ProgramStudiMixin, RedirectView):
         return super().get(request, *args, **kwargs)
 
 
-class NilaiAverageCloAchivementDeleteView(ProgramStudiMixin, RedirectView):
+class NilaiAverageCloAchivementDeleteView(ProgramStudiMixin, PermissionRequiredMixin, RedirectView):
+    permission_required = (
+        'clo.delete_nilaiclomatakuliahsemester',
+        'mata_kuliah_semester.change_matakuliahsemester',
+    )
+
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
         mk_semester_id = kwargs.get('mk_semester_id')

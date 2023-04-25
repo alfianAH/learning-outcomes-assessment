@@ -264,9 +264,14 @@ dosen_permissions = [
 mahasiswa_permissions = [
     'clo.view_clo',
     'clo.view_komponenclo',
+    
+    'clo.add_nilaiclopeserta',
+    'clo.change_nilaiclopeserta',
     'clo.view_nilaiclopeserta',
+
     'clo.view_nilaikomponenclopeserta',
     'clo.view_piclo',
+    'clo.view_nilaiclomatakuliahsemester',
     'ilo.view_ilo',
     'kurikulum.view_kurikulum',
     'mata_kuliah_kurikulum.view_matakuliahkurikulum',
@@ -274,7 +279,11 @@ mahasiswa_permissions = [
     'mata_kuliah_semester.view_dosenmatakuliah',
     'mata_kuliah_semester.view_kelasmatakuliahsemester',
     'mata_kuliah_semester.view_matakuliahsemester',
+
+    'mata_kuliah_semester.add_nilaimatakuliahilomahasiswa',
+    'mata_kuliah_semester.change_nilaimatakuliahilomahasiswa',
     'mata_kuliah_semester.view_nilaimatakuliahilomahasiswa',
+    
     'mata_kuliah_semester.view_pesertamatakuliah',
     'pi_area.view_performanceindicator',
     'pi_area.view_assessmentarea',
