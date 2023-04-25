@@ -1,8 +1,9 @@
 from django.http import HttpRequest, HttpResponse
 from django.contrib import messages
-from django.views.generic.base import View
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic.detail import DetailView
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404
+from learning_outcomes_assessment.auth.mixins import ProgramStudiMixin
 from learning_outcomes_assessment.forms.edit import ModelBulkDeleteView
 from learning_outcomes_assessment.forms.views import (
     HtmxCreateFormView,
@@ -19,7 +20,8 @@ from kurikulum.models import Kurikulum
 
 
 # Create your views here.
-class IloReadAllView(ListViewModelA):
+class IloReadAllView(ProgramStudiMixin, PermissionRequiredMixin, ListViewModelA):
+    permission_required = ('ilo.view_ilo',)
     model = Ilo
     paginate_by: int = 10
     template_name: str = 'ilo/home.html'
@@ -43,6 +45,7 @@ class IloReadAllView(ListViewModelA):
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         kurikulum_id = kwargs.get('kurikulum_id')
         self.kurikulum_obj: Kurikulum = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
+        self.program_studi_obj = self.kurikulum_obj.prodi_jenjang.program_studi
 
         self.bulk_delete_url = self.kurikulum_obj.get_ilo_bulk_delete_url()
         self.reset_url = self.kurikulum_obj.read_all_ilo_url()
@@ -86,13 +89,21 @@ class IloReadAllView(ListViewModelA):
         return context
 
 
-class IloReadView(DetailView):
+class IloReadView(ProgramStudiMixin, PermissionRequiredMixin, DetailView):
+    permission_required = ('ilo.view_ilo',)
     model = Ilo
     pk_url_kwarg: str = 'ilo_id'
     template_name: str = 'ilo/ilo-detail-view.html'
 
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        self.object: Ilo = self.get_object()
+        kurikulum_obj: Kurikulum = self.object.get_kurikulum()
+        self.program_studi_obj = kurikulum_obj.prodi_jenjang.program_studi
 
-class IloCreateView(HtmxCreateFormView):
+
+class IloCreateView(ProgramStudiMixin, PermissionRequiredMixin, HtmxCreateFormView):
+    permission_required = ('ilo.add_ilo',)
     model = Ilo
     form_class = IloForm
     kurikulum_obj: Kurikulum = None
@@ -108,6 +119,7 @@ class IloCreateView(HtmxCreateFormView):
 
         kurikulum_id = kwargs.get('kurikulum_id')
         self.kurikulum_obj = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
+        self.program_studi_obj = self.kurikulum_obj.prodi_jenjang.program_studi
         self.post_url = self.kurikulum_obj.get_create_ilo_url()
         self.success_url = self.kurikulum_obj.read_all_ilo_url()
 
@@ -132,7 +144,8 @@ class IloCreateView(HtmxCreateFormView):
         return super().form_valid(form)
 
 
-class IloUpdateView(HtmxUpdateFormView):
+class IloUpdateView(ProgramStudiMixin, PermissionRequiredMixin, HtmxUpdateFormView):
+    permission_required = ('ilo.change_ilo',)
     model = Ilo
     form_class = IloForm
     pk_url_kwarg = 'ilo_id'
@@ -150,7 +163,7 @@ class IloUpdateView(HtmxUpdateFormView):
 
         kurikulum_id = kwargs.get('kurikulum_id')
         self.kurikulum_obj = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
-        
+        self.program_studi_obj = self.kurikulum_obj.prodi_jenjang.program_studi
         self.object: Ilo = self.get_object()
         self.post_url = self.object.get_ilo_update_url()
         self.success_url = self.object.read_detail_url()
@@ -163,7 +176,8 @@ class IloUpdateView(HtmxUpdateFormView):
         return kwargs
 
 
-class IloBulkDeleteView(ModelBulkDeleteView):
+class IloBulkDeleteView(ProgramStudiMixin, PermissionRequiredMixin, ModelBulkDeleteView):
+    permission_required = ('ilo.delete_ilo',)
     model = Ilo
     id_list_obj: str = 'id_ilo'
     success_msg = 'Berhasil menghapus CPL'
@@ -172,6 +186,7 @@ class IloBulkDeleteView(ModelBulkDeleteView):
         super().setup(request, *args, **kwargs)
         kurikulum_id = kwargs.get('kurikulum_id')
         kurikulum_obj: Kurikulum = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
+        self.program_studi_obj = kurikulum_obj.prodi_jenjang.program_studi
         self.success_url = kurikulum_obj.read_all_ilo_url()
 
     def get_queryset(self):
