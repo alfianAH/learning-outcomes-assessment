@@ -3,6 +3,7 @@ from django.db.models import QuerySet
 from django.shortcuts import get_object_or_404, redirect
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic.base import View, RedirectView
 from django.views.generic.edit import FormView
 from learning_outcomes_assessment.auth.mixins import (
@@ -40,7 +41,8 @@ from .utils import (
 
 
 # Create your views here.
-class CloReadAllView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin, ListViewModelA):
+class CloReadAllView(ProgramStudiMixin, PermissionRequiredMixin, MahasiswaAndMKSemesterMixin, ListViewModelA):
+    permission_required = ('clo.view_clo',)
     template_name = 'clo/home.html'
     model = Clo
     filter_form = None
@@ -145,7 +147,8 @@ class CloReadAllGraphJsonResponse(ProgramStudiMixin, View):
         return JsonResponse(json_response)
     
 
-class CloReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin, DetailWithListViewModelA):
+class CloReadView(ProgramStudiMixin, PermissionRequiredMixin, MahasiswaAndMKSemesterMixin, DetailWithListViewModelA):
+    permission_required = ('clo.view_clo', 'clo.view_komponenclo', 'clo.view_piclo',)
     single_model = Clo
     single_pk_url_kwarg = 'clo_id'
     single_object: Clo = None
@@ -178,7 +181,8 @@ class CloReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin, DetailWithList
         return super().get_queryset()
 
 
-class CloCreateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, MySessionWizardView):
+class CloCreateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, PermissionRequiredMixin, MySessionWizardView):
+    permission_required = ('clo.add_clo', 'clo.add_piclo', 'clo.add_komponenclo',)
     template_name: str = 'clo/create-view.html'
     form_list: list = [CloForm, PerformanceIndicatorAreaForPiCloForm, PiCloForm, KomponenCloFormset]
     mk_semester_obj: MataKuliahSemester = None
@@ -295,7 +299,8 @@ class CloCreateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, MySession
         return redirect(self.success_url)    
 
 
-class CloUpdateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, MySessionWizardView):
+class CloUpdateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, PermissionRequiredMixin, MySessionWizardView):
+    permission_required = ('clo.change_clo', 'clo.change_piclo',)
     form_list = [CloForm, PerformanceIndicatorAreaForPiCloForm, PiCloForm]
     template_name = 'clo/update-view.html'
     clo_obj: Clo = None
@@ -417,7 +422,8 @@ class CloUpdateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, MySession
         return redirect(self.success_url)
 
 
-class CloBulkDeleteView(ProgramStudiMixin, CloLockedObjectPermissionMixin, ModelBulkDeleteView):
+class CloBulkDeleteView(ProgramStudiMixin, CloLockedObjectPermissionMixin, PermissionRequiredMixin, ModelBulkDeleteView):
+    permission_required = ('clo.delete_clo',)
     model = Clo
     id_list_obj = 'id_clo'
     success_msg = 'Berhasil menghapus CPMK'
@@ -434,7 +440,8 @@ class CloBulkDeleteView(ProgramStudiMixin, CloLockedObjectPermissionMixin, Model
         return super().get_queryset()
 
 
-class CloDuplicateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, DuplicateFormview):
+class CloDuplicateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, PermissionRequiredMixin, DuplicateFormview):
+    permission_required = ('clo.add_clo', 'clo.add_piclo', 'clo.add_komponenclo',)
     form_class = CloDuplicateForm
     empty_choices_msg = 'Semester lain belum mempunyai CPMK.'
     template_name = 'clo/duplicate-view.html'
@@ -557,7 +564,16 @@ class CloLockAndUnlockView(ProgramStudiMixin, RedirectView):
         return is_success, is_unlocking_success
 
 
-class CloLockView(CloLockAndUnlockView):
+class CloLockView(PermissionRequiredMixin, CloLockAndUnlockView):
+    permission_required = (
+        'clo.change_clo',
+        'clo.change_komponenclo',
+        'clo.change_piclo',
+        'mata_kuliah_semester.change_matakuliahsemester',
+        'lock_model.add_lock',
+        'lock_model.change_lock',
+    )
+    
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         total_persentase_clo = self.mk_semester_obj.get_total_persentase_clo()
 
@@ -581,7 +597,12 @@ class CloLockView(CloLockAndUnlockView):
         return super().get(request, *args, **kwargs)
 
 
-class CloUnlockView(CloLockAndUnlockView):
+class CloUnlockView(PermissionRequiredMixin, CloLockAndUnlockView):
+    permission_required = (
+        'mata_kuliah_semester.change_matakuliahsemester',
+        'lock_model.change_lock',
+    )
+
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         clo_qs: QuerySet[Clo] = self.mk_semester_obj.get_all_clo()
         is_success, is_unlocking_success = self.unlock_clo(clo_qs)
@@ -600,7 +621,8 @@ class CloUnlockView(CloLockAndUnlockView):
 
 
 # Komponen CLO
-class KomponenCloBulkDeleteView(ProgramStudiMixin, CloLockedObjectPermissionMixin, ModelBulkDeleteView):
+class KomponenCloBulkDeleteView(ProgramStudiMixin, CloLockedObjectPermissionMixin, PermissionRequiredMixin, ModelBulkDeleteView):
+    permission_required = ('clo.delete_komponenclo',)
     model = KomponenClo
     id_list_obj = 'id_komponen_clo'
     success_msg = 'Berhasil menghapus komponen CPMK'
@@ -620,7 +642,8 @@ class KomponenCloBulkDeleteView(ProgramStudiMixin, CloLockedObjectPermissionMixi
         return super().get_queryset()
 
 
-class KomponenCloCreateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, FormView): 
+class KomponenCloCreateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, PermissionRequiredMixin, FormView): 
+    permission_required = ('clo.add_komponenclo',)
     form_class = KomponenCloFormset
     template_name = 'clo/komponen/create-view.html'
     
