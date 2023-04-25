@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from .models import MataKuliahKurikulum
@@ -27,7 +28,8 @@ from mata_kuliah_kurikulum.utils import(
 
 
 # Create your views here.
-class MataKuliahKurikulumReadAllView(ProgramStudiMixin, ListViewModelA):
+class MataKuliahKurikulumReadAllView(ProgramStudiMixin, PermissionRequiredMixin, ListViewModelA):
+    permission_required = ('mata_kuliah_kurikulum.view_matakuliahkurikulum',)
     model = MataKuliahKurikulum
     paginate_by: int = 10
     template_name: str = 'mata-kuliah-kurikulum/home.html'
@@ -96,7 +98,8 @@ class MataKuliahKurikulumReadAllView(ProgramStudiMixin, ListViewModelA):
         return context
 
 
-class MataKuliahKurikulumCreateView(ProgramStudiMixin, FormView):
+class MataKuliahKurikulumCreateView(ProgramStudiMixin, PermissionRequiredMixin, FormView):
+    permission_required = ('mata_kuliah_kurikulum.add_matakuliahkurikulum',)
     form_class = MataKuliahKurikulumCreateForm
     template_name: str = 'mata-kuliah-kurikulum/create-view.html'
     kurikulum_obj: Kurikulum = None
@@ -163,7 +166,8 @@ class MataKuliahKurikulumCreateView(ProgramStudiMixin, FormView):
         return redirect(self.success_url)
 
 
-class MataKuliahKurikulumReadView(ProgramStudiMixin, DetailView):
+class MataKuliahKurikulumReadView(ProgramStudiMixin, PermissionRequiredMixin, DetailView):
+    permission_required = ('mata_kuliah_kurikulum.view_matakuliahkurikulum',)
     model = MataKuliahKurikulum
     pk_url_kwarg: str = 'mk_id'
     template_name: str = 'mata-kuliah-kurikulum/detail-view.html'
@@ -175,7 +179,8 @@ class MataKuliahKurikulumReadView(ProgramStudiMixin, DetailView):
         self.program_studi_obj = self.object.kurikulum.prodi_jenjang.program_studi
 
 
-class MataKuliahKurikulumBulkUpdateView(ProgramStudiMixin, ModelBulkUpdateView):
+class MataKuliahKurikulumBulkUpdateView(ProgramStudiMixin, PermissionRequiredMixin, ModelBulkUpdateView):
+    permission_required = ('mata_kuliah_kurikulum.change_matakuliahkurikulum',)
     form_class = MataKuliahKurikulumBulkUpdateForm
     template_name: str = 'mata-kuliah-kurikulum/update-view.html'
     kurikulum_obj: Kurikulum = None
@@ -227,7 +232,8 @@ class MataKuliahKurikulumBulkUpdateView(ProgramStudiMixin, ModelBulkUpdateView):
         return super().form_valid(form)
 
 
-class MataKuliahKurikulumBulkDeleteView(ProgramStudiMixin, ModelBulkDeleteView):
+class MataKuliahKurikulumBulkDeleteView(ProgramStudiMixin, PermissionRequiredMixin, ModelBulkDeleteView):
+    permission_required = ('mata_kuliah_kurikulum.delete_matakuliahkurikulum',)
     model = MataKuliahKurikulum
     success_msg = 'Berhasil menghapus mata kuliah kurikulum'
     id_list_obj = 'id_mk_kurikulum'
