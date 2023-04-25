@@ -4,6 +4,7 @@ from django.core.exceptions import PermissionDenied
 from django.conf import settings
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import QuerySet
 from django.contrib import messages
 from django.forms import BaseFormSet
@@ -102,7 +103,7 @@ class GetSemesterJsonResponse(TemplateView):
         return JsonResponse({'choices': semester_choices})
 
 
-class LaporanCapaianPembelajaranTemplateView(FormView):
+class LaporanCapaianPembelajaranTemplateView(LoginRequiredMixin, FormView):
     formset_class = None
     add_more_btn_text = 'Tambah filter'
 
