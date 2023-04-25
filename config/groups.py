@@ -189,6 +189,7 @@ dosen_permissions = [
     'ilo.delete_ilo',
     'ilo.view_ilo',
     
+    'kurikulum.change_kurikulum',
     'kurikulum.view_kurikulum',
 
     'mata_kuliah_kurikulum.add_matakuliahkurikulum',

@@ -3,6 +3,7 @@ from django.forms import BaseInlineFormSet
 from django.http import HttpRequest, HttpResponse
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic.base import RedirectView
 from django.views.generic.edit import DeleteView
 from django.views.generic.list import ListView
@@ -39,7 +40,8 @@ from .utils import(
 
 # Create your views here.
 # PI Area and Assessment Area
-class PIAreaCreateView(ProgramStudiMixin, PILockedObjectPermissionMixin, HtmxCreateInlineFormsetView):
+class PIAreaCreateView(ProgramStudiMixin, PILockedObjectPermissionMixin, PermissionRequiredMixin, HtmxCreateInlineFormsetView):
+    permission_required = ('pi_area.add_assessmentarea', 'pi_area.add_performanceindicatorarea',)
     model = AssessmentArea
     form_class = AssessmentAreaForm
     object = None
@@ -86,7 +88,8 @@ class PIAreaCreateView(ProgramStudiMixin, PILockedObjectPermissionMixin, HtmxCre
         return super().form_valid(form)
 
 
-class PIAreaUpdateView(ProgramStudiMixin, PILockedObjectPermissionMixin, HtmxUpdateInlineFormsetView):
+class PIAreaUpdateView(ProgramStudiMixin, PILockedObjectPermissionMixin, PermissionRequiredMixin, HtmxUpdateInlineFormsetView):
+    permission_required = ('pi_area.change_assessmentarea', 'pi_area.change_performanceindicatorarea',)
     model = AssessmentArea
     pk_url_kwarg = 'assessment_area_id'
     form_class = AssessmentAreaForm
@@ -113,7 +116,8 @@ class PIAreaUpdateView(ProgramStudiMixin, PILockedObjectPermissionMixin, HtmxUpd
         self.success_url = self.kurikulum_obj.read_all_pi_area_url()
 
 
-class PIAreaReadAllView(ListView):
+class PIAreaReadAllView(ProgramStudiMixin, PermissionRequiredMixin, ListView):
+    permission_required = ('pi_area.view_assessmentarea', 'pi_area.view_performanceindicatorarea',)
     model = AssessmentArea
     template_name: str = 'pi-area/home.html'
     ordering: str = 'nama'
@@ -122,6 +126,8 @@ class PIAreaReadAllView(ListView):
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         kurikulum_id = kwargs.get('kurikulum_id')
         self.kurikulum_obj = get_object_or_404(Kurikulum, id_neosia=kurikulum_id)
+        self.program_studi_obj = self.kurikulum_obj.prodi_jenjang.program_studi
+
         return super().setup(request, *args, **kwargs)
 
     def get_queryset(self):
@@ -143,7 +149,8 @@ class PIAreaReadAllView(ListView):
 
 
 # Assessment Area
-class AssessmentAreaDeleteView(ProgramStudiMixin, PILockedObjectPermissionMixin, DeleteView):
+class AssessmentAreaDeleteView(ProgramStudiMixin, PILockedObjectPermissionMixin, PermissionRequiredMixin, DeleteView):
+    permission_required = ('pi_area.delete_assessmentarea',)
     model = AssessmentArea
     pk_url_kwarg = 'assessment_area_id'
 
@@ -166,7 +173,8 @@ class AssessmentAreaDeleteView(ProgramStudiMixin, PILockedObjectPermissionMixin,
 
 
 # PI Area
-class PerformanceIndicatorAreaReadView(DetailView):
+class PerformanceIndicatorAreaReadView(PermissionRequiredMixin, DetailView):
+    permission_required = ('pi_area.view_performanceindicatorarea', 'pi_area.view_performanceindicator',)
     model = PerformanceIndicatorArea
     pk_url_kwarg = 'pi_area_id'
     template_name = 'pi-area/pi-area-detail-view.html'
@@ -254,7 +262,8 @@ class PerformanceIndicatorAreaReadView(DetailView):
         return context
 
 
-class PerformanceIndicatorAreaBulkDeleteView(ProgramStudiMixin, PILockedObjectPermissionMixin, ModelBulkDeleteView):
+class PerformanceIndicatorAreaBulkDeleteView(ProgramStudiMixin, PILockedObjectPermissionMixin, PermissionRequiredMixin, ModelBulkDeleteView):
+    permission_required = ('pi_area.delete_performanceindicatorarea',)
     model = PerformanceIndicatorArea
     success_msg = 'Berhasil menghapus PI Area'
     id_list_obj = 'id_pi_area'
@@ -273,7 +282,8 @@ class PerformanceIndicatorAreaBulkDeleteView(ProgramStudiMixin, PILockedObjectPe
 
 
 # PI Area and Performance Indicator
-class PerformanceIndicatorAreaUpdateView(ProgramStudiMixin, PILockedObjectPermissionMixin, UpdateInlineFormsetView):
+class PerformanceIndicatorAreaUpdateView(ProgramStudiMixin, PILockedObjectPermissionMixin, PermissionRequiredMixin, UpdateInlineFormsetView):
+    permission_required = ('pi_area.change_performanceindicatorarea', 'pi_area.change_performanceindicator',)
     model = PerformanceIndicatorArea
     pk_url_kwarg: str = 'pi_area_id'
     template_name = 'pi-area/peformance-indicator-area-update-view.html'
@@ -300,7 +310,8 @@ class PerformanceIndicatorAreaUpdateView(ProgramStudiMixin, PILockedObjectPermis
 
 
 # Assessment area, PI Area, Performance Indicator
-class PIAreaDuplicateFormView(ProgramStudiMixin, PILockedObjectPermissionMixin, DuplicateFormview):
+class PIAreaDuplicateFormView(ProgramStudiMixin, PILockedObjectPermissionMixin, PermissionRequiredMixin, DuplicateFormview):
+    permission_required = ('pi_area.add_assessmentarea', 'pi_area.add_performanceindicatorarea', 'pi_area.add_performanceindicator',)
     form_class = PIAreaDuplicateForm
     kurikulum_obj: Kurikulum = None
     empty_choices_msg = 'Kurikulum lain belum mempunyai performance indicator.'
@@ -410,7 +421,16 @@ class PIAreaLockAndUnlockView(ProgramStudiMixin, RedirectView):
         return is_success, is_unlocking_success
 
 
-class PIAreaLockView(PIAreaLockAndUnlockView):
+class PIAreaLockView(PermissionRequiredMixin, PIAreaLockAndUnlockView):
+    permission_required = (
+        'kurikulum.change_kurikulum',
+        'pi_area.change_assessmentarea',
+        'pi_area.change_performanceindicatorarea',
+        'pi_area.change_performanceindicator',
+        'lock_model.add_lock',
+        'lock_model.change_lock',
+    )
+
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         assessment_area_qs: QuerySet[AssessmentArea] = self.kurikulum_obj.get_all_assessment_area()
         
@@ -444,7 +464,11 @@ class PIAreaLockView(PIAreaLockAndUnlockView):
         return super().get(request, *args, **kwargs)
 
 
-class PIAreaUnlockView(PIAreaLockAndUnlockView):
+class PIAreaUnlockView(PermissionRequiredMixin, PIAreaLockAndUnlockView):
+    permission_required = (
+        'kurikulum.change_kurikulum',
+        'lock_model.change_lock',
+    )
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         assessment_area_qs: QuerySet[AssessmentArea] = self.kurikulum_obj.get_all_assessment_area()
         is_success, is_unlocking_success = self.unlock_pi(assessment_area_qs)
