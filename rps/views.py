@@ -3,6 +3,7 @@ from django.conf import settings
 from django.http import FileResponse, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import CreateView, UpdateView
@@ -17,7 +18,8 @@ from .forms import RPSModelForm
 
 
 # Create your views here.
-class RPSHomeView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin, TemplateView):
+class RPSHomeView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin, PermissionRequiredMixin, TemplateView):
+    permission_required = ('rps.view_rencanapembelajaransemester',)
     template_name = 'rps/home.html'
     rps_obj: RencanaPembelajaranSemester = None
     rps_filename = 'RPS-'
@@ -56,7 +58,8 @@ class RPSHomeView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin, TemplateView):
         return response
 
 
-class RPSCreateView(ProgramStudiMixin, RPSLockedObjectPermissionMixin, CreateView):
+class RPSCreateView(ProgramStudiMixin, RPSLockedObjectPermissionMixin, PermissionRequiredMixin, CreateView):
+    permission_required = ('rps.add_rencanapembelajaransemester',)
     form_class = RPSModelForm
     model = RencanaPembelajaranSemester
     template_name = 'rps/create-view.html'
@@ -85,7 +88,8 @@ class RPSCreateView(ProgramStudiMixin, RPSLockedObjectPermissionMixin, CreateVie
         return redirect(self.success_url)
     
 
-class RPSUpdateView(ProgramStudiMixin, RPSLockedObjectPermissionMixin, UpdateView):
+class RPSUpdateView(ProgramStudiMixin, RPSLockedObjectPermissionMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = ('rps.change_rencanapembelajaransemester',)
     model = RencanaPembelajaranSemester
     form_class = RPSModelForm
     template_name = 'rps/update-view.html'
@@ -138,7 +142,9 @@ class RPSUpdateView(ProgramStudiMixin, RPSLockedObjectPermissionMixin, UpdateVie
         return redirect(self.success_url)
     
 
-class RPSDeleteView(ProgramStudiMixin, RPSLockedObjectPermissionMixin, RedirectView):
+class RPSDeleteView(ProgramStudiMixin, RPSLockedObjectPermissionMixin, PermissionRequiredMixin, RedirectView):
+    permission_required = ('rps.delete_rencanapembelajaransemester',)
+
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
         mk_semester_id = kwargs.get('mk_semester_id')
@@ -210,7 +216,14 @@ class RPSLockAndUnlockTemplateView(ProgramStudiMixin, RedirectView):
         return is_unlocking_success, is_success
 
 
-class RPSLockView(RPSLockAndUnlockTemplateView):
+class RPSLockView(PermissionRequiredMixin, RPSLockAndUnlockTemplateView):
+    permission_required = (
+        'rps.change_rencanapembelajaransemester',
+        'mata_kuliah_semester.change_matakuliahsemester',
+        'lock_model.add_lock',
+        'lock_model.change_lock',
+    )
+
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         if not hasattr(self.mk_semester_obj, 'rencanapembelajaransemester'):
             messages.info(request, 'Mata kuliah belum mempunyai RPS.')
@@ -231,7 +244,12 @@ class RPSLockView(RPSLockAndUnlockTemplateView):
         return super().get(request, *args, **kwargs)
 
 
-class RPSUnlockView(RPSLockAndUnlockTemplateView):
+class RPSUnlockView(PermissionRequiredMixin, RPSLockAndUnlockTemplateView):
+    permission_required = (
+        'mata_kuliah_semester.change_matakuliahsemester',
+        'lock_model.change_lock',
+    )
+
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         if not hasattr(self.mk_semester_obj, 'rencanapembelajaransemester'):
             messages.info(request, 'Mata kuliah belum mempunyai RPS.')
