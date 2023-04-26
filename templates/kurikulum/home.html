@@ -13,12 +13,14 @@ Kurikulum -
     <div class="h-icon">
         <h1>Data Kurikulum</h1>
         {% if user_role != 'm' %}
-        <a href="{% url 'kurikulum:create' %}" title="Tambah data kurikulum" type="button" class="btn btn-success loading-trigger">
-            <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-            </svg>
-            <span class="hidden sm:block">Tambah</span>
-        </a>
+            {% if user_role == 'a' %}
+            <a href="{% url 'kurikulum:create' %}" title="Tambah data kurikulum" type="button" class="btn btn-success loading-trigger">
+                <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                </svg>
+                <span class="hidden sm:block">Tambah</span>
+            </a>
+            {% endif %}
         <a href="{% url 'kurikulum:bulk-update' %}" title="Update data kurikulum" type="button" class="btn btn-primary loading-trigger">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" focusable="False" aria-label="sync">
                 <path d="M.01 0h24v24h-24V0z" fill="none"/>
@@ -39,7 +41,7 @@ Kurikulum -
 {% else %}
     <h1>Kurikulum</h1>
     <p>Belum ada data.</p>
-    {% if user_role != 'm' %}
+    {% if user_role == 'a' %}
     <a href="{% url 'kurikulum:create' %}" type="button" class="btn btn-primary btn-icon-start max-w-min loading-trigger">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" focusable="False" aria-label="sync">
             <path d="M.01 0h24v24h-24V0z" fill="none"/>

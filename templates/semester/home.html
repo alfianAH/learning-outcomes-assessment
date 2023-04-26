@@ -13,7 +13,7 @@ Semester -
     <div class="h-icon">
         <h1>Data Semester</h1>
         
-        {% if user_role != 'm' %}
+        {% if user_role == 'a' %}
         <a href="{% url 'semester:create' %}" title="Tambah data semester" type="button" class="btn btn-success">
             <svg xmlns="http://www.w3.org/2000/svg" focusable="False" role="img" aria-label="" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
                 <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
@@ -39,9 +39,7 @@ Semester -
     {% endif %}
 {% else %}
     <h1>Data Semester</h1>
-    {% if user_role == 'm' %}
-    <p>Data semester belum ada.</p>
-    {% else %}
+    {% if user_role == 'a' %}
     <a href="{% url 'semester:create' %}" type="button" class="btn btn-primary btn-icon-start max-w-min loading-trigger">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" focusable="False" aria-label="sync">
             <path d="M.01 0h24v24h-24V0z" fill="none"/>
@@ -49,6 +47,8 @@ Semester -
         </svg>
         Sinkronisasi data semester dengan Neosia
     </a>
+    {% else %}
+    <p>Data semester belum ada.</p>
     {% endif %}
 {% endif %}
 {% endblock content %}

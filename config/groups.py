@@ -152,6 +152,7 @@ admin_prodi_permissions = [
 ]
 
 dosen_permissions = [
+    'accounts.view_programstudi',
     'accounts.view_programstudijenjang',
 
     'clo.add_clo',
