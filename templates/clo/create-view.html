@@ -19,7 +19,19 @@ Tambah CPMK -
 {% block script %}
 {% if wizard.form.forms %}
 <script>
-    addMoreForm('#{{ wizard.form.management_form.TOTAL_FORMS.id_for_label }}', isRequired=false);
+    addMoreForm(
+        '#{{ wizard.form.management_form.TOTAL_FORMS.id_for_label }}', 
+        isRequired=false, 
+        removeSelect2FieldHandler=function(){
+            $('.teknik-penilaian-search').select2('destroy');
+        },
+        addSelect2FieldHandler=function(){
+            $('.teknik-penilaian-search').select2({
+                width: '256px',
+                tags: true,
+            });
+        },
+    );
     $('.teknik-penilaian-search').select2({
         width: '256px',
         tags: true,

@@ -31,7 +31,19 @@ Tambah Komponen -
 
 {% block script %}
 <script>
-    addMoreForm('{{ id_total_form }}', isRequired=false);
+    addMoreForm(
+        '{{ id_total_form }}', 
+        isRequired=false, 
+        removeSelect2FieldHandler=function(){
+            $('.teknik-penilaian-search').select2('destroy');
+        },
+        addSelect2FieldHandler=function(){
+            $('.teknik-penilaian-search').select2({
+                width: '256px',
+                tags: true,
+            });
+        },
+    );
     $('.teknik-penilaian-search').select2({
         width: '256px',
         tags: true,
