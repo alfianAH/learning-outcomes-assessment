@@ -265,7 +265,7 @@ class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
             # Filter peserta MK
             list_peserta_mk = PesertaMataKuliah.objects.filter(
                 kelas_mk_semester__mk_semester__mk_kurikulum__kurikulum=kurikulum_obj
-            )
+            ).exclude(nilai_akhir=None)
 
             filter = [(kurikulum_obj, kurikulum_obj.nama)]
 
@@ -320,7 +320,7 @@ class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
                 # Filter peserta MK
                 list_peserta_mk = PesertaMataKuliah.objects.filter(
                     kelas_mk_semester__mk_semester__semester__in=[semester_prodi_obj for semester_prodi_obj, _ in filter]
-                )
+                ).exclude(nilai_akhir=None)
             else:
                 # Tahun ajaran filters
                 for tahun_ajaran_prodi_id in filter_dict.keys():
@@ -344,7 +344,7 @@ class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
                 # Filter peserta MK
                 list_peserta_mk = PesertaMataKuliah.objects.filter(
                     kelas_mk_semester__mk_semester__semester__tahun_ajaran_prodi__in=[tahun_ajaran_prodi_obj for tahun_ajaran_prodi_obj, _ in filter]
-                )
+                ).exclude(nilai_akhir=None)
 
             # If is multiple result, use line chart, else, use radar chart
             is_multiple_result = len(filter) > 1
@@ -445,7 +445,7 @@ class LaporanCapaianPembelajaranDownloadView(LaporanCapaianPembelajaranTemplateV
             # Filter peserta MK
             list_peserta_mk = PesertaMataKuliah.objects.filter(
                 kelas_mk_semester__mk_semester__mk_kurikulum__kurikulum=kurikulum_obj
-            )
+            ).exclude(nilai_akhir=None)
 
             filter = [(kurikulum_obj, kurikulum_obj.nama)]
 
@@ -513,7 +513,7 @@ class LaporanCapaianPembelajaranDownloadView(LaporanCapaianPembelajaranTemplateV
                 # Filter peserta MK
                 list_peserta_mk = PesertaMataKuliah.objects.filter(
                     kelas_mk_semester__mk_semester__semester__in=[semester_prodi_obj for semester_prodi_obj, _ in filter]
-                )
+                ).exclude(nilai_akhir=None)
             else:
                 # Tahun ajaran filters
                 for tahun_ajaran_prodi_id in filter_dict.keys():
@@ -537,7 +537,7 @@ class LaporanCapaianPembelajaranDownloadView(LaporanCapaianPembelajaranTemplateV
                 # Filter peserta MK
                 list_peserta_mk = PesertaMataKuliah.objects.filter(
                     kelas_mk_semester__mk_semester__semester__tahun_ajaran_prodi__in=[tahun_ajaran_prodi_obj for tahun_ajaran_prodi_obj, _ in filter]
-                )
+                ).exclude(nilai_akhir=None)
 
             # If is multiple result, use line chart, else, use radar chart
             is_multiple_result = len(filter) > 1
@@ -663,7 +663,7 @@ class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCa
             list_peserta_mk = PesertaMataKuliah.objects.filter(
                 mahasiswa=self.user,
                 kelas_mk_semester__mk_semester__mk_kurikulum__kurikulum=kurikulum_obj
-            )
+            ).exclude(nilai_akhir=None)
 
             mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa_by_kurikulum(list_ilo, max_sks_prodi, list_peserta_mk, kurikulum_obj)
 
@@ -713,7 +713,7 @@ class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCa
                 list_peserta_mk = PesertaMataKuliah.objects.filter(
                     mahasiswa=self.user,
                     kelas_mk_semester__mk_semester__semester__in=[semester_prodi_obj for semester_prodi_obj, _ in filter]
-                )
+                ).exclude(nilai_akhir=None)
             else:
                 # Tahun ajaran filters
                 for tahun_ajaran_prodi_id in filter_dict.keys():
@@ -738,7 +738,7 @@ class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCa
                 list_peserta_mk = PesertaMataKuliah.objects.filter(
                     mahasiswa=self.user,
                     kelas_mk_semester__mk_semester__semester__tahun_ajaran_prodi__in=[tahun_ajaran_prodi_obj for tahun_ajaran_prodi_obj, _ in filter]
-                )
+                ).exclude(nilai_akhir=None)
             
             # If is multiple result, use line chart, else, use radar chart
             is_multiple_result = len(filter) > 1
@@ -836,7 +836,7 @@ class LaporanCapaianPembelajaranMahasiswaDownloadView(MahasiswaAsPesertaMixin, L
             list_peserta_mk = PesertaMataKuliah.objects.filter(
                 mahasiswa=self.user,
                 kelas_mk_semester__mk_semester__mk_kurikulum__kurikulum=kurikulum_obj
-            )
+            ).exclude(nilai_akhir=None)
             filter = [(kurikulum_obj, kurikulum_obj.nama)]
 
             mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa_by_kurikulum(list_ilo, max_sks_prodi, list_peserta_mk, kurikulum_obj)
@@ -883,7 +883,7 @@ class LaporanCapaianPembelajaranMahasiswaDownloadView(MahasiswaAsPesertaMixin, L
                 list_peserta_mk = PesertaMataKuliah.objects.filter(
                     mahasiswa=self.user,
                     kelas_mk_semester__mk_semester__semester__in=[semester_prodi_obj for semester_prodi_obj, _ in filter]
-                )
+                ).exclude(nilai_akhir=None)
             else:
                 # Tahun ajaran filters
                 for tahun_ajaran_prodi_id in filter_dict.keys():
@@ -908,7 +908,7 @@ class LaporanCapaianPembelajaranMahasiswaDownloadView(MahasiswaAsPesertaMixin, L
                 list_peserta_mk = PesertaMataKuliah.objects.filter(
                     mahasiswa=self.user,
                     kelas_mk_semester__mk_semester__semester__tahun_ajaran_prodi__in=[tahun_ajaran_prodi_obj for tahun_ajaran_prodi_obj, _ in filter]
-                )
+                ).exclude(nilai_akhir=None)
 
             mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa(list_ilo, max_sks_prodi, list_peserta_mk, is_semester_included, filter)
 
