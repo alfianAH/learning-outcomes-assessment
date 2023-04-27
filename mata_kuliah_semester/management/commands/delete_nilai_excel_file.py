@@ -1,7 +1,6 @@
 import os
-from datetime import timedelta
+from datetime import timedelta, datetime
 from django.core.management.base import BaseCommand
-from django.utils import timezone
 from mata_kuliah_semester.models import NilaiExcelMataKuliahSemester
 
 
@@ -10,7 +9,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         period = timedelta(minutes=1)
-        older_than = timezone.now() - period
+        older_than = datetime.now() - period
         nilai_qs = NilaiExcelMataKuliahSemester.objects.filter(
             created_at__lt=older_than)
         
