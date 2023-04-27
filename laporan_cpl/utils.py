@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Count
 from reportlab.platypus import SimpleDocTemplate
 from reportlab.lib.units import cm, inch
 from reportlab.platypus import (
@@ -141,6 +141,11 @@ def calculate_ilo_prodi(list_ilo: QuerySet[Ilo],
         for mk_semester in list_mk_semester_ilo:
             # Check status nilai MK Semester
             if not mk_semester.status_nilai:
+                peserta_qs = PesertaMataKuliah.objects.filter(kelas_mk_semester__mk_semester=mk_semester).exclude(nilai_akhir=None)
+                # Skip mata kuliah that doesn't have nilai akhir yet
+                if peserta_qs.count() == 0:
+                    continue
+                
                 message = 'Harap melengkapi nilai dari mata kuliah ({}, {}) terlebih dahulu'.format(
                     mk_semester.mk_kurikulum.nama, mk_semester.semester.semester)
                 return (is_success, message, result)
@@ -183,10 +188,10 @@ def calculate_ilo_prodi(list_ilo: QuerySet[Ilo],
                 return (is_success, message, result)
         
         # Calculate ILO
-        is_success, persentase_capaian_ilo = calculate_ilo(list_bobot_mk, list_persentase_clo, list_bobot_pi_ilo, list_nilai_clo_mk_semester, nilai_max)
+        is_calculation_success, persentase_capaian_ilo = calculate_ilo(list_bobot_mk, list_persentase_clo, list_bobot_pi_ilo, list_nilai_clo_mk_semester, nilai_max)
         
         # Add to result
-        if is_success:
+        if is_calculation_success:
             result[ilo.nama] = persentase_capaian_ilo
         else:
             result[ilo.nama] = None
@@ -499,8 +504,12 @@ def process_ilo_prodi(list_ilo: QuerySet[Ilo], max_sks_prodi: int,
     if is_semester_included:
         for semester_prodi_obj, semester_nama in filter:
             # Get all mata kuliah semester
-            list_mk_semester = MataKuliahSemester.objects.filter(
-                semester=semester_prodi_obj
+            list_mk_semester = MataKuliahSemester.objects.annotate(
+                num_peserta=Count('kelasmatakuliahsemester__pesertamatakuliah')
+            ).filter(
+                num_peserta__gt=0,
+                semester=semester_prodi_obj,
+                kelasmatakuliahsemester__pesertamatakuliah__nilai_akhir__isnull=False
             ).distinct()
             
             # Calculate ILO Prodi
@@ -514,8 +523,12 @@ def process_ilo_prodi(list_ilo: QuerySet[Ilo], max_sks_prodi: int,
                 return (is_success, message, result)
     else:
         for tahun_ajaran_prodi_obj, tahun_ajaran_nama in filter:
-            list_mk_semester = MataKuliahSemester.objects.filter(
-                semester__tahun_ajaran_prodi=tahun_ajaran_prodi_obj
+            list_mk_semester = MataKuliahSemester.objects.annotate(
+                num_peserta=Count('kelasmatakuliahsemester__pesertamatakuliah')
+            ).filter(
+                num_peserta__gt=0,
+                semester__tahun_ajaran_prodi=tahun_ajaran_prodi_obj,
+                kelasmatakuliahsemester__pesertamatakuliah__nilai_akhir__isnull=False
             ).distinct()
 
             # Calculate ILO Prodi
@@ -571,8 +584,12 @@ def process_ilo_prodi_by_kurikulum(list_ilo: QuerySet[Ilo], max_sks_prodi: int, 
     nilai_max = 100
 
      # Get all mata kuliah semester
-    list_mk_semester = MataKuliahSemester.objects.filter(
-        mk_kurikulum__kurikulum=kurikulum
+    list_mk_semester = MataKuliahSemester.objects.annotate(
+        num_peserta=Count('kelasmatakuliahsemester__pesertamatakuliah')
+    ).filter(
+        num_peserta__gt=0,
+        mk_kurikulum__kurikulum=kurikulum,
+        kelasmatakuliahsemester__pesertamatakuliah__nilai_akhir__isnull=False
     ).distinct()
     
     # Calculate ILO Prodi
