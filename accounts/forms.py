@@ -68,6 +68,7 @@ class ProgramStudiJenjangSelectForm(forms.Form):
         widget=MyRadioInput(),
         label = 'Pilih Jenjang Program Studi',
         help_text = 'Berikut adalah list jenjang program studi. Pilih salah satu untuk memilih kurikulum, di step selanjutnya, yang sesuai dengan jenjang program studi masing-masing.',
+        required=False,
     )
 
     def __init__(self, *args, **kwargs):
@@ -81,11 +82,16 @@ class ProgramStudiJenjangSelectForm(forms.Form):
         cleaned_data = super().clean()
         prodi_jenjang_id = cleaned_data['prodi_jenjang']
 
+        if prodi_jenjang_id is None or prodi_jenjang_id == '':
+            self.add_error('prodi_jenjang', 'Harus memilih jenjang program studi.')
+            return cleaned_data
+
         try:
             prodi_jenjang_id = int(prodi_jenjang_id)
         except ValueError:
             if settings.DEBUG:
                 print('Cannot convert prodi jenjang ID: {}'.format(prodi_jenjang_id))
+            self.add_error('prodi_jenjang', 'Prodi jenjang yang dipilih: {}. Tidak bisa diconvert ke integer.'.format(prodi_jenjang_id))
         
         cleaned_data['prodi_jenjang'] = prodi_jenjang_id
 
