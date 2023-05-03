@@ -5,6 +5,10 @@ from django.db.models.signals import (
     post_delete,
 )
 from django.dispatch import receiver
+from learning_outcomes_assessment.exceptions import (
+    SaveLockedObjectException, 
+    DeleteLockedObjectException
+)
 from clo.models import (
     Clo, KomponenClo, PiClo,
 )
@@ -26,7 +30,7 @@ from rps.models import RencanaPembelajaranSemester
 @receiver(pre_save, sender=RencanaPembelajaranSemester)
 def prevent_save_when_locked(sender, instance, **kwargs):
     if instance.lock and instance.lock.is_locked:
-        raise Exception('Model {} (pk={}) is locked and cannot be modified.'.format(sender.__name__, instance.pk))
+        raise SaveLockedObjectException('Model {} (pk={}) is locked and cannot be modified.'.format(sender.__name__, instance.pk))
 
 
 @receiver(post_save, sender=Lock)
@@ -47,7 +51,7 @@ def prevent_lock_save(sender, instance, **kwargs):
 @receiver(pre_delete, sender=RencanaPembelajaranSemester)
 def prevent_delete_when_locked(sender, instance, **kwargs):
     if instance.lock and instance.lock.is_locked:
-        raise Exception('Model {} (pk={}) is locked and cannot be deleted.'.format(sender.__name__, instance.pk))
+        raise DeleteLockedObjectException('Model {} (pk={}) is locked and cannot be deleted.'.format(sender.__name__, instance.pk))
     
 
 @receiver(post_delete, sender=Clo)

@@ -82,6 +82,7 @@ MIDDLEWARE = [
     'django_htmx.middleware.HtmxMiddleware',
 
     'learning_outcomes_assessment.middleware.TimeoutMiddleware',
+    'learning_outcomes_assessment.middleware.LockedMiddleware',
 ]
 
 ROOT_URLCONF = 'learning_outcomes_assessment.urls'
