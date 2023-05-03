@@ -119,6 +119,10 @@ class MataKuliahSemesterCreateView(ProgramStudiMixin, PermissionRequiredMixin, F
 
     def form_valid(self, form) -> HttpResponse:
         list_kelas_mk_semester_id = form.cleaned_data.get('mk_from_neosia')
+
+        if len(list_kelas_mk_semester_id) == 0:
+            return super().form_valid(form)
+        
         list_kelas_mk_semester = get_kelas_mk_semester(self.semester_obj.id_neosia)
 
         for kelas_mk_semester in list_kelas_mk_semester:
