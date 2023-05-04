@@ -14,10 +14,10 @@ Laporan CPL -
 <form action="." method="post" class="space-y-3">
     {% csrf_token %}
     
-    {% include 'components/form/form-fields.html' %}
+    {% include 'components/form/form-fields.html' with form=forms.kurikulum_form %}
 
     <div id="formset-fields" class="max-h-60 overflow-y-auto">
-        {% include 'components/form/formset.html' %}
+        {% include 'components/form/formset.html' with formset=forms.filter_formset %}
     </div>
     
     <div class="form-buttons !justify-start">
@@ -80,7 +80,7 @@ Laporan CPL -
 
 {% block script %}
 <script>
-    addMoreForm('#{{ formset.management_form.TOTAL_FORMS.id_for_label }}', false);
+    addMoreForm('#{{ forms.filter_formset.management_form.TOTAL_FORMS.id_for_label }}', false);
     // Kurikulum on change
     $('#id_kurikulum').on('change', function(){
         let selectedKurikulumId = $(this).val();
@@ -141,13 +141,14 @@ Laporan CPL -
     $('#submit-btn').on('click', function(){
         let notDeletedForm = 0;
 
-        $('#form-list-{{ formset.management_form.TOTAL_FORMS.id_for_label }}').children().each(function(index, elem) {
+        $('#form-list-{{ forms.filter_formset.management_form.TOTAL_FORMS.id_for_label }}').children().each(function(index, elem) {
             if(!$(elem).find('input:checkbox').is(':checked')){
                 notDeletedForm ++;
+                console.log(notDeletedForm);
             }
         });
         
-        $('#{{ formset.management_form.TOTAL_FORMS.id_for_label }}').val(notDeletedForm);
+        $('#{{ forms.filter_formset.management_form.TOTAL_FORMS.id_for_label }}').val(notDeletedForm);
     });
 
     {% comment %} Perolehan Nilai ILO {% endcomment %}

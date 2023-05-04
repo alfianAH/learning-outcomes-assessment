@@ -13,6 +13,7 @@ from django.urls import reverse_lazy
 from django.views.generic.edit import FormView
 from django.views.generic.base import TemplateView
 from mata_kuliah_semester.models import PesertaMataKuliah
+from learning_outcomes_assessment.forms.edit import MultiFormView
 from learning_outcomes_assessment.auth.mixins import(
     MahasiswaAsPesertaMixin,
 )
@@ -103,42 +104,22 @@ class GetSemesterJsonResponse(TemplateView):
         return JsonResponse({'choices': semester_choices})
 
 
-class LaporanCapaianPembelajaranTemplateView(LoginRequiredMixin, FormView):
-    formset_class = None
+class LaporanCapaianPembelajaranTemplateView(LoginRequiredMixin, MultiFormView):
+    form_classes = {
+        'kurikulum_form': KurikulumChoiceForm,
+        'filter_formset': TahunAjaranSemesterFormset,
+    }
     add_more_btn_text = 'Tambah filter'
-
-    def get_formset_class(self):
-        return self.formset_class
-
-    def get_formset_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs.update({
-            'prefix': self.get_formset_class().get_default_prefix()
-        })
-        
-        return kwargs
-    
-    def get_formset(self, formset_class=None) -> BaseFormSet:
-        if formset_class is None:
-            formset_class = self.get_formset_class()
-        
-        return formset_class(**self.get_formset_kwargs())
     
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs.update({
+        kwargs['kurikulum_form'].update({
             'prodi': self.request.user.prodi,
         })
+        kwargs['filter_formset'].update({
+            'prefix': self.form_classes['filter_formset'].get_default_prefix()
+        })
         return kwargs
-    
-    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        form = self.get_form()
-        formset = self.get_formset()
-
-        if all([form.is_valid(), formset.is_valid()]):
-            return self.form_valid(form, formset)
-        else:
-            return self.form_invalid(form, formset)
         
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -146,20 +127,8 @@ class LaporanCapaianPembelajaranTemplateView(LoginRequiredMixin, FormView):
             'is_formset_row': True,
             'add_more_btn_text': self.add_more_btn_text,
         })
-        if 'formset' not in kwargs:
-            context['formset'] = self.get_formset()
         
         return context
-    
-    def form_valid(self, form, formset) -> HttpResponse:
-        raise NotImplementedError
-    
-    def form_invalid(self, form, formset) -> HttpResponse:
-        return self.render_to_response(
-            self.get_context_data(
-                form=form, formset=formset
-            )
-        )
     
     def show_result_messages(self, is_success: bool, message: str):
         if is_success:
@@ -198,8 +167,6 @@ class LaporanCapaianPembelajaranTemplateView(LoginRequiredMixin, FormView):
 
 class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
     template_name = 'laporan-cpl/home.html'
-    form_class = KurikulumChoiceForm
-    formset_class = TahunAjaranSemesterFormset
     success_url = reverse_lazy('laporan_cpl:home')
 
     table_scroll_head_header: str = 'laporan-cpl/partials/prodi/table-scroll-head-header-prodi.html'
@@ -242,9 +209,9 @@ class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
         
         return context
 
-    def form_valid(self, form, formset) -> HttpResponse:
-        kurikulum_obj = form.cleaned_data.get('kurikulum')
-        formset_cleaned_data = formset.cleaned_data
+    def forms_valid(self, forms: dict) -> HttpResponse:
+        kurikulum_obj = forms['kurikulum_form'].cleaned_data.get('kurikulum')
+        formset_cleaned_data = forms['filter_formset'].cleaned_data
 
         # Get list ilo and max sks prodi
         list_ilo, max_sks_prodi = get_ilo_and_sks_from_kurikulum(kurikulum_obj)
@@ -361,7 +328,7 @@ class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
 
         return self.render_to_response(
             self.get_context_data(
-                form=form, formset=formset,
+                forms=forms,
                 perolehan_nilai_ilo_graph=perolehan_nilai_ilo_graph,
                 object_list=mahasiswa_result,
                 list_ilo=list_ilo,
@@ -393,20 +360,13 @@ class LaporanCapaianPembelajaranDownloadView(LaporanCapaianPembelajaranTemplateV
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
 
-        if self.request.method in ('POST', 'PUT'):
-            kwargs.update({
-                'data': json.loads(self.request.body),
-                'files': self.request.FILES,
-            })
-        return kwargs
-    
-    def get_formset_kwargs(self):
-        kwargs = super().get_formset_kwargs()
-        if self.request.method in ('POST', 'PUT'):
-            kwargs.update({
-                'data': json.loads(self.request.body),
-                'files': self.request.FILES,
-            })
+        for key in self.form_classes.keys():
+            if self.request.method in ('POST', 'PUT'):
+                kwargs[key].update({
+                    'data': json.loads(self.request.body),
+                    'files': self.request.FILES,
+                })
+        
         return kwargs
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
@@ -420,9 +380,9 @@ class LaporanCapaianPembelajaranDownloadView(LaporanCapaianPembelajaranTemplateV
         response = FileResponse(file, as_attachment=as_attachment, filename=filename)
         return response
 
-    def form_valid(self, form, formset) -> HttpResponse:
-        kurikulum_obj = form.cleaned_data.get('kurikulum')
-        formset_cleaned_data = formset.cleaned_data
+    def forms_valid(self, forms: dict) -> HttpResponse:
+        kurikulum_obj = forms['kurikulum_form'].cleaned_data.get('kurikulum')
+        formset_cleaned_data = forms['filter_formset'].cleaned_data
 
         # Get list ilo and max sks prodi
         list_ilo, max_sks_prodi = get_ilo_and_sks_from_kurikulum(kurikulum_obj)
@@ -568,9 +528,10 @@ class LaporanCapaianPembelajaranDownloadView(LaporanCapaianPembelajaranTemplateV
         if settings.DEBUG: print('Perhitungan gagal')
         return HttpResponse('Perhitungan gagal')
     
-    def form_invalid(self, form, formset) -> HttpResponse:
+    def form_invalid(self, forms: dict) -> HttpResponse:
         if settings.DEBUG:
-            print('Form invalid. Form errors: {}, formset errors: {}'.format(form.errors, formset.errors))
+            print('Form invalid. Form errors: {}, formset errors: {}'.format(
+                forms['kurikulum_form'].errors, forms['filter_formset'].errors))
         return HttpResponse('Form invalid')
 
 
@@ -593,15 +554,10 @@ class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCa
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         if self.user.role == 'm':
-            kwargs.update({
+            kwargs['kurikulum_form'].update({
                 'user': self.user
             })
-        return kwargs
-    
-    def get_formset_kwargs(self):
-        kwargs = super().get_formset_kwargs()
-        if self.user.role == 'm':
-            kwargs.update({
+            kwargs['filter_formset'].update({
                 'user': self.user
             })
         return kwargs
@@ -640,9 +596,9 @@ class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCa
 
         return json.dumps(json_response)
     
-    def form_valid(self, form, formset) -> HttpResponse:
-        kurikulum_obj = form.cleaned_data.get('kurikulum')
-        formset_cleaned_data = formset.cleaned_data
+    def forms_valid(self, forms: dict) -> HttpResponse:
+        kurikulum_obj = forms['kurikulum_form'].cleaned_data.get('kurikulum')
+        formset_cleaned_data = forms['filter_formset'].cleaned_data
 
         # Get list ilo and max sks prodi
         list_ilo, max_sks_prodi = get_ilo_and_sks_from_kurikulum(kurikulum_obj)
@@ -751,7 +707,7 @@ class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCa
 
         return self.render_to_response(
             self.get_context_data(
-                form=form, formset=formset,
+                forms=forms,
                 perolehan_nilai_ilo_graph=perolehan_nilai_ilo_graph,
                 options=list_peserta_mk,
             )
@@ -774,28 +730,19 @@ class LaporanCapaianPembelajaranMahasiswaDownloadView(MahasiswaAsPesertaMixin, L
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        if self.request.method in ('POST', 'PUT'):
-            kwargs.update({
-                'data': json.loads(self.request.body),
-                'files': self.request.FILES,
-            })
 
+        for key in self.form_classes.keys():
+            if self.request.method in ('POST', 'PUT'):
+                kwargs[key].update({
+                    'data': json.loads(self.request.body),
+                    'files': self.request.FILES,
+                })
+        
         if self.user.role == 'm':
-            kwargs.update({
+            kwargs['kurikulum_form'].update({
                 'user': self.user
             })
-        return kwargs
-    
-    def get_formset_kwargs(self):
-        kwargs = super().get_formset_kwargs()
-        if self.request.method in ('POST', 'PUT'):
-            kwargs.update({
-                'data': json.loads(self.request.body),
-                'files': self.request.FILES,
-            })
-
-        if self.user.role == 'm':
-            kwargs.update({
+            kwargs['filter_formset'].update({
                 'user': self.user
             })
         return kwargs
@@ -810,9 +757,9 @@ class LaporanCapaianPembelajaranMahasiswaDownloadView(MahasiswaAsPesertaMixin, L
             print('Form invalid. Form errors: {}, formset errors: {}'.format(form.errors, formset.errors))
         return HttpResponse('Form invalid')
     
-    def form_valid(self, form, formset) -> HttpResponse:
-        kurikulum_obj = form.cleaned_data.get('kurikulum')
-        formset_cleaned_data = formset.cleaned_data
+    def forms_valid(self, forms: dict) -> HttpResponse:
+        kurikulum_obj = forms['kurikulum_form'].cleaned_data.get('kurikulum')
+        formset_cleaned_data = forms['filter_formset'].cleaned_data
 
         # Get list ilo and max sks prodi
         list_ilo, max_sks_prodi = get_ilo_and_sks_from_kurikulum(kurikulum_obj)
