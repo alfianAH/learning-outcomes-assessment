@@ -13,7 +13,7 @@ from reportlab.platypus import SimpleDocTemplate
 from reportlab.lib.units import cm, inch
 from reportlab.platypus import (
     Paragraph, Spacer, Table, TableStyle,
-    Frame, PageTemplate, Image
+    Frame, PageTemplate, Image, PageBreak
 )
 from reportlab.lib.pagesizes import letter, landscape
 from reportlab.lib.enums import TA_CENTER
@@ -863,6 +863,49 @@ def generate_laporan_cpl_chart(
     return chart_path
 
 
+def generate_keterangan_ilo(list_ilo: QuerySet[Ilo]):
+    styles = getSampleStyleSheet()
+
+    # (COL, ROW)
+    table_style_data = [
+        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),               # Header align
+        ('ALIGN', (0, 1), (0, -1), 'CENTER'),               # Nomor align
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),    # Header font
+        ('FONTSIZE', (0, 0), (-1, 0), 11),                  # Header font size
+        ('TOPPADDING', (0, 0), (-1, 0), 12),                # Header top padding
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),             # Header bottom padding
+        ('TOPPADDING', (0, 1), (-1, -1), 4),                # Body top padding
+        ('BOTTOMPADDING', (0, 1), (-1, -1), 4),             # Body bottom padding
+        ('GRID', (0, 0), (-1, -1), 0.25, colors.black),     # Grid
+        ('VALIGN', (0, 1), (-1, -1), 'TOP'),                # Body vertical align
+    ]
+
+    # Keterangan ILO
+    ilo_detail_title = Paragraph(
+        'Detail Capaian Pembelajaran Lulusan',
+        style=styles['h2']
+    )
+    ilo_detail_table_data = [
+        ['No.', 'CPL', 'Deskripsi']
+    ]
+
+    for i, ilo in enumerate(list_ilo):
+        ilo_detail_table_data.append((
+            '{}.'.format(i+1), 
+            ilo.nama, 
+            Paragraph('{}'.format(ilo.deskripsi))
+        ))
+
+    ilo_detail_table = Table(
+        ilo_detail_table_data,
+        style=table_style_data,
+        hAlign='LEFT',
+        colWidths=[1*cm, 3*cm, None]
+    )
+
+    return ilo_detail_title, ilo_detail_table
+
+
 def generate_laporan_cpl_prodi_pdf(
         list_ilo: QuerySet[Ilo],
         list_filter,
@@ -1021,6 +1064,9 @@ def generate_laporan_cpl_prodi_pdf(
     )
     chart_image = Image(chart_path)
 
+    # Keterangan ILO
+    ilo_detail_title, ilo_detail_table = generate_keterangan_ilo(list_ilo)
+
     # Build
     pdf_file_elements = [
         title,
@@ -1030,7 +1076,9 @@ def generate_laporan_cpl_prodi_pdf(
         pdf_file_elements += [spider_chart_table, empty_line]
     
     pdf_file_elements += [
-        chart_image,
+        PageBreak(), chart_image, PageBreak(),
+        ilo_detail_title,
+        ilo_detail_table,
     ]
     pdf_file.build(pdf_file_elements)
     
@@ -1197,6 +1245,9 @@ def generate_laporan_cpl_mahasiswa_pdf(
 
         list_table_detail_ilo.append(detail_ilo_table)
 
+    # Keterangan ILO
+    ilo_detail_title, ilo_detail_table = generate_keterangan_ilo(list_ilo)
+
     # Build
     pdf_file_elements = [
         title,
@@ -1204,6 +1255,11 @@ def generate_laporan_cpl_mahasiswa_pdf(
     ]
     for detail_ilo_table in list_table_detail_ilo:
         pdf_file_elements += [detail_ilo_table, empty_line]
+
+    pdf_file_elements += [
+        PageBreak(),
+        ilo_detail_title, ilo_detail_table,
+    ]
     
     pdf_file.build(pdf_file_elements)
     
@@ -1482,11 +1538,12 @@ def generate_laporan_cpl_per_mahasiswa_pdf(
     )
     chart_image = Image(chart_path)
 
+    # Keterangan ILO
+    ilo_detail_title, ilo_detail_table = generate_keterangan_ilo(list_ilo)
+
     # Build
     pdf_file_elements = [
         title, user_table,
-        table_detail_mk_ilo_title,
-        detail_mk_ilo_table, empty_line,
         table_chart_title,
     ]
 
@@ -1494,7 +1551,11 @@ def generate_laporan_cpl_per_mahasiswa_pdf(
         pdf_file_elements += [chart_table, empty_line]
     
     pdf_file_elements += [
-        chart_image,
+        PageBreak(), chart_image, PageBreak(),
+        table_detail_mk_ilo_title,
+        detail_mk_ilo_table, empty_line,
+        PageBreak(),
+        ilo_detail_title, ilo_detail_table
     ]
     
     pdf_file.build(pdf_file_elements)
