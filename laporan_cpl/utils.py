@@ -801,7 +801,7 @@ def generate_laporan_cpl_chart(
                     plot_title, weight='bold', size='medium', position=(0.5, 1.1),
                     horizontalalignment='center', verticalalignment='center')
                 for d, color in zip(case_data, line_colors):
-                    ax.plot(theta, d, color=color)
+                    ax.plot(theta, d, color=color, marker='o')
                 ax.set_varlabels(spoke_labels)
             
             # add legend relative to top-left plot
@@ -1430,6 +1430,12 @@ def generate_laporan_cpl_per_mahasiswa_pdf(
                     
                     # Add result to row
                     list_ilo_result: list[dict] = peserta_ilo_result['result']
+
+                    if len(list_ilo_result) == 0:
+                        chart_data[nama_filter] = [np.NaN for _ in list_ilo]
+                    elif len(list_ilo_result) != len(list_ilo):
+                        if settings.DEBUG:
+                            print('ILO di result ({}) tidak sama dengan List ILO yang ada ({}).'.format(len(list_ilo_result), len(list_ilo)))
 
                     for ilo_result in list_ilo_result:
                         if ilo_result['nama'] != ilo.nama: 
