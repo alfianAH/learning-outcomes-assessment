@@ -796,7 +796,12 @@ function downloadLaporanCPL(buttonId, filename) {
     $(buttonId).on('click', function(){
         let formData = {};
         $('form').serializeArray().forEach(function(input) {
-            formData[input.name] = input.value;
+            if (input.name in formData) {
+                formData[input.name].push(input.value);
+            } else {
+                formData[input.name] = [input.value];
+            }
+            
         });
         let targetUrl = $(this).attr('data-url');
 

@@ -7,10 +7,11 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import QuerySet
 from django.contrib import messages
-from django.forms import BaseFormSet
-from django.http import FileResponse, HttpResponse, HttpRequest, JsonResponse
+from django.http import (
+    FileResponse, HttpResponse, 
+    HttpRequest, JsonResponse, QueryDict
+)
 from django.urls import reverse_lazy
-from django.views.generic.edit import FormView
 from django.views.generic.base import TemplateView
 from mata_kuliah_semester.models import PesertaMataKuliah
 from learning_outcomes_assessment.forms.edit import MultiFormView
@@ -361,8 +362,18 @@ class LaporanCapaianPembelajaranDownloadView(LaporanCapaianPembelajaranTemplateV
 
         for key in self.form_classes.keys():
             if self.request.method in ('POST', 'PUT'):
+                body_dict = json.loads(self.request.body)
+                query_dict = QueryDict('', mutable=True)
+
+                for body_key, body_value in body_dict.items():
+                    if isinstance(body_value, list):
+                        for v in body_value:
+                            query_dict.appendlist(body_key, v)
+                    else:
+                        query_dict.appendlist(body_key, body_value)
+                
                 kwargs[key].update({
-                    'data': json.loads(self.request.body),
+                    'data': query_dict,
                     'files': self.request.FILES,
                 })
         
@@ -511,7 +522,7 @@ class LaporanCapaianPembelajaranDownloadView(LaporanCapaianPembelajaranTemplateV
                     return self.download_laporan_cpl(file, self.cpl_prodi_filename)
                 else:
                     if settings.DEBUG: print(prodi_message)
-                    return HttpResponse(prodi_message)
+                    return HttpResponse(prodi_message, status=404)
 
             if self.download_cpl_mahasiswa:
                 mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa(list_ilo, max_sks_prodi, list_peserta_mk, is_semester_included, filter)
@@ -522,16 +533,16 @@ class LaporanCapaianPembelajaranDownloadView(LaporanCapaianPembelajaranTemplateV
                     return self.download_laporan_cpl(file, self.cpl_mahasiswa_filename)
                 else:
                     if settings.DEBUG: print(mahasiswa_message)
-                    return HttpResponse(mahasiswa_message)
+                    return HttpResponse(mahasiswa_message, status=404)
         
         if settings.DEBUG: print('Perhitungan gagal')
-        return HttpResponse('Perhitungan gagal')
+        return HttpResponse('Perhitungan gagal', status=404)
     
     def form_invalid(self, forms: dict) -> HttpResponse:
         if settings.DEBUG:
             print('Form invalid. Form errors: {}, formset errors: {}'.format(
                 forms['kurikulum_form'].errors, forms['filter_formset'].errors))
-        return HttpResponse('Form invalid')
+        return HttpResponse('Form invalid', status=404)
 
 
 class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCapaianPembelajaranTemplateView):
@@ -728,6 +739,7 @@ class LaporanCapaianPembelajaranMahasiswaDownloadView(MahasiswaAsPesertaMixin, L
     form_classes = {
         'kurikulum_form': KurikulumChoiceForm,
         'filter_formset': TahunAjaranSemesterFormset,
+        'mk_filter_form': MataKuliahSemesterExcludeForm,
     }
 
     def setup(self, request: HttpRequest, *args, **kwargs):
@@ -745,18 +757,29 @@ class LaporanCapaianPembelajaranMahasiswaDownloadView(MahasiswaAsPesertaMixin, L
 
         for key in self.form_classes.keys():
             if self.request.method in ('POST', 'PUT'):
+                body_dict = json.loads(self.request.body)
+                query_dict = QueryDict('', mutable=True)
+
+                for body_key, body_value in body_dict.items():
+                    if isinstance(body_value, list):
+                        for v in body_value:
+                            query_dict.appendlist(body_key, v)
+                    else:
+                        query_dict.appendlist(body_key, body_value)
+                
                 kwargs[key].update({
-                    'data': json.loads(self.request.body),
+                    'data': query_dict,
                     'files': self.request.FILES,
                 })
         
+        user_dict = {
+            'user': self.user
+        }
         if self.user.role == 'm':
-            kwargs['kurikulum_form'].update({
-                'user': self.user
-            })
-            kwargs['filter_formset'].update({
-                'user': self.user
-            })
+            kwargs['kurikulum_form'].update(user_dict)
+            kwargs['filter_formset'].update(user_dict)
+
+        kwargs['mk_filter_form'].update(user_dict)
         return kwargs
     
     def download_laporan_cpl(self, file, filename):
@@ -764,14 +787,16 @@ class LaporanCapaianPembelajaranMahasiswaDownloadView(MahasiswaAsPesertaMixin, L
         response = FileResponse(file, as_attachment=as_attachment, filename=filename)
         return response
     
-    def form_invalid(self, form, formset) -> HttpResponse:
+    def forms_invalid(self, forms: dict) -> HttpResponse:
         if settings.DEBUG:
-            print('Form invalid. Form errors: {}, formset errors: {}'.format(form.errors, formset.errors))
-        return HttpResponse('Form invalid')
+            for form in forms.values():
+                print('Form invalid. Form errors: {}'.format(form.errors))
+        return HttpResponse('Form invalid', status=404)
     
     def forms_valid(self, forms: dict) -> HttpResponse:
         kurikulum_obj = forms['kurikulum_form'].cleaned_data.get('kurikulum')
         formset_cleaned_data = forms['filter_formset'].cleaned_data
+        mk_filter_cleaned_data = forms['mk_filter_form'].cleaned_data.get('mk_semester', [])
 
         # Get list ilo and max sks prodi
         list_ilo, max_sks_prodi = get_ilo_and_sks_from_kurikulum(kurikulum_obj)
@@ -795,7 +820,9 @@ class LaporanCapaianPembelajaranMahasiswaDownloadView(MahasiswaAsPesertaMixin, L
             list_peserta_mk = PesertaMataKuliah.objects.filter(
                 mahasiswa=self.user,
                 kelas_mk_semester__mk_semester__mk_kurikulum__kurikulum=kurikulum_obj
-            ).exclude(nilai_akhir=None)
+            ).exclude(nilai_akhir=None).exclude(
+                id_neosia__in=mk_filter_cleaned_data
+            )
             filter = [(kurikulum_obj, kurikulum_obj.nama)]
 
             mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa_by_kurikulum(list_ilo, max_sks_prodi, list_peserta_mk, kurikulum_obj)
@@ -842,7 +869,9 @@ class LaporanCapaianPembelajaranMahasiswaDownloadView(MahasiswaAsPesertaMixin, L
                 list_peserta_mk = PesertaMataKuliah.objects.filter(
                     mahasiswa=self.user,
                     kelas_mk_semester__mk_semester__semester__in=[semester_prodi_obj for semester_prodi_obj, _ in filter]
-                ).exclude(nilai_akhir=None)
+                ).exclude(nilai_akhir=None).exclude(
+                    id_neosia__in=mk_filter_cleaned_data
+                )
             else:
                 # Tahun ajaran filters
                 for tahun_ajaran_prodi_id in filter_dict.keys():
@@ -867,7 +896,9 @@ class LaporanCapaianPembelajaranMahasiswaDownloadView(MahasiswaAsPesertaMixin, L
                 list_peserta_mk = PesertaMataKuliah.objects.filter(
                     mahasiswa=self.user,
                     kelas_mk_semester__mk_semester__semester__tahun_ajaran_prodi__in=[tahun_ajaran_prodi_obj for tahun_ajaran_prodi_obj, _ in filter]
-                ).exclude(nilai_akhir=None)
+                ).exclude(nilai_akhir=None).exclude(
+                    id_neosia__in=mk_filter_cleaned_data
+                )
 
             mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa(list_ilo, max_sks_prodi, list_peserta_mk, is_semester_included, filter)
 
@@ -878,4 +909,4 @@ class LaporanCapaianPembelajaranMahasiswaDownloadView(MahasiswaAsPesertaMixin, L
             return self.download_laporan_cpl(file, self.cpl_mahasiswa_filename)
         else:
             if settings.DEBUG: print(mahasiswa_message)
-            return HttpResponse(mahasiswa_message)
+            return HttpResponse(mahasiswa_message, status=404)
