@@ -71,7 +71,11 @@ Laporan CPL -
             <span>Download laporan CPL semua mahasiswa</span>
         </a>
 
-        {% include 'components/list-table-view/model-e/table-view-model-e.html' %}
+        {% if object_list|length > 0 %}
+            {% include 'components/list-table-view/model-e/table-view-model-e.html' %}
+        {% else %}
+            <p>Tidak ditemukan data dengan filter yang diberikan</p>
+        {% endif %}
     </div>
 </div>
 {% endif %}

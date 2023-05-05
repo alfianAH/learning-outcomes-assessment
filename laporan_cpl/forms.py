@@ -5,7 +5,6 @@ from django.forms import (
 from learning_outcomes_assessment.forms.formset import CanDeleteBaseFormSet
 from learning_outcomes_assessment.widgets import (
     MySelectInput,
-    MyCheckboxInput,
     ChoiceListInteractiveModelA
 )
 from kurikulum.models import Kurikulum
@@ -48,16 +47,15 @@ class KurikulumChoiceForm(forms.Form):
 
 
 class MataKuliahSemesterExcludeForm(forms.Form):
-    mk_semester = forms.ModelMultipleChoiceField(
+    mk_semester = forms.MultipleChoiceField(
         widget=ChoiceListInteractiveModelA(
             list_custom_field_template='laporan-cpl/partials/mahasiswa/filter-mk/list-custom-field-filter-mk.html',
             table_custom_field_template='laporan-cpl/partials/mahasiswa/filter-mk/table-custom-field-filter-mk.html',
             table_custom_field_header_template='laporan-cpl/partials/mahasiswa/filter-mk/table-custom-field-header-filter-mk.html',
             custom_option_template_name='laporan-cpl/partials/mahasiswa/filter-mk/custom-option-template-name-filter-mk.html'
         ),
-        label='Mata kuliah semester yang ingin dikecualikan',
+        label='Pilih mata kuliah semester yang ingin dikecualikan',
         required=False,
-        queryset=None,
     )
 
     def __init__(self, user, *args, **kwargs):
@@ -65,6 +63,17 @@ class MataKuliahSemesterExcludeForm(forms.Form):
         self.fields['mk_semester'].choices = [
             (peserta.id_neosia, peserta) for peserta in PesertaMataKuliah.objects.filter(mahasiswa=user)
         ]
+
+    def clean(self):
+        cleaned_data = super().clean()
+        
+        # Clean MK Semester IDs
+        mk_semester = cleaned_data.get('mk_semester')
+        mk_semester = [*set(mk_semester)]
+        
+        cleaned_data['mk_semester'] = mk_semester
+
+        return cleaned_data
 
 
 class TahunAjaranSemesterChoiceForm(forms.Form):

@@ -602,6 +602,7 @@ class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCa
     def forms_valid(self, forms: dict) -> HttpResponse:
         kurikulum_obj = forms['kurikulum_form'].cleaned_data.get('kurikulum')
         formset_cleaned_data = forms['filter_formset'].cleaned_data
+        mk_filter_cleaned_data = forms['mk_filter_form'].cleaned_data.get('mk_semester', [])
 
         # Get list ilo and max sks prodi
         list_ilo, max_sks_prodi = get_ilo_and_sks_from_kurikulum(kurikulum_obj)
@@ -622,7 +623,9 @@ class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCa
             list_peserta_mk = PesertaMataKuliah.objects.filter(
                 mahasiswa=self.user,
                 kelas_mk_semester__mk_semester__mk_kurikulum__kurikulum=kurikulum_obj
-            ).exclude(nilai_akhir=None)
+            ).exclude(nilai_akhir=None).exclude(
+                id_neosia__in=mk_filter_cleaned_data
+            )
 
             mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa_by_kurikulum(list_ilo, max_sks_prodi, list_peserta_mk, kurikulum_obj)
 
@@ -672,7 +675,9 @@ class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCa
                 list_peserta_mk = PesertaMataKuliah.objects.filter(
                     mahasiswa=self.user,
                     kelas_mk_semester__mk_semester__semester__in=[semester_prodi_obj for semester_prodi_obj, _ in filter]
-                ).exclude(nilai_akhir=None)
+                ).exclude(nilai_akhir=None).exclude(
+                    id_neosia__in=mk_filter_cleaned_data
+                )
             else:
                 # Tahun ajaran filters
                 for tahun_ajaran_prodi_id in filter_dict.keys():
@@ -697,7 +702,9 @@ class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCa
                 list_peserta_mk = PesertaMataKuliah.objects.filter(
                     mahasiswa=self.user,
                     kelas_mk_semester__mk_semester__semester__tahun_ajaran_prodi__in=[tahun_ajaran_prodi_obj for tahun_ajaran_prodi_obj, _ in filter]
-                ).exclude(nilai_akhir=None)
+                ).exclude(nilai_akhir=None).exclude(
+                    id_neosia__in=mk_filter_cleaned_data
+                )
             
             # If is multiple result, use line chart, else, use radar chart
             is_multiple_result = len(filter) > 1

@@ -133,8 +133,12 @@
                 <div>{{ user.prodi.nama }}</div>
             </div>
         </div>
-
-        {% include 'components/list-table-view/model-a/list-view-model-a.html' with is_custom_header=True not_use_checkbox=True %}
+        
+        {% if options|length > 0 %}
+            {% include 'components/list-table-view/model-a/list-view-model-a.html' with is_custom_header=True not_use_checkbox=True %}
+        {% else %}
+            <p>Tidak ditemukan data dengan filter yang diberikan</p>
+        {% endif %}
     </div>
 </div>
 {% endif %}
