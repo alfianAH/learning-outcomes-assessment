@@ -1,0 +1,11 @@
+{% include "django/forms/widgets/input.html" %}
+
+{% if use_label %}
+    {% if widget.wrap_label %}
+    <label class="list-item-title" title="{{ widget.label.nama }}"
+        for="{% if widget.attrs.id %}{{ widget.attrs.id }}{% endif %}">{% endif %}
+        {% if widget.wrap_label %} 
+            {{ widget.label.kelas_mk_semester.mk_semester.mk_kurikulum.nama }}
+    </label>
+    {% endif %}
+{% endif %}

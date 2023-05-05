@@ -24,6 +24,36 @@
     <div id="formset-fields" class="max-h-60 overflow-y-auto">
         {% include 'components/form/formset.html' with formset=forms.filter_formset %}
     </div>
+
+    <button class="btn btn-icon-start btn-outline-light" type="button" data-target="#mk-filter-modal" onclick="openModalByButton(this)">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-funnel" viewBox="0 0 16 16">
+            <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2zm1 .5v1.308l4.372 4.858A.5.5 0 0 1 7 8.5v5.306l2-.666V8.5a.5.5 0 0 1 .128-.334L13.5 3.308V2h-11z"/>
+        </svg>
+        Filter MK
+    </button>
+
+    <div class="modal" id="mk-filter-modal" role="dialog">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Filter Mata Kuliah</h3>
+                    <button class="btn border-none" type="button" data-dismiss="modal" onclick="closeModalByButton(this)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    {% include 'components/form/form-fields.html' with form=forms.mk_filter_form %}
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-primary" type="button" data-dismiss="modal" onclick="closeModalByButton(this)">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <div class="form-buttons !justify-start">
         <button type="submit" class="btn btn-success loading-trigger" id="submit-btn">Submit</button>

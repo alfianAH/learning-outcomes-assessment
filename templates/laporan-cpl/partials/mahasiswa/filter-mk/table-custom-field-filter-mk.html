@@ -1,0 +1,18 @@
+{% with option.label.kelas_mk_semester.mk_semester.mk_kurikulum as mk_kurikulum  %}
+{% comment %} Kode {% endcomment %}
+<td class="text-left">
+    {{ mk_kurikulum.kode }}
+</td>
+{% comment %} Nama {% endcomment %}
+<td class="text-left md:max-w-[12rem] lg:max-w-[10rem] xl:max-w-[18rem] truncate field-nama" title="{{ mk_kurikulum.nama }}">
+    {{ mk_kurikulum.nama }}
+</td>
+{% endwith %}
+{% comment %} Nilai angka {% endcomment %}
+<td class="text-right">
+    {{ option.label.nilai_akhir|default_if_none:'-' }}
+</td>
+{% comment %} Nilai huruf {% endcomment %}
+<td class="text-right">
+    {{ option.label.nilai_huruf|default_if_none:'-' }}
+</td>

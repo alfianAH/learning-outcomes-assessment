@@ -27,12 +27,14 @@ class ChoiceListInteractiveModelA(CheckboxSelectMultiple):
         list_custom_field_template: str = None, 
         table_custom_field_template: str = None,
         table_custom_field_header_template: str = None,
+        custom_option_template_name: str = None,
         *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.badge_template = badge_template or None
         self.list_custom_field_template = list_custom_field_template or None
         self.table_custom_field_template = table_custom_field_template or None
         self.table_custom_field_header_template = table_custom_field_header_template or None
+        self.custom_option_template_name = custom_option_template_name or None
 
     def create_option(self, *args, **kwargs):
         option = super().create_option(*args, **kwargs)
@@ -59,6 +61,9 @@ class ChoiceListInteractiveModelA(CheckboxSelectMultiple):
 
         if self.table_custom_field_header_template is not None:
             option['table_custom_field_header_template'] = self.table_custom_field_header_template
+
+        if self.custom_option_template_name is not None:
+            option['custom_option_template_name'] = self.custom_option_template_name
         
         return option
 

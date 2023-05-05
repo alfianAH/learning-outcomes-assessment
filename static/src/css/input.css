@@ -529,6 +529,10 @@
         @apply relative m-7 mx-auto pointer-events-auto max-w-lg duration-300 ease-in-out scale-100;
     }
 
+    .modal-xl{
+        @apply max-w-sm sm:max-w-xl md:max-w-2xl lg:max-w-4xl xl:max-w-5xl;
+    }
+
     .modal-content{
         @apply relative flex flex-col w-full bg-slate-100 dark:bg-neutral-800 pointer-events-auto rounded-md;
     }

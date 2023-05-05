@@ -1,0 +1,20 @@
+<div class="w-full table-strip">
+    <div class="space-y-1">
+        {% with option.label.kelas_mk_semester.mk_semester.mk_kurikulum as mk_kurikulum  %}
+        <div class="flex px-3 py-1 space-x-2.5 justify-between">
+            <div class="whitespace-nowrap font-bold">Kode</div>
+            <div>{{ mk_kurikulum.kode }}</div>
+        </div>
+        {% endwith %}
+
+        <div class="flex px-3 py-1 space-x-2.5 justify-between">
+            <div class="whitespace-nowrap font-bold">Nilai akhir</div>
+            <div class="truncate">{{ option.label.nilai_akhir }}</div>
+        </div>
+
+        <div class="flex px-3 py-1 space-x-2.5 justify-between">
+            <div class="whitespace-nowrap font-bold">Nilai huruf</div>
+            <div class="truncate">{{ option.label.nilai_huruf }}</div>
+        </div>
+    </div>
+</div>

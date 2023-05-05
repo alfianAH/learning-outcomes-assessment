@@ -25,6 +25,7 @@ from ilo.models import Ilo
 from .forms import (
     KurikulumChoiceForm,
     TahunAjaranSemesterFormset,
+    MataKuliahSemesterExcludeForm,
 )
 from .utils import (
     get_ilo_and_sks_from_kurikulum,
@@ -339,8 +340,6 @@ class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
     
 
 class LaporanCapaianPembelajaranDownloadView(LaporanCapaianPembelajaranTemplateView):
-    form_class = KurikulumChoiceForm
-    formset_class = TahunAjaranSemesterFormset
     download_cpl_prodi = False
     download_cpl_mahasiswa = False
 
@@ -537,8 +536,11 @@ class LaporanCapaianPembelajaranDownloadView(LaporanCapaianPembelajaranTemplateV
 
 class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCapaianPembelajaranTemplateView):
     template_name = 'laporan-cpl/laporan-mahasiswa.html'
-    form_class = KurikulumChoiceForm
-    formset_class = TahunAjaranSemesterFormset
+    form_classes = {
+        'kurikulum_form': KurikulumChoiceForm,
+        'filter_formset': TahunAjaranSemesterFormset,
+        'mk_filter_form': MataKuliahSemesterExcludeForm,
+    }
     
     list_item_name: str = 'laporan-cpl/partials/mahasiswa/list-item-name.html'
     list_custom_field_template: str = 'laporan-cpl/partials/mahasiswa/list-custom-field-mahasiswa.html'
@@ -553,13 +555,14 @@ class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCa
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
+        user_dict = {
+            'user': self.user
+        }
         if self.user.role == 'm':
-            kwargs['kurikulum_form'].update({
-                'user': self.user
-            })
-            kwargs['filter_formset'].update({
-                'user': self.user
-            })
+            kwargs['kurikulum_form'].update(user_dict)
+            kwargs['filter_formset'].update(user_dict)
+
+        kwargs['mk_filter_form'].update(user_dict)
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -715,8 +718,10 @@ class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCa
 
 
 class LaporanCapaianPembelajaranMahasiswaDownloadView(MahasiswaAsPesertaMixin, LaporanCapaianPembelajaranTemplateView):
-    form_class = KurikulumChoiceForm
-    formset_class = TahunAjaranSemesterFormset
+    form_classes = {
+        'kurikulum_form': KurikulumChoiceForm,
+        'filter_formset': TahunAjaranSemesterFormset,
+    }
 
     def setup(self, request: HttpRequest, *args, **kwargs):
         super().setup(request, *args, **kwargs)

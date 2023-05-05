@@ -3009,6 +3009,34 @@ details.dropdown::marker {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.modal-xl {
+  max-width: 24rem;
+}
+
+@media (min-width: 640px) {
+  .modal-xl {
+    max-width: 36rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .modal-xl {
+    max-width: 42rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .modal-xl {
+    max-width: 56rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .modal-xl {
+    max-width: 64rem;
+  }
+}
+
 .modal-content {
   pointer-events: auto;
   position: relative;
