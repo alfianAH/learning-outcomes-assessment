@@ -1,5 +1,7 @@
 from django import forms
 from django.conf import settings
+
+from semester.models import SemesterProdi
 from .utils import (
     get_semester_prodi_choices,
 )
@@ -21,7 +23,7 @@ class SemesterProdiCreateForm(forms.Form):
             table_custom_field_header_template='semester/partials/table-custom-field-header-semester-prodi.html',
         ),
         label = 'Tambahkan Semester dari Neosia',
-        help_text = 'Data di bawah ini merupakan data baru dari Neosia dan belum ditemukan dalam database. Beri centang pada item yang ingin anda tambahkan.<br>Note: Data semester yang tidak bisa dicentang berarti semester tidak memiliki data mata kuliah di Neosia atau mata kuliah semester sudah disinkronisasi semuanya.',
+        help_text = 'Data di bawah ini merupakan data baru dari Neosia dan belum ditemukan dalam database. Beri centang pada item yang ingin anda tambahkan.<br>Note: Data semester yang tidak bisa dicentang berarti semester tidak memiliki data mata kuliah di Neosia atau semester sudah disinkronisasi.',
         required = False,
     )
 
@@ -33,6 +35,16 @@ class SemesterProdiCreateForm(forms.Form):
         semester_prodi_choices = get_semester_prodi_choices(prodi_jenjang_id)
 
         for semester_prodi_id, _ in semester_prodi_choices:
+            # Check semester prodi in database
+            semester_prodi_qs = SemesterProdi.objects.filter(
+                id_neosia=semester_prodi_id
+            )
+            if semester_prodi_qs: 
+                # Set input with semester that has already been in database to false
+                self.fields.get('semester_from_neosia').widget.condition_dict.update({
+                    semester_prodi_id: False
+                })
+
             kelas_mk_semester = get_kelas_mk_semester(semester_prodi_id)
 
             if len(kelas_mk_semester) == 0: 
