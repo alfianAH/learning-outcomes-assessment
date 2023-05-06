@@ -597,7 +597,11 @@ class PesertaMataKuliahSemesterCreateView(ProgramStudiMixin, PermissionRequiredM
     
     def form_valid(self, form) -> HttpResponse:
         list_peserta_mk_semester_id = form.cleaned_data.get('peserta_mk_from_neosia')
+        if len(list_peserta_mk_semester_id) == 0:
+             return super().form_valid(form)
+        
         list_peserta_mk_semester = get_peserta_kelas_mk_semester(self.mk_semester_obj)
+        added_peserta_number = 0
 
         for peserta_mk in list_peserta_mk_semester:
             if str(peserta_mk['id_neosia']) not in list_peserta_mk_semester_id: continue
@@ -623,7 +627,9 @@ class PesertaMataKuliahSemesterCreateView(ProgramStudiMixin, PermissionRequiredM
                 nilai_akhir=peserta_mk['nilai_akhir'],
                 nilai_huruf=peserta_mk['nilai_huruf'],
             )
+            added_peserta_number += 1
 
+        messages.success(self.request, 'Berhasil menambahkan {} peserta dari {} peserta yang dipilih.'.format(added_peserta_number, len(list_peserta_mk_semester_id)))
         return super().form_valid(form)
 
 
