@@ -643,7 +643,7 @@ class KomponenCloBulkDeleteView(ProgramStudiMixin, CloLockedObjectPermissionMixi
 
 
 class KomponenCloCreateView(ProgramStudiMixin, CloLockedObjectPermissionMixin, PermissionRequiredMixin, FormView): 
-    permission_required = ('clo.add_komponenclo',)
+    permission_required = ('clo.add_komponenclo', 'clo.change_komponenclo',)
     form_class = KomponenCloFormset
     template_name = 'clo/komponen/create-view.html'
     

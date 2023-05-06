@@ -173,7 +173,6 @@ class KomponenCloInlineFormset(CanDeleteInlineFormSet):
             new_clo_persentase = exist_persentase + submitted_persentase
             total_persentase = self.mk_semester.get_total_persentase_clo() - old_clo_persentase + new_clo_persentase
         
-        print('Total: {}'.format(total_persentase))
         # Add error to field if total_persentase is more than 100
         if total_persentase > 100:
             for form in self.forms:
