@@ -52,6 +52,26 @@ class CloForm(forms.ModelForm):
             'nama': 'Nama CPMK. Contoh: <b>CPMK 1</b>',
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['nama'].required = False
+        self.fields['deskripsi'].required = False
+
+    def clean(self):
+        cleaned_data = super().clean()
+        nama = cleaned_data.get('nama', '')
+        deskripsi = cleaned_data.get('deskripsi', '')
+        
+        # If nama is empty string, add error
+        if not nama.strip():
+            self.add_error('nama', 'Nama harus diisi.')
+        
+        # If deskripsi is empty string, add error
+        if not deskripsi.strip():
+            self.add_error('deskripsi', 'Deskripsi harus diisi.')
+        
+        return cleaned_data
+
 
 class CloDuplicateForm(forms.Form):
     semester = forms.ChoiceField(
