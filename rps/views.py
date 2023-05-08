@@ -127,9 +127,12 @@ class RPSUpdateView(ProgramStudiMixin, RPSLockedObjectPermissionMixin, Permissio
 
         form = self.get_form()
         if form.is_valid():
-            # Remove previous file
-            os.remove(old_file_path)
-            return self.form_valid(form)
+            if form.has_changed():
+                # Remove previous file
+                os.remove(old_file_path)
+                return self.form_valid(form)
+            else:
+                return redirect(self.success_url)
         else:
             return self.form_invalid(form)
         
