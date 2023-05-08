@@ -15,3 +15,15 @@ class RPSModelForm(forms.ModelForm):
             }),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['file_rps'].required = False
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        file_rps = cleaned_data.get('file_rps')
+        if file_rps is None:
+            self.add_error('file_rps', 'File RPS harus diisi.')
+        
+        return cleaned_data
