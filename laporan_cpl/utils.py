@@ -893,7 +893,7 @@ def generate_keterangan_ilo(list_ilo: QuerySet[Ilo]):
         ilo_detail_table_data.append((
             '{}.'.format(i+1), 
             ilo.nama, 
-            Paragraph('{}'.format(ilo.deskripsi))
+            Paragraph('{}    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'.format(ilo.deskripsi))
         ))
 
     ilo_detail_table = Table(
@@ -901,7 +901,7 @@ def generate_keterangan_ilo(list_ilo: QuerySet[Ilo]):
         style=table_style_data,
         hAlign='LEFT',
         colWidths=[1*cm, 3*cm, None],
-        repeatRows=(0, 1),
+        repeatRows=1,
     )
 
     return ilo_detail_title, ilo_detail_table
@@ -1053,7 +1053,7 @@ def generate_laporan_cpl_prodi_pdf(
             table_data,
             style=current_table_spider_chart_style,
             hAlign='LEFT',
-            repeatRows=(0, 1),
+            repeatRows=1,
         )
 
         list_table_spider_chart.append(spider_chart_table)
@@ -1530,7 +1530,7 @@ def generate_laporan_cpl_per_mahasiswa_pdf(
             table_data,
             style=current_table_chart_style,
             hAlign='LEFT',
-            repeatRows=(0, 1),
+            repeatRows=1,
         )
 
         list_table_chart.append(chart_table)
