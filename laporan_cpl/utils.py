@@ -900,7 +900,8 @@ def generate_keterangan_ilo(list_ilo: QuerySet[Ilo]):
         ilo_detail_table_data,
         style=table_style_data,
         hAlign='LEFT',
-        colWidths=[1*cm, 3*cm, None]
+        colWidths=[1*cm, 3*cm, None],
+        repeatRows=(0, 1),
     )
 
     return ilo_detail_title, ilo_detail_table
@@ -1052,6 +1053,7 @@ def generate_laporan_cpl_prodi_pdf(
             table_data,
             style=current_table_spider_chart_style,
             hAlign='LEFT',
+            repeatRows=(0, 1),
         )
 
         list_table_spider_chart.append(spider_chart_table)
@@ -1240,7 +1242,8 @@ def generate_laporan_cpl_mahasiswa_pdf(
             table_data, 
             style=current_table_detail_ilo_style,
             hAlign='LEFT',
-            colWidths=[1*cm, 3*cm, 6.5*cm, None]
+            colWidths=[1*cm, 3*cm, 6.5*cm, None],
+            repeatRows=(0, 1),
         )
 
         list_table_detail_ilo.append(detail_ilo_table)
@@ -1422,7 +1425,8 @@ def generate_laporan_cpl_per_mahasiswa_pdf(
         table_detail_mk_ilo_data,
         style=table_detail_mk_ilo_style,
         hAlign='LEFT',
-        colWidths=[1*cm, None]
+        colWidths=[1*cm, None],
+        repeatRows=(0, 1),
     )
 
     # Table chart header
@@ -1526,6 +1530,7 @@ def generate_laporan_cpl_per_mahasiswa_pdf(
             table_data,
             style=current_table_chart_style,
             hAlign='LEFT',
+            repeatRows=(0, 1),
         )
 
         list_table_chart.append(chart_table)

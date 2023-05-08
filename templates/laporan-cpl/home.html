@@ -45,6 +45,14 @@ Laporan CPL -
 
         <div class="tab-item-line"></div>
     </li>
+
+    <li class="tab-item w-56 disabled" id="tab-2" data-target="#tab-ilo-pane" role="presentation">
+        <div class="tab-title">
+            <span class="truncate">Detail CPL</span>
+        </div>
+
+        <div class="tab-item-line"></div>
+    </li>
 </ul>
 
 <div class="tab-content">
@@ -62,6 +70,7 @@ Laporan CPL -
             <canvas id="perolehan-nilai-ilo" class="w-full max-h-60 sm:max-h-64 lg:max-h-72 xl:max-h-80"></canvas>
         </div>
     </div>
+    
     <div class="tab-pane fade min-h-screen" id="tab-nilai-pane" role="tabpanel" aria-labelledby="tab-1">
         <a href="javascript:void(0);" id="download-cpl-mahasiswa" data-url="{% url 'laporan_cpl:download' %}?download_cpl=mahasiswa" class="btn btn-icon-start btn-success max-w-min" role="menuitem link">
             <svg xmlns="http://www.w3.org/2000/svg" focusable="False" fill="currentColor" class="bi bi-file-earmark-pdf w-4 h-4 fill-slate-100" viewBox="0 0 16 16">
@@ -76,6 +85,17 @@ Laporan CPL -
         {% else %}
             <p>Tidak ditemukan data dengan filter yang diberikan</p>
         {% endif %}
+    </div>
+
+    <div class="tab-pane fade min-h-screen" id="tab-ilo-pane" role="tabpanel" aria-labelledby="tab-2">
+        <ol class="list-decimal ml-5 space-y-2">
+            {% for ilo in list_ilo %}
+            <li>
+                {{ ilo.nama }}
+                <p>{{ ilo.deskripsi }}</p>
+            </li>
+            {% endfor %}
+        </ol>
     </div>
 </div>
 {% endif %}

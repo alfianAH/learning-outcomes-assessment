@@ -731,6 +731,7 @@ class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCa
                 forms=forms,
                 perolehan_nilai_ilo_graph=perolehan_nilai_ilo_graph,
                 options=list_peserta_mk,
+                list_ilo=list_ilo,
             )
         )
 
