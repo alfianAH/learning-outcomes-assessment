@@ -20,7 +20,7 @@ from reportlab.platypus import SimpleDocTemplate
 from reportlab.lib.units import cm, inch
 from reportlab.platypus import (
     Paragraph, Spacer, Table, ListFlowable, TableStyle,
-    Frame, PageTemplate, Image
+    Frame, PageTemplate, Image, PageBreak
 )
 from reportlab.lib.enums import TA_CENTER, TA_RIGHT
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -1039,7 +1039,8 @@ def generate_nilai_file(mk_semester: MataKuliahSemester, list_nilai_huruf: dict)
         mahasiswa_data,
         style=mahasiswa_table_style,
         hAlign='LEFT',
-        colWidths=[1*cm, 3*cm, 6.5*cm, None, None]
+        colWidths=[1*cm, 3*cm, 6.5*cm, None, None],
+        repeatRows=1,
     )
 
     # Pencapaian per CPMK
@@ -1099,7 +1100,8 @@ def generate_nilai_file(mk_semester: MataKuliahSemester, list_nilai_huruf: dict)
     pencapaian_per_cpmk_table = Table(
         pencapaian_per_cpmk_table_data,
         style=pencapaian_per_cpmk_table_style,
-        hAlign='LEFT'
+        hAlign='LEFT',
+        repeatRows=1,
     )
 
     # Pie chart capaian per CPMK
@@ -1148,9 +1150,9 @@ def generate_nilai_file(mk_semester: MataKuliahSemester, list_nilai_huruf: dict)
     pdf_file.build([
         title, detail,
         list_dosen, empty_line,
-        mahasiswa_table, empty_line,
+        mahasiswa_table, PageBreak(),
         pencapaian_per_cpmk_title,
-        pencapaian_per_cpmk_table, empty_line,
+        pencapaian_per_cpmk_table, PageBreak(),
         pencapaian_per_cpmk_chart_image, empty_line,
         nilai_mhs_chart_image,
     ])
@@ -1282,7 +1284,8 @@ def generate_student_performance_file(peserta_mk_semester: PesertaMataKuliah):
     perolehan_nilai_clo_table = Table(
         perolehan_nilai_clo_table_data,
         style=table_style_data,
-        hAlign='LEFT'
+        hAlign='LEFT',
+        repeatRows=1,
     )
 
     fig, ax = plt.subplots()
@@ -1361,7 +1364,8 @@ def generate_student_performance_file(peserta_mk_semester: PesertaMataKuliah):
     perolehan_nilai_ilo_table = Table(
         perolehan_nilai_ilo_table_data,
         style=perolehan_nilai_ilo_table_style,
-        hAlign='LEFT'
+        hAlign='LEFT',
+        repeatRows=1,
     )
 
     is_radar_chart = True
@@ -1468,8 +1472,8 @@ def generate_student_performance_file(peserta_mk_semester: PesertaMataKuliah):
         perolehan_nilai_clo_title,
         perolehan_nilai_clo_table, empty_line,
         perolehan_nilai_ilo_title,
-        perolehan_nilai_ilo_table, empty_line,
-        perolehan_nilai_clo_chart_image, empty_line,
+        perolehan_nilai_ilo_table, PageBreak(),
+        perolehan_nilai_clo_chart_image, PageBreak(), 
         perolehan_nilai_ilo_chart_image
     ])
     
