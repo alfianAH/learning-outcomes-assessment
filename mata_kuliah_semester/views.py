@@ -920,6 +920,9 @@ class NilaiKomponenCloEditTemplateView(ProgramStudiMixin, FormView):
         cleaned_data = form.cleaned_data
         
         for nilai_komponen_clo_submit in cleaned_data:
+            # If dict is empty, skip
+            if not nilai_komponen_clo_submit: continue
+
             # Check query first
             nilai_peserta_qs = NilaiKomponenCloPeserta.objects.filter(
                 peserta=nilai_komponen_clo_submit.get('peserta'),
