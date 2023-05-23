@@ -14,6 +14,7 @@ Author: Alfian Aldy Hamdani
 ## How to clone*
 1. Clone this repository
 1. Follow setups in [SETUP.md](SETUP.md)
+1. Add groups and its permission by running (copy and paste) [groups.py](config/groups.py) in Django shell
 1. Run Django project
 
 \* Proyek ini hanya bisa dijalankan dengan menggunakan akun Neosia atau MBerkas Universitas Hasanuddin
