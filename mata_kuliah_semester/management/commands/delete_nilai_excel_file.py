@@ -1,5 +1,6 @@
 import os
-from datetime import timedelta, datetime
+from datetime import timedelta
+from django.utils import timezone
 from django.core.management.base import BaseCommand
 from mata_kuliah_semester.models import NilaiExcelMataKuliahSemester
 
@@ -8,8 +9,8 @@ class Command(BaseCommand):
     help = 'Deletes objects older than a certain period'
 
     def handle(self, *args, **options):
-        period = timedelta(minutes=1)
-        older_than = datetime.now() - period
+        period = timedelta(days=1)
+        older_than = timezone.now() - period
         nilai_qs = NilaiExcelMataKuliahSemester.objects.filter(
             created_at__lt=older_than)
         
