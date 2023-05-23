@@ -70,11 +70,12 @@ def get_oauth_access_token(code: str):
     """
 
     redirect_uri = os.environ.get('DJANGO_ALLOWED_HOST') + reverse('accounts:oauth-callback')
+    if settings.DEBUG: print(redirect_uri)
     parameters = {
         'grant_type': 'authorization_code',
         'client_id': '3',
         'client_secret': os.environ.get('OAUTH_CLIENT_SECRET'),
-        'redirect_uri': 'http://{}'.format(redirect_uri),
+        'redirect_uri': 'https://{}'.format(redirect_uri),
         'code': code,
     }
     

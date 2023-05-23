@@ -57,7 +57,7 @@ def login_oauth_view(request: HttpRequest):
     redirect_uri = os.environ.get('DJANGO_ALLOWED_HOST') + reverse('accounts:oauth-callback')
     parameters = {
         'client_id': '3',
-        'redirect_uri':'http://{}'.format(redirect_uri),
+        'redirect_uri':'https://{}'.format(redirect_uri),
         'response_type': 'code',
         'scope': '*',
     }
