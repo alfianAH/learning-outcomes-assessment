@@ -10,6 +10,7 @@ from io import BytesIO
 from functools import partial
 from openpyxl.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
+from openpyxl.cell.read_only import EmptyCell, EMPTY_CELL
 from openpyxl.styles import (
     Font, Alignment, Border, Side,
     Protection,
@@ -639,8 +640,7 @@ def generate_template_nilai_mk_semester(mk_semester: MataKuliahSemester, list_pe
 
     for clo in list_clo:
         start_col_num = alphabet_to_number(start_col)
-        list_komponen: QuerySet[KomponenClo] = clo.get_komponen_clo()
-
+        list_komponen: QuerySet[KomponenClo] = clo.get_komponen_clo().order_by('instrumen_penilaian')
         # Nama CLO
         # Merged cells
         if list_komponen.count() > 1:
@@ -767,6 +767,8 @@ def process_excel_file(
     
     # Excel values
     for cell in worksheet[clo_row][3:]:
+        if cell is EMPTY_CELL: continue
+
         komponen = worksheet['{}{}'.format(cell.column_letter, komponen_clo_row)].value
         persentase = worksheet['{}{}'.format(cell.column_letter, persentase_komponen_row)].value
         
