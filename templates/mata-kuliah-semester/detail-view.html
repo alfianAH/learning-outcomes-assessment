@@ -480,7 +480,7 @@
                     display: false,
                 },
                 customPercentage: {
-                    content: {{ single_object.average_clo_achievement|floatformat:2 }},
+                    content: {{ single_object.average_clo_achievement|default_if_none:0|floatformat:2 }},
                 },
             }
         },
