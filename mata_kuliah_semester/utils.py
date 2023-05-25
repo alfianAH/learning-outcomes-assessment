@@ -837,7 +837,7 @@ def process_excel_file(
             qs = list_komponen_clo.filter(
                 clo__nama=clo_excel,
                 instrumen_penilaian=nama_komponen,
-                persentase=persentase_komponen*100
+                persentase=round(persentase_komponen*100, 10)
             )
 
             if not qs.exists():
