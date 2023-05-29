@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'django_htmx',
     'formtools',
     'mathfilters',
+    'django_q',
 
     # Internal
     'accounts',
@@ -181,3 +182,24 @@ DIRS = [
     BASE_DIR / 'templates' / 'custom-widgets' / 'forms' / 'widgets'
 ]
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
+
+# Django Q setup
+Q_CLUSTER = {
+    'name': 'learning_outcomes_assessment',
+    'workers': 8,
+    'recycle': 500,
+    'timeout': 60,
+    'compress': True,
+    'save_limit': 250,
+    'queue_limit': 500,
+    'cpu_affinity': 3,
+    'label': 'Django Q',
+    'redis': {
+        'host': '127.0.0.1',
+        'port': 6379,
+        'db': 0,
+        'password': os.environ.get('REDIS_PASSWORD'),
+        'charset': 'utf-8',
+        'errors': 'strict',
+    }
+}

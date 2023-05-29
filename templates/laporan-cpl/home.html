@@ -168,12 +168,22 @@ Laporan CPL -
         $('#form-list-{{ forms.filter_formset.management_form.TOTAL_FORMS.id_for_label }}').children().each(function(index, elem) {
             if(!$(elem).find('input:checkbox').is(':checked')){
                 notDeletedForm ++;
-                console.log(notDeletedForm);
             }
         });
         
         $('#{{ forms.filter_formset.management_form.TOTAL_FORMS.id_for_label }}').val(notDeletedForm);
     });
+
+    {% if prodi_task %}
+    let prodiResultUrl = "{% url 'task-result' %}?task_id={{ prodi_task }}";
+    updateProgress(
+        prodiResultUrl, 
+        onResult=function(result){
+            console.log('berhasil');
+            console.log(result);
+        }
+    );
+    {% endif %}
 
     {% comment %} Perolehan Nilai ILO {% endcomment %}
     {% if perolehan_nilai_ilo_graph %}

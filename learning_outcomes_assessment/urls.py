@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include, re_path
-from .views import home_view, dosen_json_response
+from .views import home_view, dosen_json_response, get_task_result
 from django.views.static import serve 
 from django.conf import settings
 
@@ -28,6 +28,7 @@ urlpatterns = [
     path('semester/', include('semester.urls')),
     path('laporan-cpl/', include('laporan_cpl.urls')),
     path('dosen-search/', dosen_json_response, name='dosen-search'),
+    path('task/', get_task_result, name='task-result'),
     re_path(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}), 
     re_path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}), 
 ]

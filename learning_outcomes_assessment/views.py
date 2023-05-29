@@ -1,6 +1,8 @@
-from django.http import HttpRequest, JsonResponse
-from django.views.generic.base import TemplateView
+import json
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
+from django.contrib.auth.decorators import login_required
+from django_q.tasks import AsyncTask, result
 from django.urls import reverse
 from .utils import request_nusoap
 
@@ -17,3 +19,13 @@ def dosen_json_response(request: HttpRequest):
     json = request_nusoap(search_text)
     
     return JsonResponse(json)
+
+
+@login_required
+def get_task_result(request: HttpRequest):
+    task_id = request.GET.get('task_id')
+    if task_id is None:
+        return JsonResponse({'result': None})
+    
+    task_result = result(task_id)
+    return JsonResponse({'result': task_result}, safe=False)

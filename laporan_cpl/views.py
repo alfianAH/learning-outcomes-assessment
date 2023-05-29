@@ -30,14 +30,21 @@ from .forms import (
 )
 from .utils import (
     get_ilo_and_sks_from_kurikulum,
-    process_ilo_prodi,
-    process_ilo_mahasiswa,
-    process_ilo_prodi_by_kurikulum,
-    process_ilo_mahasiswa_by_kurikulum,
+    # process_ilo_prodi,
+    # process_ilo_mahasiswa,
+    # process_ilo_prodi_by_kurikulum,
+    # process_ilo_mahasiswa_by_kurikulum,
     generate_laporan_cpl_prodi_pdf,
     generate_laporan_cpl_mahasiswa_pdf,
     generate_laporan_cpl_per_mahasiswa_pdf,
 )
+from .tasks import (
+    process_ilo_prodi,
+    process_ilo_mahasiswa,
+    process_ilo_prodi_by_kurikulum,
+    process_ilo_mahasiswa_by_kurikulum,
+)
+from django_q.tasks import async_task
 
 
 User = get_user_model()
@@ -137,34 +144,6 @@ class LaporanCapaianPembelajaranTemplateView(LoginRequiredMixin, MultiFormView):
             messages.success(self.request, message)
         else:
             messages.error(self.request, message)
-    
-    def perolehan_nilai_ilo_graph(self, list_ilo: QuerySet[Ilo], is_multiple_result: bool, calculation_result: dict):
-        json_response = {
-            'labels': [ilo.nama for ilo in list_ilo],
-            'datasets': [
-                {
-                    'label': 'Satisfactory Level',
-                    'data': [ilo.satisfactory_level for ilo in list_ilo],
-                    'fill': False,
-                }
-            ]
-        }
-
-        if is_multiple_result:
-            # Update to bar chart
-            json_response.update({
-                'chart_type': 'bar'
-            })
-            # Update satisfactory level to line
-            json_response['datasets'][0].update({
-                'type': 'line'
-            })
-        else:
-            json_response.update({
-                'chart_type': 'radar'
-            })
-
-        return json_response
 
 
 class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
@@ -181,18 +160,6 @@ class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
             return redirect(request.user.get_laporan_cpl_url())
         return super().get(request, *args, **kwargs)
 
-    def perolehan_nilai_ilo_graph(self, list_ilo: QuerySet[Ilo], is_multiple_result: bool, calculation_result: dict):
-        json_response = super().perolehan_nilai_ilo_graph(list_ilo, is_multiple_result, calculation_result)
-
-        for key, value in calculation_result.items():
-            json_response['datasets'].append({
-                'label': key,
-                'data': [nilai_ilo for nama_ilo, nilai_ilo in value.items()],
-                'fill': False,
-            })
-
-        return json.dumps(json_response)
-    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
@@ -237,16 +204,24 @@ class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
             ).exclude(nilai_akhir=None)
 
             filter = [(kurikulum_obj, kurikulum_obj.nama)]
-
+            
             # Process
-            prodi_is_success, prodi_message, prodi_result = process_ilo_prodi_by_kurikulum(list_ilo, max_sks_prodi, kurikulum_obj)
-            mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa_by_kurikulum(list_ilo, max_sks_prodi, list_peserta_mk, kurikulum_obj)
+            # prodi_is_success, prodi_message, prodi_result = process_ilo_prodi_by_kurikulum(list_ilo, max_sks_prodi, kurikulum_obj)
+            # mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa_by_kurikulum(list_ilo, max_sks_prodi, list_peserta_mk, kurikulum_obj)
 
-            perolehan_nilai_ilo_graph = self.perolehan_nilai_ilo_graph(list_ilo, is_multiple_result, prodi_result)
+            # perolehan_nilai_ilo_graph = self.perolehan_nilai_ilo_graph(list_ilo, is_multiple_result, prodi_result)
 
-            # Success and Error messages
-            self.show_result_messages(prodi_is_success, prodi_message)
-            self.show_result_messages(mahasiswa_is_success, mahasiswa_message)
+            # # Success and Error messages
+            # self.show_result_messages(prodi_is_success, prodi_message)
+            # self.show_result_messages(mahasiswa_is_success, mahasiswa_message)
+            prodi_task = async_task(
+                process_ilo_prodi_by_kurikulum,
+                list_ilo, max_sks_prodi, kurikulum_obj, is_multiple_result
+            )
+            mahasiswa_task = async_task(
+                process_ilo_mahasiswa_by_kurikulum,
+                list_ilo, max_sks_prodi, list_peserta_mk, kurikulum_obj, is_multiple_result
+            )
         else:
             # Filter by tahun ajaran or semester
             is_semester_included = len(formset_cleaned_data[0].get('semester', '').strip()) != 0
@@ -319,20 +294,30 @@ class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
             is_multiple_result = len(filter) > 1
 
             # Process
-            prodi_is_success, prodi_message, prodi_result = process_ilo_prodi(list_ilo, max_sks_prodi, is_semester_included, filter)
-            mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa(list_ilo, max_sks_prodi, list_peserta_mk, is_semester_included, filter)
+            # prodi_is_success, prodi_message, prodi_result = process_ilo_prodi(list_ilo, max_sks_prodi, is_semester_included, filter)
+            # mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa(list_ilo, max_sks_prodi, list_peserta_mk, is_semester_included, filter)
 
-            perolehan_nilai_ilo_graph = self.perolehan_nilai_ilo_graph(list_ilo, is_multiple_result, prodi_result)
+            # perolehan_nilai_ilo_graph = self.perolehan_nilai_ilo_graph(list_ilo, is_multiple_result, prodi_result)
 
-            # Success and Error messages
-            self.show_result_messages(prodi_is_success, prodi_message)
-            self.show_result_messages(mahasiswa_is_success, mahasiswa_message)
+            # # Success and Error messages
+            # self.show_result_messages(prodi_is_success, prodi_message)
+            # self.show_result_messages(mahasiswa_is_success, mahasiswa_message)
+            prodi_task = async_task(
+                process_ilo_prodi,
+                list_ilo, max_sks_prodi, is_semester_included, filter, is_multiple_result
+            )
+            mahasiswa_task = async_task(
+                process_ilo_mahasiswa,
+                list_ilo, max_sks_prodi, list_peserta_mk, is_semester_included, filter, is_multiple_result
+            )
 
         return self.render_to_response(
             self.get_context_data(
                 forms=forms,
-                perolehan_nilai_ilo_graph=perolehan_nilai_ilo_graph,
-                object_list=mahasiswa_result,
+                # perolehan_nilai_ilo_graph=perolehan_nilai_ilo_graph,
+                # object_list=mahasiswa_result,
+                prodi_task=prodi_task,
+                mahasiswa_task=mahasiswa_task,
                 list_ilo=list_ilo,
                 list_filter=filter,
                 is_multiple_result=is_multiple_result,
@@ -592,24 +577,6 @@ class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCa
         })
         return context
     
-    def perolehan_nilai_ilo_graph(self, list_ilo: QuerySet[Ilo], is_multiple_result: bool, calculation_result: dict):
-        json_response = super().perolehan_nilai_ilo_graph(list_ilo, is_multiple_result, calculation_result)
-
-        for _, data_mhs in calculation_result.items():
-            for filter in data_mhs['result']:
-                filter_name = filter['filter']
-                filter_results = filter['result']
-
-                json_response['datasets'].append({
-                    'label': filter_name,
-                    'data': [filter_result['nilai'] for filter_result in filter_results],
-                    'fill': False,
-                })
-
-            break
-
-        return json.dumps(json_response)
-    
     def forms_valid(self, forms: dict) -> HttpResponse:
         kurikulum_obj = forms['kurikulum_form'].cleaned_data.get('kurikulum')
         formset_cleaned_data = forms['filter_formset'].cleaned_data
@@ -629,6 +596,7 @@ class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCa
         filter_dict = {}
         
         if len(formset_cleaned_data) == 0:
+            is_multiple_result = False
             # Filter by kurikulum
             # Filter peserta MK
             list_peserta_mk = PesertaMataKuliah.objects.filter(
@@ -638,11 +606,15 @@ class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCa
                 id_neosia__in=mk_filter_cleaned_data
             )
 
-            mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa_by_kurikulum(list_ilo, max_sks_prodi, list_peserta_mk, kurikulum_obj)
+            # mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa_by_kurikulum(list_ilo, max_sks_prodi, list_peserta_mk, kurikulum_obj)
 
-            perolehan_nilai_ilo_graph = self.perolehan_nilai_ilo_graph(list_ilo, False, mahasiswa_result)
+            # perolehan_nilai_ilo_graph = self.perolehan_nilai_ilo_graph(list_ilo, False, mahasiswa_result)
 
-            self.show_result_messages(mahasiswa_is_success, mahasiswa_message)
+            # self.show_result_messages(mahasiswa_is_success, mahasiswa_message)
+            mahasiswa_task = async_task(
+                process_ilo_mahasiswa_by_kurikulum,
+                list_ilo, max_sks_prodi, list_peserta_mk, kurikulum_obj, is_multiple_result
+            )
         else:
             # Filter by tahun ajaran or semester
             is_semester_included = len(formset_cleaned_data[0].get('semester', '').strip()) != 0
@@ -720,16 +692,20 @@ class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCa
             # If is multiple result, use line chart, else, use radar chart
             is_multiple_result = len(filter) > 1
 
-            mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa(list_ilo, max_sks_prodi, list_peserta_mk, is_semester_included, filter)
+            # mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa(list_ilo, max_sks_prodi, list_peserta_mk, is_semester_included, filter)
 
-            perolehan_nilai_ilo_graph = self.perolehan_nilai_ilo_graph(list_ilo, is_multiple_result, mahasiswa_result)
+            # perolehan_nilai_ilo_graph = self.perolehan_nilai_ilo_graph(list_ilo, is_multiple_result, mahasiswa_result)
 
-            self.show_result_messages(mahasiswa_is_success, mahasiswa_message)
+            # self.show_result_messages(mahasiswa_is_success, mahasiswa_message)
+            mahasiswa_task = async_task(
+                process_ilo_mahasiswa,
+                list_ilo, max_sks_prodi, list_peserta_mk, is_semester_included, filter, is_multiple_result
+            )
 
         return self.render_to_response(
             self.get_context_data(
                 forms=forms,
-                perolehan_nilai_ilo_graph=perolehan_nilai_ilo_graph,
+                mahasiswa_task=mahasiswa_task,
                 options=list_peserta_mk,
                 list_ilo=list_ilo,
             )

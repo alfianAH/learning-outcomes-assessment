@@ -339,6 +339,59 @@ def calculate_ilo_mahasiswa(list_ilo: QuerySet[Ilo],
     return (is_success, message, result)
 
 
+def perolehan_nilai_ilo_graph(list_ilo, is_multiple_result):
+    perolehan_nilai_ilo_graph_dict = {
+        'labels': [ilo.nama for ilo in list_ilo],
+        'datasets': [
+            {
+                'label': 'Satisfactory Level',
+                'data': [ilo.satisfactory_level for ilo in list_ilo],
+                'fill': False,
+            }
+        ]
+    }
+
+    if is_multiple_result:
+        # Update to bar chart
+        perolehan_nilai_ilo_graph_dict.update({
+            'chart_type': 'bar'
+        })
+        # Update satisfactory level to line
+        perolehan_nilai_ilo_graph_dict['datasets'][0].update({
+            'type': 'line'
+        })
+    else:
+        perolehan_nilai_ilo_graph_dict.update({
+            'chart_type': 'radar'
+        })
+
+    return perolehan_nilai_ilo_graph_dict
+
+
+def perolehan_nilai_ilo_prodi_graph(calculation_result: dict, json_dict: dict):
+    for key, value in calculation_result.items():
+        json_dict['datasets'].append({
+            'label': key,
+            'data': [nilai_ilo for nama_ilo, nilai_ilo in value.items()],
+            'fill': False,
+        })
+
+
+def perolehan_nilai_ilo_mahasiswa_graph(calculation_result: dict, json_dict: dict):
+    for _, data_mhs in calculation_result.items():
+        for filter in data_mhs['result']:
+            filter_name = filter['filter']
+            filter_results = filter['result']
+
+            json_dict['datasets'].append({
+                'label': filter_name,
+                'data': [filter_result['nilai'] for filter_result in filter_results],
+                'fill': False,
+            })
+
+        break
+
+
 def process_ilo_mahasiswa(list_ilo: QuerySet[Ilo], max_sks_prodi: int,
                           list_peserta_mk: QuerySet[PesertaMataKuliah],
                           is_semester_included: bool,
