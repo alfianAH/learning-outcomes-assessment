@@ -291,8 +291,6 @@ class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
         return self.render_to_response(
             self.get_context_data(
                 forms=forms,
-                # perolehan_nilai_ilo_graph=perolehan_nilai_ilo_graph,
-                # object_list=mahasiswa_result,
                 prodi_task=prodi_task,
                 mahasiswa_task=mahasiswa_task,
                 list_ilo=list_ilo,
