@@ -6,7 +6,6 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import QuerySet
 from django.contrib import messages
 from django.http import (
     FileResponse, Http404, HttpResponse, 
@@ -33,10 +32,6 @@ from .forms import (
 )
 from .utils import (
     get_ilo_and_sks_from_kurikulum,
-    # process_ilo_prodi,
-    # process_ilo_mahasiswa,
-    # process_ilo_prodi_by_kurikulum,
-    # process_ilo_mahasiswa_by_kurikulum,
     generate_laporan_cpl_prodi_pdf,
     generate_laporan_cpl_mahasiswa_pdf,
     generate_laporan_cpl_per_mahasiswa_pdf,
@@ -411,6 +406,7 @@ class LaporanCapaianPembelajaranDownloadView(LaporanCapaianPembelajaranTemplateV
         filter_dict = {}
 
         if len(formset_cleaned_data) == 0:
+            is_multiple_result = False
             # Filter by kurikulum
             # Filter peserta MK
             list_peserta_mk = PesertaMataKuliah.objects.filter(
@@ -421,7 +417,7 @@ class LaporanCapaianPembelajaranDownloadView(LaporanCapaianPembelajaranTemplateV
 
             # Process
             if self.download_cpl_prodi:
-                prodi_is_success, prodi_message, prodi_result = process_ilo_prodi_by_kurikulum(list_ilo, max_sks_prodi, kurikulum_obj)
+                prodi_is_success, prodi_message, prodi_result, _ = process_ilo_prodi_by_kurikulum(list_ilo, max_sks_prodi, filter, is_multiple_result)
 
                 if prodi_is_success:
                     file = generate_laporan_cpl_prodi_pdf(list_ilo, filter, prodi_result, prodi, fakultas)
@@ -432,7 +428,7 @@ class LaporanCapaianPembelajaranDownloadView(LaporanCapaianPembelajaranTemplateV
                     return HttpResponse(prodi_message)
             
             if self.download_cpl_mahasiswa:
-                mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa_by_kurikulum(list_ilo, max_sks_prodi, list_peserta_mk, kurikulum_obj)
+                mahasiswa_is_success, mahasiswa_message, mahasiswa_result, _ = process_ilo_mahasiswa_by_kurikulum(list_ilo, max_sks_prodi, filter, is_multiple_result, list_peserta_mk)
 
                 if mahasiswa_is_success:
                     file = generate_laporan_cpl_mahasiswa_pdf(list_ilo, filter, mahasiswa_result, prodi, fakultas)
@@ -514,7 +510,7 @@ class LaporanCapaianPembelajaranDownloadView(LaporanCapaianPembelajaranTemplateV
 
             # Process
             if self.download_cpl_prodi:
-                prodi_is_success, prodi_message, prodi_result = process_ilo_prodi(list_ilo, max_sks_prodi, is_semester_included, filter)
+                prodi_is_success, prodi_message, prodi_result, _ = process_ilo_prodi(list_ilo, max_sks_prodi, filter, is_multiple_result, is_semester_included)
                 
                 if prodi_is_success:
                     file = generate_laporan_cpl_prodi_pdf(list_ilo, filter, prodi_result, prodi, fakultas)
@@ -525,7 +521,7 @@ class LaporanCapaianPembelajaranDownloadView(LaporanCapaianPembelajaranTemplateV
                     return HttpResponse(prodi_message, status=404)
 
             if self.download_cpl_mahasiswa:
-                mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa(list_ilo, max_sks_prodi, list_peserta_mk, is_semester_included, filter)
+                mahasiswa_is_success, mahasiswa_message, mahasiswa_result, _ = process_ilo_mahasiswa(list_ilo, max_sks_prodi, filter, is_multiple_result, is_semester_included, list_peserta_mk)
 
                 if mahasiswa_is_success:
                     file = generate_laporan_cpl_mahasiswa_pdf(list_ilo, filter, mahasiswa_result, prodi, fakultas)
@@ -799,6 +795,7 @@ class LaporanCapaianPembelajaranMahasiswaDownloadView(MahasiswaAsPesertaMixin, L
         filter_dict = {}
         
         if len(formset_cleaned_data) == 0:
+            is_multiple_result = False
             # Filter by kurikulum
             # Filter peserta MK
             list_peserta_mk = PesertaMataKuliah.objects.filter(
@@ -809,7 +806,7 @@ class LaporanCapaianPembelajaranMahasiswaDownloadView(MahasiswaAsPesertaMixin, L
             )
             filter = [(kurikulum_obj, kurikulum_obj.nama)]
 
-            mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa_by_kurikulum(list_ilo, max_sks_prodi, list_peserta_mk, kurikulum_obj)
+            mahasiswa_is_success, mahasiswa_message, mahasiswa_result, _ = process_ilo_mahasiswa_by_kurikulum(list_ilo, max_sks_prodi, filter, is_multiple_result, list_peserta_mk)
         else:
             # Filter by tahun ajaran or semester
             is_semester_included = len(formset_cleaned_data[0].get('semester', '').strip()) != 0
@@ -884,7 +881,7 @@ class LaporanCapaianPembelajaranMahasiswaDownloadView(MahasiswaAsPesertaMixin, L
                     id_neosia__in=mk_filter_cleaned_data
                 )
 
-            mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa(list_ilo, max_sks_prodi, list_peserta_mk, is_semester_included, filter)
+            mahasiswa_is_success, mahasiswa_message, mahasiswa_result, _ = process_ilo_mahasiswa(list_ilo, max_sks_prodi, filter, is_multiple_result, is_semester_included, list_peserta_mk)
 
         if mahasiswa_is_success:
             file = generate_laporan_cpl_per_mahasiswa_pdf(

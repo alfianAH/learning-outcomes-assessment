@@ -238,10 +238,10 @@ Laporan CPL -
                     },
                     success: function(response){
                         $('#tab-nilai-pane').html(response);
+
+                        downloadLaporanCPL('#download-cpl-mahasiswa', '{{ cpl_mahasiswa_filename }}');
                     }
                 });
-
-                downloadLaporanCPL('#download-cpl-mahasiswa', '{{ cpl_mahasiswa_filename }}');
             } else{
                 addToast('error', message);
             }

@@ -72,7 +72,7 @@ def process_ilo_prodi(
 
             if not is_success: 
                 if settings.DEBUG: print('Perhitungan CPL Prodi gagal.', message)
-                return (is_success, message, result)
+                return (is_success, message, result, json.dumps(perolehan_nilai_ilo_graph_json_response))
     else:
         for tahun_ajaran_prodi_obj, tahun_ajaran_nama in filter:
             list_mk_semester = MataKuliahSemester.objects.annotate(
@@ -92,7 +92,7 @@ def process_ilo_prodi(
 
             if not is_success: 
                 if settings.DEBUG: print('Perhitungan CPL Prodi gagal.', message)
-                return (is_success, message, result)
+                return (is_success, message, result, json.dumps(perolehan_nilai_ilo_graph_json_response))
     
     
     if len(result.keys()) != len(filter):
@@ -189,7 +189,7 @@ def process_ilo_mahasiswa(
                 # Return if not success
                 if not is_success: 
                     if settings.DEBUG: print('Perhitungan CPL Mahasiswa gagal.', message)
-                    return (is_success, message, result)
+                    return (is_success, message, result, json.dumps(perolehan_nilai_ilo_graph_json_response))
         else:
             for tahun_ajaran_prodi_obj, tahun_ajaran_name in filter:
                 list_mahasiswa_as_peserta_mk = list_peserta_mk.filter(
@@ -213,12 +213,12 @@ def process_ilo_mahasiswa(
                 # Return if not success
                 if not is_success: 
                     if settings.DEBUG: print('Perhitungan CPL Mahasiswa gagal.', message)
-                    return (is_success, message, result)
+                    return (is_success, message, result, json.dumps(perolehan_nilai_ilo_graph_json_response))
         
         if mahasiswa.username not in result.keys():
             result[mahasiswa.username] = result_mahasiswa
 
-    perolehan_nilai_ilo_prodi_graph(result, perolehan_nilai_ilo_graph_json_response)
+    perolehan_nilai_ilo_mahasiswa_graph(result, perolehan_nilai_ilo_graph_json_response)
     return (is_success, message, result, json.dumps(perolehan_nilai_ilo_graph_json_response))
 
 
