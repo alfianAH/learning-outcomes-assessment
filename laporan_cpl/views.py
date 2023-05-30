@@ -1,4 +1,5 @@
 import json
+from typing import Any, Dict
 from django.utils import timezone
 from django.core.exceptions import PermissionDenied
 from django.conf import settings
@@ -8,9 +9,11 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import QuerySet
 from django.contrib import messages
 from django.http import (
-    FileResponse, HttpResponse, 
+    FileResponse, Http404, HttpResponse, 
     HttpRequest, JsonResponse, QueryDict
 )
+from django_q.tasks import async_task, result
+from django_q.models import Task
 from django.urls import reverse_lazy
 from django.views.generic.base import TemplateView
 from mata_kuliah_semester.models import PesertaMataKuliah
@@ -44,7 +47,6 @@ from .tasks import (
     process_ilo_prodi_by_kurikulum,
     process_ilo_mahasiswa_by_kurikulum,
 )
-from django_q.tasks import async_task
 
 
 User = get_user_model()
@@ -150,11 +152,6 @@ class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
     template_name = 'laporan-cpl/home.html'
     success_url = reverse_lazy('laporan_cpl:home')
 
-    table_scroll_head_header: str = 'laporan-cpl/partials/prodi/table-scroll-head-header-prodi.html'
-    table_scroll_head_body: str = 'laporan-cpl/partials/prodi/table-scroll-head-body-prodi.html'
-    table_scroll_data_header: str = 'laporan-cpl/partials/prodi/table-scroll-data-header-prodi.html'
-    table_scroll_data_body: str = 'laporan-cpl/partials/prodi/table-scroll-data-body-prodi.html'
-
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         if request.user.role == 'm':
             return redirect(request.user.get_laporan_cpl_url())
@@ -168,10 +165,6 @@ class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
         cpl_mahasiswa_filename = 'Laporan CPL Mahasiwa-{}.pdf'.format(time)
         
         context.update({
-            'table_scroll_head_header': self.table_scroll_head_header,
-            'table_scroll_head_body': self.table_scroll_head_body,
-            'table_scroll_data_header': self.table_scroll_data_header,
-            'table_scroll_data_body': self.table_scroll_data_body,
             'cpl_prodi_filename': cpl_prodi_filename,
             'cpl_mahasiswa_filename': cpl_mahasiswa_filename,
         })
@@ -206,21 +199,13 @@ class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
             filter = [(kurikulum_obj, kurikulum_obj.nama)]
             
             # Process
-            # prodi_is_success, prodi_message, prodi_result = process_ilo_prodi_by_kurikulum(list_ilo, max_sks_prodi, kurikulum_obj)
-            # mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa_by_kurikulum(list_ilo, max_sks_prodi, list_peserta_mk, kurikulum_obj)
-
-            # perolehan_nilai_ilo_graph = self.perolehan_nilai_ilo_graph(list_ilo, is_multiple_result, prodi_result)
-
-            # # Success and Error messages
-            # self.show_result_messages(prodi_is_success, prodi_message)
-            # self.show_result_messages(mahasiswa_is_success, mahasiswa_message)
             prodi_task = async_task(
                 process_ilo_prodi_by_kurikulum,
-                list_ilo, max_sks_prodi, kurikulum_obj, is_multiple_result
+                list_ilo, max_sks_prodi, filter, is_multiple_result
             )
             mahasiswa_task = async_task(
                 process_ilo_mahasiswa_by_kurikulum,
-                list_ilo, max_sks_prodi, list_peserta_mk, kurikulum_obj, is_multiple_result
+                list_ilo, max_sks_prodi, filter, is_multiple_result, list_peserta_mk
             )
         else:
             # Filter by tahun ajaran or semester
@@ -294,21 +279,13 @@ class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
             is_multiple_result = len(filter) > 1
 
             # Process
-            # prodi_is_success, prodi_message, prodi_result = process_ilo_prodi(list_ilo, max_sks_prodi, is_semester_included, filter)
-            # mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa(list_ilo, max_sks_prodi, list_peserta_mk, is_semester_included, filter)
-
-            # perolehan_nilai_ilo_graph = self.perolehan_nilai_ilo_graph(list_ilo, is_multiple_result, prodi_result)
-
-            # # Success and Error messages
-            # self.show_result_messages(prodi_is_success, prodi_message)
-            # self.show_result_messages(mahasiswa_is_success, mahasiswa_message)
             prodi_task = async_task(
                 process_ilo_prodi,
-                list_ilo, max_sks_prodi, is_semester_included, filter, is_multiple_result
+                list_ilo, max_sks_prodi, filter, is_multiple_result, is_semester_included
             )
             mahasiswa_task = async_task(
                 process_ilo_mahasiswa,
-                list_ilo, max_sks_prodi, list_peserta_mk, is_semester_included, filter, is_multiple_result
+                list_ilo, max_sks_prodi, filter, is_multiple_result, is_semester_included, list_peserta_mk
             )
 
         return self.render_to_response(
@@ -323,6 +300,47 @@ class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
                 is_multiple_result=is_multiple_result,
             )
         )
+
+
+class ListMahasiswaLaporanCPLProgrmStudiView(TemplateView):
+    template_name = 'laporan-cpl/partials/list-mahasiswa-prodi.html'
+    table_scroll_head_header: str = 'laporan-cpl/partials/prodi/table-scroll-head-header-prodi.html'
+    table_scroll_head_body: str = 'laporan-cpl/partials/prodi/table-scroll-head-body-prodi.html'
+    table_scroll_data_header: str = 'laporan-cpl/partials/prodi/table-scroll-data-header-prodi.html'
+    table_scroll_data_body: str = 'laporan-cpl/partials/prodi/table-scroll-data-body-prodi.html'
+    mahasiswa_result = None
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if not request.is_ajax(): 
+            raise PermissionDenied
+        task_id = request.GET.get('task_id')
+        if task_id is None: raise Http404
+        
+        # Get result
+        task_result = result(task_id)
+        if task_result is not None:
+            _, _, self.mahasiswa_result, _ = task_result
+        
+        # Get filter list from task obj
+        task_obj = Task.objects.get(id=task_id)
+        self.filter_list = task_obj.args[2]
+        self.list_ilo = task_obj.args[0]
+        print(self.filter_list)
+
+        return super().get(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'list_filter': self.filter_list,
+            'list_ilo': self.list_ilo,
+            'object_list': self.mahasiswa_result,
+            'table_scroll_head_header': self.table_scroll_head_header,
+            'table_scroll_head_body': self.table_scroll_head_body,
+            'table_scroll_data_header': self.table_scroll_data_header,
+            'table_scroll_data_body': self.table_scroll_data_body,
+        })
+        return context
     
 
 class LaporanCapaianPembelajaranDownloadView(LaporanCapaianPembelajaranTemplateView):
@@ -606,14 +624,9 @@ class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCa
                 id_neosia__in=mk_filter_cleaned_data
             )
 
-            # mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa_by_kurikulum(list_ilo, max_sks_prodi, list_peserta_mk, kurikulum_obj)
-
-            # perolehan_nilai_ilo_graph = self.perolehan_nilai_ilo_graph(list_ilo, False, mahasiswa_result)
-
-            # self.show_result_messages(mahasiswa_is_success, mahasiswa_message)
             mahasiswa_task = async_task(
                 process_ilo_mahasiswa_by_kurikulum,
-                list_ilo, max_sks_prodi, list_peserta_mk, kurikulum_obj, is_multiple_result
+                list_ilo, max_sks_prodi, filter, is_multiple_result, list_peserta_mk
             )
         else:
             # Filter by tahun ajaran or semester
@@ -692,14 +705,9 @@ class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCa
             # If is multiple result, use line chart, else, use radar chart
             is_multiple_result = len(filter) > 1
 
-            # mahasiswa_is_success, mahasiswa_message, mahasiswa_result = process_ilo_mahasiswa(list_ilo, max_sks_prodi, list_peserta_mk, is_semester_included, filter)
-
-            # perolehan_nilai_ilo_graph = self.perolehan_nilai_ilo_graph(list_ilo, is_multiple_result, mahasiswa_result)
-
-            # self.show_result_messages(mahasiswa_is_success, mahasiswa_message)
             mahasiswa_task = async_task(
                 process_ilo_mahasiswa,
-                list_ilo, max_sks_prodi, list_peserta_mk, is_semester_included, filter, is_multiple_result
+                list_ilo, max_sks_prodi, filter, is_multiple_result, is_semester_included, list_peserta_mk
             )
 
         return self.render_to_response(

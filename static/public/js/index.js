@@ -849,7 +849,7 @@ function updateProgress (progressUrl, onResult=null) {
     fetch(progressUrl).then(function (response) {
         response.json().then(function (data) {
             if (data.result == null){
-                setTimeout(updateProgress, 500, progressUrl, onResult=onResult);
+                setTimeout(updateProgress, 2000, progressUrl, onResult=onResult);
             } else {
                 if(onResult != null){
                     onResult(data.result);

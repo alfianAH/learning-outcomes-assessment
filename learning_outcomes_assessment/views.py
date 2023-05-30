@@ -1,8 +1,7 @@
-import json
-from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.http import HttpRequest, JsonResponse
 from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
-from django_q.tasks import AsyncTask, result
+from django_q.tasks import result
 from django.urls import reverse
 from .utils import request_nusoap
 

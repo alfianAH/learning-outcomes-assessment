@@ -19,9 +19,8 @@ User = get_user_model()
 
 def process_ilo_prodi(
     list_ilo: QuerySet[Ilo], max_sks_prodi: int, 
-    is_semester_included: bool, 
     filter: list,
-    is_multiple_result: bool
+    is_multiple_result: bool, is_semester_included: bool
 ):
     """Calculate ILO Prodi in Kurikulum according to tahun ajaran and semester filter
 
@@ -111,10 +110,9 @@ def process_ilo_prodi(
 
 def process_ilo_mahasiswa(
     list_ilo: QuerySet[Ilo], max_sks_prodi: int,
-    list_peserta_mk: QuerySet[PesertaMataKuliah],
-    is_semester_included: bool,
     filter: list,
-    is_multiple_result: bool
+    is_multiple_result: bool, is_semester_included: bool,
+    list_peserta_mk: QuerySet[PesertaMataKuliah]
 ):
     """Calculate ILO All Mahasiswa in Kurikulum according to tahun ajaran and semester filter
 
@@ -225,8 +223,8 @@ def process_ilo_mahasiswa(
 
 
 def process_ilo_prodi_by_kurikulum(
-    list_ilo: QuerySet[Ilo], 
-    max_sks_prodi: int, kurikulum: Kurikulum,
+    list_ilo: QuerySet[Ilo], max_sks_prodi: int, 
+    filter: list,
     is_multiple_result: bool
 ):
     """Calculate ILO Prodi in Kurikulum
@@ -254,6 +252,8 @@ def process_ilo_prodi_by_kurikulum(
     result = {}
     perolehan_nilai_ilo_graph_json_response = perolehan_nilai_ilo_graph(list_ilo, is_multiple_result)
 
+    kurikulum_obj: Kurikulum = filter[0][0]
+
     # Prepare all needed components
     nilai_max = 100
 
@@ -262,14 +262,14 @@ def process_ilo_prodi_by_kurikulum(
         num_peserta=Count('kelasmatakuliahsemester__pesertamatakuliah')
     ).filter(
         num_peserta__gt=0,
-        mk_kurikulum__kurikulum=kurikulum,
+        mk_kurikulum__kurikulum=kurikulum_obj,
         kelasmatakuliahsemester__pesertamatakuliah__nilai_akhir__isnull=False
     ).distinct()
     
     # Calculate ILO Prodi
     is_success, message, calculation_result = calculate_ilo_prodi(list_ilo, list_mk_semester, max_sks_prodi, nilai_max)
     result.update({
-        kurikulum.nama: calculation_result
+        kurikulum_obj.nama: calculation_result
     })
 
     if not is_success: 
@@ -289,9 +289,9 @@ def process_ilo_prodi_by_kurikulum(
 
 def process_ilo_mahasiswa_by_kurikulum(
     list_ilo: QuerySet[Ilo], max_sks_prodi: int, 
+    filter: list,
+    is_multiple_result: bool,
     list_peserta_mk: QuerySet[PesertaMataKuliah],
-    kurikulum_obj: Kurikulum,
-    is_multiple_result: bool
 ):
     """Calculate ILO All Mahasiswa in Kurikulum
 
@@ -329,7 +329,7 @@ def process_ilo_mahasiswa_by_kurikulum(
     result: dict = {}
     nilai_max = 100
     perolehan_nilai_ilo_graph_json_response = perolehan_nilai_ilo_graph(list_ilo, is_multiple_result)
-
+    kurikulum_obj = filter[0][0]
 
     list_mahasiswa = User.objects.filter(
         pesertamatakuliah__in=list_peserta_mk
