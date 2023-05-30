@@ -323,16 +323,15 @@ class ListMahasiswaLaporanCPLProgrmStudiView(TemplateView):
         
         # Get filter list from task obj
         task_obj = Task.objects.get(id=task_id)
-        self.filter_list = task_obj.args[2]
+        self.list_filter = task_obj.args[2]
         self.list_ilo = task_obj.args[0]
-        print(self.filter_list)
 
         return super().get(request, *args, **kwargs)
     
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context.update({
-            'list_filter': self.filter_list,
+            'list_filter': self.list_filter,
             'list_ilo': self.list_ilo,
             'object_list': self.mahasiswa_result,
             'table_scroll_head_header': self.table_scroll_head_header,
@@ -615,6 +614,8 @@ class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCa
         
         if len(formset_cleaned_data) == 0:
             is_multiple_result = False
+            filter = [(kurikulum_obj, kurikulum_obj.nama)]
+
             # Filter by kurikulum
             # Filter peserta MK
             list_peserta_mk = PesertaMataKuliah.objects.filter(
