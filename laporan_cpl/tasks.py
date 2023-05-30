@@ -111,8 +111,9 @@ def process_ilo_prodi(
 def process_ilo_mahasiswa(
     list_ilo: QuerySet[Ilo], max_sks_prodi: int,
     filter: list,
-    is_multiple_result: bool, is_semester_included: bool,
-    list_peserta_mk: QuerySet[PesertaMataKuliah]
+    is_multiple_result: bool,
+    list_peserta_mk: QuerySet[PesertaMataKuliah], 
+    is_semester_included: bool
 ):
     """Calculate ILO All Mahasiswa in Kurikulum according to tahun ajaran and semester filter
 

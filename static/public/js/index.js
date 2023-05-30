@@ -794,31 +794,11 @@ function downloadFileButton(buttonId, filename) {
 
 function downloadLaporanCPL(buttonId, filename) { 
     $(buttonId).on('click', function(){
-        let formData = {};
-        $('form').serializeArray().forEach(function(input) {
-            if (input.name in formData) {
-                formData[input.name].push(input.value);
-            } else {
-                formData[input.name] = [input.value];
-            }
-            
-        });
         let targetUrl = $(this).attr('data-url');
 
         $.ajax({
             url: targetUrl,
-            type: 'POST',
-            data: JSON.stringify(formData),
-            contentType: 'application/json;charset=UTF-8',
-            xhrFields: {
-                responseType: "blob"  // Set the response type to blob
-            },
-            beforeSend: function(xhr, settings) {
-                // Get the CSRF token from the cookie and set the header
-                let csrftoken = $("[name=csrfmiddlewaretoken]").val();
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                addToast(toastType='info', message='Sedang memproses file laporan CPL.');
-            },
+            type: 'GET',
             success: function(response){
                 // Create download link for PDF file
                 let blob = new Blob([response], {type: 'application/pdf'});

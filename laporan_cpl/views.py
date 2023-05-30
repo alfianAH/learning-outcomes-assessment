@@ -1,20 +1,19 @@
-import json
-from typing import Any, Dict
 from django.utils import timezone
 from django.core.exceptions import PermissionDenied
 from django.conf import settings
+from django.db.models import QuerySet
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.http import (
     FileResponse, Http404, HttpResponse, 
-    HttpRequest, JsonResponse, QueryDict
+    HttpRequest, JsonResponse
 )
 from django_q.tasks import async_task, result
 from django_q.models import Task
 from django.urls import reverse_lazy
-from django.views.generic.base import TemplateView
+from django.views.generic.base import TemplateView, View
 from mata_kuliah_semester.models import PesertaMataKuliah
 from learning_outcomes_assessment.forms.edit import MultiFormView
 from learning_outcomes_assessment.auth.mixins import(
@@ -280,7 +279,7 @@ class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
             )
             mahasiswa_task = async_task(
                 process_ilo_mahasiswa,
-                list_ilo, max_sks_prodi, filter, is_multiple_result, is_semester_included, list_peserta_mk
+                list_ilo, max_sks_prodi, filter, is_multiple_result, list_peserta_mk, is_semester_included
             )
 
         return self.render_to_response(
@@ -306,22 +305,22 @@ class ListMahasiswaLaporanCPLProgrmStudiView(TemplateView):
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         if not request.is_ajax(): 
             raise PermissionDenied
-        task_id = request.GET.get('task_id')
-        if task_id is None: raise Http404
+        self.task_id = request.GET.get('task_id')
+        if self.task_id is None: raise Http404
         
         # Get result
-        task_result = result(task_id)
+        task_result = result(self.task_id)
         if task_result is not None:
             _, _, self.mahasiswa_result, _ = task_result
         
         # Get filter list from task obj
-        task_obj = Task.objects.get(id=task_id)
+        task_obj = Task.objects.get(id=self.task_id)
         self.list_filter = task_obj.args[2]
         self.list_ilo = task_obj.args[0]
 
         return super().get(request, *args, **kwargs)
     
-    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
             'list_filter': self.list_filter,
@@ -331,11 +330,12 @@ class ListMahasiswaLaporanCPLProgrmStudiView(TemplateView):
             'table_scroll_head_body': self.table_scroll_head_body,
             'table_scroll_data_header': self.table_scroll_data_header,
             'table_scroll_data_body': self.table_scroll_data_body,
+            'mahasiswa_task': self.task_id,
         })
         return context
-    
 
-class LaporanCapaianPembelajaranDownloadView(LaporanCapaianPembelajaranTemplateView):
+
+class LaporanCapaianPembelajaranDownloadView(View):
     download_cpl_prodi = False
     download_cpl_mahasiswa = False
 
@@ -352,193 +352,51 @@ class LaporanCapaianPembelajaranDownloadView(LaporanCapaianPembelajaranTemplateV
             elif request.GET.get('download_cpl') == 'mahasiswa':
                 self.download_cpl_mahasiswa = True
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-
-        for key in self.form_classes.keys():
-            if self.request.method in ('POST', 'PUT'):
-                body_dict = json.loads(self.request.body)
-                query_dict = QueryDict('', mutable=True)
-
-                for body_key, body_value in body_dict.items():
-                    if isinstance(body_value, list):
-                        for v in body_value:
-                            query_dict.appendlist(body_key, v)
-                    else:
-                        query_dict.appendlist(body_key, body_value)
-                
-                kwargs[key].update({
-                    'data': query_dict,
-                    'files': self.request.FILES,
-                })
-        
-        return kwargs
-
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         if request.user.role == 'm': raise PermissionDenied
         if not request.is_ajax(): raise PermissionDenied
         
-        return super().get(request, *args, **kwargs)
+        task_id = request.GET.get('task_id')
+        if task_id is None: raise PermissionDenied
+
+        task_obj = Task.objects.get(id=task_id)
+
+        list_ilo: QuerySet[Ilo] = task_obj.args[0]
+        filter = task_obj.args[2]
+        
+        ilo_obj: Ilo = list_ilo.first()
+        prodi = ilo_obj.get_kurikulum().prodi_jenjang.program_studi.nama
+        fakultas = ilo_obj.get_kurikulum().prodi_jenjang.program_studi.fakultas.nama
+
+        # Process
+        if self.download_cpl_prodi:
+            prodi_is_success, prodi_message, prodi_result, _ = result(task_id)
+
+            if prodi_is_success:
+                file = generate_laporan_cpl_prodi_pdf(list_ilo, filter, prodi_result, prodi, fakultas)
+                if settings.DEBUG: print('Berhasil generate file laporan CPL prodi.')
+                return self.download_laporan_cpl(file, self.cpl_prodi_filename)
+            else:
+                if settings.DEBUG: print(prodi_message)
+                return HttpResponse(prodi_message)
+        
+        if self.download_cpl_mahasiswa:
+            mahasiswa_is_success, mahasiswa_message, mahasiswa_result, _ = result(task_id)
+
+            if mahasiswa_is_success:
+                file = generate_laporan_cpl_mahasiswa_pdf(list_ilo, filter, mahasiswa_result, prodi, fakultas)
+                if settings.DEBUG: print('Berhasil generate file laporan CPL mahasiswa.')
+                return self.download_laporan_cpl(file, self.cpl_prodi_filename)
+            else:
+                if settings.DEBUG: print(mahasiswa_message)
+                return HttpResponse(mahasiswa_message)
+        
+        return HttpResponse('Empty')
     
     def download_laporan_cpl(self, file, filename):
         as_attachment = True
         response = FileResponse(file, as_attachment=as_attachment, filename=filename)
         return response
-
-    def forms_valid(self, forms: dict) -> HttpResponse:
-        kurikulum_obj = forms['kurikulum_form'].cleaned_data.get('kurikulum')
-        formset_cleaned_data = forms['filter_formset'].cleaned_data
-
-        # Get list ilo and max sks prodi
-        list_ilo, max_sks_prodi = get_ilo_and_sks_from_kurikulum(kurikulum_obj)
-        ilo_obj: Ilo = list_ilo.first()
-        prodi = ilo_obj.get_kurikulum().prodi_jenjang.program_studi.nama
-        fakultas = ilo_obj.get_kurikulum().prodi_jenjang.program_studi.fakultas.nama
-        
-        # Filter dict is based on tahun ajaran
-        """
-        filter_dict = {
-            tahun_ajaran_prodi_id:[
-                semester_prodi_id
-            ],
-        }
-        """
-        filter_dict = {}
-
-        if len(formset_cleaned_data) == 0:
-            is_multiple_result = False
-            # Filter by kurikulum
-            # Filter peserta MK
-            list_peserta_mk = PesertaMataKuliah.objects.filter(
-                kelas_mk_semester__mk_semester__mk_kurikulum__kurikulum=kurikulum_obj
-            ).exclude(nilai_akhir=None)
-
-            filter = [(kurikulum_obj, kurikulum_obj.nama)]
-
-            # Process
-            if self.download_cpl_prodi:
-                prodi_is_success, prodi_message, prodi_result, _ = process_ilo_prodi_by_kurikulum(list_ilo, max_sks_prodi, filter, is_multiple_result)
-
-                if prodi_is_success:
-                    file = generate_laporan_cpl_prodi_pdf(list_ilo, filter, prodi_result, prodi, fakultas)
-                    if settings.DEBUG: print('Berhasil generate file laporan CPL prodi.')
-                    return self.download_laporan_cpl(file, self.cpl_prodi_filename)
-                else:
-                    if settings.DEBUG: print(prodi_message)
-                    return HttpResponse(prodi_message)
-            
-            if self.download_cpl_mahasiswa:
-                mahasiswa_is_success, mahasiswa_message, mahasiswa_result, _ = process_ilo_mahasiswa_by_kurikulum(list_ilo, max_sks_prodi, filter, is_multiple_result, list_peserta_mk)
-
-                if mahasiswa_is_success:
-                    file = generate_laporan_cpl_mahasiswa_pdf(list_ilo, filter, mahasiswa_result, prodi, fakultas)
-                    if settings.DEBUG: print('Berhasil generate file laporan CPL mahasiswa.')
-                    return self.download_laporan_cpl(file, self.cpl_mahasiswa_filename)
-                else:
-                    if settings.DEBUG: print(mahasiswa_message)
-                    return HttpResponse(mahasiswa_message)
-        else:
-            # Filter by tahun ajaran or semester
-            is_semester_included = len(formset_cleaned_data[0].get('semester', '').strip()) != 0
-
-            # Separate tahun ajaran and semester
-            for clean_data in formset_cleaned_data:
-                tahun_ajaran_prodi_id = clean_data['tahun_ajaran']
-
-                if tahun_ajaran_prodi_id not in filter_dict.keys():
-                    filter_dict[tahun_ajaran_prodi_id] = []
-                
-                if is_semester_included:
-                    semester_prodi_id = clean_data['semester']
-                    filter_dict[tahun_ajaran_prodi_id].append(semester_prodi_id)
-            
-            filter = []
-            if is_semester_included:
-                # Semester filters
-                for tahun_ajaran_prodi_id, list_semester_prodi_id in filter_dict.items():
-                    for semester_prodi_id in list_semester_prodi_id:
-                        if not semester_prodi_id.strip(): continue
-
-                        try:
-                            semester_prodi_obj = SemesterProdi.objects.get(
-                                id_neosia=semester_prodi_id
-                            )
-                        except SemesterProdi.DoesNotExist:
-                            message = 'Semester Prodi (ID={}) tidak ada di database.'.format(semester_prodi_id)
-                            if settings.DEBUG: print(message)
-                            messages.error(self.request, message)
-                            continue
-                        except SemesterProdi.MultipleObjectsReturned:
-                            message = 'Semester Prodi (ID={}) mengembalikan multiple object.'.format(semester_prodi_id)
-                            if settings.DEBUG: print(message)
-                            messages.error(self.request, message)
-                            continue
-                        
-                        filter.append((semester_prodi_obj, str(semester_prodi_obj.semester)))
-
-                # Filter peserta MK
-                list_peserta_mk = PesertaMataKuliah.objects.filter(
-                    kelas_mk_semester__mk_semester__semester__in=[semester_prodi_obj for semester_prodi_obj, _ in filter]
-                ).exclude(nilai_akhir=None)
-            else:
-                # Tahun ajaran filters
-                for tahun_ajaran_prodi_id in filter_dict.keys():
-                    if not tahun_ajaran_prodi_id.strip(): continue
-
-                    try:
-                        tahun_ajaran_prodi_obj = TahunAjaranProdi.objects.get(
-                            id=tahun_ajaran_prodi_id
-                        )
-                    except TahunAjaranProdi.DoesNotExist:
-                        message = 'TahunAjaranProdi (ID={}) tidak ada di database.'.format(tahun_ajaran_prodi_id)
-                        if settings.DEBUG: print(message)
-                        continue
-                    except TahunAjaranProdi.MultipleObjectsReturned:
-                        message = 'TahunAjaranProdi (ID={}) mengembalikan multiple object.'.format(tahun_ajaran_prodi_id)
-                        if settings.DEBUG: print(message)
-                        continue
-                    
-                    filter.append((tahun_ajaran_prodi_obj, str(tahun_ajaran_prodi_obj.tahun_ajaran)))
-
-                # Filter peserta MK
-                list_peserta_mk = PesertaMataKuliah.objects.filter(
-                    kelas_mk_semester__mk_semester__semester__tahun_ajaran_prodi__in=[tahun_ajaran_prodi_obj for tahun_ajaran_prodi_obj, _ in filter]
-                ).exclude(nilai_akhir=None)
-
-            # If is multiple result, use line chart, else, use radar chart
-            is_multiple_result = len(filter) > 1
-
-            # Process
-            if self.download_cpl_prodi:
-                prodi_is_success, prodi_message, prodi_result, _ = process_ilo_prodi(list_ilo, max_sks_prodi, filter, is_multiple_result, is_semester_included)
-                
-                if prodi_is_success:
-                    file = generate_laporan_cpl_prodi_pdf(list_ilo, filter, prodi_result, prodi, fakultas)
-                    if settings.DEBUG: print('Berhasil generate file laporan CPL prodi.')
-                    return self.download_laporan_cpl(file, self.cpl_prodi_filename)
-                else:
-                    if settings.DEBUG: print(prodi_message)
-                    return HttpResponse(prodi_message, status=404)
-
-            if self.download_cpl_mahasiswa:
-                mahasiswa_is_success, mahasiswa_message, mahasiswa_result, _ = process_ilo_mahasiswa(list_ilo, max_sks_prodi, filter, is_multiple_result, is_semester_included, list_peserta_mk)
-
-                if mahasiswa_is_success:
-                    file = generate_laporan_cpl_mahasiswa_pdf(list_ilo, filter, mahasiswa_result, prodi, fakultas)
-                    if settings.DEBUG: print('Berhasil generate file laporan CPL mahasiswa.')
-                    return self.download_laporan_cpl(file, self.cpl_mahasiswa_filename)
-                else:
-                    if settings.DEBUG: print(mahasiswa_message)
-                    return HttpResponse(mahasiswa_message, status=404)
-        
-        if settings.DEBUG: print('Perhitungan gagal')
-        return HttpResponse('Perhitungan gagal', status=404)
-    
-    def form_invalid(self, forms: dict) -> HttpResponse:
-        if settings.DEBUG:
-            print('Form invalid. Form errors: {}, formset errors: {}'.format(
-                forms['kurikulum_form'].errors, forms['filter_formset'].errors))
-        return HttpResponse('Form invalid', status=404)
 
 
 class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCapaianPembelajaranTemplateView):
@@ -702,7 +560,7 @@ class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCa
 
             mahasiswa_task = async_task(
                 process_ilo_mahasiswa,
-                list_ilo, max_sks_prodi, filter, is_multiple_result, is_semester_included, list_peserta_mk
+                list_ilo, max_sks_prodi, filter, is_multiple_result, list_peserta_mk, is_semester_included
             )
 
         return self.render_to_response(
@@ -715,13 +573,7 @@ class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCa
         )
 
 
-class LaporanCapaianPembelajaranMahasiswaDownloadView(MahasiswaAsPesertaMixin, LaporanCapaianPembelajaranTemplateView):
-    form_classes = {
-        'kurikulum_form': KurikulumChoiceForm,
-        'filter_formset': TahunAjaranSemesterFormset,
-        'mk_filter_form': MataKuliahSemesterExcludeForm,
-    }
-
+class LaporanCapaianPembelajaranMahasiswaDownloadView(MahasiswaAsPesertaMixin, View):
     def setup(self, request: HttpRequest, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
@@ -731,157 +583,29 @@ class LaporanCapaianPembelajaranMahasiswaDownloadView(MahasiswaAsPesertaMixin, L
         self.cpl_mahasiswa_filename = 'Laporan CPL Mahasiwa-{}-{}.pdf'.format(username, time)
 
         self.user = get_object_or_404(User, username=username)
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-
-        for key in self.form_classes.keys():
-            if self.request.method in ('POST', 'PUT'):
-                body_dict = json.loads(self.request.body)
-                query_dict = QueryDict('', mutable=True)
-
-                for body_key, body_value in body_dict.items():
-                    if isinstance(body_value, list):
-                        for v in body_value:
-                            query_dict.appendlist(body_key, v)
-                    else:
-                        query_dict.appendlist(body_key, body_value)
-                
-                kwargs[key].update({
-                    'data': query_dict,
-                    'files': self.request.FILES,
-                })
-        
-        user_dict = {
-            'user': self.user
-        }
-        if self.user.role == 'm':
-            kwargs['kurikulum_form'].update(user_dict)
-            kwargs['filter_formset'].update(user_dict)
-
-        kwargs['mk_filter_form'].update(user_dict)
-        return kwargs
     
     def download_laporan_cpl(self, file, filename):
         as_attachment = True
         response = FileResponse(file, as_attachment=as_attachment, filename=filename)
         return response
     
-    def forms_invalid(self, forms: dict) -> HttpResponse:
-        if settings.DEBUG:
-            for form in forms.values():
-                print('Form invalid. Form errors: {}'.format(form.errors))
-        return HttpResponse('Form invalid', status=404)
-    
-    def forms_valid(self, forms: dict) -> HttpResponse:
-        kurikulum_obj = forms['kurikulum_form'].cleaned_data.get('kurikulum')
-        formset_cleaned_data = forms['filter_formset'].cleaned_data
-        mk_filter_cleaned_data = forms['mk_filter_form'].cleaned_data.get('mk_semester', [])
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if not request.is_ajax(): raise PermissionDenied
+        
+        task_id = request.GET.get('task_id')
+        if task_id is None: raise PermissionDenied
 
-        # Get list ilo and max sks prodi
-        list_ilo, max_sks_prodi = get_ilo_and_sks_from_kurikulum(kurikulum_obj)
+        task_obj = Task.objects.get(id=task_id)
+
+        list_ilo: QuerySet[Ilo] = task_obj.args[0]
+        filter = task_obj.args[2]
+        list_peserta_mk = task_obj.args[4]
+        
         ilo_obj: Ilo = list_ilo.first()
         prodi = ilo_obj.get_kurikulum().prodi_jenjang.program_studi.nama
         fakultas = ilo_obj.get_kurikulum().prodi_jenjang.program_studi.fakultas.nama
-        
-        # Filter dict is based on tahun ajaran
-        """
-        filter_dict = {
-            tahun_ajaran_prodi_id:[
-                semester_prodi_id
-            ],
-        }
-        """
-        filter_dict = {}
-        
-        if len(formset_cleaned_data) == 0:
-            is_multiple_result = False
-            # Filter by kurikulum
-            # Filter peserta MK
-            list_peserta_mk = PesertaMataKuliah.objects.filter(
-                mahasiswa=self.user,
-                kelas_mk_semester__mk_semester__mk_kurikulum__kurikulum=kurikulum_obj
-            ).exclude(nilai_akhir=None).exclude(
-                id_neosia__in=mk_filter_cleaned_data
-            )
-            filter = [(kurikulum_obj, kurikulum_obj.nama)]
 
-            mahasiswa_is_success, mahasiswa_message, mahasiswa_result, _ = process_ilo_mahasiswa_by_kurikulum(list_ilo, max_sks_prodi, filter, is_multiple_result, list_peserta_mk)
-        else:
-            # Filter by tahun ajaran or semester
-            is_semester_included = len(formset_cleaned_data[0].get('semester', '').strip()) != 0
-
-            # Separate tahun ajaran and semester
-            for clean_data in formset_cleaned_data:
-                tahun_ajaran_prodi_id = clean_data['tahun_ajaran']
-
-                if tahun_ajaran_prodi_id not in filter_dict.keys():
-                    filter_dict[tahun_ajaran_prodi_id] = []
-                
-                if is_semester_included:
-                    semester_prodi_id = clean_data['semester']
-                    filter_dict[tahun_ajaran_prodi_id].append(semester_prodi_id)
-            
-            filter = []
-            if is_semester_included:
-                # Semester filters
-                for tahun_ajaran_prodi_id, list_semester_prodi_id in filter_dict.items():
-                    for semester_prodi_id in list_semester_prodi_id:
-                        if not semester_prodi_id.strip(): continue
-
-                        try:
-                            semester_prodi_obj = SemesterProdi.objects.get(
-                                id_neosia=semester_prodi_id
-                            )
-                        except SemesterProdi.DoesNotExist:
-                            message = 'Semester Prodi (ID={}) tidak ada di database.'.format(semester_prodi_id)
-                            if settings.DEBUG: print(message)
-                            messages.error(self.request, message)
-                            continue
-                        except SemesterProdi.MultipleObjectsReturned:
-                            message = 'Semester Prodi (ID={}) mengembalikan multiple object.'.format(semester_prodi_id)
-                            if settings.DEBUG: print(message)
-                            messages.error(self.request, message)
-                            continue
-                        
-                        filter.append((semester_prodi_obj, str(semester_prodi_obj.semester)))
-
-                # Filter peserta MK
-                list_peserta_mk = PesertaMataKuliah.objects.filter(
-                    mahasiswa=self.user,
-                    kelas_mk_semester__mk_semester__semester__in=[semester_prodi_obj for semester_prodi_obj, _ in filter]
-                ).exclude(nilai_akhir=None).exclude(
-                    id_neosia__in=mk_filter_cleaned_data
-                )
-            else:
-                # Tahun ajaran filters
-                for tahun_ajaran_prodi_id in filter_dict.keys():
-                    if not tahun_ajaran_prodi_id.strip(): continue
-
-                    try:
-                        tahun_ajaran_prodi_obj = TahunAjaranProdi.objects.get(
-                            id=tahun_ajaran_prodi_id
-                        )
-                    except TahunAjaranProdi.DoesNotExist:
-                        message = 'TahunAjaranProdi (ID={}) tidak ada di database.'.format(tahun_ajaran_prodi_id)
-                        if settings.DEBUG: print(message)
-                        continue
-                    except TahunAjaranProdi.MultipleObjectsReturned:
-                        message = 'TahunAjaranProdi (ID={}) mengembalikan multiple object.'.format(tahun_ajaran_prodi_id)
-                        if settings.DEBUG: print(message)
-                        continue
-                    
-                    filter.append((tahun_ajaran_prodi_obj, str(tahun_ajaran_prodi_obj.tahun_ajaran)))
-
-                # Filter peserta MK
-                list_peserta_mk = PesertaMataKuliah.objects.filter(
-                    mahasiswa=self.user,
-                    kelas_mk_semester__mk_semester__semester__tahun_ajaran_prodi__in=[tahun_ajaran_prodi_obj for tahun_ajaran_prodi_obj, _ in filter]
-                ).exclude(nilai_akhir=None).exclude(
-                    id_neosia__in=mk_filter_cleaned_data
-                )
-
-            mahasiswa_is_success, mahasiswa_message, mahasiswa_result, _ = process_ilo_mahasiswa(list_ilo, max_sks_prodi, filter, is_multiple_result, is_semester_included, list_peserta_mk)
+        mahasiswa_is_success, mahasiswa_message, mahasiswa_result, _ = result(task_id)
 
         if mahasiswa_is_success:
             file = generate_laporan_cpl_per_mahasiswa_pdf(
