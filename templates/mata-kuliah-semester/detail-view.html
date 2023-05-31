@@ -330,6 +330,10 @@
                                                     <th scope="row" class="w-full">{{ nilai_clo.clo.nama }} - {{ nilai_clo.clo.get_ilo.nama }}</th>
                                                     <td class="text-right  whitespace-nowrap">{{ nilai_clo.clo.get_total_persentase_komponen }}% ({{ nilai_clo.clo.get_total_persentase_komponen|div:100|mul:nilai_clo.nilai|floatformat:2 }})</td>
                                                 </tr>
+                                                <tr class="flex space-x-2.5">
+                                                    <th scope="row" class="w-full">Bobot PI</th>
+                                                    <td class="text-right  whitespace-nowrap">{{ nilai_clo.clo.get_pi_clo.count|div:nilai_clo.clo.get_ilo.pi_area.get_performance_indicator.count|floatformat:2 }}</td>
+                                                </tr>
                                             </tbody>
                                         </table>
                                     </li>
