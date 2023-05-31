@@ -186,12 +186,12 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
 # Django Q setup
 Q_CLUSTER = {
     'name': 'learning_outcomes_assessment',
-    'workers': 8,
+    'workers': 100,
     'recycle': 500,
     'timeout': 540,
     'retry': 600,
     'compress': True,
-    'save_limit': 250,
+    'save_limit': 2000,
     'queue_limit': 500,
     'cpu_affinity': 3,
     'ack_failures': True,
