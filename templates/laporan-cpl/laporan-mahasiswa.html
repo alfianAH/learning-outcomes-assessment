@@ -93,7 +93,7 @@
 
     <div class="tab-content">
         <div class="tab-pane fade min-h-screen show active" id="tab-grafik-pane" role="tabpanel" aria-labelledby="tab-1">
-            {% include 'components/loading.html' %}
+            {% include 'components/loading.html' with is_single_component=True %}
 
             <div id="grafik-result" class="space-y-2.5 hidden">
                 <a href="javascript:void(0);" id="download-cpl-mahasiswa" data-url="{{ user.get_download_laporan_cpl_url }}?task_id={{ mahasiswa_task }}" class="btn btn-icon-start btn-success max-w-min" role="menuitem link">

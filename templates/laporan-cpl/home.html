@@ -58,7 +58,7 @@ Laporan CPL -
 
     <div class="tab-content">
         <div class="tab-pane fade min-h-screen show active" id="tab-grafik-pane" role="tabpanel" aria-labelledby="tab-1">
-            {% include 'components/loading.html' %}
+            {% include 'components/loading.html' with is_single_component=True %}
 
             <div id="grafik-result" class="space-y-2.5 hidden">
                 <a href="javascript:void(0);" id="download-cpl-prodi" data-url="{% url 'laporan_cpl:download' %}?download_cpl=prodi&task_id={{ prodi_task }}" class="btn btn-icon-start btn-success max-w-min" role="menuitem link">
@@ -77,7 +77,7 @@ Laporan CPL -
         </div>
         
         <div class="tab-pane fade min-h-screen" id="tab-nilai-pane" role="tabpanel" aria-labelledby="tab-1">
-            {% include 'components/loading.html' %}
+            {% include 'components/loading.html' with is_single_component=True %}
 
             <div id="nilai-result" class="space-y-2.5 hidden"></div>
         </div>
