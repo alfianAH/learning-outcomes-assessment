@@ -123,7 +123,7 @@ def duplicate_clo(semester_prodi_id: int, new_mk_semester: MataKuliahSemester):
     return (is_success, message)
 
 
-def generate_nilai_clo(persentase_komponen_clo, nilai_akhir: float, timeout = 10):
+def generate_nilai_clo(persentase_komponen_clo, nilai_akhir: float, timeout = 50):
     possibility_choices = {
         'low': {
             'choices': list(range(16)),
