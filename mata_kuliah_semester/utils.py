@@ -93,7 +93,7 @@ def get_peserta_kelas_mk_semester(mk_semester: MataKuliahSemester):
         }
 
         json_response = request_data_to_neosia(PESERTA_MATA_KULIAH_URL, parameters)
-        if json_response is None: return list_peserta
+        if json_response is None: continue
 
         for peserta_data in json_response:
             if peserta_data['id'] is None: continue
