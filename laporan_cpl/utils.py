@@ -2,6 +2,7 @@ from functools import partial
 from io import BytesIO
 from copy import copy
 import os
+import openpyxl
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
@@ -19,6 +20,14 @@ from reportlab.lib.pagesizes import letter, landscape
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
+from openpyxl.workbook import Workbook
+from openpyxl.worksheet.worksheet import Worksheet
+from openpyxl.cell.read_only import EMPTY_CELL
+from openpyxl.styles import (
+    Font, Alignment, Border, Side,
+    Protection,
+    PatternFill
+)
 from learning_outcomes_assessment.utils import export_pdf_header
 from learning_outcomes_assessment.chart.utils import (
     radar_factory,
@@ -808,6 +817,227 @@ def generate_laporan_cpl_prodi_pdf(
     return file_stream
 
 
+def generate_all_bobot_perhitungan_cpl_prodi(
+        current_worksheet,
+        list_mk_semester: QuerySet[MataKuliahSemester],
+        ilo: Ilo,
+        max_sks_prodi: int,
+):
+    """Generate bobot perhitungan CPL mahasiswa for raw report
+
+    Args:
+        current_worksheet (Worksheet): worksheet
+        list_mk_semester (QuerySet[MataKuliahSemester]): list mata kuliah semester
+        ilo (Ilo): ILO
+        max_sks_prodi (int): Max SKS kelulusan Prodi
+    """
+
+    start_row = 2
+
+    # Loop through MK Semester
+    for mk_semester in list_mk_semester:
+        # Check status nilai MK Semester
+        if not mk_semester.status_nilai:
+            peserta_qs = PesertaMataKuliah.objects.filter(kelas_mk_semester__mk_semester=mk_semester).exclude(nilai_akhir=None)
+            # Skip mata kuliah that doesn't have nilai akhir yet
+            if peserta_qs.count() == 0: continue
+            
+            continue
+
+        list_clo_ilo: QuerySet[Clo] = Clo.objects.filter(
+            mk_semester=mk_semester,
+            piclo__performance_indicator__pi_area__ilo=ilo,
+        ).distinct()
+
+        # Get list bobot PI
+        list_pi_ilo = PerformanceIndicator.objects.filter(
+            pi_area__ilo=ilo
+        )
+
+        for clo in list_clo_ilo:
+            persentase_clo = clo.get_total_persentase_komponen()/100
+            bobot_pi_ilo = clo.get_pi_clo().count() / list_pi_ilo.count()
+
+            # Get nilai CLO MK
+            nilai_clo_mk_semester_qs = NilaiCloMataKuliahSemester.objects.filter(
+                mk_semester=mk_semester,
+                clo=clo
+            ).values_list('nilai')
+
+            # Excel
+            current_worksheet['A{}'.format(start_row)] = mk_semester.mk_kurikulum.kode
+            current_worksheet['B{}'.format(start_row)] = mk_semester.mk_kurikulum.nama
+            current_worksheet['C{}'.format(start_row)] = clo.nama
+            current_worksheet['D{}'.format(start_row)] = '={}/{}'.format(mk_semester.mk_kurikulum.sks, max_sks_prodi)
+            current_worksheet['E{}'.format(start_row)] = persentase_clo
+            current_worksheet['F{}'.format(start_row)] = bobot_pi_ilo
+            current_worksheet['G{}'.format(start_row)] = 100
+
+            if nilai_clo_mk_semester_qs.exists():
+                nilai_clo_mk_semester = nilai_clo_mk_semester_qs.first()[0]
+                current_worksheet['H{}'.format(start_row)] = nilai_clo_mk_semester
+            else:
+                current_worksheet['H{}'.format(start_row)] = 0
+                continue
+            
+            start_row += 1
+
+
+def generate_all_bobot_perhitungan_cpl_mahasiswa(
+        current_worksheet,
+        list_peserta_mk_semester: QuerySet[PesertaMataKuliah],
+        ilo: Ilo,
+        max_sks_prodi: int,
+):
+    """Generate bobot perhitungan CPL mahasiswa for raw report
+
+    Args:
+        current_worksheet (Sheet): Worksheet
+        list_peserta_mk_semester (QuerySet[PesertaMataKuliah]): Peserta Mata Kuliah
+        ilo (Ilo): ILO
+        max_sks_prodi (int): Max SKS kelulusan Prodi
+    """
+    start_row = 2
+
+    # Loop through MK Semester
+    for peserta_mk_semester in list_peserta_mk_semester:
+        mk_semester = peserta_mk_semester.kelas_mk_semester.mk_semester
+
+        # Check status nilai MK Semester
+        if not peserta_mk_semester.status_nilai:
+            continue
+
+        list_clo_ilo: QuerySet[Clo] = Clo.objects.filter(
+            mk_semester=mk_semester,
+            piclo__performance_indicator__pi_area__ilo=ilo,
+        ).distinct()
+
+        # Get list bobot PI
+        list_pi_ilo = PerformanceIndicator.objects.filter(
+            pi_area__ilo=ilo
+        )
+
+        for clo in list_clo_ilo:
+            persentase_clo = clo.get_total_persentase_komponen()/100
+            bobot_pi_ilo = clo.get_pi_clo().count() / list_pi_ilo.count()
+
+            # Get nilai CLO peserta
+            nilai_clo_peserta_qs = NilaiCloPeserta.objects.filter(
+                peserta=peserta_mk_semester,
+                clo=clo
+            ).values_list('nilai')
+
+            # Excel
+            current_worksheet['A{}'.format(start_row)] = mk_semester.mk_kurikulum.kode
+            current_worksheet['B{}'.format(start_row)] = mk_semester.mk_kurikulum.nama
+            current_worksheet['C{}'.format(start_row)] = clo.nama
+            current_worksheet['D{}'.format(start_row)] = '={}/{}'.format(mk_semester.mk_kurikulum.sks, max_sks_prodi)
+            current_worksheet['E{}'.format(start_row)] = persentase_clo
+            current_worksheet['F{}'.format(start_row)] = bobot_pi_ilo
+            current_worksheet['G{}'.format(start_row)] = 100
+
+            if nilai_clo_peserta_qs.exists():
+                nilai_clo_peserta_mk_semester = nilai_clo_peserta_qs.first()[0]
+                current_worksheet['H{}'.format(start_row)] = nilai_clo_peserta_mk_semester
+            else:
+                current_worksheet['H{}'.format(start_row)] = 0
+                continue
+            
+            start_row += 1
+
+
+def generate_laporan_cpl_prodi_raw(
+        list_ilo: QuerySet[Ilo], max_sks_prodi: int, 
+        list_filter, 
+        is_kurikulum: bool = False, is_semester_included: bool = False
+):
+    """Generate laporan CPL Prodi Raw
+
+    Args:
+        list_ilo (QuerySet[Ilo]): List ILO
+        max_sks_prodi (int): Max SKS kelulusan prodi
+        list_filter (list): Filter kurikulum/tahun ajaran/semester
+        is_kurikulum (bool, optional): is filter kurikulum only?. Defaults to False.
+        is_semester_included (bool, optional): does filter include semester?. Defaults to False.
+
+    Returns:
+        FileStream: excel file
+    """
+
+    workbook = openpyxl.Workbook()
+
+    # Remove default sheet
+    workbook.remove_sheet(workbook['Sheet'])
+
+    # Create sheets
+    for ilo in list_ilo:
+        workbook.create_sheet(ilo.nama)
+        current_worksheet = workbook[ilo.nama]
+
+        current_worksheet['A1'] = 'Kode MK'
+        current_worksheet['B1'] = 'Nama MK'
+        current_worksheet['C1'] = 'CPMK'
+        current_worksheet['D1'] = 'Bobot MK'
+        current_worksheet['E1'] = 'Bobot CPMK'
+        current_worksheet['F1'] = 'Bobot PI CPL'
+        current_worksheet['G1'] = 'Nilai maksimum'
+        current_worksheet['H1'] = 'Nilai CPMK'
+
+        if is_kurikulum:
+            kurikulum_obj: Kurikulum = list_filter[0][0]
+            # Get all mata kuliah semester
+            list_mk_semester = MataKuliahSemester.objects.annotate(
+                num_peserta=Count('kelasmatakuliahsemester__pesertamatakuliah')
+            ).filter(
+                num_peserta__gt=0,
+                mk_kurikulum__kurikulum=kurikulum_obj,
+                clo__piclo__performance_indicator__pi_area__ilo=ilo,
+                kelasmatakuliahsemester__pesertamatakuliah__nilai_akhir__isnull=False
+            ).distinct()
+
+            generate_all_bobot_perhitungan_cpl_prodi(current_worksheet, list_mk_semester, ilo, max_sks_prodi)
+        else:
+            if is_semester_included:
+                list_semester_obj = []
+                for semester_prodi_obj, semester_nama in list_filter:
+                    list_semester_obj.append(semester_prodi_obj)
+                
+                # Get all mata kuliah semester
+                list_mk_semester = MataKuliahSemester.objects.annotate(
+                    num_peserta=Count('kelasmatakuliahsemester__pesertamatakuliah')
+                ).filter(
+                    num_peserta__gt=0,
+                    semester__in=list_semester_obj,
+                    clo__piclo__performance_indicator__pi_area__ilo=ilo,
+                    kelasmatakuliahsemester__pesertamatakuliah__nilai_akhir__isnull=False
+                ).distinct()
+
+                generate_all_bobot_perhitungan_cpl_prodi(current_worksheet, list_mk_semester, ilo, max_sks_prodi)
+            else:
+                list_tahun_ajaran_obj = []
+                for tahun_ajaran_prodi_obj, tahun_ajaran_nama in list_filter:
+                    list_tahun_ajaran_obj.append(tahun_ajaran_prodi_obj)
+                
+                # Get all mata kuliah semester
+                list_mk_semester = MataKuliahSemester.objects.annotate(
+                    num_peserta=Count('kelasmatakuliahsemester__pesertamatakuliah')
+                ).filter(
+                    num_peserta__gt=0,
+                    semester__tahun_ajaran_prodi__in=list_tahun_ajaran_obj,
+                    kelasmatakuliahsemester__pesertamatakuliah__nilai_akhir__isnull=False
+                ).distinct()
+
+                generate_all_bobot_perhitungan_cpl_prodi(current_worksheet, list_mk_semester, ilo, max_sks_prodi)
+
+    # Save the workbook to a BytesIO object
+    file_stream = BytesIO()
+    workbook.save(file_stream)
+
+    file_stream.seek(0)
+
+    return file_stream
+
+
 def generate_laporan_cpl_mahasiswa_pdf(
         list_ilo: QuerySet[Ilo],
         list_filter,
@@ -1288,3 +1518,88 @@ def generate_laporan_cpl_per_mahasiswa_pdf(
 
     return file_stream
 
+
+def generate_laporan_cpl_per_mahasiswa_raw(
+        list_ilo: QuerySet[Ilo], max_sks_prodi: int, 
+        list_peserta_mk: QuerySet[PesertaMataKuliah],
+        list_filter, 
+        is_kurikulum: bool = False, is_semester_included: bool = False
+):
+    """Generate laporan CPL mahasiswa Raw
+
+    Args:
+        list_ilo (QuerySet[Ilo]): List ILO
+        max_sks_prodi (int): Max SKS kelulusan prodi
+        list_peserta_mk (QuerySet[PesertaMataKuliah]): list peserta mk
+        list_filter (list): Filter kurikulum/tahun ajaran/semester
+        is_kurikulum (bool, optional): is filter kurikulum only?. Defaults to False.
+        is_semester_included (bool, optional): does filter include semester?. Defaults to False.
+
+    Returns:
+        FileStream: excel file
+    """
+
+    workbook = openpyxl.Workbook()
+
+    # Remove default sheet
+    workbook.remove_sheet(workbook['Sheet'])
+
+    # Create sheets
+    for ilo in list_ilo:
+        workbook.create_sheet(ilo.nama)
+        current_worksheet = workbook[ilo.nama]
+
+        current_worksheet['A1'] = 'Kode MK'
+        current_worksheet['B1'] = 'Nama MK'
+        current_worksheet['C1'] = 'CPMK'
+        current_worksheet['D1'] = 'Bobot MK'
+        current_worksheet['E1'] = 'Bobot CPMK'
+        current_worksheet['F1'] = 'Bobot PI CPL'
+        current_worksheet['G1'] = 'Nilai maksimum'
+        current_worksheet['H1'] = 'Nilai CPMK'
+
+        if is_kurikulum:
+            kurikulum_obj: Kurikulum = list_filter[0][0]
+            # Get mahasiswa's mata kuliah participation
+            list_mahasiswa_as_peserta_mk = list_peserta_mk.filter(
+                kelas_mk_semester__mk_semester__mk_kurikulum__kurikulum=kurikulum_obj,
+                kelas_mk_semester__mk_semester__clo__piclo__performance_indicator__pi_area__ilo=ilo,
+                nilai_akhir__isnull=False,
+            ).distinct()
+
+            generate_all_bobot_perhitungan_cpl_mahasiswa(current_worksheet, list_mahasiswa_as_peserta_mk, ilo, max_sks_prodi)
+        else:
+            if is_semester_included:
+                list_semester_obj = []
+                for semester_prodi_obj, semester_nama in list_filter:
+                    list_semester_obj.append(semester_prodi_obj)
+                
+                # Get mahasiswa's mata kuliah participation
+                list_mahasiswa_as_peserta_mk = list_peserta_mk.filter(
+                    kelas_mk_semester__mk_semester__semester__in=list_semester_obj,
+                    kelas_mk_semester__mk_semester__clo__piclo__performance_indicator__pi_area__ilo=ilo,
+                    nilai_akhir__isnull=False,
+                ).distinct()
+
+                generate_all_bobot_perhitungan_cpl_mahasiswa(current_worksheet, list_mahasiswa_as_peserta_mk, ilo, max_sks_prodi)
+            else:
+                list_tahun_ajaran_obj = []
+                for tahun_ajaran_prodi_obj, tahun_ajaran_nama in list_filter:
+                    list_tahun_ajaran_obj.append(tahun_ajaran_prodi_obj)
+                
+                # Get mahasiswa's mata kuliah participation
+                list_mahasiswa_as_peserta_mk = list_peserta_mk.filter(
+                    kelas_mk_semester__mk_semester__semester__tahun_ajaran_prodi__in=list_tahun_ajaran_obj,
+                    kelas_mk_semester__mk_semester__clo__piclo__performance_indicator__pi_area__ilo=ilo,
+                    nilai_akhir__isnull=False,
+                ).distinct()
+
+                generate_all_bobot_perhitungan_cpl_mahasiswa(current_worksheet, list_mahasiswa_as_peserta_mk, ilo, max_sks_prodi)
+
+    # Save the workbook to a BytesIO object
+    file_stream = BytesIO()
+    workbook.save(file_stream)
+
+    file_stream.seek(0)
+
+    return file_stream

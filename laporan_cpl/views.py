@@ -32,8 +32,10 @@ from .forms import (
 from .utils import (
     get_ilo_and_sks_from_kurikulum,
     generate_laporan_cpl_prodi_pdf,
+    generate_laporan_cpl_prodi_raw,
     generate_laporan_cpl_mahasiswa_pdf,
     generate_laporan_cpl_per_mahasiswa_pdf,
+    generate_laporan_cpl_per_mahasiswa_raw,
 )
 from .tasks import (
     process_ilo_prodi,
@@ -155,12 +157,14 @@ class LaporanCapaianPembelajaranView(LaporanCapaianPembelajaranTemplateView):
         context = super().get_context_data(**kwargs)
         
         time = timezone.now().strftime('%d%m%Y-%H%M%S')
+        raw_cpl_prodi_filename = 'Laporan CPL Prodi RAW-{}.xlsx'.format(time)
         cpl_prodi_filename = 'Laporan CPL Prodi-{}.pdf'.format(time)
         cpl_mahasiswa_filename = 'Laporan CPL Mahasiwa-{}.pdf'.format(time)
         
         context.update({
             'cpl_prodi_filename': cpl_prodi_filename,
             'cpl_mahasiswa_filename': cpl_mahasiswa_filename,
+            'raw_cpl_prodi_filename': raw_cpl_prodi_filename,
         })
         
         return context
@@ -399,6 +403,48 @@ class LaporanCapaianPembelajaranDownloadView(View):
         return response
 
 
+class LaporanCapaianPembelajaranRawDownloadView(View):
+    def setup(self, request: HttpRequest, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        
+        time = timezone.now().strftime('%d%m%Y-%H%M%S')
+        self.cpl_prodi_filename = 'Laporan CPL Prodi Raw-{}.xlsx'.format(time)
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if request.user.role == 'm': raise PermissionDenied
+        if not request.is_ajax(): raise PermissionDenied
+        
+        task_id = request.GET.get('task_id')
+        if task_id is None: raise PermissionDenied
+
+        task_obj = Task.objects.get(id=task_id)
+
+        list_ilo: QuerySet[Ilo] = task_obj.args[0]
+        max_sks_prodi = task_obj.args[1]
+        filter = task_obj.args[2]
+        if task_obj.func == 'laporan_cpl.tasks.process_ilo_prodi':
+            is_kurikulum = False
+            is_semester_included: bool = task_obj.args[-1]
+        elif task_obj.func == 'laporan_cpl.tasks.process_ilo_prodi_by_kurikulum':
+            is_kurikulum = True
+            is_semester_included = False
+
+        prodi_is_success, prodi_message, _, _ = result(task_id)
+
+        if prodi_is_success:
+            file = generate_laporan_cpl_prodi_raw(list_ilo, max_sks_prodi, filter, is_kurikulum, is_semester_included)
+            if settings.DEBUG: print('Berhasil generate RAW file laporan CPL prodi.')
+            return self.download_laporan_cpl(file, self.cpl_prodi_filename)
+        else:
+            if settings.DEBUG: print(prodi_message)
+            return HttpResponse(prodi_message)
+
+    def download_laporan_cpl(self, file, filename):
+        as_attachment = True
+        response = FileResponse(file, as_attachment=as_attachment, filename=filename)
+        return response
+
+
 class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCapaianPembelajaranTemplateView):
     template_name = 'laporan-cpl/laporan-mahasiswa.html'
     form_classes = {
@@ -435,6 +481,7 @@ class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCa
 
         time = timezone.now().strftime('%d%m%Y-%H%M%S')
         cpl_mahasiswa_filename = 'Laporan CPL Mahasiwa-{}-{}.pdf'.format(self.user.username, time)
+        raw_cpl_mahasiswa_filename = 'Laporan CPL Mahasiwa RAW-{}-{}.xlsx'.format(self.user.username, time)
 
         context.update({
             'user': self.user,
@@ -443,6 +490,7 @@ class LaporanCapaianPembelajaranMahasiswaView(MahasiswaAsPesertaMixin, LaporanCa
             'table_custom_field_header_template': self.table_custom_field_header_template,
             'table_custom_field_template': self.table_custom_field_template,
             'cpl_mahasiswa_filename': cpl_mahasiswa_filename,
+            'raw_cpl_mahasiswa_filename': raw_cpl_mahasiswa_filename,
         })
         return context
     
@@ -610,6 +658,54 @@ class LaporanCapaianPembelajaranMahasiswaDownloadView(MahasiswaAsPesertaMixin, V
         if mahasiswa_is_success:
             file = generate_laporan_cpl_per_mahasiswa_pdf(
                 list_ilo, list_peserta_mk, filter, mahasiswa_result, self.user, prodi, fakultas)
+            if settings.DEBUG: print('Berhasil generate file laporan CPL mahasiswa.')
+            return self.download_laporan_cpl(file, self.cpl_mahasiswa_filename)
+        else:
+            if settings.DEBUG: print(mahasiswa_message)
+            return HttpResponse(mahasiswa_message, status=404)
+
+
+class LaporanCapaianPembelajaranMahasiswaRawDownloadView(MahasiswaAsPesertaMixin, View):
+    def setup(self, request: HttpRequest, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        username = kwargs.get('username')
+        self.user = get_object_or_404(User, username=username)
+        time = timezone.now().strftime('%d%m%Y-%H%M%S')
+        self.cpl_mahasiswa_filename = 'Laporan CPL Mahasiwa-{}-{}.xlsx'.format(username, time)
+
+        self.user = get_object_or_404(User, username=username)
+    
+    def download_laporan_cpl(self, file, filename):
+        as_attachment = True
+        response = FileResponse(file, as_attachment=as_attachment, filename=filename)
+        return response
+    
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if not request.is_ajax(): raise PermissionDenied
+        
+        task_id = request.GET.get('task_id')
+        if task_id is None: raise PermissionDenied
+
+        task_obj = Task.objects.get(id=task_id)
+
+        # Get all data for laporan CPL
+        list_ilo: QuerySet[Ilo] = task_obj.args[0]
+        max_sks_prodi = task_obj.args[1]
+        filter = task_obj.args[2]
+        if task_obj.func == 'laporan_cpl.tasks.process_ilo_mahasiswa':
+            is_kurikulum = False
+            is_semester_included: bool = task_obj.args[-1]
+        elif task_obj.func == 'laporan_cpl.tasks.process_ilo_mahasiswa_by_kurikulum':
+            is_kurikulum = True
+            is_semester_included = False
+        list_peserta_mk = task_obj.args[4]
+
+        mahasiswa_is_success, mahasiswa_message, _, _ = result(task_id)
+
+        if mahasiswa_is_success:
+            file = generate_laporan_cpl_per_mahasiswa_raw(
+                list_ilo, max_sks_prodi, list_peserta_mk, filter, is_kurikulum, is_semester_included)
             if settings.DEBUG: print('Berhasil generate file laporan CPL mahasiswa.')
             return self.download_laporan_cpl(file, self.cpl_mahasiswa_filename)
         else:

@@ -258,7 +258,7 @@ def process_ilo_prodi_by_kurikulum(
     # Prepare all needed components
     nilai_max = 100
 
-     # Get all mata kuliah semester
+    # Get all mata kuliah semester
     list_mk_semester = MataKuliahSemester.objects.annotate(
         num_peserta=Count('kelasmatakuliahsemester__pesertamatakuliah')
     ).filter(

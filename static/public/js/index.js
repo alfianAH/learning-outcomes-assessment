@@ -787,6 +787,10 @@ function downloadFileButton(buttonId, filename) {
                 link.click();
                 document.body.removeChild(link);
                 window.URL.revokeObjectURL(url);
+                addToast(toastType='success', message='Berhasil mendownload file.');
+            },
+            error: function () {
+                addToast(toastType='error', message='Gagal mendownload file.');
             }
         });
     });

@@ -69,6 +69,14 @@ Laporan CPL -
                     <span>Download laporan CPL Program Studi</span>
                 </a>
 
+                <a href="javascript:void(0);" id="download-raw-cpl-prodi" data-url="{% url 'laporan_cpl:raw-download' %}?task_id={{ prodi_task }}" class="btn btn-icon-start btn-success max-w-min" role="menuitem link">
+                    <svg xmlns="http://www.w3.org/2000/svg" focusable="False" fill="currentColor" class="bi bi-file-earmark-excel w-4 h-4 fill-slate-100" viewBox="0 0 16 16">
+                        <path d="M5.884 6.68a.5.5 0 1 0-.768.64L7.349 10l-2.233 2.68a.5.5 0 0 0 .768.64L8 10.781l2.116 2.54a.5.5 0 0 0 .768-.641L8.651 10l2.233-2.68a.5.5 0 0 0-.768-.64L8 9.219l-2.116-2.54z"/>
+                        <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
+                    </svg>
+                    <span>Download RAW laporan CPL Program Studi</span>
+                </a>
+
                 {% comment %} Perolahan Nilai ILO Spider chart {% endcomment %}
                 <div class="w-full mx-auto my-0">
                     <canvas id="perolehan-nilai-ilo" class="w-full max-h-60 sm:max-h-64 lg:max-h-72 xl:max-h-80"></canvas>
@@ -185,6 +193,7 @@ Laporan CPL -
 
                 addToast('success', message);
                 downloadLaporanCPL('#download-cpl-prodi', '{{ cpl_prodi_filename }}');
+                downloadFileButton('#download-raw-cpl-prodi', '{{ raw_cpl_prodi_filename }}');
             } else{
                 addToast('error', message);
             }

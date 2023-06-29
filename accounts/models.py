@@ -145,3 +145,8 @@ class MyUser(AbstractUser):
         return get_reverse_url('laporan_cpl:laporan-mahasiswa-download', {
             'username': self.username,
         })
+    
+    def get_download_raw_laporan_cpl_url(self):
+        return get_reverse_url('laporan_cpl:raw-laporan-mahasiswa-download', {
+            'username': self.username,
+        })
