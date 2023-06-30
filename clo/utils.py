@@ -127,7 +127,7 @@ def generate_nilai_clo(persentase_komponen_clo, nilai_akhir: float, timeout = 50
     possibility_choices = {
         'low': {
             'choices': list(range(16)),
-            'weights': [5 if i == 0 else 1 for i in range(16)]
+            'weights': [10, 3, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1]
         }
     }
     batas = {
