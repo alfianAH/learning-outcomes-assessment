@@ -82,12 +82,15 @@ Laporan CPL -
                     <canvas id="perolehan-nilai-ilo" class="w-full max-h-60 sm:max-h-64 lg:max-h-72 xl:max-h-80"></canvas>
                 </div>
             </div>
+
+            <div id="error-result" class="space-y-2.5 hidden"></div>
         </div>
         
         <div class="tab-pane fade min-h-screen" id="tab-nilai-pane" role="tabpanel" aria-labelledby="tab-1">
             {% include 'components/loading.html' with is_single_component=True %}
 
             <div id="nilai-result" class="space-y-2.5 hidden"></div>
+            <div id="error-result" class="space-y-2.5 hidden"></div>
         </div>
 
         <div class="tab-pane fade min-h-screen" id="tab-ilo-pane" role="tabpanel" aria-labelledby="tab-2">
@@ -196,6 +199,10 @@ Laporan CPL -
                 downloadFileButton('#download-raw-cpl-prodi', '{{ raw_cpl_prodi_filename }}');
             } else{
                 addToast('error', message);
+                
+                $('#tab-grafik-pane').children('#loading').fadeOut();
+                $('#tab-grafik-pane').children('#error-result').fadeIn();
+                $('#tab-grafik-pane').children('#error-result').text(message);
             }
 
             let perolehanNilaiIloGraphConfig = {
@@ -253,6 +260,9 @@ Laporan CPL -
                 });
             } else{
                 addToast('error', message);
+                $('#tab-nilai-pane').children('#loading').fadeOut();
+                $('#tab-nilai-pane').children('#error-result').fadeIn();
+                $('#tab-nilai-pane').children('#error-result').text(message);
             }
         }
     );

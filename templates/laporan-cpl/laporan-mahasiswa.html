@@ -135,6 +135,8 @@
                     <canvas id="perolehan-nilai-ilo" class="w-full max-h-60 sm:max-h-64 lg:max-h-72 xl:max-h-80"></canvas>
                 </div>
             </div>
+
+            <div id="error-result" class="space-y-2.5 hidden"></div>
         </div>
 
         <div class="tab-pane fade min-h-screen" id="tab-nilai-pane" role="tabpanel" aria-labelledby="tab-1">
@@ -271,6 +273,9 @@
                 downloadFileButton('#download-raw-cpl-mahasiswa', '{{ raw_cpl_mahasiswa_filename }}');
             } else{
                 addToast('error', message);
+                $('#tab-grafik-pane').children('#loading').fadeOut();
+                $('#tab-grafik-pane').children('#error-result').fadeIn();
+                $('#tab-grafik-pane').children('#error-result').text(message);
             }
 
             let perolehanNilaiIloGraphConfig = {
