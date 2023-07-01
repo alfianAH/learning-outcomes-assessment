@@ -23,7 +23,6 @@ from .models import (
     KomponenClo,
     NilaiKomponenCloPeserta,
 )
-from mata_kuliah_semester.utils import process_excel_file
 from .utils import (
     get_pi_area_by_kurikulum_choices,
     get_pi_by_pi_area_choices,
@@ -344,7 +343,8 @@ NilaiKomponenCloPesertaFormset = formset_factory(
     NilaiKomponenCloPesertaForm,
     formset=NilaiKomponenCloPesertaFormsetClass,
     extra=0,
-    can_delete=False
+    can_delete=False,
+    max_num=20000,
 )
 
 

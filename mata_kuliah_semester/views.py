@@ -1,5 +1,6 @@
 import json
 import os
+from typing import Any, Dict
 from django.contrib.auth import authenticate
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
@@ -8,9 +9,11 @@ from django.http import FileResponse, HttpRequest, HttpResponse
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
-from django.views.generic.base import View, RedirectView
+from django.views.generic.base import View, RedirectView, TemplateView
 from django.views.generic.edit import FormView
 from django.views.generic.detail import DetailView
+from django_q.tasks import async_task, result
+from django_q.models import Task
 from accounts.enums import RoleChoices
 from clo.models import KomponenClo
 from learning_outcomes_assessment.auth.mixins import (
@@ -67,10 +70,10 @@ from .utils import(
     calculate_nilai_per_clo_peserta,
     calculate_nilai_per_ilo_mahasiswa,
     generate_template_nilai_mk_semester,
-    process_excel_file,
     generate_nilai_file,
     generate_student_performance_file,
 )
+from .tasks import process_excel_file
 
 
 # Create your views here.
@@ -968,9 +971,9 @@ class NilaiKomponenCloEditView(PermissionRequiredMixin, NilaiKomponenCloEditTemp
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         if request.GET.get('is_import') == 'true':
             self.can_generate = False
+            process_excel_file_task_id = request.GET.get('task')
             # Process
-            self.is_import_success, self.message, self.import_result = process_excel_file(
-                self.mk_semester_obj, self.list_komponen_clo)
+            self.is_import_success, self.message, self.import_result = result(process_excel_file_task_id)
 
             if not self.is_import_success:
                 messages.error(request, self.message)
@@ -1053,7 +1056,7 @@ class ImportNilaiMataKuliahSemesterView(ProgramStudiMixin, PermissionRequiredMix
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
 
         self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
-        self.success_url = '{}?is_import=true'.format(self.mk_semester_obj.get_nilai_komponen_edit_url())
+        self.success_url = self.mk_semester_obj.get_loading_nilai_komponen_import_url()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -1086,6 +1089,41 @@ class ImportNilaiMataKuliahSemesterView(ProgramStudiMixin, PermissionRequiredMix
         os.chmod(nilai_excel_obj.file.path, 0o600)
 
         return super().form_valid(form)
+    
+
+class LoadingImportNilaiMataKuliahSemesterView(ProgramStudiMixin, PermissionRequiredMixin, TemplateView):
+    permission_required = (
+        'mata_kuliah_semester.add_nilaiexcelmatakuliahsemester',
+        'mata_kuliah_semester.change_nilaiexcelmatakuliahsemester',
+    )
+    template_name = 'mata-kuliah-semester/nilai-komponen/loading-import.html'
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        mk_semester_id = kwargs.get('mk_semester_id')
+
+        self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
+        self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
+        
+        self.list_komponen_clo = KomponenClo.objects.filter(
+            clo__mk_semester=self.mk_semester_obj
+        ).order_by('clo__nama', 'instrumen_penilaian')
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        # Process
+        self.process_excel_file_task = async_task(
+            process_excel_file,
+            self.mk_semester_obj, self.list_komponen_clo
+        )
+        return super().get(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'process_excel_file_task': self.process_excel_file_task,
+            'mk_semester_obj': self.mk_semester_obj
+        })
+        return context
 
 
 # Nilai average CLO achievement

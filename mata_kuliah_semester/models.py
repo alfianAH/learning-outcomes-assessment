@@ -149,6 +149,9 @@ class MataKuliahSemester(MataKuliahSemesterLock):
     def get_nilai_komponen_import_url(self):
         return get_reverse_url('semester:mata_kuliah_semester:nilai-komponen-import', self.get_kwargs)
     
+    def get_loading_nilai_komponen_import_url(self):
+        return get_reverse_url('semester:mata_kuliah_semester:loading-nilai-komponen-import', self.get_kwargs)
+
     # Nilai Average CLO Achivement
     def get_nilai_clo_mk_semester(self):
         return self.nilaiclomatakuliahsemester_set.all()

@@ -1,0 +1,43 @@
+{% extends 'home-view.html' %}
+
+{% block title %}
+Import Nilai - 
+{% endblock title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'semester:read-all' %}" role="listitem">Semester</a></li>
+<li class="breadcrumb-item"><a href="{{ mk_semester_obj.semester.read_detail_url }}" role="listitem">Detail</a></li>
+<li class="breadcrumb-item"><a href="{{ mk_semester_obj.read_detail_url }}" role="listitem">Detail MK</a></li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">Import Nilai</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<p>Mohon menunggu dan disarankan untuk tidak meninggalkan halaman ini sampai proses membaca file selesai.</p>
+{% include 'components/loading.html' with is_single_component=True %}
+{% endblock content %}
+
+{% block script %}
+<script>
+    {% if process_excel_file_task %}
+    let processExcelFileResultUrl =  "{% url 'task-result' %}?task_id={{ process_excel_file_task }}";
+
+    updateProgress(
+        processExcelFileResultUrl,
+        onResult=function(result){
+            let isSuccess = result[0];
+            let message = result[1];
+            
+            if(isSuccess){
+                addToast('success', message);
+                // Move to new URL
+                window.location.replace("{{ mk_semester_obj.get_nilai_komponen_edit_url }}?is_import=true&task={{ process_excel_file_task }}");
+            } else{
+                addToast('error', message);
+                // Move to new URL
+                window.location.replace("{{ mk_semester_obj.get_nilai_komponen_edit_url }}");
+            }
+        }
+    )
+    {% endif %}
+</script>
+{% endblock script %}

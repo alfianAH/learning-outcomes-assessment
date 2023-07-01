@@ -3,6 +3,8 @@
 
     {% include 'mata-kuliah-semester/partials/nilai-komponen/nilai-komponen-clo-form-content.html' %}
 
+    {% include 'components/form/form-errors.html' with errors=form.non_form_errors %}
+
     <div class="form-buttons">
         <a href="{{ back_url }}" class="btn btn-secondary">Kembali</a>
         <button type="submit" class="btn btn-success loading-trigger">Submit</button>
