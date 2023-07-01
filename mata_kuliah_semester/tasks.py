@@ -12,7 +12,7 @@ from .models import (
     PesertaMataKuliah,
     NilaiExcelMataKuliahSemester,
 )
-from clo.models import KomponenClo
+from clo.models import KomponenClo, NilaiKomponenCloPeserta
 
 
 def process_excel_file(
@@ -184,3 +184,30 @@ def process_excel_file(
     
     if settings.DEBUG: print(message)
     return (is_import_success, message, import_result)
+
+
+def nilai_komponen_edit_process(cleaned_data):
+    is_success = False
+
+    for nilai_komponen_clo_submit in cleaned_data:
+        # If dict is empty, skip
+        if not nilai_komponen_clo_submit: continue
+
+        # Check query first
+        nilai_peserta_qs = NilaiKomponenCloPeserta.objects.filter(
+            peserta=nilai_komponen_clo_submit.get('peserta'),
+            komponen_clo=nilai_komponen_clo_submit.get('komponen_clo')
+        )
+
+        # If exists, then update the query
+        if nilai_peserta_qs.exists():
+            nilai_peserta_qs.update(**nilai_komponen_clo_submit)
+        else:  # Else, create new one
+            # If form is empty, skip
+            if len(nilai_komponen_clo_submit.items()) == 0: continue
+
+            # Create new one
+            NilaiKomponenCloPeserta.objects.create(**nilai_komponen_clo_submit)
+
+    is_success = True
+    return is_success

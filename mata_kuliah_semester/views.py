@@ -13,7 +13,6 @@ from django.views.generic.base import View, RedirectView, TemplateView
 from django.views.generic.edit import FormView
 from django.views.generic.detail import DetailView
 from django_q.tasks import async_task, result
-from django_q.models import Task
 from accounts.enums import RoleChoices
 from clo.models import KomponenClo
 from learning_outcomes_assessment.auth.mixins import (
@@ -73,7 +72,10 @@ from .utils import(
     generate_nilai_file,
     generate_student_performance_file,
 )
-from .tasks import process_excel_file
+from .tasks import (
+    process_excel_file,
+    nilai_komponen_edit_process,
+)
 
 
 # Create your views here.
@@ -843,7 +845,7 @@ class NilaiKomponenCloEditTemplateView(ProgramStudiMixin, FormView):
     mk_semester_obj: MataKuliahSemester = None
     list_komponen_clo = None
     list_peserta_mk: list[PesertaMataKuliah] = []
-    success_msg = 'Proses mengedit nilai komponen CPMK sudah selesai.'
+    success_msg = 'Proses mengedit nilai komponen CPMK sedang diproses di latar belakang.'
     error_msg: str = 'Gagal mengedit nilai. Pastikan data yang anda masukkan valid.'
     can_generate = True
 
@@ -922,27 +924,10 @@ class NilaiKomponenCloEditTemplateView(ProgramStudiMixin, FormView):
     def form_valid(self, form) -> HttpResponse:
         cleaned_data = form.cleaned_data
         
-        for nilai_komponen_clo_submit in cleaned_data:
-            # If dict is empty, skip
-            if not nilai_komponen_clo_submit: continue
-
-            # Check query first
-            nilai_peserta_qs = NilaiKomponenCloPeserta.objects.filter(
-                peserta=nilai_komponen_clo_submit.get('peserta'),
-                komponen_clo=nilai_komponen_clo_submit.get('komponen_clo')
-            )
-
-            # If exists, then update the query
-            if nilai_peserta_qs.exists():
-                nilai_peserta_qs.update(**nilai_komponen_clo_submit)
-            else:  # Else, create new one
-                # If form is empty, skip
-                if len(nilai_komponen_clo_submit.items()) == 0: continue
-
-                # Create new one
-                NilaiKomponenCloPeserta.objects.create(**nilai_komponen_clo_submit)
+        nilai_komponen_edit_task = async_task(nilai_komponen_edit_process, cleaned_data)
         
-        messages.success(self.request, self.success_msg)
+        messages.info(self.request, self.success_msg)
+        self.success_url += '&task={}'.format(nilai_komponen_edit_task)
         return super().form_valid(form)
     
     def form_invalid(self, form) -> HttpResponse:
@@ -1104,7 +1089,7 @@ class LoadingImportNilaiMataKuliahSemesterView(ProgramStudiMixin, PermissionRequ
 
         self.mk_semester_obj = get_object_or_404(MataKuliahSemester, id=mk_semester_id)
         self.program_studi_obj = self.mk_semester_obj.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
-        
+
         self.list_komponen_clo = KomponenClo.objects.filter(
             clo__mk_semester=self.mk_semester_obj
         ).order_by('clo__nama', 'instrumen_penilaian')

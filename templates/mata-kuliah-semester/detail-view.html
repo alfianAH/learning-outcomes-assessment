@@ -576,4 +576,25 @@
     let isDarkMode = $('body').hasClass('dark');
     chartDarkMode(isDarkMode);
 </script>
+<script>
+    {% comment %} Get task {% endcomment %}
+    let urlParams = new URLSearchParams(window.location.search);
+    let taskParam = urlParams.get('task');
+
+    if(taskParam != null){
+        let crudResultUrl = `{% url 'task-result' %}?task_id=${taskParam}`;
+        updateProgress(
+            crudResultUrl,
+            onResult=function(result){
+                let isSuccess = result;
+                
+                if(isSuccess){
+                    addToast("success", "Proses mengedit nilai komponen CPMK sudah selesai. Silakan refresh halaman ini.");
+                } else{
+                    addToast("error", "Proses mengedit nilai komponen CPMK gagal.");
+                }
+            } 
+        )
+    }
+</script>
 {% endblock script %}

@@ -181,7 +181,7 @@ FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 DIRS = [
     BASE_DIR / 'templates' / 'custom-widgets' / 'forms' / 'widgets'
 ]
-DATA_UPLOAD_MAX_NUMBER_FIELDS = 20000
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 60000
 
 # Django Q setup
 Q_CLUSTER = {
