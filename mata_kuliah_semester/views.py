@@ -1022,6 +1022,13 @@ class NilaiKomponenCloPesertaEditView(PermissionRequiredMixin, NilaiKomponenCloE
 
         self.list_peserta_mk = [self.peserta_mk_semester]
         super().setup(request, *args, **kwargs)
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if request.htmx and not self.mk_semester_obj.is_clo_locked:
+            return HttpResponse("Gagal", headers={
+                'hx-redirect': self.peserta_mk_semester.get_nilai_komponen_clo_peserta_edit_url()
+            })
+        return super().get(request, *args, **kwargs)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
