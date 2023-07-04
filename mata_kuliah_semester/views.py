@@ -859,7 +859,7 @@ class NilaiKomponenCloEditTemplateView(ProgramStudiMixin, FormView):
 
         self.list_komponen_clo = KomponenClo.objects.filter(
             clo__mk_semester=self.mk_semester_obj
-        ).order_by('clo__nama', 'instrumen_penilaian')
+        ).order_by('clo', 'instrumen_penilaian')
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         if not self.mk_semester_obj.is_clo_locked:
@@ -1092,7 +1092,7 @@ class LoadingImportNilaiMataKuliahSemesterView(ProgramStudiMixin, PermissionRequ
 
         self.list_komponen_clo = KomponenClo.objects.filter(
             clo__mk_semester=self.mk_semester_obj
-        ).order_by('clo__nama', 'instrumen_penilaian')
+        ).order_by('clo', 'instrumen_penilaian')
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         # Process
