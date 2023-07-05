@@ -845,7 +845,7 @@ def generate_nilai_file(mk_semester: MataKuliahSemester, list_nilai_huruf: dict)
             nilai_mahasiswa_table_data.append(
                 [
                     nilai_komponen.komponen_clo.clo.nama,
-                    nilai_komponen.komponen_clo.teknik_penilaian,
+                    nilai_komponen.komponen_clo.instrumen_penilaian,
                     '{}%'.format(nilai_komponen.komponen_clo.persentase),
                     ':',
                     nilai_komponen.nilai
