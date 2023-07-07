@@ -122,6 +122,67 @@ def duplicate_clo(semester_prodi_id: int, new_mk_semester: MataKuliahSemester):
 
     return (is_success, message)
 
+def duplicate_clo_lintas_mk(old_mk_semester_id: int, new_mk_semester_id: int):
+    is_success = False
+    message = ''
+    
+    try:    
+        new_mk_semester_obj = MataKuliahSemester.objects.get(
+            id=new_mk_semester_id
+        )
+    except (MataKuliahSemester.DoesNotExist, MataKuliahSemester.MultipleObjectsReturned):
+        message = 'Mata Kuliah Semester tidak dapat ditemukan. MK Semester ID: {}'.format(new_mk_semester_id)
+        if settings.DEBUG: print(message) 
+        return (is_success, message)
+    
+    try:    
+        old_mk_semester_obj = MataKuliahSemester.objects.get(
+            id=old_mk_semester_id
+        )
+    except (MataKuliahSemester.DoesNotExist, MataKuliahSemester.MultipleObjectsReturned):
+        message = 'Mata Kuliah Semester tidak dapat ditemukan. MK Semester ID: {}'.format(old_mk_semester_id)
+        if settings.DEBUG: print(message) 
+        return (is_success, message)
+    
+    list_clo: QuerySet[Clo] = old_mk_semester_obj.get_all_clo()
+
+    def duplicate_clo_children(list_obj, new_clo):
+        for obj in list_obj:
+            new_obj = copy(obj)
+            new_obj._state.adding = True
+            new_obj.pk = None
+            new_obj.clo = new_clo
+            new_obj.lock = None
+            new_obj.save()
+
+    for clo in list_clo:
+        # Get komponen CLO
+        list_komponen_clo: QuerySet[KomponenClo] = KomponenClo.objects.filter(
+            clo=clo
+        )
+
+        # Get PI CLO
+        list_pi_clo: QuerySet[PiClo] = PiClo.objects.filter(
+            clo=clo
+        )
+        
+        # Duplicate CLO
+        new_clo = copy(clo)
+        new_clo._state.adding = True
+        new_clo.pk = None
+        new_clo.mk_semester = new_mk_semester_obj
+        new_clo.lock = None
+        new_clo.save()
+
+        # Duplicate Komponen and PI CLO
+        duplicate_clo_children(list_komponen_clo, new_clo)
+        duplicate_clo_children(list_pi_clo, new_clo)
+    
+    is_success = True
+    message = 'Berhasil menduplikasi CPMK ke mata kuliah ini.'
+
+    return (is_success, message)
+
 
 def generate_nilai_clo(persentase_komponen_clo, nilai_akhir: float, timeout = 50):
     possibility_choices = {

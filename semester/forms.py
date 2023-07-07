@@ -39,7 +39,7 @@ class SemesterProdiCreateForm(forms.Form):
             semester_prodi_qs = SemesterProdi.objects.filter(
                 id_neosia=semester_prodi_id
             )
-            if semester_prodi_qs: 
+            if semester_prodi_qs.exists(): 
                 # Set input with semester that has already been in database to false
                 self.fields.get('semester_from_neosia').widget.condition_dict.update({
                     semester_prodi_id: False
