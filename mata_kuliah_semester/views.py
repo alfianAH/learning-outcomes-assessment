@@ -1,6 +1,5 @@
 import json
 import os
-from typing import Any, Dict
 from django.contrib.auth import authenticate
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
@@ -865,6 +864,12 @@ class NilaiKomponenCloEditTemplateView(ProgramStudiMixin, FormView):
         if not self.mk_semester_obj.is_clo_locked:
             messages.warning(request, 'Pastikan anda sudah mengunci CPMK terlebih dahulu sebelum memasukkan nilai.')
             return redirect(self.success_url)
+
+        peserta_qs: list[PesertaMataKuliah] = self.mk_semester_obj.get_all_peserta_mk_semester()
+        for peserta in peserta_qs:
+            if peserta.nilai_akhir is None:
+                messages.warning(request, 'Peserta: {} tidak memiliki nilai akhir'.format(peserta.mahasiswa.nama))
+                return redirect(self.success_url)
         
         if len(self.get_form().forms) == 0:
             messages.warning(self.request, 'Edit nilai belum bisa dilakukan. Pastikan anda sudah melengkapi CPMK dan komponen penilaiannya.')
