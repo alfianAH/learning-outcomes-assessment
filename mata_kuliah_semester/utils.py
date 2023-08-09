@@ -987,6 +987,190 @@ def generate_nilai_file(mk_semester: MataKuliahSemester, list_nilai_huruf: dict)
     return file_stream
 
 
+def generate_all_student_performance_file(mk_semester: MataKuliahSemester):
+    file_stream = BytesIO()
+
+    # Create the PDF object, using the buffer as its "file."
+    pdf_file = SimpleDocTemplate(file_stream)
+    styles = getSampleStyleSheet()
+    normal_style = styles['Normal']
+    font_size = normal_style.fontSize
+    empty_line = Spacer(1, 20)
+
+    # Title
+    title = Paragraph(
+        'Student Performance - {}'.format(mk_semester.mk_kurikulum.nama),
+        style=styles['h1']
+    )
+
+    fakultas = mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi.fakultas.nama
+    prodi = mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi.nama
+    # MK Semester detail
+    detail_data = [
+        ['Fakultas', ':', fakultas],
+        ['Program Studi', ':', prodi],
+        ['Jenjang Studi', ':', mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.jenjang_studi.kode],
+        ['Semester', ':', mk_semester.semester.semester.nama],
+        ['Kode', ':', mk_semester.mk_kurikulum.kode],
+        ['SKS', ':', mk_semester.mk_kurikulum.sks],
+        ['Dosen', ':']
+    ]
+    detail_table_style = TableStyle([
+        ('LEFTPADDING', (0, 0), (-1, -1), 0),
+    ])
+    detail = Table(
+        data=detail_data,
+        style=detail_table_style,
+        hAlign='LEFT'
+    )
+    list_dosen_mk_semester: list[DosenMataKuliah] = mk_semester.get_all_dosen_mk_semester()
+
+    header_style = copy(styles['h2'])
+    header_style.alignment = TA_CENTER
+    header_content = Paragraph(
+        "UNIVERSITAS HASANUDDIN<br/>FAKULTAS {}<br/>PROGRAM STUDI {}".format(fakultas, prodi), 
+        header_style
+    )
+
+    # Get the space before and after the paragraph
+    space_before = header_content.getSpaceBefore()
+    space_after = header_content.getSpaceAfter()
+
+    # Get the height of the paragraph
+    para_height = header_content.wrap(pdf_file.width, pdf_file.height)[1]
+
+    # Calculate the total height of the block
+    block_height = para_height + space_before + space_after
+
+    frame = Frame(
+        pdf_file.leftMargin, 
+        pdf_file.bottomMargin, 
+        pdf_file.width, 
+        pdf_file.height - block_height
+    )
+    template = PageTemplate(
+        frames=frame, 
+        onPage=partial(
+            export_pdf_header, 
+            content=header_content,
+            image_path='./static/public/img/logo-unhas.jpg',
+            image_width=0.6*inch,
+            image_height=0.75*inch,
+        )
+    )
+    pdf_file.addPageTemplates([template])
+
+    list_dosen = ListFlowable(
+        [Paragraph('{}'.format(dosen_mk_semester.dosen.nama)) for dosen_mk_semester in list_dosen_mk_semester],
+        start='1',
+        bulletFontSize=font_size,
+        bulletFormat='%s.'
+    )
+
+    # Nilai Mahasiswa
+    mahasiswa_data = [
+        ['No.', 'NIM', 'Nama', 'Nilai angka', 'Nilai huruf']
+    ]
+    list_mahasiswa_mk_semester: list[PesertaMataKuliah] = mk_semester.get_all_peserta_mk_semester()
+    
+    # (COL, ROW)
+    table_style_data = [
+        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),               # Header align
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),    # Header font
+        ('FONTSIZE', (0, 0), (-1, 0), 11),                  # Header font size
+        ('TOPPADDING', (0, 0), (-1, 0), 12),                # Header top padding
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),             # Header bottom padding
+        ('TOPPADDING', (0, 1), (-1, -1), 4),                # Body top padding
+        ('BOTTOMPADDING', (0, 1), (-1, -1), 4),             # Body bottom padding
+        ('GRID', (0, 0), (-1, -1), 0.25, colors.black),     # Grid
+        ('VALIGN', (0, 1), (-1, -1), 'TOP'),                # Body vertical align
+    ]
+    mahasiswa_table_style_data = copy(table_style_data)
+    mahasiswa_table_style_data += [
+        ('ALIGN', (0, 1), (0, -1), 'CENTER'),               # Nomor align
+        ('ALIGN', (3, 1), (-2, -1), 'RIGHT'),               # Nilai align
+    ]
+
+    for i, mahasiswa in enumerate(list_mahasiswa_mk_semester, 1):
+        # Add mahasiswa nilai
+        mahasiswa_data.append(
+            [
+                '{}.'.format(i), 
+                mahasiswa.mahasiswa.username,
+                Paragraph(mahasiswa.mahasiswa.nama),
+                mahasiswa.nilai_akhir,
+                mahasiswa.nilai_huruf
+            ],
+        )
+
+        # Add merge cells for nilai komponen
+        mahasiswa_table_style_data += [
+            ('SPAN', (0, i*2), (-1, i*2)),
+            ('ALIGN', (0, i*2), (0, i*2), 'LEFT'),
+            ('LEFTPADDING', (0, i*2), (0, i*2), 32),
+        ]
+
+        # Nilai CLO Mahasiswa
+        list_nilai_clo: QuerySet[NilaiCloPeserta] = NilaiCloPeserta.objects.filter(
+            peserta=mahasiswa,
+        ).order_by('clo')
+        list_nilai_ilo: QuerySet[NilaiMataKuliahIloMahasiswa] = NilaiMataKuliahIloMahasiswa.objects.filter(
+            peserta=mahasiswa,
+        ).order_by('ilo')
+        nilai_mahasiswa_table_data = []
+        
+        for nilai_clo in list_nilai_clo:
+            nilai_mahasiswa_table_data.append(
+                [
+                    nilai_clo.clo.nama,
+                    '{}%'.format(nilai_clo.clo.get_total_persentase_komponen()),
+                    ':',
+                    '{:.2f}'.format(nilai_clo.nilai)
+                ]
+            )
+
+        nilai_mahasiswa_table_data.append([])
+
+        for nilai_ilo in list_nilai_ilo:
+            nilai_mahasiswa_table_data.append(
+                [
+                    nilai_ilo.ilo.nama,
+                    '',
+                    ':',
+                    '{:.2f}'.format(nilai_ilo.nilai_ilo)
+                ]
+            )
+
+        mahasiswa_data.append([
+            Table(
+                nilai_mahasiswa_table_data,
+                hAlign='LEFT',
+            )
+        ])
+
+    mahasiswa_table_style = TableStyle(mahasiswa_table_style_data)
+    mahasiswa_table = Table(
+        mahasiswa_data,
+        style=mahasiswa_table_style,
+        hAlign='LEFT',
+        colWidths=[1*cm, 3*cm, 6.5*cm, None, None],
+        repeatRows=1,
+    )
+
+
+    # Build
+    pdf_file.build([
+        title, detail,
+        list_dosen, empty_line,
+        mahasiswa_table, PageBreak(),
+    ])
+    
+    # Close the PDF object cleanly
+    file_stream.seek(0)
+
+    return file_stream
+
+
 def generate_student_performance_file(peserta_mk_semester: PesertaMataKuliah):
     file_stream = BytesIO()
 

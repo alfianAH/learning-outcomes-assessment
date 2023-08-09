@@ -70,6 +70,7 @@ from .utils import(
     generate_template_nilai_mk_semester,
     generate_nilai_file,
     generate_student_performance_file,
+    generate_all_student_performance_file,
 )
 from .tasks import (
     process_excel_file,
@@ -224,6 +225,7 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin,
 
         self.template_filename = '{}-{}.xlsx'.format(self.single_object.mk_kurikulum.nama, self.single_object.semester.semester.nama)
         self.nilai_filename = '{}-{}.pdf'.format(self.single_object.mk_kurikulum.nama, self.single_object.semester.semester.nama)
+        self.all_student_performance_filename = 'Student Performance-{}-{}.pdf'.format(self.single_object.mk_kurikulum.nama, self.single_object.semester.semester.nama)
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         if 'download_template' in request.GET:
@@ -233,6 +235,10 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin,
         if 'download_nilai' in request.GET:
             if not request.is_ajax(): raise PermissionDenied
             return self.download_nilai()
+        
+        if 'download_performance' in request.GET:
+            if not request.is_ajax(): raise PermissionDenied
+            return self.download_all_student_performance()
 
         if self.peserta_mk_semester_qs.exists():
             filter_data = {
@@ -405,6 +411,13 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin,
 
         return response
 
+    def download_all_student_performance(self):
+        all_student_performance_file = generate_all_student_performance_file(self.single_object)
+        as_attachment = True
+        response = FileResponse(all_student_performance_file, as_attachment=as_attachment, filename=self.all_student_performance_filename)
+
+        return response
+
     def get_empty_komponen_clo(self):
         list_clo: QuerySet[Clo] = self.single_object.get_all_clo()
         list_komponen_clo = []
@@ -440,6 +453,7 @@ class MataKuliahSemesterReadView(ProgramStudiMixin, MahasiswaAndMKSemesterMixin,
             'empty_komponen_clo': self.get_empty_komponen_clo(),
             'template_filename': self.template_filename,
             'nilai_filename': self.nilai_filename,
+            'performance_filename': self.all_student_performance_filename,
             'import_nilai_url': self.single_object.get_hx_nilai_komponen_import_url(),
             'is_not_cols_3': True,
         })
