@@ -9,6 +9,7 @@ from learning_outcomes_assessment.widgets import (
     ChoiceListInteractiveModelA,
     MyNumberInput,
     MyRadioInput,
+    MyCheckboxInput
 )
 from .models import ProgramStudi, ProgramStudiJenjang
 from .enums import RoleChoices
@@ -171,3 +172,15 @@ ProgramStudiJenjangModelFormset = inlineformset_factory(
     can_delete=False,
     extra=0,
 )
+
+
+class ProgramStudiRestrictedForm(forms.ModelForm):
+    class Meta:
+        model = ProgramStudi
+        fields = ('is_restricted_mode', )
+        labels = {
+            'is_restricted_mode': 'Mode terbatas'
+        }
+        help_texts = {
+            'is_restricted_mode': 'Mode ini merupakan mode untuk memvalidasi nilai mahasiswa berdasarkan nilai Neosia. Jika mode ini dicentang, maka sistem akan memeriksa nilai agar sesuai dengan Neosia. Jika mode ini tidak dicentang, maka sistem tidak akan memeriksa nilai.'
+        }

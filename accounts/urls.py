@@ -10,6 +10,8 @@ from .views import (
     ProgramStudiJenjangSKSBulkUpdateView,
     ProgramStudiJenjangBulkUpdateView,
     ProgramStudiJenjangBulkDeleteView,
+
+    ProgramStudiRestrictedFormView,
 )
 
 app_name = 'accounts'
@@ -24,4 +26,6 @@ urlpatterns = [
     path('prodi/<int:prodi_id>/bulk-update/', ProgramStudiJenjangBulkUpdateView.as_view(), name='prodi-bulk-update'),
     path('prodi/<int:prodi_id>/bulk-update-sks/', ProgramStudiJenjangSKSBulkUpdateView.as_view(), name='prodi-bulk-update-sks'),
     path('prodi/<int:prodi_id>/bulk-delete/', ProgramStudiJenjangBulkDeleteView.as_view(), name='prodi-jenjang-bulk-delete'),
+
+    path('prodi/<int:prodi_id>/restricted/', ProgramStudiRestrictedFormView.as_view(), name='prodi-restricted'),
 ]

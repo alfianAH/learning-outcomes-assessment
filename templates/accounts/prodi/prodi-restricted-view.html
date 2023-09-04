@@ -1,0 +1,14 @@
+{% extends 'home-view.html' %}
+
+{% block title %}
+Program Studi - 
+{% endblock title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'admin-only' %}" role="listitem">Admin only</a></li>
+<li class="breadcrumb-item active" aria-current="page" role="listitem">Program Studi</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+{% include 'components/form/default-form.html' %}
+{% endblock content %}

@@ -18,6 +18,7 @@ class ProgramStudi(models.Model):
     fakultas = models.ForeignKey(Fakultas, on_delete=models.CASCADE, null=True)
     id_neosia = models.BigIntegerField(unique=True, null=False, primary_key=True)
     nama = models.CharField(max_length=100, null=False)
+    is_restricted_mode = models.BooleanField(default=True)
 
     def __str__(self) -> str:
         return self.nama

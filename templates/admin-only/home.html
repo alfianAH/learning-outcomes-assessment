@@ -1,0 +1,18 @@
+{% extends 'home-view.html' %}
+
+{% block title %}
+Admin only - 
+{% endblock title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page" role="listitem">Admin only</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<h1>List tools untuk Admin</h1>
+<ul class="list-disc ml-5">
+{% for obj in objects %}
+    <li><a href="{{ obj.1 }}">{{ obj.0 }}</a></li>
+{% endfor %}
+</ul>
+{% endblock content %}

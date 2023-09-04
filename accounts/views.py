@@ -2,10 +2,10 @@ from django.http import HttpRequest, HttpResponse
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib import messages
-from django.forms import BaseInlineFormSet
+from django.forms import BaseInlineFormSet, BaseModelForm
 from django.shortcuts import redirect, render, get_object_or_404
-from django.views.generic.edit import FormView
-from django.urls import reverse
+from django.views.generic.edit import FormView, UpdateView
+from django.urls import reverse, reverse_lazy
 from urllib.parse import urlencode
 import os
 from learning_outcomes_assessment.auth.mixins import ProgramStudiMixin
@@ -21,7 +21,8 @@ from .forms import (
     ProgramStudiJenjangCreateForm,
     ProgramStudiJenjangUpdateForm,
     ProgramStudiJenjangModelForm,
-    ProgramStudiJenjangModelFormset
+    ProgramStudiJenjangModelFormset,
+    ProgramStudiRestrictedForm,
 )
 from .models import (
     Fakultas,
@@ -284,3 +285,17 @@ class ProgramStudiJenjangBulkDeleteView(ProgramStudiMixin, PermissionRequiredMix
     def get_queryset(self):
         self.queryset = self.model.objects.filter(id_neosia__in=self.get_list_selected_obj())
         return super().get_queryset()
+
+
+class ProgramStudiRestrictedFormView(ProgramStudiMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = ('accounts.change_programstudi',)
+    pk_url_kwarg = 'prodi_id'
+    model = ProgramStudi
+    form_class = ProgramStudiRestrictedForm
+    template_name: str = 'accounts/prodi/prodi-restricted-view.html'
+    success_url = reverse_lazy('admin-only')
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+
+        self.program_studi_obj = self.get_object()
