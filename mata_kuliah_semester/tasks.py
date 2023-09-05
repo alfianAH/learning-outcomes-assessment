@@ -197,6 +197,8 @@ def nilai_komponen_edit_process(cleaned_data: dict, prodi: ProgramStudi):
 
         peserta: PesertaMataKuliah = nilai_komponen_clo_submit.get('peserta')
         komponen_clo: KomponenClo = nilai_komponen_clo_submit.get('komponen_clo')
+        nilai_komponen = nilai_komponen_clo_submit.get('nilai')
+
         # Check query first
         nilai_peserta_qs = NilaiKomponenCloPeserta.objects.filter(
             peserta=peserta,
@@ -205,7 +207,10 @@ def nilai_komponen_edit_process(cleaned_data: dict, prodi: ProgramStudi):
 
         # If exists, then update the query
         if nilai_peserta_qs.exists():
-            nilai_peserta_qs.update(**nilai_komponen_clo_submit)
+            # Use this save() method to trigger pre_save and post_save
+            nilai_peserta_obj = nilai_peserta_qs.first()
+            nilai_peserta_obj.nilai = nilai_komponen
+            nilai_peserta_obj.save()
         else:  # Else, create new one
             # If form is empty, skip
             if len(nilai_komponen_clo_submit.items()) == 0: continue
@@ -223,8 +228,8 @@ def nilai_komponen_edit_process(cleaned_data: dict, prodi: ProgramStudi):
                 }
             
             # Set nilai
-            nilai_komponen = nilai_komponen_clo_submit.get('nilai', 0)
-            list_nilai_akhir_peserta[nim]['nilai_akhir'] += (komponen_clo.persentase/100) * nilai_komponen
+            if nilai_komponen is not None:
+                list_nilai_akhir_peserta[nim]['nilai_akhir'] += (komponen_clo.persentase/100) * nilai_komponen
 
     if not prodi.is_restricted_mode:
         for nim, nilai_akhir_peserta in list_nilai_akhir_peserta.items():
