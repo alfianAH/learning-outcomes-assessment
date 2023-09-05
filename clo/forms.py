@@ -3,6 +3,7 @@ from django import forms
 from django.conf import settings
 from django.db.models import QuerySet
 from django.forms import inlineformset_factory, formset_factory
+from accounts.models import ProgramStudi
 from learning_outcomes_assessment.forms.formset import CanDeleteInlineFormSet
 from learning_outcomes_assessment.widgets import(
     MyCheckboxInput,
@@ -226,12 +227,15 @@ class NilaiKomponenCloPesertaForm(forms.ModelForm):
 
 
 class NilaiKomponenCloPesertaFormsetClass(forms.BaseFormSet):
-    def __init__(self, list_peserta_mk, list_komponen_clo, is_generate=False, is_import=False, import_result:dict=None, *args, **kwargs):
+    def __init__(self, list_peserta_mk, list_komponen_clo, prodi: ProgramStudi,
+                 is_generate=False, is_import=False, import_result:dict=None, 
+                 *args, **kwargs):
         super().__init__(*args, **kwargs)
         
         self.list_peserta_mk: list[PesertaMataKuliah] = list_peserta_mk
         self.list_komponen_clo: QuerySet[KomponenClo] = list_komponen_clo
         self.is_generate = is_generate
+        self.prodi = prodi
 
         # List persentase for each komponen CPMK
         list_persentase_komponen_clo = [komponen_clo.persentase for komponen_clo in self.list_komponen_clo]
@@ -332,11 +336,14 @@ class NilaiKomponenCloPesertaFormsetClass(forms.BaseFormSet):
                     'Salah satu nilai tidak boleh kosong. Hanya diperbolehkan kosong semua atau terisi semua.'
                 )
             
-            if not math.isclose(nilai_peserta, peserta.nilai_akhir, rel_tol=1e-5, abs_tol=1):
-                self.forms[form_index].add_error(
-                    'nilai', 
-                    'Nilai input tidak sesuai dengan nilai akhir. Nilai input: {:.2f}, Nilai akhir: {:.2f}'.format(nilai_peserta, peserta.nilai_akhir)
-                )
+            # if prodi is on restricted mode, validate nilai akhir
+            if self.prodi.is_restricted_mode:
+                if not math.isclose(nilai_peserta, peserta.nilai_akhir, rel_tol=1e-5, abs_tol=1):
+                    self.forms[form_index].add_error(
+                        'nilai', 
+                        'Nilai input tidak sesuai dengan nilai akhir. Nilai input: {:.2f}, Nilai akhir: {:.2f}'.format(nilai_peserta, peserta.nilai_akhir)
+                    )
+
 
 
 NilaiKomponenCloPesertaFormset = formset_factory(

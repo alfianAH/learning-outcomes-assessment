@@ -6,6 +6,7 @@ from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.cell.read_only import EMPTY_CELL
 from django.conf import settings
 from django.db.models import QuerySet
+from accounts.models import ProgramStudi
 from learning_outcomes_assessment.utils import _iter_cols
 from .models import (
     MataKuliahSemester,
@@ -186,17 +187,20 @@ def process_excel_file(
     return (is_import_success, message, import_result)
 
 
-def nilai_komponen_edit_process(cleaned_data):
+def nilai_komponen_edit_process(cleaned_data: dict, prodi: ProgramStudi):
     is_success = False
+    list_nilai_akhir_peserta = {}
 
     for nilai_komponen_clo_submit in cleaned_data:
         # If dict is empty, skip
         if not nilai_komponen_clo_submit: continue
 
+        peserta: PesertaMataKuliah = nilai_komponen_clo_submit.get('peserta')
+        komponen_clo: KomponenClo = nilai_komponen_clo_submit.get('komponen_clo')
         # Check query first
         nilai_peserta_qs = NilaiKomponenCloPeserta.objects.filter(
-            peserta=nilai_komponen_clo_submit.get('peserta'),
-            komponen_clo=nilai_komponen_clo_submit.get('komponen_clo')
+            peserta=peserta,
+            komponen_clo=komponen_clo
         )
 
         # If exists, then update the query
@@ -208,6 +212,48 @@ def nilai_komponen_edit_process(cleaned_data):
 
             # Create new one
             NilaiKomponenCloPeserta.objects.create(**nilai_komponen_clo_submit)
+
+        if peserta is not None:
+            # Set nim peserta to list nilai akhir
+            nim = peserta.mahasiswa.username
+            if nim not in list_nilai_akhir_peserta.keys():
+                list_nilai_akhir_peserta[nim] = {
+                    'peserta_id': peserta.id_neosia,
+                    'nilai_akhir': 0
+                }
+            
+            # Set nilai
+            nilai_komponen = nilai_komponen_clo_submit.get('nilai', 0)
+            list_nilai_akhir_peserta[nim]['nilai_akhir'] += (komponen_clo.persentase/100) * nilai_komponen
+
+    if not prodi.is_restricted_mode:
+        for nim, nilai_akhir_peserta in list_nilai_akhir_peserta.items():
+            peserta: PesertaMataKuliah = PesertaMataKuliah.objects.get(id_neosia=nilai_akhir_peserta['peserta_id'])
+            nilai_akhir = nilai_akhir_peserta['nilai_akhir']
+            nilai_huruf = None
+
+            if 85 <= nilai_akhir <= 100:
+                nilai_huruf = 'A'
+            elif 80 <= nilai_akhir < 85:
+                nilai_huruf = 'A-'
+            elif 75 <= nilai_akhir < 80:
+                nilai_huruf = 'B+'
+            elif 70 <= nilai_akhir < 75:
+                nilai_huruf = 'B'
+            elif 65 <= nilai_akhir < 70:
+                nilai_huruf = 'B-'
+            elif 60 <= nilai_akhir < 65:
+                nilai_huruf = 'C+'
+            elif 50 <= nilai_akhir < 60:
+                nilai_huruf = 'C'
+            elif 40 <= nilai_akhir < 50:
+                nilai_huruf = 'D'
+            elif nilai_akhir < 40:
+                nilai_huruf = 'E'
+
+            peserta.nilai_akhir = nilai_akhir
+            peserta.nilai_huruf = nilai_huruf
+            peserta.save()
 
     is_success = True
     return is_success

@@ -79,6 +79,7 @@ def get_kelas_mk_semester(semester_prodi_id: int):
 def get_peserta_kelas_mk_semester(mk_semester: MataKuliahSemester):
     list_peserta = []
     list_kelas_mk_semester: QuerySet[KelasMataKuliahSemester] = mk_semester.get_kelas_mk_semester()
+    prodi = mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
 
     for kelas_mk_semester in list_kelas_mk_semester:
         parameters = {
@@ -91,16 +92,6 @@ def get_peserta_kelas_mk_semester(mk_semester: MataKuliahSemester):
         for peserta_data in json_response:
             if peserta_data['id'] is None: continue
 
-            try:
-                nilai_akhir_response = float(peserta_data['nilai_akhir'])
-            except ValueError: 
-                if settings.DEBUG:
-                    print('Cannot convert {} to float.'.format(peserta_data['nilai_akhir']))
-                break
-            except TypeError:
-                # Nilai akhir from Neosia maybe null
-                nilai_akhir_response = peserta_data['nilai_akhir']
-
             peserta = {
                 'id_neosia': peserta_data['id'],
                 'id_kelas_mk_semester': peserta_data['id_kelas_kuliah'],
@@ -109,10 +100,30 @@ def get_peserta_kelas_mk_semester(mk_semester: MataKuliahSemester):
                     'nama': peserta_data['nama_mahasiswa'],
                 },
                 'nama': peserta_data['nama_mahasiswa'],
-                'nilai_akhir': nilai_akhir_response,
-                'nilai_huruf': peserta_data['nilai_huruf'],
             }
 
+            # If on resticted mode, take nilai akhir, else dont take it
+            if prodi.is_restricted_mode:
+                try:
+                    nilai_akhir_response = float(peserta_data['nilai_akhir'])
+                except ValueError: 
+                    if settings.DEBUG:
+                        print('Cannot convert {} to float.'.format(peserta_data['nilai_akhir']))
+                    continue
+                except TypeError:
+                    # Nilai akhir from Neosia maybe null
+                    nilai_akhir_response = peserta_data['nilai_akhir']
+
+                peserta.update({
+                    'nilai_akhir': nilai_akhir_response,
+                    'nilai_huruf': peserta_data['nilai_huruf'],
+                })
+            else:
+                peserta.update({
+                    'nilai_akhir': None,
+                    'nilai_huruf': None,
+                })
+            
             list_peserta.append(peserta)
 
     return list_peserta
@@ -244,16 +255,21 @@ def get_update_peserta_mk_semester_choices(mk_semester: MataKuliahSemester):
     list_peserta_mk_semester: QuerySet[PesertaMataKuliah] = mk_semester.get_all_peserta_mk_semester()
     list_peserta_mk_semester_response = get_peserta_kelas_mk_semester(mk_semester)
     update_peserta_mk_semester_choices = []
+    prodi = mk_semester.mk_kurikulum.kurikulum.prodi_jenjang.program_studi
 
     for peserta in list_peserta_mk_semester:
         for peserta_response in list_peserta_mk_semester_response:
             if peserta.id_neosia != peserta_response['id_neosia']: continue
             
-            # Check:
-            # *Nilai akhir
-            # *Nilai huruf
-            isDataOkay = peserta.nilai_akhir == peserta_response['nilai_akhir'] and peserta.nilai_huruf == peserta_response['nilai_huruf']
-
+            # If prodi is on restricted mode, check nilai, else no need
+            if prodi.is_restricted_mode:
+                # Check:
+                # *Nilai akhir
+                # *Nilai huruf
+                isDataOkay = peserta.nilai_akhir == peserta_response['nilai_akhir'] and peserta.nilai_huruf == peserta_response['nilai_huruf']
+            else:
+                isDataOkay = True
+            
             if isDataOkay: break
 
             update_peserta_mk_data = {

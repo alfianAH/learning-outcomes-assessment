@@ -4,7 +4,7 @@
     {% for form_dict in list_form_dict %}
     <li>
         <span class="list-item-title">{{ form_dict.nama }}</span>
-        <p>Nilai dari Neosia: {{ form_dict.nilai_akhir }}</p>
+        <p>Nilai akhir: {{ form_dict.nilai_akhir|default_if_none:'-' }}</p>
         
         <div class="grid {% if is_modal %} grid-cols-1 {% else %} grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 {% endif %} gap-1 md:gap-2 xl:gap-x-4">
             {% for single_form in form_dict.peserta_form %}

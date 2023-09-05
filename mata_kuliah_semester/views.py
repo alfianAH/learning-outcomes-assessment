@@ -13,6 +13,7 @@ from django.views.generic.edit import FormView
 from django.views.generic.detail import DetailView
 from django_q.tasks import async_task, result
 from accounts.enums import RoleChoices
+from accounts.models import ProgramStudi
 from clo.models import KomponenClo
 from learning_outcomes_assessment.auth.mixins import (
     ProgramStudiMixin,
@@ -878,18 +879,24 @@ class NilaiKomponenCloEditTemplateView(ProgramStudiMixin, FormView):
         if not self.mk_semester_obj.is_clo_locked:
             messages.warning(request, 'Pastikan anda sudah mengunci CPMK terlebih dahulu sebelum memasukkan nilai.')
             return redirect(self.success_url)
+        user = request.user
+        prodi: ProgramStudi = user.prodi
 
-        peserta_qs: list[PesertaMataKuliah] = self.mk_semester_obj.get_all_peserta_mk_semester()
-        for peserta in peserta_qs:
-            if peserta.nilai_akhir is None:
-                messages.warning(request, 'Peserta: {} tidak memiliki nilai akhir'.format(peserta.mahasiswa.nama))
-                return redirect(self.success_url)
+        if prodi.is_restricted_mode:
+            peserta_qs: list[PesertaMataKuliah] = self.mk_semester_obj.get_all_peserta_mk_semester()
+            for peserta in peserta_qs:
+                if peserta.nilai_akhir is None:
+                    messages.warning(request, 'Peserta: {} tidak memiliki nilai akhir'.format(peserta.mahasiswa.nama))
+                    return redirect(self.success_url)
+        else:
+            # If not on restrict mode, user can't generate because there are no nilai akhir
+            self.can_generate = False
         
         if len(self.get_form().forms) == 0:
             messages.warning(self.request, 'Edit nilai belum bisa dilakukan. Pastikan anda sudah melengkapi CPMK dan komponen penilaiannya.')
             return redirect(self.success_url)
 
-        if request.user.role == 'a' and self.can_generate:
+        if user.role == 'a' and self.can_generate:
             if request.GET.get('generate') == 'true':
                 messages.info(request, 'Proses generate sudah selesai. Generate nilai hanya berlaku untuk peserta yang belum memiliki nilai di semua komponen CPMK.')
         
@@ -902,6 +909,7 @@ class NilaiKomponenCloEditTemplateView(ProgramStudiMixin, FormView):
             'list_peserta_mk': self.list_peserta_mk,
             'list_komponen_clo': self.list_komponen_clo,
             'is_generate': self.request.GET.get('generate', '') == 'true' and self.can_generate,
+            'prodi': self.program_studi_obj
         })
         return kwargs
 
@@ -943,7 +951,7 @@ class NilaiKomponenCloEditTemplateView(ProgramStudiMixin, FormView):
     def form_valid(self, form) -> HttpResponse:
         cleaned_data = form.cleaned_data
         
-        nilai_komponen_edit_task = async_task(nilai_komponen_edit_process, cleaned_data)
+        nilai_komponen_edit_task = async_task(nilai_komponen_edit_process, cleaned_data, self.program_studi_obj)
         
         messages.info(self.request, self.success_msg)
         self.success_url += '&task={}'.format(nilai_komponen_edit_task)
