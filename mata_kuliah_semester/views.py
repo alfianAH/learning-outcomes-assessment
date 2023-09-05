@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.db.models import QuerySet
+from django.forms import BaseFormSet
 from django.http import FileResponse, HttpRequest, HttpResponse
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib import messages
@@ -948,9 +949,25 @@ class NilaiKomponenCloEditTemplateView(ProgramStudiMixin, FormView):
         })
         return context
 
-    def form_valid(self, form) -> HttpResponse:
-        cleaned_data = form.cleaned_data
-        
+    def form_valid(self, form: BaseFormSet) -> HttpResponse:
+        if self.program_studi_obj.is_restricted_mode:
+            cleaned_data = form.cleaned_data
+        else:
+            # Change cleaned data to count nilai akhir in async task
+            # Because in restricted mode nilai akhir count based on nilai akhir in Neosia
+            list_komponen_clo_len = self.list_komponen_clo.count()
+            cleaned_data = form.cleaned_data
+
+            # Get initial data from form
+            for i, _ in enumerate(self.list_peserta_mk):
+                for j, _ in enumerate(self.list_komponen_clo):
+                    # Use the right increment for form index
+                    form_index = i + i*(list_komponen_clo_len-1) + j
+                    
+                    if not form.forms[form_index].has_changed():
+                        init_data = form.forms[form_index].initial
+                        cleaned_data[form_index].update(init_data)
+
         nilai_komponen_edit_task = async_task(nilai_komponen_edit_process, cleaned_data, self.program_studi_obj)
         
         messages.info(self.request, self.success_msg)
