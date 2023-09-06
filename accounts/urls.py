@@ -12,6 +12,7 @@ from .views import (
     ProgramStudiJenjangBulkDeleteView,
 
     ProgramStudiRestrictedFormView,
+    ChangeUserRoleView,
 )
 
 app_name = 'accounts'
@@ -28,4 +29,5 @@ urlpatterns = [
     path('prodi/<int:prodi_id>/bulk-delete/', ProgramStudiJenjangBulkDeleteView.as_view(), name='prodi-jenjang-bulk-delete'),
 
     path('prodi/<int:prodi_id>/restricted/', ProgramStudiRestrictedFormView.as_view(), name='prodi-restricted'),
+    path('change-role/', ChangeUserRoleView.as_view(), name='change-role'),
 ]

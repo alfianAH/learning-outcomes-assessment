@@ -37,7 +37,8 @@ def get_admin_only_view(request: HttpRequest):
         raise Http404
     
     contents = [
-        ['Program studi restricted mode', reverse('accounts:prodi-restricted', kwargs={'prodi_id': user.prodi.id_neosia})]
+        ['Program studi restricted mode', reverse('accounts:prodi-restricted', kwargs={'prodi_id': user.prodi.id_neosia})],
+        ['Ubah role user (superuser only)', reverse('accounts:change-role')]
     ]
 
     context = {

@@ -1,8 +1,12 @@
+from typing import Any
+from django.forms.models import BaseModelForm
 from django.http import HttpRequest, HttpResponse
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import login, logout, authenticate, get_user_model
+from django.contrib.auth.models import Group
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.contrib import messages
-from django.forms import BaseInlineFormSet, BaseModelForm
+from django.forms import BaseForm, BaseInlineFormSet
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views.generic.edit import FormView, UpdateView
 from django.urls import reverse, reverse_lazy
@@ -23,6 +27,7 @@ from .forms import (
     ProgramStudiJenjangModelForm,
     ProgramStudiJenjangModelFormset,
     ProgramStudiRestrictedForm,
+    ChangeUserRoleForm
 )
 from .models import (
     Fakultas,
@@ -36,6 +41,9 @@ from .utils import (
     get_update_prodi_jenjang_choices,
     validate_user
 )
+
+
+User = get_user_model()
 
 
 # Create your views here.
@@ -299,3 +307,65 @@ class ProgramStudiRestrictedFormView(ProgramStudiMixin, PermissionRequiredMixin,
         super().setup(request, *args, **kwargs)
 
         self.program_studi_obj = self.get_object()
+
+    def form_valid(self, form: BaseModelForm) -> HttpResponse:
+        cleaned_data = form.cleaned_data
+        is_restricted_mode = cleaned_data.get('is_restricted_mode', False)
+
+        if is_restricted_mode:
+            messages.success(self.request, 'Berhasil mengaktifkan mode validasi.')
+        else:
+            messages.success(self.request, 'Berhasil meng-nonaktifkan mode validasi.')
+        return super().form_valid(form)
+
+
+class ChangeUserRoleView(FormView):
+    form_class = ChangeUserRoleForm
+    template_name = 'accounts/change-user-role-view.html'
+    success_url = reverse_lazy('admin-only')
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if not request.user.is_superuser:
+            raise PermissionDenied
+        return super().get(request, *args, **kwargs)
+    
+    def change_role(self, target_user, role, group):
+        target_user.role = role
+        target_user.save()
+        target_user_groups = target_user.groups.all()
+
+        # Remove from init groups
+        for target_user_group in target_user_groups:
+            target_user_group.user_set.remove(target_user)
+
+        target_user.groups.add(group)
+    
+    def form_valid(self, form: BaseForm) -> HttpResponse:
+        cleaned_data = form.cleaned_data
+        username = cleaned_data.get('username')
+        role = cleaned_data.get('role')
+        role_str = ''
+        target_user = User.objects.get(username=username)
+        admin_prodi_group, _ = Group.objects.get_or_create(name='Admin Program Studi')
+        dosen_group, _ = Group.objects.get_or_create(name='Dosen')
+        mahasiswa_group, _ = Group.objects.get_or_create(name='Mahasiswa')
+
+        match(role):
+            case RoleChoices.ADMIN_PRODI:
+                self.change_role(target_user, RoleChoices.ADMIN_PRODI, admin_prodi_group)
+                role_str = RoleChoices.ADMIN_PRODI.label
+            case RoleChoices.DOSEN:
+                self.change_role(target_user, RoleChoices.DOSEN, dosen_group)
+                role_str = RoleChoices.DOSEN.label
+            case RoleChoices.MAHASISWA:
+                self.change_role(target_user, RoleChoices.MAHASISWA, mahasiswa_group)
+                role_str = RoleChoices.MAHASISWA.label
+            case _:
+                pass
+        
+        messages.success(self.request, 'Berhasil mengubah role user ({}) menjadi {}.'.format(username, role_str))
+        return super().form_valid(form)
+    
+    def form_invalid(self, form) -> HttpResponse:
+        messages.error(self.request, 'Gagal mengubah role.')
+        return super().form_invalid(form)

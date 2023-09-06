@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import inlineformset_factory
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user_model
 from django import forms
 from learning_outcomes_assessment import settings
 from learning_outcomes_assessment.widgets import (
@@ -9,7 +9,8 @@ from learning_outcomes_assessment.widgets import (
     ChoiceListInteractiveModelA,
     MyNumberInput,
     MyRadioInput,
-    MyCheckboxInput
+    MyTextInput,
+    MySelectInput,
 )
 from .models import ProgramStudi, ProgramStudiJenjang
 from .enums import RoleChoices
@@ -19,6 +20,9 @@ from .utils import (
     get_all_prodi_choices,
     get_prodi_jenjang_db_choices,
 )
+
+
+User = get_user_model()
 
 
 class MahasiswaAuthForm(AuthenticationForm):
@@ -184,3 +188,32 @@ class ProgramStudiRestrictedForm(forms.ModelForm):
         help_texts = {
             'is_restricted_mode': 'Mode ini merupakan mode untuk memvalidasi nilai mahasiswa berdasarkan nilai Neosia. Jika mode ini dicentang, maka sistem akan memeriksa nilai agar sesuai dengan Neosia. Jika mode ini tidak dicentang, maka sistem tidak akan memeriksa nilai.'
         }
+
+
+class ChangeUserRoleForm(forms.Form):
+    username = forms.CharField(
+        label='Username (NIM/NIP)',
+        required=True,
+        widget=MyTextInput(),
+    )
+    role = forms.ChoiceField(
+        choices=RoleChoices.choices,
+        label='Pilih role',
+        required=True,
+        widget=MySelectInput(),
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        username = cleaned_data.get('username', '')
+
+        user_qs = User.objects.filter(username=username)
+        if not user_qs.exists():
+            self.add_error('username', 'Username tidak ditemukan.')
+        else:
+            try:
+                User.objects.get(username=username)
+            except User.MultipleObjectsReturned:
+                self.add_error('username', 'Multi user ditemukan.')
+        
+        return cleaned_data
