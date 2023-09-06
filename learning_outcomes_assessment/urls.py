@@ -19,6 +19,7 @@ from .views import (
     home_view, dosen_json_response, get_task_result,
     get_admin_only_view
 )
+from clo.views import DuplicateCpmkLintasMkView
 from django.views.static import serve 
 from django.conf import settings
 
@@ -35,6 +36,7 @@ urlpatterns = [
 
     # Admin only
     path('admin-only/', get_admin_only_view, name='admin-only'),
+    path('admin-only/duplicate-cpmk-lintas-mk/', DuplicateCpmkLintasMkView.as_view(), name='duplicate-cpmk-lintas-mk'),
 
     re_path(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}), 
     re_path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}), 

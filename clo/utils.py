@@ -122,11 +122,12 @@ def duplicate_clo(semester_prodi_id: int, new_mk_semester: MataKuliahSemester):
 
     return (is_success, message)
 
+
 def duplicate_clo_lintas_mk(old_mk_semester_id: int, new_mk_semester_id: int):
     is_success = False
     message = ''
     
-    try:    
+    try:
         new_mk_semester_obj = MataKuliahSemester.objects.get(
             id=new_mk_semester_id
         )
@@ -135,7 +136,7 @@ def duplicate_clo_lintas_mk(old_mk_semester_id: int, new_mk_semester_id: int):
         if settings.DEBUG: print(message) 
         return (is_success, message)
     
-    try:    
+    try:
         old_mk_semester_obj = MataKuliahSemester.objects.get(
             id=old_mk_semester_id
         )

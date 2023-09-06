@@ -3,7 +3,9 @@ from django.db.models import QuerySet
 from django.shortcuts import get_object_or_404, redirect
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
+from django.urls import reverse_lazy
 from django.views.generic.base import View, RedirectView
 from django.views.generic.edit import FormView
 from learning_outcomes_assessment.auth.mixins import (
@@ -33,10 +35,12 @@ from .forms import (
     PerformanceIndicatorAreaForPiCloForm,
     PiCloForm,
     KomponenCloFormset,
+    DuplicateCpmkLintasMkForm,
 )
 from .utils import (
     get_semester_choices_clo_duplicate,
-    duplicate_clo
+    duplicate_clo,
+    duplicate_clo_lintas_mk,
 )
 
 
@@ -756,3 +760,30 @@ class KomponenCloGraphJsonResponse(ProgramStudiMixin, View):
             })
 
         return JsonResponse(json_response)
+
+
+class DuplicateCpmkLintasMkView(LoginRequiredMixin, FormView):
+    form_class = DuplicateCpmkLintasMkForm
+    template_name = 'clo/duplicate-cpmk-lintas-mk-view.html'
+    success_url = reverse_lazy('admin-only')
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if not request.user.is_superuser:
+            raise PermissionDenied
+        return super().get(request, *args, **kwargs)
+    
+    def form_valid(self, form) -> HttpResponse:
+        cleaned_data = form.cleaned_data
+        old_mk_id = cleaned_data.get('old_mk_id')
+        new_mk_id = cleaned_data.get('new_mk_id')
+
+        is_success, message = duplicate_clo_lintas_mk(old_mk_id, new_mk_id)
+        if is_success:
+            messages.success(self.request, message)
+        else:
+            messages.error(self.request, message)
+        return super().form_valid(form)
+    
+    def form_invalid(self, form) -> HttpResponse:
+        messages.error(self.request, 'Gagal menduplikasi CPMK.')
+        return super().form_invalid(form)

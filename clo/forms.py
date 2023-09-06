@@ -377,3 +377,39 @@ class ImportNilaiUploadForm(forms.Form):
             raise forms.ValidationError('File harus dalam format Excel (.xlsx, .xls).')
         return cleaned_data 
 
+
+class DuplicateCpmkLintasMkForm(forms.Form):
+    old_mk_id = forms.IntegerField(
+        required=True,
+        widget=MyNumberInput(attrs={
+            'placeholder': 'Ex: 423'
+        }),
+        label='Mata kuliah asal',
+        help_text='Duplikasi CPMK dari mata kuliah asal ke mata kuliah tujuan tanpa batasan kurikulum'
+    )
+    new_mk_id = forms.IntegerField(
+        required=True,
+        widget=MyNumberInput(attrs={
+            'placeholder': 'Ex: 423'
+        }),
+        label='Mata kuliah tujuan',
+        help_text='Duplikasi CPMK dari mata kuliah asal ke mata kuliah tujuan tanpa batasan kurikulum'
+    )
+
+    def check_mk(self, mk_id, target_field):
+        try: 
+            MataKuliahSemester.objects.get(id=mk_id)
+        except MataKuliahSemester.MultipleObjectsReturned:
+            self.add_error(target_field, 'Multi mata kuliah ditemukan.')
+        except MataKuliahSemester.DoesNotExist:
+            self.add_error(target_field, 'Mata kuliah tidak ditemukan.')
+
+    def clean(self):
+        cleaned_data = super().clean()
+        old_mk_id = cleaned_data.get('old_mk_id')
+        new_mk_id = cleaned_data.get('new_mk_id')
+        
+        self.check_mk(old_mk_id, 'old_mk_id')
+        self.check_mk(new_mk_id, 'new_mk_id')
+        
+        return cleaned_data
