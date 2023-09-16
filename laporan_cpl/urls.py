@@ -13,6 +13,7 @@ from .views import (
 
     LaporanPerformanceIndicatorView,
     ListPiLaporanPiView,
+    LaporanPiDownloadView,
 )
 
 
@@ -24,7 +25,8 @@ urlpatterns = [
     path('raw-download/', LaporanCapaianPembelajaranRawDownloadView.as_view(), name='raw-download'),
     path('laporan-pi/', LaporanPerformanceIndicatorView.as_view(), name='laporan-pi'),
     path('list-result-pi/', ListPiLaporanPiView.as_view(), name='list-result-pi'),
-    
+    path('laporan-pi/download/', LaporanPiDownloadView.as_view(), name='download-laporan-pi'),
+
     path('<str:username>/', LaporanCapaianPembelajaranMahasiswaView.as_view(), name='laporan-mahasiswa'),
     path('<str:username>/download/', LaporanCapaianPembelajaranMahasiswaDownloadView.as_view(), name='laporan-mahasiswa-download'),
     path('<str:username>/raw-download/', LaporanCapaianPembelajaranMahasiswaRawDownloadView.as_view(), name='raw-laporan-mahasiswa-download'),

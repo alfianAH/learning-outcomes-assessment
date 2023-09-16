@@ -37,6 +37,7 @@ from .utils import (
     generate_laporan_cpl_mahasiswa_pdf,
     generate_laporan_cpl_per_mahasiswa_pdf,
     generate_laporan_cpl_per_mahasiswa_raw,
+    generate_laporan_pi_pdf,
 )
 from .tasks import (
     process_ilo_prodi,
@@ -875,3 +876,51 @@ class ListPiLaporanPiView(TemplateView):
             'pi_task': self.task_id,
         })
         return context
+
+
+class LaporanPiDownloadView(View):
+    download_pi = False
+
+    def setup(self, request: HttpRequest, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        
+        time = timezone.now().strftime('%d%m%Y-%H%M%S')
+        self.pi_filename = 'Laporan CPL Prodi-{}.pdf'.format(time)
+
+        if 'download_pi' in request.GET:
+            self.download_pi = True
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if request.user.role == 'm': raise PermissionDenied
+        if not request.is_ajax(): raise PermissionDenied
+        
+        task_id = request.GET.get('task_id')
+        if task_id is None: raise PermissionDenied
+
+        task_obj = Task.objects.get(id=task_id)
+
+        list_pi: QuerySet[PerformanceIndicator] = task_obj.args[0]
+        filter = task_obj.args[1]
+        
+        kurikulum_obj = list_pi.first().pi_area.assessment_area.kurikulum
+        prodi = kurikulum_obj.prodi_jenjang.program_studi.nama
+        fakultas = kurikulum_obj.prodi_jenjang.program_studi.fakultas.nama
+
+        # Process
+        if self.download_pi:
+            is_success, message, pi_result = result(task_id)
+
+            if is_success:
+                file = generate_laporan_pi_pdf(list_pi, filter, pi_result, prodi, fakultas)
+                if settings.DEBUG: print('Berhasil generate file laporan CPL prodi.')
+                return self.download_laporan_cpl(file, self.pi_filename)
+            else:
+                if settings.DEBUG: print(message)
+                return HttpResponse(message)
+        
+        return HttpResponse('Empty')
+    
+    def download_laporan_cpl(self, file, filename):
+        as_attachment = True
+        response = FileResponse(file, as_attachment=as_attachment, filename=filename)
+        return response

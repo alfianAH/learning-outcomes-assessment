@@ -1665,3 +1665,148 @@ def calculate_pi_elektro_way(
     message = 'Berhasil menghitung capaian PI Program Studi.'
 
     return (is_success, message, result)
+
+
+def generate_laporan_pi_pdf(
+        list_pi: QuerySet[PerformanceIndicator],
+        list_filter,
+        calculation_result,
+        prodi_name: str, fakultas_name: str,
+):
+    file_stream = BytesIO()
+
+    # Create the PDF object, using the buffer as its "file."
+    page_size = landscape(letter)
+    pdf_file = SimpleDocTemplate(file_stream, pagesize=page_size)
+    styles = getSampleStyleSheet()
+
+    # Title
+    title = Paragraph(
+        'Laporan Capaian Pembelajaran Lulusan Mahasiswa',
+        style=styles['h1']
+    )
+
+    header_style = copy(styles['h2'])
+    header_style.alignment = TA_CENTER
+    header_content = Paragraph(
+        "UNIVERSITAS HASANUDDIN<br/>FAKULTAS {}<br/>PROGRAM STUDI {}".format(fakultas_name, prodi_name), 
+        header_style
+    )
+
+    # Get the space before and after the paragraph
+    space_before = header_content.getSpaceBefore()
+    space_after = header_content.getSpaceAfter()
+
+    # Get the height of the paragraph
+    para_height = header_content.wrap(pdf_file.width, pdf_file.height)[1]
+
+    # Calculate the total height of the block
+    block_height = para_height + space_before + space_after
+
+    frame = Frame(
+        pdf_file.leftMargin, 
+        pdf_file.bottomMargin, 
+        pdf_file.width, 
+        pdf_file.height - block_height
+    )
+    template = PageTemplate(
+        frames=frame, 
+        onPage=partial(
+            export_pdf_header, 
+            content=header_content,
+            image_path='./static/public/img/logo-unhas.jpg',
+            image_width=0.6*inch,
+            image_height=0.75*inch,
+        )
+    )
+    pdf_file.addPageTemplates([template])
+
+    # Tabel detail pi
+    table_detail_pi_title = Paragraph(
+        'Tabel Pencapaian Performance Indicator',
+        style=styles['h2']
+    )
+
+    # (COL, ROW)
+    table_detail_ilo_style_data = [
+        ('ALIGN', (0, 0), (-1, 1), 'CENTER'),               # Header align
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),    # Header font
+        ('FONTSIZE', (0, 0), (-1, 1), 11),                  # Header font size
+        ('TOPPADDING', (0, 0), (-1, 1), 12),                # Header top padding
+        ('BOTTOMPADDING', (0, 0), (-1, 1), 12),             # Header bottom padding
+        ('TOPPADDING', (0, 1), (-1, -1), 4),                # Body top padding
+        ('BOTTOMPADDING', (0, 1), (-1, -1), 4),             # Body bottom padding
+        ('GRID', (0, 0), (-1, -1), 0.25, colors.black),     # Grid
+        ('VALIGN', (0, 1), (-1, -1), 'TOP'),                # Body vertical align
+        ('VALIGN', (0, 0), (2, 0), 'MIDDLE'),               # Header vertical align
+        ('ALIGN', (0, 1), (0, -1), 'CENTER'),               # Nomor align
+        ('ALIGN', (2, 1), (-1, -1), 'RIGHT'),               # Nilai align
+    ]
+
+    list_table_detail_ilo = []
+    
+    for filter in list_filter:
+        table_data = [['No.', 'PI']]
+        current_filter_name = filter[1]
+
+        # Add filter name to header
+        table_data[0].append(
+            Paragraph(
+                current_filter_name,
+                style=ParagraphStyle(
+                    name='table_filter_header',
+                    alignment=TA_CENTER,
+                    fontName='Helvetica-Bold',
+                    fontSize=11
+                )
+            )
+        )
+
+        current_table_detail_ilo_style_data = copy(table_detail_ilo_style_data)
+
+        current_table_detail_ilo_style_data += [
+            ('SPAN', (2, 0), (-1, 0)),           # Merge filter name cells
+        ]
+
+        for i, pi in enumerate(list_pi):
+            pi_row = [
+                '{}.'.format(i+1),
+                Paragraph(pi.deskripsi),
+            ]
+
+            current_nilai = calculation_result[current_filter_name][pi.pk]['nilai']
+            if current_nilai is None:
+                pi_row.append('-')
+            else:
+                pi_row.append(float('{:.2f}'.format(current_nilai)))
+
+
+            # Add row to table data
+            table_data.append(pi_row)
+        
+        current_table_detail_ilo_style = TableStyle(current_table_detail_ilo_style_data)
+        # Make table
+        detail_ilo_table = Table(
+            table_data, 
+            style=current_table_detail_ilo_style,
+            hAlign='LEFT',
+            colWidths=[1*cm, None, None],
+            repeatRows=1,
+        )
+
+        list_table_detail_ilo.append(detail_ilo_table)
+
+    # Build
+    pdf_file_elements = [
+        title,
+        table_detail_pi_title,
+    ]
+    for detail_ilo_table in list_table_detail_ilo:
+        pdf_file_elements += [detail_ilo_table, PageBreak()]
+    
+    pdf_file.build(pdf_file_elements)
+    
+    # Close the PDF object cleanly
+    file_stream.seek(0)
+
+    return file_stream
