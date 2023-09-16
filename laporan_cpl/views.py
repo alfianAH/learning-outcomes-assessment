@@ -19,6 +19,7 @@ from learning_outcomes_assessment.forms.edit import MultiFormView
 from learning_outcomes_assessment.auth.mixins import(
     MahasiswaAsPesertaMixin,
 )
+from pi_area.models import PerformanceIndicator
 from semester.models import (
     TahunAjaranProdi,
     SemesterProdi,
@@ -42,6 +43,8 @@ from .tasks import (
     process_ilo_mahasiswa,
     process_ilo_prodi_by_kurikulum,
     process_ilo_mahasiswa_by_kurikulum,
+    process_pi,
+    process_pi_by_kurikulum,
 )
 
 
@@ -711,3 +714,164 @@ class LaporanCapaianPembelajaranMahasiswaRawDownloadView(MahasiswaAsPesertaMixin
         else:
             if settings.DEBUG: print(mahasiswa_message)
             return HttpResponse(mahasiswa_message, status=404)
+
+
+class LaporanPerformanceIndicatorView(LaporanCapaianPembelajaranTemplateView):
+    template_name = 'laporan-cpl/laporan-pi.html'
+    success_url = reverse_lazy('laporan_cpl:laporan_pi')
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if request.user.role == 'm': raise PermissionDenied
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        time = timezone.now().strftime('%d%m%Y-%H%M%S')
+        pi_prodi_filename = 'Laporan PI Prodi-{}.pdf'.format(time)
+        
+        context.update({
+            'pi_prodi_filename': pi_prodi_filename,
+        })
+        
+        return context
+
+    def forms_valid(self, forms: dict) -> HttpResponse:
+        kurikulum_obj = forms['kurikulum_form'].cleaned_data.get('kurikulum')
+        formset_cleaned_data = forms['filter_formset'].cleaned_data
+
+        list_pi: QuerySet[PerformanceIndicator] = PerformanceIndicator.objects.filter(
+            pi_area__assessment_area__kurikulum=kurikulum_obj
+        ).distinct()
+        
+        # Filter dict is based on tahun ajaran
+        """
+        filter_dict = {
+            tahun_ajaran_prodi_id:[
+                semester_prodi_id
+            ],
+        }
+        """
+        filter_dict = {}
+
+        if len(formset_cleaned_data) == 0:
+            # Filter by kurikulum
+            filter = [(kurikulum_obj, kurikulum_obj.nama)]
+            
+            # Process
+            pi_task = async_task(
+                process_pi_by_kurikulum,
+                list_pi, filter
+            )
+        else:
+            # Filter by tahun ajaran or semester
+            is_semester_included = len(formset_cleaned_data[0].get('semester', '').strip()) != 0
+
+            # Separate tahun ajaran and semester
+            for clean_data in formset_cleaned_data:
+                tahun_ajaran_prodi_id = clean_data['tahun_ajaran']
+
+                if tahun_ajaran_prodi_id not in filter_dict.keys():
+                    filter_dict[tahun_ajaran_prodi_id] = []
+                
+                if is_semester_included:
+                    semester_prodi_id = clean_data['semester']
+                    filter_dict[tahun_ajaran_prodi_id].append(semester_prodi_id)
+            
+            filter = []
+            if is_semester_included:
+                # Semester filters
+                for tahun_ajaran_prodi_id, list_semester_prodi_id in filter_dict.items():
+                    for semester_prodi_id in list_semester_prodi_id:
+                        if not semester_prodi_id.strip(): continue
+
+                        try:
+                            semester_prodi_obj = SemesterProdi.objects.get(
+                                id_neosia=semester_prodi_id
+                            )
+                        except SemesterProdi.DoesNotExist:
+                            message = 'Semester Prodi (ID={}) tidak ada di database.'.format(semester_prodi_id)
+                            if settings.DEBUG: print(message)
+                            messages.error(self.request, message)
+                            continue
+                        except SemesterProdi.MultipleObjectsReturned:
+                            message = 'Semester Prodi (ID={}) mengembalikan multiple object.'.format(semester_prodi_id)
+                            if settings.DEBUG: print(message)
+                            messages.error(self.request, message)
+                            continue
+                        
+                        filter.append((semester_prodi_obj, str(semester_prodi_obj.semester)))
+            else:
+                # Tahun ajaran filters
+                for tahun_ajaran_prodi_id in filter_dict.keys():
+                    if not tahun_ajaran_prodi_id.strip(): continue
+
+                    try:
+                        tahun_ajaran_prodi_obj = TahunAjaranProdi.objects.get(
+                            id=tahun_ajaran_prodi_id
+                        )
+                    except TahunAjaranProdi.DoesNotExist:
+                        message = 'TahunAjaranProdi (ID={}) tidak ada di database.'.format(tahun_ajaran_prodi_id)
+                        if settings.DEBUG: print(message)
+                        continue
+                    except TahunAjaranProdi.MultipleObjectsReturned:
+                        message = 'TahunAjaranProdi (ID={}) mengembalikan multiple object.'.format(tahun_ajaran_prodi_id)
+                        if settings.DEBUG: print(message)
+                        continue
+                    
+                    filter.append((tahun_ajaran_prodi_obj, str(tahun_ajaran_prodi_obj.tahun_ajaran)))
+
+            # Process
+            pi_task = async_task(
+                process_pi,
+                list_pi, filter, is_semester_included
+            )
+
+        return self.render_to_response(
+            self.get_context_data(
+                forms=forms,
+                pi_task=pi_task,
+                list_filter=filter,
+            )
+        )
+
+
+class ListPiLaporanPiView(TemplateView):
+    template_name = 'laporan-cpl/partials/list-pi.html'
+    table_scroll_head_header: str = 'laporan-cpl/partials/pi/table-scroll-head-header-pi.html'
+    table_scroll_head_body: str = 'laporan-cpl/partials/pi/table-scroll-head-body-pi.html'
+    table_scroll_data_header: str = 'laporan-cpl/partials/pi/table-scroll-data-header-pi.html'
+    table_scroll_data_body: str = 'laporan-cpl/partials/pi/table-scroll-data-body-pi.html'
+    pi_result = None
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if not request.is_ajax(): 
+            raise PermissionDenied
+        self.task_id = request.GET.get('task_id')
+        if self.task_id is None: raise Http404
+        
+        # Get result
+        task_result = result(self.task_id)
+        if task_result is not None:
+            _, _, self.pi_result = task_result
+        
+        # Get filter list from task obj
+        task_obj = Task.objects.get(id=self.task_id)
+        self.list_filter = task_obj.args[1]
+        self.list_pi = task_obj.args[0]
+
+        return super().get(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'list_filter': self.list_filter,
+            'list_pi': self.list_pi,
+            'object_list': self.pi_result,
+            'table_scroll_head_header': self.table_scroll_head_header,
+            'table_scroll_head_body': self.table_scroll_head_body,
+            'table_scroll_data_header': self.table_scroll_data_header,
+            'table_scroll_data_body': self.table_scroll_data_body,
+            'pi_task': self.task_id,
+        })
+        return context

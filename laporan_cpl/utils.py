@@ -20,14 +20,6 @@ from reportlab.lib.pagesizes import letter, landscape
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
-from openpyxl.workbook import Workbook
-from openpyxl.worksheet.worksheet import Worksheet
-from openpyxl.cell.read_only import EMPTY_CELL
-from openpyxl.styles import (
-    Font, Alignment, Border, Side,
-    Protection,
-    PatternFill
-)
 from learning_outcomes_assessment.utils import export_pdf_header
 from learning_outcomes_assessment.chart.utils import (
     radar_factory,
@@ -1603,3 +1595,73 @@ def generate_laporan_cpl_per_mahasiswa_raw(
     file_stream.seek(0)
 
     return file_stream
+
+
+def calculate_pi_elektro_way(
+        list_pi: QuerySet[PerformanceIndicator],
+        list_mk_semester: QuerySet[MataKuliahSemester],
+):
+    is_success = False
+    message = ''
+    result = {}
+
+    # Loop through PI
+    for pi in list_pi:
+        list_mk_semester_pi = list_mk_semester.filter(
+            clo__piclo__performance_indicator=pi
+        ).distinct()
+
+        list_nilai_cpmk = []
+
+        # Loop through MK Semester
+        for mk_semester in list_mk_semester_pi:
+            # Check status nilai MK Semester
+            if not mk_semester.status_nilai:
+                peserta_qs = PesertaMataKuliah.objects.filter(kelas_mk_semester__mk_semester=mk_semester).exclude(nilai_akhir=None)
+                # Skip mata kuliah that doesn't have nilai akhir yet
+                if peserta_qs.count() == 0:
+                    continue
+                
+                message = 'Harap melengkapi nilai dari mata kuliah ({}, {}) terlebih dahulu'.format(
+                    mk_semester.mk_kurikulum.nama, mk_semester.semester.semester)
+                return (is_success, message, result)
+
+            # Query CPMK that has relationship with PI
+            cpmk_pi_qs = Clo.objects.filter(
+                mk_semester=mk_semester,
+                piclo__performance_indicator=pi
+            ).distinct()
+
+            # Query Nilai CPMK
+            nilai_cpmk_qs = NilaiCloMataKuliahSemester.objects.filter(
+                mk_semester=mk_semester,
+                clo__in=cpmk_pi_qs
+            )
+
+            # Get nilai CPMK
+            list_nilai_cpmk.append([
+                nilai_cpmk.nilai for nilai_cpmk in nilai_cpmk_qs
+            ])
+
+        list_avg_nilai_cpmk = []
+        # Calculate average cpmk for each mk
+        for nilai_cpmk in list_nilai_cpmk:
+            list_avg_nilai_cpmk.append(np.average(nilai_cpmk))
+
+        result[pi.pk] = {
+            'pi': pi.deskripsi,
+        }
+
+        if len(list_avg_nilai_cpmk) == 0:
+            result[pi.pk].update({
+                'nilai' : None
+            })
+        else:
+            result[pi.pk].update({
+                'nilai' : np.average(list_avg_nilai_cpmk)
+            })
+
+    is_success = True
+    message = 'Berhasil menghitung capaian PI Program Studi.'
+
+    return (is_success, message, result)

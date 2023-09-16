@@ -1,0 +1,17 @@
+{% for pi in list_pi %}
+<tr>
+    {% for filter, pi_dict in object_list.items %}
+        {% for pi_pk, pi_detail_dict in pi_dict.items %}
+            {% if pi_pk == pi.pk %}
+                <td class="text-right">
+                    {% if pi_detail_dict.nilai %}
+                        {{ pi_detail_dict.nilai|floatformat:"1" }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+</tr>
+{% endfor %}

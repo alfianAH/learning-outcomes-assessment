@@ -1,0 +1,165 @@
+{% extends 'home-view.html' %}
+
+{% block title %}
+Laporan PI - 
+{% endblock title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page" role="listitem">Laporan PI</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<h1>Laporan Performance Indicator</h1>
+
+<form action="." method="post" class="space-y-3">
+    {% csrf_token %}
+    
+    {% include 'components/form/form-fields.html' with form=forms.kurikulum_form %}
+
+    <div id="formset-fields" class="max-h-60 overflow-y-auto">
+        {% include 'components/form/formset.html' with formset=forms.filter_formset %}
+    </div>
+    
+    <div class="form-buttons !justify-start">
+        <button type="submit" class="btn btn-success loading-trigger" id="submit-btn">Submit</button>
+        <a href="." class="btn btn-secondary">Reset</a>
+    </div>
+</form>
+
+{% if pi_task %}
+<div id="filter-result">
+    <h2>Hasil</h2>
+
+    <ul class="tab" role="tablist">
+        <li class="tab-item w-40" id="tab-1" data-target="#tab-nilai-pane" role="presentation">
+            <div class="tab-title">
+                <span class="truncate">Tabel</span>
+            </div>
+
+            <div class="tab-item-line"></div>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane fade min-h-screen show active" id="tab-nilai-pane" role="tabpanel" aria-labelledby="tab-1">
+            {% include 'components/loading.html' with is_single_component=True %}
+
+            <div id="nilai-result" class="space-y-2.5 hidden">
+                
+            </div>
+
+            <div id="error-result" class="space-y-2.5 hidden"></div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock content %}
+
+{% block script %}
+<script>
+    addMoreForm('#{{ forms.filter_formset.management_form.TOTAL_FORMS.id_for_label }}', false);
+    // Kurikulum on change
+    $('#id_kurikulum').on('change', function(){
+        let selectedKurikulumId = $(this).val();
+        $.ajax({
+            url: '{% url 'laporan_cpl:formset-tahun-ajaran-choices' %}',
+            data: {
+                'kurikulum_id': selectedKurikulumId
+            },
+            dataType: 'json',
+            success: function(data) {
+                // Get tahun ajaran data
+                let options = '';
+                $.each(data.choices, function(index, choice) {
+                    options += '<option value="' + choice[0] + '">' + choice[1] + '</option>';
+                });
+
+                // Get all tahun ajaran elements
+                let tahunAjaranElements = $('.tahun-ajaran');
+                tahunAjaranElements.each((index, elem) => {
+                    $(elem).html(options).prop('disabled', false);
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
+            }
+        });
+    });
+
+    // Tahun ajaran on change
+    $('#formset-fields').on('change', '.tahun-ajaran',function(){
+        let tahunAjaranElem = $(this)
+        let selectedTahunAjaranId = $(this).val();
+        $.ajax({
+            url: '{% url 'laporan_cpl:formset-semester-choices' %}',
+            data: {
+                'tahun_ajaran_id': selectedTahunAjaranId
+            },
+            dataType: 'json',
+            success: function(data) {
+                // Get semester data
+                let options = '';
+                $.each(data.choices, function(index, choice) {
+                    options += '<option value="' + choice[0] + '">' + choice[1] + '</option>';
+                });
+                
+                // Get semester element
+                let semesterSelectElem = $(tahunAjaranElem).parent().parent().siblings().children('div').children('.semester');
+                
+                semesterSelectElem.html(options).prop('disabled', false);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
+            }
+        });
+    }).trigger('change');
+
+    // Update total form
+    $('#submit-btn').on('click', function(){
+        let notDeletedForm = 0;
+
+        $('#form-list-{{ forms.filter_formset.management_form.TOTAL_FORMS.id_for_label }}').children().each(function(index, elem) {
+            if(!$(elem).find('input:checkbox').is(':checked')){
+                notDeletedForm ++;
+            }
+        });
+        
+        $('#{{ forms.filter_formset.management_form.TOTAL_FORMS.id_for_label }}').val(notDeletedForm);
+    });
+
+    {% if pi_task %}
+    let piTaskResultUrl = "{% url 'task-result' %}?task_id={{ pi_task }}";
+    updateProgress(
+        piTaskResultUrl, 
+        onResult=function(result){
+            let isSuccess = result[0];
+            let message = result[1];
+
+            if(isSuccess){
+                $('#tab-nilai-pane').children('#loading').fadeOut();
+                $('#tab-nilai-pane').children('#nilai-result').fadeIn();
+                addToast('success', message);
+                
+                $.ajax({
+                    url: "{% url 'laporan_cpl:list-result-pi' %}",
+                    data: {
+                        task_id: "{{ pi_task }}"
+                    },
+                    success: function(response){
+                        $('#tab-nilai-pane').html(response);
+
+                        downloadLaporanCPL('#download-pi', '{{ pi_prodi_filename }}');
+                    }
+                });
+            } else{
+                addToast('error', message);
+                $('#tab-nilai-pane').children('#loading').fadeOut();
+                $('#tab-nilai-pane').children('#error-result').fadeIn();
+                $('#tab-nilai-pane').children('#error-result').text(message);
+            }
+        }
+    );
+    {% endif %}
+</script>
+{% endblock script %}

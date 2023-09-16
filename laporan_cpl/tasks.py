@@ -10,8 +10,10 @@ from laporan_cpl.utils import (
     perolehan_nilai_ilo_graph,
     perolehan_nilai_ilo_prodi_graph,
     perolehan_nilai_ilo_mahasiswa_graph,
+    calculate_pi_elektro_way,
 )
 from mata_kuliah_semester.models import MataKuliahSemester, PesertaMataKuliah
+from pi_area.models import PerformanceIndicator
 
 
 User = get_user_model()
@@ -374,3 +376,111 @@ def process_ilo_mahasiswa_by_kurikulum(
     perolehan_nilai_ilo_mahasiswa_graph(result, perolehan_nilai_ilo_graph_json_response)
     
     return (is_success, message, result, json.dumps(perolehan_nilai_ilo_graph_json_response))
+
+
+def process_pi(
+        list_pi: QuerySet[PerformanceIndicator],
+        filter: list,
+        is_semester_included: bool
+):
+    """Process PI
+
+    Args:
+        list_pi (QuerySet[PerformanceIndicator]): List PI
+        filter (list): List Filter
+        is_semester_included (bool): Is semester included in filter
+
+    Returns:
+        (bool, str, dict):
+            is_success: Is calculation success?
+            message: Success or error message
+            result: Result of calculation
+                Example:
+                result = {
+                    'nama_semester': {
+                        primary_key: {
+                            'pi': 'deskripsi_pi',
+                            'nilai': 'nilai_pi'
+                        }
+                    }
+                }
+    """
+    is_success = False
+    message = ''
+    result = {}
+
+    # Calculate PI Prodi
+    # Get all mata kuliah semester
+    if is_semester_included:
+        for semester_prodi_obj, semester_nama in filter:
+            # Get all mata kuliah semester
+            list_mk_semester = MataKuliahSemester.objects.annotate(
+                num_peserta=Count('kelasmatakuliahsemester__pesertamatakuliah')
+            ).filter(
+                num_peserta__gt=0,
+                semester=semester_prodi_obj,
+                kelasmatakuliahsemester__pesertamatakuliah__nilai_akhir__isnull=False
+            ).distinct()
+
+            # Calculate PI Prodi
+            is_success, message, calculation_result = calculate_pi_elektro_way(list_pi, list_mk_semester)
+            result.update({
+                semester_nama: calculation_result
+            })
+
+            if not is_success:
+                if settings.DEBUG: print('Perhitungan PI Prodi gagal.', message)
+                return (is_success, message, result)
+    else:
+        for tahun_ajaran_prodi_obj, tahun_ajaran_nama in filter:
+            list_mk_semester = MataKuliahSemester.objects.annotate(
+                num_peserta=Count('kelasmatakuliahsemester__pesertamatakuliah')
+            ).filter(
+                num_peserta__gt=0,
+                semester__tahun_ajaran_prodi=tahun_ajaran_prodi_obj,
+                kelasmatakuliahsemester__pesertamatakuliah__nilai_akhir__isnull=False
+            ).distinct()
+
+            # Calculate ILO Prodi
+            is_success, message, calculation_result = calculate_pi_elektro_way(list_pi, list_mk_semester)
+            
+            result.update({
+                tahun_ajaran_nama: calculation_result
+            })
+
+            if not is_success:
+                if settings.DEBUG: print('Perhitungan PI Prodi gagal.', message)
+                return (is_success, message, result)
+
+    return (is_success, message, result)
+
+
+def process_pi_by_kurikulum(
+        list_pi: QuerySet[PerformanceIndicator],
+        filter: list,
+):
+    is_success = False
+    message = ''
+    result = {}
+    kurikulum_obj: Kurikulum = filter[0][0]
+
+    # Get all mata kuliah semester
+    list_mk_semester = MataKuliahSemester.objects.annotate(
+        num_peserta=Count('kelasmatakuliahsemester__pesertamatakuliah')
+    ).filter(
+        num_peserta__gt=0,
+        mk_kurikulum__kurikulum=kurikulum_obj,
+        kelasmatakuliahsemester__pesertamatakuliah__nilai_akhir__isnull=False
+    ).distinct()
+
+    # Calculate PI Prodi
+    is_success, message, calculation_result = calculate_pi_elektro_way(list_pi, list_mk_semester)
+    result.update({
+        kurikulum_obj.nama: calculation_result
+    })
+
+    if not is_success: 
+        if settings.DEBUG: print('Perhitungan PI Prodi gagal.', message)
+        return (is_success, message, result)
+    
+    return (is_success, message, result)

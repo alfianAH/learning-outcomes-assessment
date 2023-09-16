@@ -1,0 +1,6 @@
+{% comment %} List FIlter {% endcomment %}
+<tr>
+    {% for filter in list_filter %}
+    <th colspan="{{ list_ilo|length }}">{{ filter.1 }}</th>
+    {% endfor %}
+</tr>

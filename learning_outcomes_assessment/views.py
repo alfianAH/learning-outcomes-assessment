@@ -40,6 +40,7 @@ def get_admin_only_view(request: HttpRequest):
         ['Program studi restricted mode', reverse('accounts:prodi-restricted', kwargs={'prodi_id': user.prodi.id_neosia})],
         ['Ubah role user (superuser only)', reverse('accounts:change-role')],
         ['Duplikasi CPMK lintas mata kuliah (superuser only)', reverse('duplicate-cpmk-lintas-mk')],
+        ['Laporan PI', reverse('laporan_cpl:laporan-pi')],
     ]
 
     context = {
